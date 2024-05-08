@@ -5,11 +5,9 @@ import axios from "axios";
 import DatePicker from "react-datepicker";
 import { APIURL, ImageAPI } from "../constant";
 import { toast } from "react-toastify";
-import { MultiSelect } from 'primereact/multiselect';
+import { MultiSelect } from "primereact/multiselect";
 
-
-const CircularsRequestForm = ({ handleFormClose,handleCircularListData }) => {
-
+const CircularsRequestForm = ({ handleFormClose, handleCircularListData }) => {
   // const purposeApplicationRef = useRef(null);
   const userID = Storage.getItem("userID");
   const bankID = Storage.getItem("bankID");
@@ -36,8 +34,8 @@ const CircularsRequestForm = ({ handleFormClose,handleCircularListData }) => {
   });
 
   const handelAnalystCheck = () => {
-    setAnalyst(!checkAnalyst)
-  }
+    setAnalyst(!checkAnalyst);
+  };
 
   const changeHandelForm = (e) => {
     const { name, value } = e.target;
@@ -47,15 +45,13 @@ const CircularsRequestForm = ({ handleFormClose,handleCircularListData }) => {
     const specialCharsOLD = /[`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/;
     const spaceCheck = /\s{2,}/g;
 
-
     if (name == "name" && specialCharsOLD.test(value)) {
       newErrors.name = "Special characters not allowed.";
     } else if (name == "name" && value.charAt(0) === " ") {
       newErrors.name = "First character cannot be a blank space";
     } else if (name == "name" && spaceCheck.test(value)) {
       newErrors.name = "Multiple space not allow.";
-    }
-    else {
+    } else {
       setExportForm((prevState) => ({
         ...prevState,
         [name]: value,
@@ -67,27 +63,28 @@ const CircularsRequestForm = ({ handleFormClose,handleCircularListData }) => {
 
   //---bank data start
   const bankData = async () => {
-    await axios
-      .post(APIURL + 'Master/GetMasterBank')
-      .then((res) => {
-        setSelectedBankOption(res.data.responseData)
-
-      })
-  }
+    await axios.post(APIURL + "Master/GetMasterBank").then((res) => {
+      setSelectedBankOption(res.data.responseData);
+    });
+  };
 
   const panelFooterTemplate = () => {
-    const length = exportForm.bankSelectValue ? exportForm.bankSelectValue.length : 0;
+    const length = exportForm.bankSelectValue
+      ? exportForm.bankSelectValue.length
+      : 0;
 
     return (
       <div className="py-2 px-3">
-        <b>{length}</b> item{length > 1 ? 's' : ''} selected.
+        <b>{length}</b> item{length > 1 ? "s" : ""} selected.
       </div>
     );
   };
   const onShow = () => {
     // Wait for the component to be mounted before accessing the DOM
     setTimeout(() => {
-      let selectAllCheckbox = document.querySelector(".p-multiselect-header > .p-multiselect-select-all");
+      let selectAllCheckbox = document.querySelector(
+        ".p-multiselect-header > .p-multiselect-select-all"
+      );
       if (selectAllCheckbox) {
         selectAllCheckbox.after(" Select All");
       }
@@ -95,27 +92,25 @@ const CircularsRequestForm = ({ handleFormClose,handleCircularListData }) => {
   };
   //---bank data end
 
-  //---------director start 
+  //---------director start
   const directivesData = async () => {
-    await axios
-      .post(APIURL + 'Admin/GetAllDirectives')
-      .then((res) => {
-        setSelectedDirectivesOpt(res.data.responseData)
-
-      })
-  }
+    await axios.post(APIURL + "Admin/GetAllDirectives").then((res) => {
+      setSelectedDirectivesOpt(res.data.responseData);
+    });
+  };
   //---------director end
   //--------analyst user api start
   const analystUserFun = async () => {
-    await
-      axios.post(APIURL + 'User/GetSupervisors', {
+    await axios
+      .post(APIURL + "User/GetSupervisors", {
         BankID: bankID,
         RoleID: roleID,
-        UserID: userID
-      }).then((res) => {
-        setAnalystUser(res.data.responseData)
+        UserID: userID,
       })
-  }
+      .then((res) => {
+        setAnalystUser(res.data.responseData);
+      });
+  };
   //--------analyst user api end
   // file change start
   // const handleFileChange = (e) => {
@@ -125,18 +120,18 @@ const CircularsRequestForm = ({ handleFormClose,handleCircularListData }) => {
   // }
   const handleFileChange = (e, label) => {
     const file = e.target.files[0];
-    const index = files.findIndex(item => item.label === label);
+    const index = files.findIndex((item) => item.label === label);
     if (index !== -1) {
-      setFiles(prevFiles => {
+      setFiles((prevFiles) => {
         const newFiles = [...prevFiles];
         newFiles[index] = { file, label };
         return newFiles;
       });
     } else {
-      setFiles(prevFiles => [...prevFiles, { file, label }]);
+      setFiles((prevFiles) => [...prevFiles, { file, label }]);
     }
   };
-  
+
   // file change end
   //---------- Start Code For Add More File Option Field
   const handleAddMore = (e) => {
@@ -167,10 +162,11 @@ const CircularsRequestForm = ({ handleFormClose,handleCircularListData }) => {
       newErrors.circularReference = "Circular reference is required";
       valid = false;
     }
-    if (exportForm.directiveSelectValue.length == '0') {
+    if (exportForm.directiveSelectValue.length == "0") {
       newErrors.directiveSelectValue = "Directive is required";
       valid = false;
-    } if (exportForm.bankSelectValue.length == '0') {
+    }
+    if (exportForm.bankSelectValue.length == "0") {
       newErrors.bankSelectValue = "Bank is required";
       valid = false;
     }
@@ -181,7 +177,8 @@ const CircularsRequestForm = ({ handleFormClose,handleCircularListData }) => {
     if (releasingDate == null) {
       newErrors.releasingDate = "Releasing date is required";
       valid = false;
-    } if (checkAnalyst == true && exportForm.analyst == '') {
+    }
+    if (checkAnalyst == true && exportForm.analyst == "") {
       newErrors.analyst = "Please select analyst";
       valid = false;
     }
@@ -189,17 +186,16 @@ const CircularsRequestForm = ({ handleFormClose,handleCircularListData }) => {
     return valid;
   };
 
- 
   //---------- End Code For Check Validation for Form Field
   const bankSelectedID = exportForm?.bankSelectValue.map((res) => res.id);
-  const directiveSelectedID = exportForm?.directiveSelectValue.map((res) => res.directiveID);
+  const directiveSelectedID = exportForm?.directiveSelectValue.map(
+    (res) => res.directiveID
+  );
 
-console.log("files",files);
-console.log("otherfilesupload",otherfilesupload);
   const HandleSubmit = async (e) => {
     e.preventDefault();
     let formData = new FormData();
-   
+
     const data = {
       UserID: userID.replace(/"/g, ""),
       RoleID: roleID,
@@ -213,33 +209,37 @@ console.log("otherfilesupload",otherfilesupload);
       AssignedTo: checkAnalyst ? exportForm.analyst : userID.replace(/"/g, ""),
       AssignedToRoleID: checkAnalyst ? "6" : roleID,
       // FutureDate: futureDate,
-      ReleasingDate: releasingDate
+      ReleasingDate: releasingDate,
+    };
 
-    }
- 
     if (validateForm()) {
       await axios
         .post(APIURL + "Circular/CreateCircular", data)
         .then((res) => {
-          console.log("resSHREYA", res);
-          if (res.data.responseCode === '200') {
-            for (let i = 0; i < files?.length; i++) { // Corrected loop condition
+          if (res.data.responseCode === "200") {
+            for (let i = 0; i < files?.length; i++) {
+              // Corrected loop condition
               formData.append("files", files[i].file);
               formData.append("Label", files[i].label);
             }
-            formData.append("CircularReferenceNumber", res.data.responseData.circularReferenceNumber);
+            formData.append(
+              "CircularReferenceNumber",
+              res.data.responseData.circularReferenceNumber
+            );
             formData.append("CircularID", res.data.responseData.id);
             formData.append("DepartmentID", "1");
             formData.append("UserID", userID.replace(/"/g, ""));
-            axios.post(ImageAPI + 'File/UploadCircularDocs', formData).then((res) => {
-               console.log("res99999",res);
-            })
-              .catch((err) => {
-                console.log("file Upload ", err)
+            axios
+              .post(ImageAPI + "File/UploadCircularDocs", formData)
+              .then((res) => {
+                console.log("File/UploadCircularDocs");
               })
-            toast.success(res.data.responseMessage, { autoClose: 2000 })
+              .catch((err) => {
+                console.log("file Upload ", err);
+              });
+            toast.success(res.data.responseMessage, { autoClose: 2000 });
             setTimeout(() => {
-              setToastDisplayed(false)
+              setToastDisplayed(false);
               handleFormClose();
               handleCircularListData();
               setExportForm({
@@ -250,19 +250,17 @@ console.log("otherfilesupload",otherfilesupload);
                 directiveSelectValue: [],
                 bankSelectValue: [],
                 analyst: "",
-              })
-            }, 2500)
-
+              });
+            }, 2500);
           } else {
-            toast.error(res.data.responseMessage, { autoClose: 2000 })
+            toast.error(res.data.responseMessage, { autoClose: 2000 });
             setTimeout(() => {
               setToastDisplayed(false);
-            }, 2500)
+            }, 2500);
           }
         })
         .catch((err) => {
           console.log(err);
-
         });
     } else {
       if (!toastDisplayed) {
@@ -278,9 +276,7 @@ console.log("otherfilesupload",otherfilesupload);
       subject: "",
     });
     setErrors({});
-
   };
-
 
   useEffect(() => {
     if (toastDisplayed) {
@@ -292,9 +288,8 @@ console.log("otherfilesupload",otherfilesupload);
     directivesData();
     analystUserFun();
   }, [toastDisplayed]);
-
   // ----- End Code For Geting Table Data
-  console.log("exportForm.analyst", exportForm.analyst);
+
   return (
     <>
       <form className="circular-form">
@@ -314,10 +309,10 @@ console.log("otherfilesupload",otherfilesupload);
               <span className="sspan"></span>
             </label>
             {errors?.name ? (
-              <span className="errormsg">
-                {errors?.name}
-              </span>
-            ) : ""}
+              <span className="errormsg">{errors?.name}</span>
+            ) : (
+              ""
+            )}
           </div>
         </div>
         {/* end form-bx  */}
@@ -338,10 +333,10 @@ console.log("otherfilesupload",otherfilesupload);
               <span className="sspan"></span>
             </label>
             {errors?.content ? (
-              <span className="errormsg">
-                {errors?.content}
-              </span>
-            ) : ""}
+              <span className="errormsg">{errors?.content}</span>
+            ) : (
+              ""
+            )}
           </div>
         </div>
         {/* end form-bx  */}
@@ -361,10 +356,10 @@ console.log("otherfilesupload",otherfilesupload);
               <span className="sspan"></span>
             </label>
             {errors?.circularReference ? (
-              <span className="errormsg">
-                {errors?.circularReference}
-              </span>
-            ) : ""}
+              <span className="errormsg">{errors?.circularReference}</span>
+            ) : (
+              ""
+            )}
           </div>
         </div>
         {/* end form-bx  */}
@@ -386,10 +381,10 @@ console.log("otherfilesupload",otherfilesupload);
                 onShow={onShow}
               />
               {errors?.bankSelectValue ? (
-                <span className="errormsg">
-                  {errors?.bankSelectValue}
-                </span>
-              ) : ""}
+                <span className="errormsg">{errors?.bankSelectValue}</span>
+              ) : (
+                ""
+              )}
             </div>
           </div>
         </div>
@@ -407,7 +402,6 @@ console.log("otherfilesupload",otherfilesupload);
                 value={exportForm.subject}
               />
               <span className="sspan"></span>
-
             </label>
             {errors?.subject ? (
               <small className="errormsg">{errors.subject}</small>
@@ -433,10 +427,12 @@ console.log("otherfilesupload",otherfilesupload);
                 name="directiveSelectValue"
                 placeholder="Select Directives"
                 display="chip"
-              // maxSelectedLabels={3}
+                // maxSelectedLabels={3}
               />
               {errors?.directiveSelectValue ? (
-                <small className="errormsg">{errors.directiveSelectValue}</small>
+                <small className="errormsg">
+                  {errors.directiveSelectValue}
+                </small>
               ) : (
                 ""
               )}
@@ -459,11 +455,11 @@ console.log("otherfilesupload",otherfilesupload);
               dropdownMode="select"
               dateFormat="dd/MMMM/yyyy"
             />
-            {
-              errors?.releasingDate ? (
-                <small className="errormsg">{errors.releasingDate}</small>
-              ) : (" ")
-            }
+            {errors?.releasingDate ? (
+              <small className="errormsg">{errors.releasingDate}</small>
+            ) : (
+              " "
+            )}
           </div>
         </div>
         {/* end form-bx  */}
@@ -495,7 +491,7 @@ console.log("otherfilesupload",otherfilesupload);
           />
         </div>
         {/* end form-bx  */}
-        {checkAnalyst == true ?
+        {checkAnalyst == true ? (
           <div className="inner_form_new ">
             <label className="controlform">Select Analyst</label>
 
@@ -511,44 +507,44 @@ console.log("otherfilesupload",otherfilesupload);
                   <option value="" selected>
                     Select Analyst
                   </option>
-                  {
-                    analystUser?.map((item, index) => {
-                      return (
-                        <option value={item.userID} key={index}>
-                          {item.name}
-                        </option>
-                      )
-                    })
-                  }
+                  {analystUser?.map((item, index) => {
+                    return (
+                      <option value={item.userID} key={index}>
+                        {item.name}
+                      </option>
+                    );
+                  })}
                 </select>
                 <span className="sspan"></span>
-                {errors.analyst ? (<small className="errormsg" style={{ bottom: "-22px" }}>{errors.analyst}</small>) : (" ")}
+                {errors.analyst ? (
+                  <small className="errormsg" style={{ bottom: "-22px" }}>
+                    {errors.analyst}
+                  </small>
+                ) : (
+                  " "
+                )}
               </label>
             </div>
           </div>
-          : " "}
+        ) : (
+          " "
+        )}
         {/* upload file start */}
         <h5 className="section_top_subheading mt-3">Attachments</h5>
-        
-        <div className="attachemt_form-bx" >
+
+        <div className="attachemt_form-bx">
           <label>
             <i className="bi bi-forward"></i>
             File
           </label>
           <div className="browse-btn">
             Browse{" "}
-            <input
-              type="file"
-              onChange={(e) => handleFileChange(e,"File")}
-            />
+            <input type="file" onChange={(e) => handleFileChange(e, "File")} />
           </div>
           <span className="filename">
             {files.find((f) => f.name === files?.name)?.file?.name ||
               "No file chosen"}
-
           </span>
-
-
         </div>
         {/* other file start */}
         {otherfiles.map((file, index) => (
@@ -567,23 +563,20 @@ console.log("otherfilesupload",otherfilesupload);
               />
             </div>
             <span className="filename">
-              {files.find((f) => f.label === "other" + (index + 1))?.file?.name ||
-                "No file chosen"}
+              {files.find((f) => f.label === "other" + (index + 1))?.file
+                ?.name || "No file chosen"}
             </span>
-
-           
-
           </div>
         ))}
         {/* other file end */}
         <button
-            type="button"
-            className="addmore-btn"
-            onClick={(e) => handleAddMore(e)}
-          >
-            {" "}
-            Add More File{" "}
-          </button>
+          type="button"
+          className="addmore-btn"
+          onClick={(e) => handleAddMore(e)}
+        >
+          {" "}
+          Add More File{" "}
+        </button>
         {/* upload file end */}
         <div className="form-footer mt-5 mb-3 justify-content-end">
           {/* <button
@@ -606,9 +599,7 @@ console.log("otherfilesupload",otherfilesupload);
             Submit
           </button>
         </div>
-
       </form>
-
     </>
   );
 };

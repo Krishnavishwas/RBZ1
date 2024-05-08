@@ -301,7 +301,6 @@ const ExportNewRequestForm = () => {
       })
       .then((res) => {
         if (res.data.responseCode == 200) {
-          console.log("responceCount", res);
           setresponceCount(res.data.responseData);
         } else {
           setresponceCount([]);
@@ -632,7 +631,7 @@ const ExportNewRequestForm = () => {
             axios
               .post(ImageAPI + "File/UploadFile", formData)
               .then((res) => {
-                // console.log("res99999",res);
+                console.log("File/UploadFile");
               })
               .catch((err) => {
                 console.log("file Upload ", err);
@@ -658,10 +657,6 @@ const ExportNewRequestForm = () => {
       setToastDisplayed(true);
     }
   };
-
-  console.log("registerusertype",registerusertype);
-
-  console.log("applicantTypes--", applicantTypes);
 
   const closePopupHandle = () => {
     Navigate("/BankADLADashboard");
@@ -895,7 +890,6 @@ setselectuserRole("")
   // ----- End Code For Open Poup
   // ----- Start Code For Geting Table Data
   const action = (rowData) => {
-    // console.log("rowDataACTION", rowData);
     return bankName.replace(/"/g, "") == rowData?.bankName ? (
       <>
         <i
@@ -1043,7 +1037,7 @@ setselectuserRole("")
   useEffect(() => {
     getRoleHandle();
   }, []);
-  console.log("ValidateShow", ValidateShow);
+
   return (
     <>
       <form>
@@ -1495,30 +1489,6 @@ setselectuserRole("")
               )}
             </label>
           </div>
-
-          {/* <div className="col-md-3">
-              <div className="form-bx">
-                <label>
-                  <select
-                    // ref={applicantYearRef}
-                    name="applicantYear"
-                    onChange={(e) => {
-                      changeHandelForm(e);
-                    }}
-                  >
-                    <option value="2024">2024</option>
-                    <option value="2023">2023</option>
-                    <option value="2022">2022</option>
-                    <option value="2021">2021</option>
-                    <option value="2020">2020</option>
-                    <option value="2019">2019</option>
-                    <option value="2018">2018</option>
-                    <option value="2017">2017</option>
-                  </select>
-                  <span className="sspan"></span>
-                </label>
-              </div>
-            </div> */}
         </div>
         {/* end form-bx  */}
 
@@ -1526,7 +1496,6 @@ setselectuserRole("")
           <label className="controlform">Application Date</label>
 
           <div className="form-bx">
-            {console.log("startDate", startDate)}
             {/* <label> */}
             <DatePicker
               closeOnScroll={(e) => e.target === document}
@@ -1565,8 +1534,6 @@ setselectuserRole("")
 
         <div className="inner_form_new ">
           <label className="controlform">Application Type</label>
-          {console.log("errors", errors)}
-          {console.log("exportForm.applicationType", exportForm.applicationType)}
           <div className="form-bx">
             <label>
               <select
