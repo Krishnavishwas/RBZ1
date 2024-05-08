@@ -281,20 +281,6 @@ const ImportDashboardEditDetails = ({
       newErrors.PECANNumber = "Special characters not allowed";
       valid = false;
     }
-    // else if (
-    //   name == "relatedexchangeControlNumber" &&
-    //   value.charAt(0) === " "
-    // ) {
-    //   newErrors.relatedexchangeControlNumber =
-    //     "First character cannot be a blank space";
-    //   valid = false;
-    // } else if (
-    //   name == "relatedexchangeControlNumber" &&
-    //   specialChars.test(value)
-    // ) {
-    //   newErrors.relatedexchangeControlNumber = "Special characters not allowed";
-    //   valid = false;
-    // }
     else {
       setErrors({});
       setApplicationDetail((prevState) => ({
@@ -304,7 +290,6 @@ const ImportDashboardEditDetails = ({
     }
 
     setErrors(newErrors);
-    console.log("name - value", name, value);
     if (name === "sector") {
       axios
         .post(APIURL + "Master/GetSubSectorBySectorID", {
@@ -489,8 +474,6 @@ const ImportDashboardEditDetails = ({
       setFiles((prevFiles) => [...prevFiles, { file, label }]);
     }
   };
-
-  console.log("files - ", files);
 
   const HandleFileUpload = (e, label, indx) => {
     const file = e.target.files[0];
@@ -898,7 +881,7 @@ const ImportDashboardEditDetails = ({
       if (optionExpirydisplayRef.current) optionExpirydisplayRef.current = "";
     }
   };
-  console.log("applicationDetail.subSector - ", applicationDetail.subSector);
+
   const validateForm = () => {
     let valid = true;
     const newErrors = {};
@@ -1730,7 +1713,6 @@ const ImportDashboardEditDetails = ({
               <div className="inner_form_new ">
                 <label className="controlform">Type of Importer</label>
                 <div className="form-bx-radio mt-4">
-                  {console.log("registerusertype - ", registerusertype)}
                   {applicantTypes?.map((item, index) => {
                     return (
                       <>
@@ -1740,11 +1722,9 @@ const ImportDashboardEditDetails = ({
                             ref={typeExporterRef}
                             onChange={(e) => {
                               changeHandelForm(e);
-                              // handleUsertype(e);
                             }}
                             name="importType"
                             value={item.id}
-                            // checked={registerusertype == item.id}
                             checked={
                               applicationDetail?.applicantType == item?.id
                             }

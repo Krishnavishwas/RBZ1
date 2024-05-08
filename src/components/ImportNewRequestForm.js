@@ -334,7 +334,6 @@ const ImportNewRequestForm = () => {
     GetApplicationTypes();
     getRoleHandle();
   }, []);
-  // End Get Application Types By DepartmentID start
 
   const handleUsertype = (e) => {
     setregisterusertype(e.target.value);
