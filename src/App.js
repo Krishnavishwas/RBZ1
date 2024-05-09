@@ -50,7 +50,10 @@ import ImportApprovedRequests from "./pages/ImportApprovedRequests";
 import ImportDeferredRequests from "./pages/ImportDeferredRequests";
 import ImportPendingRequests from "./pages/ImportPendingRequests";
 import ImportRejectedRequests from "./pages/ImportRejectedRequests";
-import ImportSubmittedRequests from "./pages/ImportSubmittedRequests"; 
+import ImportSubmittedRequests from "./pages/ImportSubmittedRequests";
+import ImportCancelledRequests from "./pages/ImportCancelledRequests";
+import ImportsExpiredRequests from "./pages/ImportsExpiredRequests";
+import ImportsExpiringRequests from "./pages/ImportsExpiringRequests";
 
 import ImpersonateUser from "./admin/pages/ImpersonateUser";
 
@@ -138,13 +141,39 @@ function App() {
               path="/ExportCancelledRequests"
               element={<ExportCancelledRequests />}
             />
-
             <Route path="/ExportExpired" element={<ExportExpiredRequests />} />
-            <Route path="/ImportApprovedRequests" element={<ImportApprovedRequests />} />
-            <Route path="/ImportDeferredRequests" element={<ImportDeferredRequests />} />
-            <Route path="/ImportPendingRequests" element={<ImportPendingRequests />} />
-            <Route path="/ImportRejectedRequests" element={<ImportRejectedRequests />} />
-            <Route path="/ImportSubmittedRequests" element={<ImportSubmittedRequests />} />
+            <Route
+              path="/ImportApprovedRequests"
+              element={<ImportApprovedRequests />}
+            />
+            <Route
+              path="/ImportDeferredRequests"
+              element={<ImportDeferredRequests />}
+            />
+            <Route
+              path="/ImportPendingRequests"
+              element={<ImportPendingRequests />}
+            />
+            <Route
+              path="/ImportRejectedRequests"
+              element={<ImportRejectedRequests />}
+            />
+            <Route
+              path="/ImportSubmittedRequests"
+              element={<ImportSubmittedRequests />}
+            />
+            <Route
+              path="/ImportCancelledRequests"
+              element={<ImportCancelledRequests />}
+            />
+            <Route
+              path="/ImportsExpiredRequests"
+              element={<ImportsExpiredRequests />}
+            />
+            <Route
+              path="/ImportsExpiringRequests"
+              element={<ImportsExpiringRequests />}
+            />
             <Route
               path="/ExportExpiringRequests"
               element={<ExportExpiringRequests />}

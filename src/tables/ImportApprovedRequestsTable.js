@@ -112,7 +112,7 @@ const ImportApprovedRequestsTable = () => {
             />
           ) : (
             <>
-              {roleID == 2 ? (
+              {/* {roleID == 2 ? (
                 <i
                   class="bi bi-copy"
                   style={{
@@ -137,7 +137,7 @@ const ImportApprovedRequestsTable = () => {
                 ></i>
               ) : (
                 ""
-              )}
+              )} */}
 
               {rowData?.filePath != null ? (
                 <>
@@ -478,21 +478,18 @@ const ImportApprovedRequestsTable = () => {
       });
 
     await axios
-      .post(APIURL + "ExportApplication/GetApplicationActionsByApplicationID", {
+      .post(APIURL + "ImportApplication/GetActionsByApplicationID", {
         ID: id,
       })
       .then((res) => {
         if (res.data.responseCode == 200) {
           setActiondata(res.data.responseData);
-          // setshowdataloader(false)
         } else {
           setActiondata([]);
-          // setshowdataloader(false)
         }
       })
       .catch((err) => {
         console.log(err);
-        // setshowdataloader(false)
       });
 
     // --------------------------vishwas start----------------------------
@@ -584,8 +581,8 @@ const ImportApprovedRequestsTable = () => {
   // pagination click loader start
   const [paginationModalShow, setpaginationModalShow] = useState(false);
   const handlePaginationModalClose = () => setpaginationModalShow(false);
-
   // pagination click loader end
+
   ///--------pagination start
   const [first, setFirst] = useState("");
   const [rows, setRows] = useState(10);
@@ -594,7 +591,6 @@ const ImportApprovedRequestsTable = () => {
     setpaginationModalShow(true);
     setFirst(event.first);
     setRows(event.rows);
-
     axios
       .post(APIURL + "ImportApplication/GetImportDatabyUserID", {
         UserID: useId.replace(/"/g, ""),
@@ -685,7 +681,6 @@ const ImportApprovedRequestsTable = () => {
               // paginatorPosition={"both"}
               // paginatorLeft
               rowHover
-              // rows={10}
               dataKey="id"
               rowsPerPageOptions={[10, 50, 100]}
               globalFilterFields={[
@@ -785,7 +780,7 @@ const ImportApprovedRequestsTable = () => {
                   <h5>
                     <Modal.Header closeButton className="p-0">
                       <Modal.Title>
-                        View Export Request --{" "}
+                        View Import Request --{" "}
                         <big>{applicationDetail?.rbzReferenceNumber}</big>
                       </Modal.Title>
                     </Modal.Header>
@@ -868,7 +863,6 @@ const ImportApprovedRequestsTable = () => {
             </div>
           </Modal>
 
-          {/* loader modal start */}
           <Modal
             size="sm"
             show={paginationModalShow}
@@ -884,7 +878,6 @@ const ImportApprovedRequestsTable = () => {
               <p>Please wait loading data.</p>
             </Modal.Body>
           </Modal>
-          {/* loader modal end */}
         </>
       )}
     </>
