@@ -3455,7 +3455,7 @@ overflow-y: auto;
 } 
 
 .acting_form_new .form-bxact{
-  width: calc(100% - 20px);
+  width: calc(100% - 0px);
 }
 
 .acting_form_new .form-bxact p{
@@ -3496,10 +3496,12 @@ overflow-y: auto;
 
 .action_form_new{
   width: 100%;
-  display: inline-block;
+  display: inline-flex;
   margin: 0px 0px;
   padding-left: 0 !important;
   padding-right: 0px !important;
+  column-gap: 18px;
+  align-items: flex-start;
 }
 .action_form_new label.actioncontrolform{
   font-size: 14px;
@@ -3510,13 +3512,13 @@ overflow-y: auto;
     background: #d9edf7;
     padding-top: 16px;
     padding-bottom: 16px;
-    padding-left: 5px;
+    padding-left: 8px;
     min-width: 280px;
     padding-right: 5px;
 } 
 
 .action_form_new .form-bx-action{
-  width: calc(100% - 28px);
+  width: calc(100% - 306px);
   position: relative;
 }
 .form-bx-action label {
@@ -3649,3 +3651,30 @@ overflow-y: auto;
     margin-top: -9px;
     margin-right: 22px !important;
   }
+.acting-date{
+  display: inline-block;
+  max-width: 50%;
+  width: 100%;
+  position: relative;
+}
+  .date-acting{
+    padding: 1.5rem 0.45rem 0.8rem;
+    border-bottom: 1px solid #d1d5db !important;
+    transition: background-color 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s;
+    appearance: none;
+    border-radius: 0px;
+    margin-right: 10px;
+    max-width: 100%;
+  }
+  .acting-date .react-datepicker-wrapper{
+border: 0px !important; 
+    margin-top: 0;
+  }
+
+  .errormsg {
+    color: #f00;
+    font-size: 12px;
+    bottom: -20px;
+    position: absolute;
+    left: 0;
+}

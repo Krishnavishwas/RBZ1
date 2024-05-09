@@ -34,6 +34,7 @@ import StarterKit from "@tiptap/starter-kit";
 
 // import MultiSelect from "react-multi-select-component";
 
+
 const ExportDashboardEditDetails = ({
   applicationDetail,
   setApplicationDetail,
@@ -134,6 +135,31 @@ const ExportDashboardEditDetails = ({
   const userSign = Storage.getItem("signImageURL");
 
   const navigate = useNavigate();
+
+  const fileInputRefs = [
+    useRef(null),
+    useRef(null),
+    useRef(null), 
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null), 
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+  ];
+
+  const fileInputRefsother = [ useRef(null),useRef(null),useRef(null), useRef(null),useRef(null),useRef(null),useRef(null),useRef(null),useRef(null), useRef(null)];
 
   const [startDate, setStartDate] = useState("");
   const [toastDisplayed, setToastDisplayed] = useState(false);
@@ -1290,7 +1316,15 @@ useEffect(() => {
     setFiles(updatedUserFile);
   };
 
-  const [blobdata, setblobdata] = useState(null);
+  
+ 
+  const clearInputFile = (index) => { 
+    
+    if (fileInputRefs[index].current) fileInputRefs[index].current.value = "";
+  };
+ const clearInputFileother = (index) =>{
+  if (fileInputRefsother[index]?.current) fileInputRefsother[index].current.value = "";
+ }
 
   /* PDF Preview code starts */
   const GetHandelDetailPDF = async () => {
@@ -1856,7 +1890,10 @@ useEffect(() => {
     setErrors(newErrors);
     return valid;
   };
+  //console.log("--t", AssignUserID == "" , nextlevelvalue == "20" , nextlevelvalue == "10"  ,  checkSupervisor == true)
 
+  console.log("AssignUserID", AssignUserID);
+  console.log("nextlevelvalue", nextlevelvalue);
   const onShow = () => {
     setTimeout(() => {
       let selectAllCheckbox = document.querySelector(
@@ -2321,6 +2358,7 @@ useEffect(() => {
                         } else {
                           var headerImage = "";
                         }
+                        //console.log('FooterData---',response.data.responseData.headerFooterData['1']);
                         if (
                           response.data.responseData?.headerFooterData["1"]
                             ?.fileType == "FooterFile"
@@ -2503,7 +2541,10 @@ useEffect(() => {
                 console.log("error", error);
               });
 
+            // sharefileupload
+
             for (let i = 0; i < sharefile?.length; i++) {
+              // Corrected loop condition
               shareformData.append("files", sharefile[i].file);
               shareformData.append("fileInfoID", sharefile[i].fileInfoID);
             }
@@ -2521,12 +2562,21 @@ useEffect(() => {
               .catch((err) => {
                 console.log("sharefile Upload ", err);
               });
+
             handleData();
+
+            // setSupervisorRoleId("");
+            // setupdatepopup(true);
+            //   setSubmitBtnLoader(false);
+            // setAssignUserID("");
+            // setselectuserRoleRecordofficer("");
           } else {
             toast.error(res.data.responseMessage);
+            // setSubmitBtnLoader(false);
           }
         })
         .catch((err) => {
+          // setSubmitBtnLoader(false);
           console.log(err);
         });
     } else {
@@ -2534,6 +2584,7 @@ useEffect(() => {
         toast.warning("Please fill all mandatory fields");
       }
       setToastDisplayed(true);
+      // setSubmitBtnLoader(false);
     }
   };
   // End code for save form
@@ -2549,6 +2600,7 @@ useEffect(() => {
   const handleInputChangecompany = (input) => {
     setInputValue(input);
     if (input?.length >= 3) {
+      // Filter options when input length is at least 3 characters
       const filteredOptions = companies
         ?.filter((company) =>
           company?.companyName?.toLowerCase().includes(input.toLowerCase())
@@ -2559,6 +2611,7 @@ useEffect(() => {
         }));
       setOptions(filteredOptions?.length > 0 ? filteredOptions : []);
     } else {
+      // Reset options when input length is less than 3 characters
       setOptions([]);
     }
   };
@@ -2583,13 +2636,65 @@ useEffect(() => {
       ))
     : null;
 
+  // console.log("applicationDetail--applicationDetail", applicationDetail);
+
+  // const finalArray = getBlankFile?.map((blankFile) => {
+  //   const attachedFile = applicationDetail?.attachedFiles?.find(
+  //     (file) => file.label === blankFile.name
+  //   );
+  //   if (attachedFile) {
+  //     return {
+  //       ...attachedFile,
+  //       ...blankFile,
+  //     };
+  //   } else {
+  //     return blankFile;
+  //   }
+  // });
+
+  // Combine attachedFiles and getBlankFile arrays
+
+  //   const finalArray = applicationDetail?.attachedFiles?.map(attachedFile => {
+  //     const matchingFile = getBlankFile?.find(blankFile => blankFile.name == attachedFile.label);
+
+  //     if (matchingFile) {
+  //         // Combine properties from both objects
+  //         return { ...matchingFile, ...attachedFile };
+  //     } else {
+  //         // If there's no matching file, return the attachedFile as is
+  //         return attachedFile;
+  //     }
+  // });
+
+  // const labelSet = new Set(getBlankFile?.map((item) => item.name));
+  // geninfoFile?.forEach((item) => labelSet.add(item.label));
+
+  // Create the finalArray by merging attachedFiles and getBlankFile based on the labelSet
+
   useEffect(() => {
+    //     const finalArray = Array.from(labelSet)?.map(label => {
+    //       const attachedFile = geninfoFile?.find(item => item.label === label);
+    //       const getBlankFileItem = getBlankFile?.find(item => item.name === label);
+    //       if (attachedFile) {
+    //           return { ...attachedFile, status: 0 };
+    //       } else if (getBlankFileItem) {
+    //           return { ...getBlankFileItem, status: 0 };
+    //       }
+    //   });
+    //   console.log("finalArray", finalArray)
+    // if(finalArray){
+    // setFiles(finalArray)
+    // }
+
     let newData1 = getBlankFile?.filter((blankFile) => {
       return !geninfoFile?.some(
         (infoFile) => infoFile.label === blankFile.name
       );
     });
+
     setnewData(newData1);
+
+    // setFiles(geninfoFile);
   }, [applicationDetail, geninfoFile, allcomment]);
 
   const handleRemovfile = (id) => {
@@ -2622,6 +2727,8 @@ useEffect(() => {
         console.log("GetLastApplicationDataByID Error", error);
       });
   };
+  console.log("applicationDetail - ", applicationDetail);
+  console.log("lastComments - ", lastComments);
 
   return (
     <>
@@ -3564,6 +3671,7 @@ useEffect(() => {
                             Browse{" "}
                             <input
                               type="file"
+                              ref={fileInputRefs[index]}
                               onChange={(e) =>
                                 HandleFileUpload(
                                   e,
@@ -3583,7 +3691,7 @@ useEffect(() => {
                             <button
                               type="button"
                               className="remove-file"
-                              onClick={() => removefileImage(items?.name)}
+                              onClick={() => {removefileImage(items?.name); clearInputFile(index)}}
                             >
                               Remove
                             </button>
@@ -3664,6 +3772,7 @@ useEffect(() => {
                           Browse{" "}
                           <input
                             type="file"
+                            ref={fileInputRefsother[index]}
                             onChange={(e) => {
                               handleFileChange(e, "other file" + (index + 1));
                             }}
@@ -3683,7 +3792,9 @@ useEffect(() => {
                             type="button"
                             className="remove-file"
                             onClick={() =>
-                              removefileImage("other file" + (index + 1))
+                             { removefileImage("other file" + (index + 1));
+                             clearInputFileother(index)
+                            }
                             }
                           >
                             Remove
@@ -5485,6 +5596,7 @@ useEffect(() => {
                         role="tabpanel"
                         aria-labelledby="analyst"
                       >
+                        {console.log("Actiondata", Actiondata)}
                         {Actiondata?.map((cur) => {
                           const firstItem = cur?.applicationActivityData?.[0]; // Accessing the first element directly
 
@@ -15908,6 +16020,7 @@ useEffect(() => {
                           applicationDetail?.companyName == ""
                             ? applicationDetail?.name
                             : applicationDetail?.companyName}
+                          {console.log(applicationDetail)},
                         </td>
                       </tr>
                       <tr>
@@ -15959,6 +16072,7 @@ useEffect(() => {
                                 applicationDetail?.companyName == ""
                                   ? applicationDetail?.name
                                   : applicationDetail?.companyName}
+                                {console.log(applicationDetail)}
                               </td>
                             </tr>
                             <tr>
@@ -16517,6 +16631,7 @@ useEffect(() => {
                           applicationDetail?.companyName == ""
                             ? applicationDetail?.name
                             : applicationDetail?.companyName}
+                          {console.log(applicationDetail)},
                         </td>
                       </tr>
                       <tr>
@@ -16567,6 +16682,7 @@ useEffect(() => {
                                 {applicationDetail?.companyName == null || applicationDetail?.companyName == ""
                                   ? applicationDetail?.name
                                   : applicationDetail?.companyName} 
+                                  {console.log(applicationDetail)}
                               </td>
                             </tr> */}
                             <tr>

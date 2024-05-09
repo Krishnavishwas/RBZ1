@@ -46,10 +46,15 @@ import ExportExpiredRequests from "./pages/ExportExpiredRequests";
 import ExportExpiringRequests from "./pages/ExportExpiringRequests";
 import CircularsRequests from "./pages/CircularsRequests";
 import CopiedResponse from "./pages/ExportCopiedResponse";
+import ImportApprovedRequests from "./pages/ImportApprovedRequests";
+import ImportDeferredRequests from "./pages/ImportDeferredRequests";
+import ImportPendingRequests from "./pages/ImportPendingRequests";
+import ImportRejectedRequests from "./pages/ImportRejectedRequests";
+import ImportSubmittedRequests from "./pages/ImportSubmittedRequests"; 
+
 import ImpersonateUser from "./admin/pages/ImpersonateUser";
 
 function App() {
-  
   const loginToken = Storage.getItem("loginToken");
   const userName = Storage.getItem("userName");
   const userID = Storage.getItem("userID");
@@ -133,14 +138,20 @@ function App() {
               path="/ExportCancelledRequests"
               element={<ExportCancelledRequests />}
             />
-            <Route path="*" element={<NotFound />} />
+
             <Route path="/ExportExpired" element={<ExportExpiredRequests />} />
+            <Route path="/ImportApprovedRequests" element={<ImportApprovedRequests />} />
+            <Route path="/ImportDeferredRequests" element={<ImportDeferredRequests />} />
+            <Route path="/ImportPendingRequests" element={<ImportPendingRequests />} />
+            <Route path="/ImportRejectedRequests" element={<ImportRejectedRequests />} />
+            <Route path="/ImportSubmittedRequests" element={<ImportSubmittedRequests />} />
             <Route
               path="/ExportExpiringRequests"
               element={<ExportExpiringRequests />}
             />
             <Route path="/Circulars" element={<CircularsRequests />} />
             <Route path="/CopiedResponse" element={<CopiedResponse />} />
+            <Route path="*" element={<NotFound />} />
           </>
         ) : (
           <>
@@ -163,6 +174,7 @@ function App() {
           </>
         )}
       </Routes>
+
       <ToastContainer closeButton={false} />
     </>
   );

@@ -106,9 +106,30 @@ const ImportNewRequestForm = () => {
   const [options, setOptions] = useState([]);
   const [getBankID, setGetBankID] = useState("");
   const [getalluser, setGetalluser] = useState([]);
+  const fileInputRefsother = [ useRef(null),useRef(null),useRef(null), useRef(null),useRef(null),useRef(null),useRef(null),useRef(null),useRef(null), useRef(null)];
 
   const heading = "Application Submitted Successfully!";
   const para = "Import application request submitted successfully!";
+
+  const fileInputRefs = [
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+  ];
 
   // for input data start
   const changeHandelForm = (e) => {
@@ -296,7 +317,7 @@ const ImportNewRequestForm = () => {
       axios
         .post(APIURL + "User/GetUsersByRoleID", {
           RoleID: value,
-          DepartmentID:"3",
+          DepartmentID: "3",
           UserID: UserID.replace(/"/g, ""),
         })
         .then((res) => {
@@ -334,6 +355,7 @@ const ImportNewRequestForm = () => {
     GetApplicationTypes();
     getRoleHandle();
   }, []);
+  // End Get Application Types By DepartmentID start
 
   const handleUsertype = (e) => {
     setregisterusertype(e.target.value);
@@ -598,6 +620,16 @@ const ImportNewRequestForm = () => {
       setToastDisplayed(true);
     }
   };
+
+  
+
+  const clearInputFile = (index) => {
+    if (fileInputRefs[index].current) fileInputRefs[index].current.value = "";
+  };
+
+  const clearInputFileother = (index) =>{
+    if (fileInputRefsother[index]?.current) fileInputRefsother[index].current.value = "";
+   }
 
   const closePopupHandle = () => {
     navigate("/ImportDashboard");
@@ -1639,6 +1671,7 @@ const ImportNewRequestForm = () => {
                 Browse{" "}
                 <input
                   type="file"
+                  ref={fileInputRefs[index]}
                   onChange={(e) => handleFileChange(e, items.name)}
                 />
               </div>
@@ -1656,7 +1689,10 @@ const ImportNewRequestForm = () => {
                 <button
                   type="button"
                   className="remove-file"
-                  onClick={() => removeUserImage(items?.name)}
+                  onClick={() => {
+                    removeUserImage(items?.name);
+                    clearInputFile(index);
+                  }}
                 >
                   Remove
                 </button>
@@ -1676,6 +1712,7 @@ const ImportNewRequestForm = () => {
               Browse{" "}
               <input
                 type="file"
+                ref={fileInputRefsother[index]}
                 onChange={(e) => {
                   handleFileChange(e, "other" + (index + 1));
                   handleOthrefile(e, "other" + (index + 1));
@@ -1693,7 +1730,7 @@ const ImportNewRequestForm = () => {
               <button
                 type="button"
                 className="remove-file"
-                onClick={() => removeUserImage("other" + (index + 1))}
+                onClick={() => {removeUserImage("other" + (index + 1)); clearInputFileother(index)}}
               >
                 Remove
               </button>

@@ -123,6 +123,28 @@ const ExportNewRequestForm = () => {
     applicantName: "",
     beneficiaryName: "",
   });
+  const fileInputRefsother = [ useRef(null),useRef(null),useRef(null), useRef(null),useRef(null),useRef(null),useRef(null),useRef(null),useRef(null), useRef(null)];
+ 
+  const fileInputRefs = [
+    useRef(null),
+    useRef(null),
+    useRef(null), 
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null), 
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+  ];
 
   //---------- Start form fill data handle
 
@@ -301,6 +323,7 @@ const ExportNewRequestForm = () => {
       })
       .then((res) => {
         if (res.data.responseCode == 200) {
+          console.log("responceCount", res);
           setresponceCount(res.data.responseData);
         } else {
           setresponceCount([]);
@@ -631,7 +654,7 @@ const ExportNewRequestForm = () => {
             axios
               .post(ImageAPI + "File/UploadFile", formData)
               .then((res) => {
-                console.log("File/UploadFile");
+                // console.log("res99999",res);
               })
               .catch((err) => {
                 console.log("file Upload ", err);
@@ -657,6 +680,18 @@ const ExportNewRequestForm = () => {
       setToastDisplayed(true);
     }
   };
+ 
+
+  
+  const clearInputFile = (index) => { 
+    
+    if (fileInputRefs[index]?.current) fileInputRefs[index].current.value = "";
+  };
+
+  const clearInputFileother = (index) =>{
+    if (fileInputRefsother[index]?.current) fileInputRefsother[index].current.value = "";
+   }
+  
 
   const closePopupHandle = () => {
     Navigate("/BankADLADashboard");
@@ -890,6 +925,7 @@ setselectuserRole("")
   // ----- End Code For Open Poup
   // ----- Start Code For Geting Table Data
   const action = (rowData) => {
+    // console.log("rowDataACTION", rowData);
     return bankName.replace(/"/g, "") == rowData?.bankName ? (
       <>
         <i
@@ -1037,7 +1073,7 @@ setselectuserRole("")
   useEffect(() => {
     getRoleHandle();
   }, []);
-
+  console.log("ValidateShow", ValidateShow);
   return (
     <>
       <form>
@@ -1489,6 +1525,30 @@ setselectuserRole("")
               )}
             </label>
           </div>
+
+          {/* <div className="col-md-3">
+              <div className="form-bx">
+                <label>
+                  <select
+                    // ref={applicantYearRef}
+                    name="applicantYear"
+                    onChange={(e) => {
+                      changeHandelForm(e);
+                    }}
+                  >
+                    <option value="2024">2024</option>
+                    <option value="2023">2023</option>
+                    <option value="2022">2022</option>
+                    <option value="2021">2021</option>
+                    <option value="2020">2020</option>
+                    <option value="2019">2019</option>
+                    <option value="2018">2018</option>
+                    <option value="2017">2017</option>
+                  </select>
+                  <span className="sspan"></span>
+                </label>
+              </div>
+            </div> */}
         </div>
         {/* end form-bx  */}
 
@@ -1496,6 +1556,7 @@ setselectuserRole("")
           <label className="controlform">Application Date</label>
 
           <div className="form-bx">
+            {console.log("startDate", startDate)}
             {/* <label> */}
             <DatePicker
               closeOnScroll={(e) => e.target === document}
@@ -1534,6 +1595,8 @@ setselectuserRole("")
 
         <div className="inner_form_new ">
           <label className="controlform">Application Type</label>
+          {console.log("errors", errors)}
+          {console.log("exportForm.applicationType", exportForm.applicationType)}
           <div className="form-bx">
             <label>
               <select
@@ -2099,6 +2162,7 @@ setselectuserRole("")
         )}
 
         <h5 className="section_top_subheading mt-3">Attachments</h5>
+ 
 
         {attachmentData?.map((items, index) => {
           return (
@@ -2111,6 +2175,7 @@ setselectuserRole("")
                 Browse{" "}
                 <input
                   type="file"
+                  ref={fileInputRefs[index]}
                   onChange={(e) => handleFileChange(e, items.name)}
                 />
               </div>
@@ -2124,7 +2189,7 @@ setselectuserRole("")
                 <button
                   type="button"
                   className="remove-file"
-                  onClick={() => removeUserImage(items?.name)}
+                  onClick={() => {removeUserImage(items?.name); clearInputFile(index)}}
                 >
                   Remove
                 </button>
@@ -2144,6 +2209,7 @@ setselectuserRole("")
               Browse{" "}
               <input
                 type="file"
+                ref={fileInputRefsother[index]}
                 onChange={(e) => {
                   handleFileChange(e, "other" + (index + 1));
                   handleOthrefile(e, "other" + (index + 1));
@@ -2161,7 +2227,7 @@ setselectuserRole("")
               <button
                 type="button"
                 className="remove-file"
-                onClick={() => removeUserImage("other" + (index + 1))}
+                onClick={() => {removeUserImage("other" + (index + 1)); clearInputFileother(index)}}
               >
                 Remove
               </button>

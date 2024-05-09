@@ -432,6 +432,7 @@ const ExportCopiedResponseTable = () => {
     handleTabCount();
     setExportsCopiedResponse([]);
   }, []);
+console.log("ExportsCopiedResponse",ExportsCopiedResponse);
 
   return (
     <>

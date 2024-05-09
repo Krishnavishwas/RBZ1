@@ -21,6 +21,7 @@ import "suneditor/dist/css/suneditor.min.css";
 import NoSign from "../NoSign.png";
 import { MultiSelect } from "primereact/multiselect";
 import jsPDF from "jspdf";
+// import MultiSelect from "react-multi-select-component";
 
 const ExportDashboardRenewEditDetails = ({
   applicationDetail,
@@ -71,6 +72,7 @@ const ExportDashboardRenewEditDetails = ({
   const BeneficiaryNameRef = useRef(null);
   const applicantCommentsRef = useRef(null);
   const applicantReferenceNumberRef = useRef(null);
+  // const applicantYearRef = useRef(null);
   const applicationTypeRef = useRef(null);
   const assignedToRef = useRef(null);
   const companyNameRef = useRef(null);

@@ -201,6 +201,29 @@ const ImportDashboardEditDetails = ({
     applicantComments: "",
     bankSupervisor: "",
   });
+  const fileInputRefs = [
+    useRef(null),
+    useRef(null),
+    useRef(null), 
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null), 
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+  ];
+  const fileInputRefsother = [ useRef(null),useRef(null),useRef(null), useRef(null),useRef(null),useRef(null),useRef(null),useRef(null),useRef(null), useRef(null)];
 
   const heading = "Updated Successfully!";
   const para = "Import request updated successfully!";
@@ -281,6 +304,20 @@ const ImportDashboardEditDetails = ({
       newErrors.PECANNumber = "Special characters not allowed";
       valid = false;
     }
+    // else if (
+    //   name == "relatedexchangeControlNumber" &&
+    //   value.charAt(0) === " "
+    // ) {
+    //   newErrors.relatedexchangeControlNumber =
+    //     "First character cannot be a blank space";
+    //   valid = false;
+    // } else if (
+    //   name == "relatedexchangeControlNumber" &&
+    //   specialChars.test(value)
+    // ) {
+    //   newErrors.relatedexchangeControlNumber = "Special characters not allowed";
+    //   valid = false;
+    // }
     else {
       setErrors({});
       setApplicationDetail((prevState) => ({
@@ -290,6 +327,7 @@ const ImportDashboardEditDetails = ({
     }
 
     setErrors(newErrors);
+    console.log("name - value", name, value);
     if (name === "sector") {
       axios
         .post(APIURL + "Master/GetSubSectorBySectorID", {
@@ -475,6 +513,8 @@ const ImportDashboardEditDetails = ({
     }
   };
 
+  console.log("files - ", files);
+
   const HandleFileUpload = (e, label, indx) => {
     const file = e.target.files[0];
     const index = files?.findIndex((item, i) => i === indx);
@@ -576,6 +616,17 @@ const ImportDashboardEditDetails = ({
       setuserFiles((prevFiles) => [...prevFiles, { file, id }]);
     }
   };
+
+ 
+ 
+  const clearInputFile = (index) => { 
+    
+    if (fileInputRefs[index].current) fileInputRefs[index].current.value = "";
+  };
+  const clearInputFileother = (index) =>{
+    if (fileInputRefsother[index]?.current) fileInputRefsother[index].current.value = "";
+   }
+  
 
   const removefileImage = (label) => {
     const updatedUserFile = files?.filter((item, i) => item?.label != label);
@@ -881,7 +932,7 @@ const ImportDashboardEditDetails = ({
       if (optionExpirydisplayRef.current) optionExpirydisplayRef.current = "";
     }
   };
-
+  console.log("applicationDetail.subSector - ", applicationDetail.subSector);
   const validateForm = () => {
     let valid = true;
     const newErrors = {};
@@ -1713,6 +1764,7 @@ const ImportDashboardEditDetails = ({
               <div className="inner_form_new ">
                 <label className="controlform">Type of Importer</label>
                 <div className="form-bx-radio mt-4">
+                  {console.log("registerusertype - ", registerusertype)}
                   {applicantTypes?.map((item, index) => {
                     return (
                       <>
@@ -1722,9 +1774,11 @@ const ImportDashboardEditDetails = ({
                             ref={typeExporterRef}
                             onChange={(e) => {
                               changeHandelForm(e);
+                              // handleUsertype(e);
                             }}
                             name="importType"
                             value={item.id}
+                            // checked={registerusertype == item.id}
                             checked={
                               applicationDetail?.applicantType == item?.id
                             }
@@ -2454,6 +2508,7 @@ const ImportDashboardEditDetails = ({
                           Browse{" "}
                           <input
                             type="file"
+                            ref={fileInputRefs[index]}
                             onChange={(e) =>
                               HandleFileUpload(
                                 e,
@@ -2473,7 +2528,7 @@ const ImportDashboardEditDetails = ({
                           <button
                             type="button"
                             className="remove-file"
-                            onClick={() => removefileImage(items?.name)}
+                            onClick={() => {removefileImage(items?.name); clearInputFile(index)}}
                           >
                             Remove
                           </button>
@@ -2551,6 +2606,7 @@ const ImportDashboardEditDetails = ({
                       <div className="browse-btn">
                         Browse{" "}
                         <input
+                        ref={fileInputRefsother[index]}
                           type="file"
                           onChange={(e) => {
                             handleFileChange(e, "other file" + (index + 1));
@@ -2569,8 +2625,10 @@ const ImportDashboardEditDetails = ({
                         <button
                           type="button"
                           className="remove-file"
-                          onClick={() =>
-                            removefileImage("other file" + (index + 1))
+                          onClick={() =>{
+                            removefileImage("other file" + (index + 1));
+                            clearInputFileother(index)
+                          }
                           }
                         >
                           Remove

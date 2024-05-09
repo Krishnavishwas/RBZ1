@@ -545,6 +545,7 @@ const [showOldDataLoader, setShowOldDataLoader] = useState(false);
   };
 
   const GetOldHandelDetail = async (id) => {
+    console.log("GetOldHandelDetail - ", id);
     setShowOldDataLoader(true);
     await axios
       .post(APIURL + "ExportApplication/GetRequestInfoByApplicationID", {

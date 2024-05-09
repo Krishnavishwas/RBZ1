@@ -8,12 +8,14 @@ import { Storage } from "../login/Storagesetting";
 import Menubar from "./Menubar";
 import Modal from "react-bootstrap/Modal";
 import { toast } from "react-toastify";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 const Header = () => {
   const menucounts = Menubar();
   let menuCount = JSON.parse(menucounts?.menucounts);
   const LoginToken = Storage.getItem("loginToken");
-  const RoleID = Storage.getItem("roleIDs")
+  const RoleID = Storage.getItem("roleIDs");
   // const navigation = useNavigate();
   const [userRole, setUserRole] = useState([]);
   const userId = Storage.getItem("userID");
@@ -34,24 +36,40 @@ const Header = () => {
   const UserID = Storage.getItem("userID");
   const RoleId = Storage.getItem("roleIDs");
   const bankId = Storage.getItem("bankID");
-
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setendDate] = useState("");
   const [chnageload, setchangeload] = useState(false);
   const [actinglist, setactinglist] = useState([]);
+  const [reasontext, setreasontext] = useState("");
   const [allactingdata, setallactingdata] = useState([
     {
+      actingId: "",
       UserID: "",
       RoleID: "",
       ActingUserID: "",
       ActingRoleID: "",
-      RoleStartDate: "",
-      RoleEndDate: "",
-      Reason: ""
-    }
-  ])
+      // RoleStartDate: startDate,
+      // RoleEndDate: endDate,
+      // Reason: "",
+    },
+  ]);
   const [exportuser, setexportuser] = useState([]);
   const [importuser, setimportuser] = useState([]);
   const [fibuser, setfib] = useState([]);
   const [inspecuser, setinspecuser] = useState([]);
+
+  const finalActiondata = allactingdata?.map((v) => {
+    return {
+      UserID: v.UserID,
+      RoleID: v.RoleID,
+      ActingUserID: v.ActingUserID,
+      ActingRoleID: v.ActingRoleID,
+      RoleStartDate: startDate,
+      RoleEndDate: endDate,
+      Reason: reasontext,
+    };
+  });
+ 
 
   // const handleToggle = () => {
   //   setIsToggled((prevState) => !prevState);
@@ -61,40 +79,41 @@ const Header = () => {
   //     document.body.classList.remove("toggle-sidebar");
   //   }
   // };
- 
 
-  const hanldeSetactiondata = (e, index) => {
+  const hanldeSetactiondata = (e, index, id) => {
     const name = e.target.name;
-    const value = e.target.value; 
-  
+    const value = e.target.value;
+
     if (name === "users" && value != "") {
       const { userID, roleID } = JSON.parse(value);
-   
+
       setallactingdata((prevState) => {
         const updatedList = [...prevState];
         updatedList[index] = {
-          ...updatedList[index], 
-          ActingUserID: roleID,
-          ActingRoleID: userID,
-          UserID:UserID.replace(/"/g, ""),
-          RoleID:RoleID
+          ...updatedList[index],
+          actingId: id,
+          ActingUserID: userID,
+          ActingRoleID: roleID,
+          UserID: UserID.replace(/"/g, ""),
+          RoleID: RoleID,
         };
         return updatedList;
       });
     } else {
       setallactingdata((prevState) => {
         const updatedList = [...prevState];
-        updatedList[index] = {
-          ...updatedList[index],
-          [name]: value,   
-        };
+        const removeIndex = updatedList.findIndex(
+          (item) => item.actingId === id
+        );
+        if (removeIndex !== -1) {
+          updatedList.splice(removeIndex, 1);
+        }
         return updatedList;
       });
     }
   };
-  
 
-  console.log("allactingdata", allactingdata)
+  console.log("allactingdata", allactingdata);
 
   const UserRole = async () => {
     await axios
@@ -134,8 +153,7 @@ const Header = () => {
         Storage.removeItem("menuitem");
         sessionStorage.setItem("submenuname", "Dashboard");
 
-        if (res.data.responseCode == 200) {
-          console.log("count--list", res);
+        if (res.data.responseCode == 200) { 
           // setmenuCount(res.data.responseData);
           Storage.setItem("menuitem", JSON.stringify(res.data.responseData));
           const firstMenuItem = res.data.responseData[1];
@@ -186,55 +204,64 @@ const Header = () => {
     setUserRoleName(name);
   };
   // Role click Function end
-
   
 
-  const UserRoleList = (e, checked) => {
-    const value = e.target.value;
-
+  const UserRoleList = () => {
     const roleIDs = RoleId?.replace(/"/g, "");
 
     axios
       .post(APIURL + "User/GetUsersByRoleID", {
         RoleID: roleIDs - 1,
-        DepartmentID: value,
+        DepartmentID: 2,
         UserID: userId?.replace(/"/g, ""),
       })
       .then((res) => {
-        console.log("res----------user", res);
         if (res.data.responseCode == 200) {
-          if (value == 2) {
-            if (checked) {
-              setexportuser(res.data.responseData);
-            } else { 
-              setexportuser([]); // Reset the state when unchecked
-            } 
-          } else if (value == 3) {
-           
-            if (checked) {
-              setimportuser(res.data.responseData);
-            } else {
-              setimportuser([]); // Reset the state when unchecked
-               
-            } 
-             
-          } else if (value == 4) {
-            if (checked) {
-              setfib(res.data.responseData);
-            } else {
-              setfib([]); // Reset the state when unchecked
-               
-            } 
-            
-          } else {
-            if (checked) {
-              setinspecuser(res.data.responseData);
-            } else {
-              setinspecuser([]); // Reset the state when unchecked
-            
-            }
-           
-          }
+          setexportuser(res.data.responseData);
+        } else {
+          setexportuser([]);
+        }
+      });
+
+    axios
+      .post(APIURL + "User/GetUsersByRoleID", {
+        RoleID: roleIDs - 1,
+        DepartmentID: 3,
+        UserID: userId?.replace(/"/g, ""),
+      })
+      .then((res) => {
+        if (res.data.responseCode == 200) {
+          setimportuser(res.data.responseData);
+        } else {
+          setimportuser([]);
+        }
+      });
+
+    axios
+      .post(APIURL + "User/GetUsersByRoleID", {
+        RoleID: roleIDs - 1,
+        DepartmentID: 4,
+        UserID: userId?.replace(/"/g, ""),
+      })
+      .then((res) => {
+        if (res.data.responseCode == 200) {
+          setfib(res.data.responseData);
+        } else {
+          setfib([]);
+        }
+      });
+
+    axios
+      .post(APIURL + "User/GetUsersByRoleID", {
+        RoleID: roleIDs - 1,
+        DepartmentID: 5,
+        UserID: userId?.replace(/"/g, ""),
+      })
+      .then((res) => { 
+        if (res.data.responseCode == 200) {
+          setinspecuser(res.data.responseData);
+        } else {
+          setinspecuser([]);
         }
       });
   };
@@ -260,11 +287,25 @@ const Header = () => {
 
   const handleActingRole = async () => {
     axios
-      .post(APIURL + "User/AddActingRole", allactingdata)
+      .post(APIURL + "User/AddActingRole", finalActiondata)
       .then((res) => {
-        console.log(res); 
-      toast.success("Data save successfully");
-        EditModalClose();
+        console.log(res);
+        if(res.data.responseCode == 200){
+          toast.success(res.data.responseMessage);
+          EditModalClose();
+          setStartDate("")
+          setendDate("")
+          setallactingdata([ {
+            actingId: "",
+            UserID: "",
+            RoleID: "",
+            ActingUserID: "",
+            ActingRoleID: "", 
+          }])
+        }else{
+          toast.warning(res.data.responseMessage);
+        }
+        
       })
       .catch((error) => {
         console.log(error);
@@ -274,10 +315,20 @@ const Header = () => {
   useEffect(() => {
     handleActingRoleList();
     UserRole();
+    UserRoleList();
   }, []);
 
   const EditModalClose = () => {
     setshowEditForm(false);
+    setStartDate("")
+    setendDate("")
+    setallactingdata([ {
+      actingId: "",
+      UserID: "",
+      RoleID: "",
+      ActingUserID: "",
+      ActingRoleID: "", 
+    }]) 
   };
 
   useEffect(() => {
@@ -476,35 +527,99 @@ const Header = () => {
             <div className="login_form_panel">
               <Modal.Body className="p-0">
                 <div className="actingrolebox">
-                  <h4>Welcome To Acting Role Principal Analyst</h4>
+                  {/* <h4>Welcome To Acting Role Principal Analyst</h4> */}
 
                   <div className="row">
                     <div className="col-md-12">
-                      <div className="table-responsive">
-                        <table className="table">
-                          <thead className="thead-light">
-                            <tr>
-                              <th >Department</th>
-                              <th>Role Start Date</th>
-                              <th>Role End Date</th>
-                              <th>User</th>
-                            </tr>
-                          </thead>
+                  
+                       
+                      <div className="action_form_new">
+                        <label className="actioncontrolform">Date</label>
+                        <div className="acting-date">
+                          <DatePicker
+                            closeOnScroll={(e) => e.target === document}
+                            selected={startDate}
+                            placeholderText="Start Date"
+                            onChange={(date) => {
+                              setStartDate(date);
+                              setendDate(null);
+                            }}
+                            peekNextMonth
+                            showMonthDropdown
+                            minDate={new Date()}
+                            showYearDropdown
+                            dropdownMode="select"
+                            dateFormat="dd/MMM/yyyy"
+                            onKeyDown={(e) => {
+                              const key = e.key;
+                              const allowedKeys = /[0-9\/]/; // Allow numbers and '/'
+                              if (
+                                !allowedKeys.test(key) &&
+                                key !== "Backspace" &&
+                                key !== "Delete"
+                              ) {
+                                e.preventDefault();
+                              }
+                            }}
+                            className="date-acting"
+                          />
+                        </div>
+                        <div className="acting-date">
+                          <DatePicker
+                            closeOnScroll={(e) => e.target === document}
+                            selected={endDate}
+                            placeholderText="End Date"
+                            onChange={(date) => setendDate(date)}
+                            peekNextMonth
+                            showMonthDropdown
+                            minDate={startDate ? startDate : new Date()}
+                            showYearDropdown
+                            dropdownMode="select"
+                            dateFormat="dd/MMM/yyyy"
+                            onKeyDown={(e) => {
+                              const key = e.key;
+                              const allowedKeys = /[0-9\/]/; // Allow numbers and '/'
+                              if (
+                                !allowedKeys.test(key) &&
+                                key !== "Backspace" &&
+                                key !== "Delete"
+                              ) {
+                                e.preventDefault();
+                              }
+                            }}
+                            className="date-acting"
+                            disabled={!startDate}
+                          />
+                        </div>
+                      
+                  </div>
+
+                        <table className="table"> 
 
                           {actinglist?.length
                             ? actinglist?.map((list, index) => {
                                 return (
                                   <>
                                     <tr>
-                                      <td style={{width:"120px", paddingRight:"10px"}}>
+                                      <td
+                                        style={{
+                                          width: "120px",
+                                          paddingRight: "10px",
+                                        }}
+                                      >
                                         {" "}
                                         <label className="labelacting">
-                                          <div className="checkbox-wrapper-15">
+                                          {/* <div className="checkbox-wrapper-15">
                                             <input
                                               className="inp-cbx"
                                               id={"cbx-15" + list.id}
                                               value={list.id}
-                                              onClick={(e) => UserRoleList(e, e.target.checked)}
+                                              onClick={(e) =>
+                                                UserRoleList(
+                                                  e,
+                                                  e.target.checked
+                                                )
+                                              }
                                               type="checkbox"
                                               style={{ display: "none" }}
                                             />
@@ -522,81 +637,86 @@ const Header = () => {
                                                 </svg>
                                               </span>
                                             </label>
-                                          </div>{" "}
-                                         {list.menuName}
+                                          </div>{" "} */}
+                                          {list.menuName}
                                         </label>
                                       </td>
+
                                       <td>
                                         <div className="acting_form_new">
                                           <div className="form-bxact">
                                             <label>
-                                              {" "}
-                                              <input type="date" name="RoleStartDate" onChange={(e)=>hanldeSetactiondata(e , index)} />
-                                            </label>
-                                          </div>
-                                        </div>
-                                      </td>
-                                      <td>
-                                        <div className="acting_form_new">
-                                          <div className="form-bxact">
-                                            <label>
-                                              {" "}
-                                              <input type="date" name="RoleEndDate" onChange={(e)=>hanldeSetactiondata(e, index)} />
-                                            </label>
-                                          </div>
-                                        </div>
-                                      </td>
-                                      <td>
-                                        <div className="acting_form_new">
-                                          <div className="form-bxact">
-                                            <label>
-                                               
-                                              <select name="users" onChange={(e)=>{  hanldeSetactiondata(e, index)}}>
-                                                <option value="">Select user</option>
-                                                {
-                                                list.id == 2 ? (
-                                                  exportuser?.map((userlist, ind)=>{
-                                                    return(
-                                                    <option value={JSON?.stringify(userlist)}>{userlist.name}</option>
+                                              <select
+                                                name="users"
+                                                onChange={(e) => {
+                                                  hanldeSetactiondata(
+                                                    e,
+                                                    index,
+                                                    list.id
+                                                  );
+                                                }}
+                                              >
+                                                <option value="">
+                                                  Select user
+                                                </option>
+                                                {list.id == 2
+                                                  ? exportuser?.map(
+                                                      (userlist, ind) => {
+                                                        return (
+                                                          <option
+                                                            value={JSON?.stringify(
+                                                              userlist
+                                                            )}
+                                                          >
+                                                            {userlist.name}
+                                                          </option>
+                                                        );
+                                                      }
                                                     )
-                                                  })
-                                                  )  : list.id == 3 ? (
-                                                    importuser?.map((userlist, ind)=>{
-                                                      return(
-                                                      <option value={JSON?.stringify(userlist)}>{userlist.name}</option>
-                                                      )
-                                                    })
-                                                    ) : list.id == 4 ? (
-                                                      fibuser?.map((userlist, ind)=>{
-                                                        return(
-                                                        <option value={JSON?.stringify(userlist)}>{userlist.name}</option>
-                                                        )
-                                                      })
-                                                      ) : list.id == 5 ? (
-                                                        inspecuser?.map((userlist, ind)=>{
-                                                          return(
-                                                          <option value={JSON?.stringify(userlist)}>{userlist.name}</option>
-                                                          )
-                                                        })
-                                                        ) : ""
-                                                }
+                                                  : list.id == 3
+                                                  ? importuser?.map(
+                                                      (userlist, ind) => {
+                                                        return (
+                                                          <option
+                                                            value={JSON?.stringify(
+                                                              userlist
+                                                            )}
+                                                          >
+                                                            {userlist.name}
+                                                          </option>
+                                                        );
+                                                      }
+                                                    )
+                                                  : list.id == 4
+                                                  ? fibuser?.map(
+                                                      (userlist, ind) => {
+                                                        return (
+                                                          <option
+                                                            value={JSON?.stringify(
+                                                              userlist
+                                                            )}
+                                                          >
+                                                            {userlist.name}
+                                                          </option>
+                                                        );
+                                                      }
+                                                    )
+                                                  : list.id == 5
+                                                  ? inspecuser?.map(
+                                                      (userlist, ind) => {
+                                                        return (
+                                                          <option
+                                                            value={JSON?.stringify(
+                                                              userlist
+                                                            )}
+                                                          >
+                                                            {userlist.name}
+                                                          </option>
+                                                        );
+                                                      }
+                                                    )
+                                                  : ""}
                                               </select>
-                                            </label>
-                                          </div>
-                                        </div>
-                                      </td>
-                                    </tr>
-                                    <tr>
-                                      <td></td>
-                                      <td colSpan="3">
-                                        <div className="action_form_new ">
-                                          <div className="form-bx-action">
-                                            <label>
-                                              <textarea
-                                               name="Reason" onChange={(e)=>hanldeSetactiondata(e, index)}
-                                                placeholder="Reason"
-                                              ></textarea>
-                                              <span className="sspan"></span>
                                             </label>
                                           </div>
                                         </div>
@@ -607,14 +727,44 @@ const Header = () => {
                               })
                             : ""}
                         </table>
+                      
+                        <div className="action_form_new">
+                          <label class="actioncontrolform">Reason</label>
+                          <div className="form-bx-action">
+                            <label>
+                              <textarea
+                                name="Reason"
+                                onChange={(e) => setreasontext(e.target.value)}
+                                placeholder="Reason"
+                              ></textarea>
+                              <span className="sspan"></span>
+                            </label>
+                          </div>
+                       
+
                       </div>
                     </div>
                   </div>
+
+                 
+
                 </div>
 
                 <div className="form-footer mt-5 mb-3 flex-row-reverse">
                   <div>
-                    <button type="button" className="login" onClick={handleActingRole} disabled={(allactingdata.length && allactingdata[0].UserID =="") || !allactingdata.length ? true : false}>
+                    <button
+                      type="button"
+                      className="login"
+                      onClick={handleActingRole}
+                      disabled={
+                        allactingdata.length == 0 ||
+                        !allactingdata.length ||
+                        !startDate ||
+                        !endDate
+                          ? true
+                          : false
+                      }
+                    >
                       Submit{" "}
                     </button>
                   </div>
