@@ -2,7 +2,9 @@ import axios from "axios";
 import React, { useState } from "react";
 import { APIURL } from "../constant";
 import { DataTable } from "primereact/datatable";
+import { Column } from "primereact/column";
 import Modal from "react-bootstrap/Modal";
+import moment from "moment";
 import ExportDashboardViewDetails from "../components/ExportDashboardViewDetails";
 
 const SearchTable = () => {
@@ -33,6 +35,68 @@ const SearchTable = () => {
     }
   };
 
+  const applicantName = (rowData) => {
+    return (
+      <>
+        {rowData.applicantType === 1 || rowData.userTypeID === 1 ? (
+          <span>
+            <i className="bi bi-c-circle-fill text-primary"></i>
+            &nbsp;&nbsp;{rowData.companyName}
+          </span>
+        ) : rowData.applicantType === 2 || rowData.userTypeID == 2 ? (
+          <span>
+            <i className="bi bi-person-circle"></i>
+            &nbsp;&nbsp;{rowData.name}
+          </span>
+        ) : (
+          ""
+        )}
+      </>
+    );
+  };
+
+  const amountwithCurrency = (rowData) => {
+    return (
+      <span>
+        {rowData.currencyCode}&nbsp;{rowData.amount?.toLocaleString()}
+      </span>
+    );
+  };
+
+  const submittedDate = (rowData) => {
+    return (
+      <span>
+        {moment(rowData.applicationSubmittedDate).format("DD MMM YYYY")}
+      </span>
+    );
+  };
+
+  const action = (rowData) => {
+    return (
+      <>
+        <i
+          className="pi pi-eye"
+          style={{
+            padding: "10px 5px",
+            marginRight: "10px",
+            cursor: "pointer",
+          }}
+          // onClick={() => {
+          //   handleViewData(rowData.id);
+          //   GetHandelDetail(rowData?.rbzReferenceNumber, rowData.id);
+          //   GetApplicationCount(rowData.id);
+          // }}
+          onMouseEnter={(e) => {
+            e.target.style.color = "var(--primary-color)";
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.color = "";
+          }}
+        ></i>
+      </>
+    );
+  };
+
   console.log("SearchData - ", SearchData);
 
   return (
@@ -43,10 +107,15 @@ const SearchTable = () => {
           placeholder="Search"
           onChange={(e) => setSearchInput(e.target.value)}
         />
-        <button type="button" disabled={SearchInput ? false : true} onClick={() => GetSearchData()}>
+        <button
+          type="button"
+          disabled={SearchInput ? false : true}
+          onClick={() => GetSearchData()}
+        >
           Search
         </button>
       </div>
+      <hr />
 
       {loading == true ? (
         <label className="outerloader2">
@@ -55,19 +124,20 @@ const SearchTable = () => {
         </label>
       ) : NoSearchData && !SearchData.length ? (
         <div className="row">
-          <div className="col-12">
-            <p>{NoSearchData}...</p>
+          <div className="col-12 text-center">
+            <p>{NoSearchData}</p>
           </div>
         </div>
-      ) : (
+      ) : SearchData.length ? (
         <div>
-          {/* <DataTable
+          <DataTable
             value={SearchData}
             scrollable
             scrollHeight="500px"
-            className={roleID >= 5 || roleID == 3 ? "mt-1" : "mt-1 tablehideth"}
-            onSelectionChange={(e) => setSelectedAppliation(e.value)}
-            paginator={data.length > 10 ? true : false}
+            // className={roleID >= 5 || roleID == 3 ? "mt-1" : "mt-1 tablehideth"}
+            className="mt-1 tablehideth"
+            // onSelectionChange={(e) => setSelectedAppliation(e.value)}
+            paginator={SearchData.length > 10 ? true : false}
             selectionMode="checkbox"
             paginatorPosition={"both"}
             paginatorLeft
@@ -84,17 +154,7 @@ const SearchTable = () => {
               "statusName",
             ]}
             emptyMessage="No Data found."
-            header={header}
           >
-            {roleID >= 5 || roleID == 3 ? (
-              <Column
-                selectionMode="multiple"
-                style={{ width: "40px", cursor: "pointer" }}
-                exportable={false}
-              ></Column>
-            ) : (
-              ""
-            )}
             <Column
               field="rbzReferenceNumber"
               header="RBZ Reference Number"
@@ -142,7 +202,13 @@ const SearchTable = () => {
               alignFrozen="right"
               body={action}
             ></Column>
-          </DataTable> */}
+          </DataTable>
+        </div>
+      ) : (
+        <div className="row">
+          <div className="col-12 text-center">
+            <p>No records to showv</p>
+          </div>
         </div>
       )}
       {/* <Modal

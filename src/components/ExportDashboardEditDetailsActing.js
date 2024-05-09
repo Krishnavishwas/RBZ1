@@ -35,7 +35,7 @@ import StarterKit from "@tiptap/starter-kit";
 // import MultiSelect from "react-multi-select-component";
 
 
-const ExportDashboardEditDetails = ({
+const ExportDashboardEditDetailsActing = ({
   applicationDetail,
   setApplicationDetail,
   EditModalClose,
@@ -130,7 +130,9 @@ const ExportDashboardEditDetails = ({
   const PdfUsername = Storage.getItem("name");
   const PdfRolename = Storage.getItem("roleName");
   const bankidcheck = bankID !== "" ? "1" : "3";
-  const roleID = Storage.getItem("roleIDs");
+  const roleIDs = Storage.getItem("roleIDs");
+  const roleID = parseInt(roleIDs) + 1;
+ 
 
   const userSign = Storage.getItem("signImageURL");
 
@@ -1986,6 +1988,7 @@ useEffect(() => {
           DepartmentID: "2",
           UserID: UserID.replace(/"/g, ""),
           RoleID: roleID,
+          ActingRole:"1",
           AssignedTo:
             // checkSupervisor == true
             //   ? AssignUserID
@@ -16906,4 +16909,4 @@ useEffect(() => {
   );
 };
 
-export default ExportDashboardEditDetails;
+export default ExportDashboardEditDetailsActing;

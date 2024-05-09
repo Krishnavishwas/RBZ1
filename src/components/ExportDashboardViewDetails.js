@@ -4508,7 +4508,7 @@ const ExportDashboardViewDetails = ({
             )} */}
 
             <>
-              <h5 className={roleID > 2 ? "section_top_subheading mt-3 py-3 btn-collapse_active " : "d-none"}>
+              <h5 className={roleID > 3 ? "section_top_subheading mt-3 py-3 btn-collapse_active " : "d-none"}>
                 Application History
               </h5>
 
@@ -4531,7 +4531,7 @@ const ExportDashboardViewDetails = ({
                               <>
                                 <tr>
                                   <td>{item.roleName}</td>
-                                  <td>{item.name ? item.name : "--"}</td>
+                                  <td>{item.name ? item.name : "--"} {item.actingRole == "1" ? <span className="act_sym">A</span> : ""}</td>
                                   <td>
                                     {item.createdDate
                                       ? moment(item.createdDate).format(
