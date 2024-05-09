@@ -41,6 +41,10 @@
 .cursorpointer{
   cursor: pointer;
 }
+html {
+  scroll-behavior: smooth;
+}
+
 
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
@@ -2134,6 +2138,11 @@ padding: 30px 0px 20px;
   color: #fff;
   padding: 15px;
   margin: 0 0 5px;
+  display: inline-flex;
+  width: 100%;
+  align-content: center;
+  justify-content: space-between;
+  align-items: center;
 }
 .section_top_subheading{
   padding: 9px 18px;
@@ -2699,6 +2708,7 @@ display: none;
   float: right;
   color: #000;
   cursor: pointer;
+  padding: 4px;
 }
 .btn-collapse_active{
   background: #42a5f5;
@@ -3678,3 +3688,39 @@ border: 0px !important;
     position: absolute;
     left: 0;
 }
+.act_btn-dashboard{
+  float: right;
+  background: #42a5f5;
+  padding: 8px 16px;
+  border-radius: 2px;
+  color: #fff;
+  text-transform: uppercase;
+  line-height: normal;
+}
+.act_btn-dashboard span{
+  background: #fff;
+    color: #5e62a1;
+    padding: 2px 5px;
+    margin-left: 10px;
+    box-shadow: 0px 1px 2px #0000003b;
+    border-radius: 1px;
+}
+.act_btn-dashboard:hover{
+color: #fff;
+box-shadow: 0 0 2 #00000050;
+}
+
+.searchtable_bx {
+  display: inline-block;
+  width: 100%;
+  padding: 20px;
+}
+.searchtable_inner_bx {
+  display: block;
+  max-width: 400px;
+  margin:10px auto 40px;
+
+}
+ 
+.searchtable_inner_bx input{border: 1px solid #ccc;padding: 10px 15px;border-radius: 5px;width: calc(92% - 60px);}
+.searchtable_inner_bx button{border: 0px;padding: 11px 16px;margin-left: 10px;background: #5e62a1;border-radius: 4px;color: #fff;}

@@ -4508,11 +4508,11 @@ const ExportDashboardViewDetails = ({
             )} */}
 
             <>
-              <h5 className="section_top_subheading mt-3 py-3 btn-collapse_active ">
+              <h5 className={roleID > 2 ? "section_top_subheading mt-3 py-3 btn-collapse_active " : "d-none"}>
                 Application History
               </h5>
 
-              <div className="tab-content">
+              <div className={roleID > 2 ? "tab-content" : "d-none"}>
                 <div className="table-responsive">
                   <table class="table">
                     <thead>

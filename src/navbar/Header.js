@@ -60,6 +60,7 @@ const Header = () => {
 
   const finalActiondata = allactingdata?.map((v) => {
     return {
+      DepartmentID: v.actingId,
       UserID: v.UserID,
       RoleID: v.RoleID,
       ActingUserID: v.ActingUserID,
@@ -69,6 +70,8 @@ const Header = () => {
       Reason: reasontext,
     };
   });
+
+  console.log("finalActiondata", finalActiondata)
  
 
   // const handleToggle = () => {

@@ -1865,7 +1865,7 @@ useEffect(() => {
       newErrors.sector = "Sector is required";
       valid = false;
     }
-    if (applicationDetail.subSector === "" || checksectorchange === true) {
+    if ((applicationDetail.subSector === "" || checksectorchange === true) && applicationDetail.sector != 2 ) {
       newErrors.subSector = "Sub sector is required";
       valid = false;
     }
@@ -14704,14 +14704,14 @@ useEffect(() => {
               )}
 
               <>
-                <h5 className="section_top_subheading mt-3 py-3 btn-collapse_active ">
+                <h5 className={roleID > 2 ? "section_top_subheading mt-3 py-3 btn-collapse_active " : "d-none"}>
                   Application History{" "}
                   {/* <span className="btn-collapse">
               <i className="bi bi-caret-down-fill"></i>
             </span> */}
                 </h5>
 
-                <div className="tab-content">
+                <div className= {roleID > 2 ? "tab-content" : "d-none"}>
                   <div className="table-responsive">
                     <table className="table">
                       <thead>

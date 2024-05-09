@@ -513,7 +513,7 @@ const ExportNewRequestForm = () => {
       newErrors.sector = "Sector is required";
       valid = false;
     }
-    if (exportForm.subsector === "") {
+    if (exportForm.subsector === "" && exportForm.sector != 2) {
       newErrors.subsector = "Subsector is required";
       valid = false;
     }

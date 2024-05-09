@@ -926,7 +926,7 @@ const ExportDashboardRenewEditDetails = ({
       newErrors.sector = "Sector is required";
       valid = false;
     }
-    if (applicationDetail.subSector === "" || checksectorchange === true) {
+    if ((applicationDetail.subSector === "" || checksectorchange === true) && applicationDetail.sector != 2) {
       newErrors.subSector = "Sub sector is required";
       valid = false;
     }
