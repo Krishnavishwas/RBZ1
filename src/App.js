@@ -34,9 +34,9 @@ import ExportApprovedRequests from "./pages/ExportApprovedRequests";
 import ExportRejectedRequests from "./pages/ExportRejectedRequests";
 import ExportDeferredRequests from "./pages/ExportDeferredRequests";
 import ExportCancelledRequests from "./pages/ExportCancelledRequests";
-import EditTemp from './admin/components/EditorTemplate'
+import EditTemp from "./admin/components/EditorTemplate";
 import TatData from "./TatData";
-import Profile from "./pages/Profile"
+import Profile from "./pages/Profile";
 import NotApproveUser from "./admin/pages/NotApprovedUser";
 import Directives from "./admin/pages/Directives";
 import AdminNotFound from "./admin/pages/AdminNotFound";
@@ -44,12 +44,12 @@ import ImportNewForm from "./pages/ImportNewForm";
 import ImportDashboard from "./pages/ImportDashboard";
 import ExportExpiredRequests from "./pages/ExportExpiredRequests";
 import ExportExpiringRequests from "./pages/ExportExpiringRequests";
-import CircularsRequests from "./pages/CircularsRequests"
-import CopiedResponse   from './pages/ExportCopiedResponse'
-import ImpersonateUser from './admin/pages/ImpersonateUser'
-
+import CircularsRequests from "./pages/CircularsRequests";
+import CopiedResponse from "./pages/ExportCopiedResponse";
+import ImpersonateUser from "./admin/pages/ImpersonateUser";
 
 function App() {
+  
   const loginToken = Storage.getItem("loginToken");
   const userName = Storage.getItem("userName");
   const userID = Storage.getItem("userID");
@@ -88,10 +88,9 @@ function App() {
             <Route path="/NotApprovedUser" element={<NotApproveUser />} />
             <Route path="/PendingUser" element={<PendingUser />} />
             <Route path="/BankMaster" element={<BankMaster />} />
-            <Route path="/EditTemp" element={<EditTemp />} /> 
+            <Route path="/EditTemp" element={<EditTemp />} />
             <Route path="/Directives" element={<Directives />} />
             <Route path="/Impersonate" element={<ImpersonateUser />} />
-
 
             <Route path="*" element={<AdminNotFound />} />
           </>
@@ -109,10 +108,7 @@ function App() {
             <Route path="/ImportDashboard" element={<ImportDashboard />} />
             <Route path="/FINVDashboard" element={<FINVDashboard />} />
             <Route path="/FINVNewRequest" element={<FINVNewRequest />} />
-            <Route
-              path="/Profile"
-              element={<Profile />}
-            />
+            <Route path="/Profile" element={<Profile />} />
             <Route
               path="/ExportPendingRequests"
               element={<ExportPendingRequests />}
@@ -138,10 +134,12 @@ function App() {
               element={<ExportCancelledRequests />}
             />
             <Route path="*" element={<NotFound />} />
-            
             <Route path="/ExportExpired" element={<ExportExpiredRequests />} />
-            <Route path="/ExportExpiringRequests" element={<ExportExpiringRequests />} /> 
-            <Route path="/Circulars" element={<CircularsRequests />}/>
+            <Route
+              path="/ExportExpiringRequests"
+              element={<ExportExpiringRequests />}
+            />
+            <Route path="/Circulars" element={<CircularsRequests />} />
             <Route path="/CopiedResponse" element={<CopiedResponse />} />
           </>
         ) : (
@@ -165,7 +163,6 @@ function App() {
           </>
         )}
       </Routes>
-
       <ToastContainer closeButton={false} />
     </>
   );
