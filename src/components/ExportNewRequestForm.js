@@ -123,6 +123,28 @@ const ExportNewRequestForm = () => {
     applicantName: "",
     beneficiaryName: "",
   });
+  const fileInputRefsother = [ useRef(null),useRef(null),useRef(null), useRef(null),useRef(null),useRef(null),useRef(null),useRef(null),useRef(null), useRef(null)];
+ 
+  const fileInputRefs = [
+    useRef(null),
+    useRef(null),
+    useRef(null), 
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null), 
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+  ];
 
   //---------- Start form fill data handle
 
@@ -658,10 +680,18 @@ const ExportNewRequestForm = () => {
       setToastDisplayed(true);
     }
   };
+ 
 
-  console.log("registerusertype",registerusertype);
+  
+  const clearInputFile = (index) => { 
+    
+    if (fileInputRefs[index]?.current) fileInputRefs[index].current.value = "";
+  };
 
-  console.log("applicantTypes--", applicantTypes);
+  const clearInputFileother = (index) =>{
+    if (fileInputRefsother[index]?.current) fileInputRefsother[index].current.value = "";
+   }
+  
 
   const closePopupHandle = () => {
     Navigate("/BankADLADashboard");
@@ -2132,6 +2162,7 @@ setselectuserRole("")
         )}
 
         <h5 className="section_top_subheading mt-3">Attachments</h5>
+ 
 
         {attachmentData?.map((items, index) => {
           return (
@@ -2144,6 +2175,7 @@ setselectuserRole("")
                 Browse{" "}
                 <input
                   type="file"
+                  ref={fileInputRefs[index]}
                   onChange={(e) => handleFileChange(e, items.name)}
                 />
               </div>
@@ -2157,7 +2189,7 @@ setselectuserRole("")
                 <button
                   type="button"
                   className="remove-file"
-                  onClick={() => removeUserImage(items?.name)}
+                  onClick={() => {removeUserImage(items?.name); clearInputFile(index)}}
                 >
                   Remove
                 </button>
@@ -2177,6 +2209,7 @@ setselectuserRole("")
               Browse{" "}
               <input
                 type="file"
+                ref={fileInputRefsother[index]}
                 onChange={(e) => {
                   handleFileChange(e, "other" + (index + 1));
                   handleOthrefile(e, "other" + (index + 1));
@@ -2194,7 +2227,7 @@ setselectuserRole("")
               <button
                 type="button"
                 className="remove-file"
-                onClick={() => removeUserImage("other" + (index + 1))}
+                onClick={() => {removeUserImage("other" + (index + 1)); clearInputFileother(index)}}
               >
                 Remove
               </button>
