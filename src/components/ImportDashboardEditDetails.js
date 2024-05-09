@@ -229,7 +229,12 @@ const ImportDashboardEditDetails = ({
   const para = "Import request updated successfully!";
   const applicationNumber = applicationDetail.rbzReferenceNumber;
 
-  const convertedRate = curRate * parseFloat(applicationDetail.amount);
+  // const convertedRate = curRate * parseFloat(applicationDetail.amount);
+  const ratevalue = applicationDetail?.rate;
+
+  const convertedRate =
+  parseFloat(curRate ? curRate : ratevalue) *
+  parseFloat(applicationDetail?.amount);
 
   const changeHandelForm = (e) => {
     const name = e.target.name;
@@ -941,7 +946,7 @@ const ImportDashboardEditDetails = ({
       applicationDetail.companyName == "" &&
       !getCompanyName
     ) {
-      newErrors.companyName = "Company name is required";
+      newErrors.companyName = "Company Name is required";
       valid = false;
     }
     if (applicationDetail.applicationTypeID === "") {
@@ -1799,7 +1804,7 @@ const ImportDashboardEditDetails = ({
               </div>
 
               {/* {registerusertype === "1" && bankID !== "" ? ( */}
-              {applicationDetail?.applicantType === "1" && bankID !== "" ? (
+              {applicationDetail?.applicantType == "1" && bankID != "" ? (
                 <>
                   {/* <div className="inner_form_new ">
               <label className="controlform">Company Name</label>
@@ -1834,7 +1839,7 @@ const ImportDashboardEditDetails = ({
                         placeholder={
                           applicationDetail.companyName
                             ? applicationDetail.companyName
-                            : "Select company name"
+                            : "Select Company Name"
                         }
                         value={getCompanyName}
                         onChange={handleChangecompany}
@@ -1843,7 +1848,7 @@ const ImportDashboardEditDetails = ({
                         isSearchable
                         noOptionsMessage={({ inputValue }) =>
                           inputValue?.length >= 3
-                            ? "No company found"
+                            ? "No Company found"
                             : "Please provide at least 3 characters for auto search of Company Name"
                         }
                         onMenuClose={handleClear}
@@ -1856,7 +1861,6 @@ const ImportDashboardEditDetails = ({
                             : true
                         }
                       />
-
                       {errors.companyName &&
                       (getCompanyName === "Company Name" ||
                         getCompanyName == null) ? (
@@ -2027,6 +2031,7 @@ const ImportDashboardEditDetails = ({
                       type="text"
                       ref={BeneficiaryNameRef}
                       name="beneficiaryName"
+                      placeholder="Beneficiary Name"
                       onChange={(e) => {
                         changeHandelForm(e);
                       }}
@@ -2048,7 +2053,7 @@ const ImportDashboardEditDetails = ({
               </div>
 
               <div className="inner_form_new ">
-                <label className="controlform">Baneficiary Country</label>
+                <label className="controlform">Beneficiary Country</label>
                 <div className="form-bx">
                   <label>
                     <select
@@ -2058,7 +2063,7 @@ const ImportDashboardEditDetails = ({
                       }}
                     >
                       <option value="">
-                        {applicationDetail?.beneficiaryCountryName}
+                        {applicationDetail?.beneficiaryCountryName ? applicationDetail?.beneficiaryCountryName : "Select Beneficiary Country"}
                       </option>
                       {countries?.map((item, ind) => {
                         return (
@@ -2113,7 +2118,8 @@ const ImportDashboardEditDetails = ({
               ) : (
                 ""
               )}
-
+{console.log("currency - ", currency)}
+{console.log("ImportForm - ", ImportForm)}
               <div className="row">
                 <div className="col-md-6">
                   <div className="inner_form_new">
@@ -2141,7 +2147,7 @@ const ImportDashboardEditDetails = ({
                                   key={cur.id}
                                   value={cur.id}
                                   selected={
-                                    ImportForm?.currency == cur.id
+                                    applicationDetail?.currency == cur.id
                                   }
                                 >
                                   {cur.currencyCode}
@@ -2236,11 +2242,6 @@ const ImportDashboardEditDetails = ({
                       ref={usdEquivalentRef}
                       type="text"
                       name="usdEquivalent"
-                      // value={
-                      //   ImportForm.currency && ImportForm.amount
-                      //     ? convertedRate.toFixed(2)
-                      //     : applicationDetail?.usdEquivalent
-                      // }
                       value={
                         applicationDetail?.currency &&
                         applicationDetail?.amount

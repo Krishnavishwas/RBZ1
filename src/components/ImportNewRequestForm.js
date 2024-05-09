@@ -395,17 +395,13 @@ const ImportNewRequestForm = () => {
     setTimeout(() => {
       setsubmitbuttonhide(false);
     }, 1000);
-    // if (ImportForm.purposeApplication === "") {
-    //   newErrors.purposeApplication = "Purpose of the application is required";
-    //   valid = false;
-    // }
     if (
       registerusertype === "1" &&
       (getCompanyName == null ||
         value === "Company Name" ||
         getCompanyName.label == "")
     ) {
-      newErrors.companyName = "Company name is required";
+      newErrors.companyName = "Company Name is required";
       valid = false;
     }
     if (ImportForm.applicationType === "") {
@@ -424,20 +420,8 @@ const ImportNewRequestForm = () => {
       newErrors.govtAgencie = "Government agencies name is required";
       valid = false;
     }
-    // if (registerusertype === "1" && ImportForm.BPNCode === "") {
-    //   newErrors.BPNCode = "BPN code is required";
-    //   valid = false;
-    // }
-    // if (registerusertype === "2" && ImportForm.TIN === "") {
-    //   newErrors.TIN = "TIN is Required";
-    //   valid = false;
-    // }
     if (registerusertype === "2" && ImportForm.applicant === "") {
       newErrors.applicant = "Applicant name is required";
-      valid = false;
-    }
-    if (ImportForm.PECANNumber === "") {
-      newErrors.PECANNumber = "PECAN is required";
       valid = false;
     }
     if (ImportForm.currency === "") {
@@ -448,11 +432,6 @@ const ImportNewRequestForm = () => {
       newErrors.amount = "Amount is required";
       valid = false;
     }
-    // if (ImportForm.relatedexchangeControlNumber === "") {
-    //   newErrors.relatedexchangeControlNumber =
-    //     "Related exchange control reference number is required";
-    //   valid = false;
-    // }
     if (ImportForm.sector === "") {
       newErrors.sector = "Sector is required";
       valid = false;
@@ -485,7 +464,6 @@ const ImportNewRequestForm = () => {
       await axios
         .post(APIURL + "ImportApplication/CreateImportApplication", {
           UserID: UserID.replace(/"/g, ""),
-          // BankID: bankID,
           BankID: roleID == 4 ? getBankID : bankID,
           RoleID: roleID,
           DepartmentID: "3",
@@ -688,7 +666,9 @@ const ImportNewRequestForm = () => {
   };
 
   const ResetHandleData = () => {
-    setgetCompanyName("");
+    setgetCompanyName(null);
+
+    // setgetCompanyName("");
     setselectuserRole("");
     setGetBankID("");
     setGetalluser([]);
@@ -707,6 +687,7 @@ const ImportNewRequestForm = () => {
       TIN: "",
       applicant: "",
       applicantReferenceNumber: "",
+      applicationType:"",
       exporterType: "",
       currency: "",
       amount: "",
@@ -974,7 +955,8 @@ const ImportNewRequestForm = () => {
               <label className="controlform">Company Name</label>
               <div className="form-bx">
                 <Select
-                  placeholder="Select company name"
+                ref={companyNameRef}
+                  placeholder="Select Company Name"
                   value={getCompanyName}
                   onChange={handleChangecompany}
                   onInputChange={handleInputChangecompany}
@@ -982,7 +964,7 @@ const ImportNewRequestForm = () => {
                   isSearchable
                   noOptionsMessage={({ inputValue }) =>
                     inputValue?.length > 3
-                      ? "No company found"
+                      ? "No Company found"
                       : "Type to search"
                   }
                   onMenuClose={handleClear}
@@ -1166,7 +1148,7 @@ const ImportNewRequestForm = () => {
         {/* end form-bx  */}
 
         <div className="inner_form_new ">
-          <label className="controlform">Baneficiary Country</label>
+          <label className="controlform">Beneficiary Country</label>
           <div className="form-bx">
             <label>
               <select
@@ -1175,13 +1157,8 @@ const ImportNewRequestForm = () => {
                 onChange={(e) => {
                   changeHandelForm(e);
                 }}
-                // className={
-                //   errors.baneficiaryCountry && ImportForm.baneficiaryCountry === ""
-                //     ? "error"
-                //     : ""
-                // }
               >
-                <option value="">Select Baneficiary Country</option>
+                <option value="">Select Beneficiary Country</option>
                 {countries?.map((item, ind) => {
                   return (
                     <option key={item.id} value={item.id}>
@@ -1191,44 +1168,9 @@ const ImportNewRequestForm = () => {
                 })}
               </select>
               <span className="sspan"></span>
-              {/* {errors.baneficiaryCountry && ImportForm.baneficiaryCountry === "" ? (
-                <small className="errormsg">{errors.baneficiaryCountry}</small>
-              ) : (
-                ""
-              )} */}
             </label>
           </div>
         </div>
-        {/* end form-bx  */}
-
-        {/* <div className="inner_form_new ">
-          <label className="controlform">Purpose of the Application</label>
-          <div className="form-bx">
-            <label>
-              <textarea
-                name="purposeApplication"
-                ref={purposeApplicationRef}
-                onChange={(e) => {
-                  changeHandelForm(e);
-                }}
-                placeholder="Purpose of the Application"
-                className={
-                  errors.purposeApplication &&
-                  ImportForm.purposeApplication === ""
-                    ? "error"
-                    : ""
-                }
-              />
-              <span className="sspan"></span>
-              {errors.purposeApplication &&
-              ImportForm.purposeApplication === "" ? (
-                <small className="errormsg">{errors.purposeApplication}</small>
-              ) : (
-                ""
-              )}
-            </label>
-          </div>
-        </div> */}
 
         {bankID == "" ? (
           <div className="inner_form_new ">
@@ -1268,7 +1210,6 @@ const ImportNewRequestForm = () => {
         ) : (
           ""
         )}
-        {/* end form-bx  */}
 
         <div className="row">
           <div className="col-md-6">
