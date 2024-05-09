@@ -1,5 +1,5 @@
 import axios from "axios";
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { APIURL } from "../constant";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
@@ -8,10 +8,39 @@ import moment from "moment";
 import ExportDashboardViewDetails from "../components/ExportDashboardViewDetails";
 
 const SearchTable = () => {
+  const SearchInputRef = useRef(null);
   const [SearchInput, setSearchInput] = useState("");
   const [SearchData, setSearchData] = useState([]);
   const [NoSearchData, setNoSearchData] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showUpdateModal, setShowUpdateModal] = useState(false);
+  const [responceCount, setresponceCount] = useState([]);
+  const [showdataLoader, setshowdataloader] = useState(false);
+  const [applicationDetail, setApplicationDetail] = useState({});
+  const [applicationmessage, setApplicationmessage] = useState("");
+  const [noDataComment, setNoDataComment] = useState([]);
+  const [allcomment, setallcomment] = useState([]);
+  const [tatHistory, setTatHistory] = useState([]);
+  const [Actiondata, setActiondata] = useState([]);
+
+  const handleFormClose = () => setShowUpdateModal(false);
+
+  const handleClear = () => {
+    setActiondata([])
+    setTatHistory([])
+    setallcomment([])
+    setNoDataComment([])
+    setApplicationmessage("")
+    setApplicationDetail({})
+    setshowdataloader(false)
+    setresponceCount([])
+    setShowUpdateModal(false)
+    setLoading(false)
+    setNoSearchData("")
+    if (SearchInputRef.current) SearchInputRef.current.value = "";
+    setSearchData([]);
+    setSearchInput("");
+  };
 
   const GetSearchData = async () => {
     try {
@@ -27,6 +56,7 @@ const SearchTable = () => {
         setLoading(false);
       } else if (getData?.data.responseCode == 401) {
         setLoading(false);
+        setSearchData([])
         setNoSearchData(getData?.data.responseMessage);
       }
     } catch (error) {
@@ -71,6 +101,109 @@ const SearchTable = () => {
     );
   };
 
+  const handleViewData = (id) => {
+    setShowUpdateModal(true);
+  };
+
+  const GetHandelDetail = async (rbzrefnumber, id) => {
+    setshowdataloader(true);
+    await axios
+      .post(APIURL + "ExportApplication/GetRequestInfoByApplicationID", {
+        RBZReferenceNumber: `${rbzrefnumber}`,
+        ID: id,
+      })
+      .then((res) => {
+        if (res.data.responseCode === "200") {
+          setApplicationDetail(res.data.responseData);
+          setTimeout(() => {
+            setshowdataloader(false);
+          }, 2000);
+        } else {
+          setApplicationmessage(res.data.responseMessage);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+
+    await axios
+      .post(APIURL + "ExportApplication/GetCommentsInfoByRoleID", {
+        ApplicationID: id,
+      })
+      .then((res) => {
+        if (res.data.responseCode == 200) {
+          setNoDataComment(res.data.responseData);
+        } else {
+          setNoDataComment([]);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+
+    await axios
+      .post(APIURL + "ExportApplication/GetNewComments", {
+        ID: id,
+      })
+      .then((res) => {
+        if (res.data.responseCode == 200) {
+          setallcomment(res.data.responseData);
+        } else {
+          setallcomment([]);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+
+    await axios
+      .post(APIURL + "ExportApplication/GetApplicationHistory", {
+        ID: id,
+      })
+      .then((res) => {
+        if (res.data.responseCode == 200) {
+          setTatHistory(res.data.responseData);
+        } else {
+          setTatHistory([]);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+
+    await axios
+      .post(APIURL + "ExportApplication/GetApplicationActionsByApplicationID", {
+        ID: id,
+      })
+      .then((res) => {
+        if (res.data.responseCode == 200) {
+          setActiondata(res.data.responseData);
+        } else {
+          setActiondata([]);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  const GetApplicationCount = async (id) => {
+    await axios
+      .post(APIURL + "ExportApplication/CountByApplicationID", {
+        ApplicationID: id,
+      })
+      .then((res) => {
+        if (res.data.responseCode == 200) {
+          setresponceCount(res.data.responseData);
+        } else {
+          setresponceCount({});
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
   const action = (rowData) => {
     return (
       <>
@@ -81,11 +214,11 @@ const SearchTable = () => {
             marginRight: "10px",
             cursor: "pointer",
           }}
-          // onClick={() => {
-          //   handleViewData(rowData.id);
-          //   GetHandelDetail(rowData?.rbzReferenceNumber, rowData.id);
-          //   GetApplicationCount(rowData.id);
-          // }}
+          onClick={() => {
+            handleViewData(rowData.id);
+            GetHandelDetail(rowData?.rbzReferenceNumber, rowData.id);
+            GetApplicationCount(rowData.id);
+          }}
           onMouseEnter={(e) => {
             e.target.style.color = "var(--primary-color)";
           }}
@@ -97,22 +230,30 @@ const SearchTable = () => {
     );
   };
 
-  console.log("SearchData - ", SearchData);
-
   return (
     <div className="searchtable_bx">
       <div className="searchtable_inner_bx">
         <input
+          ref={SearchInputRef}
           type="text"
           placeholder="Search"
           onChange={(e) => setSearchInput(e.target.value)}
         />
         <button
           type="button"
+          className="searchButton"
           disabled={SearchInput ? false : true}
           onClick={() => GetSearchData()}
         >
           Search
+        </button>
+        <button
+          type="button"
+          className="btn btn-light resetButton"
+          disabled={SearchInput ? false : true}
+          onClick={() => handleClear()}
+        >
+          Reset
         </button>
       </div>
       <hr />
@@ -134,9 +275,7 @@ const SearchTable = () => {
             value={SearchData}
             scrollable
             scrollHeight="500px"
-            // className={roleID >= 5 || roleID == 3 ? "mt-1" : "mt-1 tablehideth"}
-            className="mt-1 tablehideth"
-            // onSelectionChange={(e) => setSelectedAppliation(e.value)}
+            className="mt-1"
             paginator={SearchData.length > 10 ? true : false}
             selectionMode="checkbox"
             paginatorPosition={"both"}
@@ -207,11 +346,11 @@ const SearchTable = () => {
       ) : (
         <div className="row">
           <div className="col-12 text-center">
-            <p>No records to showv</p>
+            <p>No records to show</p>
           </div>
         </div>
       )}
-      {/* <Modal
+      <Modal
         show={showUpdateModal}
         onHide={handleFormClose}
         backdrop="static"
@@ -245,7 +384,7 @@ const SearchTable = () => {
             </div>
           </div>
         </div>
-      </Modal> */}
+      </Modal>
     </div>
   );
 };

@@ -28,7 +28,7 @@ const Search = () => {
           <div className="row">
             <div className="col-md-12">
               <div className="datatable">
-                <h4 className="section_top_heading">Application</h4>
+                <h4 className="section_top_heading">Search Application</h4>
                 <SearchTable />
               </div>
             </div>

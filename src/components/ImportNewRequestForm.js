@@ -1315,7 +1315,7 @@ const ImportNewRequestForm = () => {
             </label>
           </div>
         </div>
-{console.log("ImportForm.sector - ", ImportForm.sector)}
+
         <div className="inner_form_new ">
           <label className="controlform">Sector</label>
           <div className="form-bx">

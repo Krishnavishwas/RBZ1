@@ -320,20 +320,6 @@ const ImportDashboardEditDetails = ({
       newErrors.PECANNumber = "Special characters not allowed";
       valid = false;
     }
-    // else if (
-    //   name == "relatedexchangeControlNumber" &&
-    //   value.charAt(0) === " "
-    // ) {
-    //   newErrors.relatedexchangeControlNumber =
-    //     "First character cannot be a blank space";
-    //   valid = false;
-    // } else if (
-    //   name == "relatedexchangeControlNumber" &&
-    //   specialChars.test(value)
-    // ) {
-    //   newErrors.relatedexchangeControlNumber = "Special characters not allowed";
-    //   valid = false;
-    // }
     else {
       setErrors({});
       setApplicationDetail((prevState) => ({
@@ -343,7 +329,6 @@ const ImportDashboardEditDetails = ({
     }
 
     setErrors(newErrors);
-    console.log("name - value", name, value);
     if (name === "sector") {
       axios
         .post(APIURL + "Master/GetSubSectorBySectorID", {
@@ -528,8 +513,6 @@ const ImportDashboardEditDetails = ({
       setFiles((prevFiles) => [...prevFiles, { file, label }]);
     }
   };
-
-  console.log("files - ", files);
 
   const HandleFileUpload = (e, label, indx) => {
     const file = e.target.files[0];
@@ -950,7 +933,7 @@ const ImportDashboardEditDetails = ({
       if (optionExpirydisplayRef.current) optionExpirydisplayRef.current = "";
     }
   };
-  console.log("applicationDetail.subSector - ", applicationDetail.subSector);
+
   const validateForm = () => {
     let valid = true;
     const newErrors = {};
@@ -1106,8 +1089,6 @@ const ImportDashboardEditDetails = ({
     setErrors(newErrors);
     return valid;
   };
-
-  console.log("applicationDetail.sector - -", applicationDetail.sector);
 
   const HandleSubmit = async (e) => {
     e.preventDefault();
@@ -1651,8 +1632,6 @@ const ImportDashboardEditDetails = ({
     }
   };
 
-  console.log("errors - ", errors);
-
   return (
     <>
       {showdataLoader == true || !noDataComment?.length ? (
@@ -1785,7 +1764,6 @@ const ImportDashboardEditDetails = ({
               <div className="inner_form_new ">
                 <label className="controlform">Type of Importer</label>
                 <div className="form-bx-radio mt-4">
-                  {console.log("registerusertype - ", registerusertype)}
                   {applicantTypes?.map((item, index) => {
                     return (
                       <>
@@ -1795,11 +1773,9 @@ const ImportDashboardEditDetails = ({
                             ref={typeExporterRef}
                             onChange={(e) => {
                               changeHandelForm(e);
-                              // handleUsertype(e);
                             }}
                             name="importType"
                             value={item.id}
-                            // checked={registerusertype == item.id}
                             checked={
                               applicationDetail?.applicantType == item?.id
                             }
@@ -2009,9 +1985,6 @@ const ImportDashboardEditDetails = ({
                           : ""
                       }
                     >
-                      <option value="">
-                        {applicationDetail?.applicationType}
-                      </option>
                       {applicationType?.map((item, ind) => {
                         return (
                           <option
@@ -2136,8 +2109,6 @@ const ImportDashboardEditDetails = ({
               ) : (
                 ""
               )}
-              {console.log("currency - ", currency)}
-              {console.log("ImportForm - ", ImportForm)}
               <div className="row">
                 <div className="col-md-6">
                   <div className="inner_form_new">
@@ -2156,7 +2127,7 @@ const ImportDashboardEditDetails = ({
                               : ""
                           }
                         >
-                          <option value="">{ImportForm?.currencyCode}</option>
+                          {/* <option value="">{ImportForm?.currencyCode}</option> */}
                           {currency?.map((cur, ind) => {
                             return (
                               <option
@@ -2287,14 +2258,9 @@ const ImportDashboardEditDetails = ({
                         errors.sector && ImportForm.sector === "" ? "error" : ""
                       }
                     >
-                      <option value="">
-                        {applicationDetail?.sectorName !== ""
-                          ? applicationDetail?.sectorName
-                          : "Select Sector"}
-                      </option>
                       {sectorData?.map((item, ind) => {
                         return (
-                          <option key={item.id} value={item.id}>
+                          <option key={item.id} value={item.id} selected={applicationDetail?.sector == item.id}>
                             {item.sectorName}
                           </option>
                         );
@@ -2336,7 +2302,7 @@ const ImportDashboardEditDetails = ({
                           : ""
                       }
                     >
-                      <option value="">Subsector</option>
+                      <option value="">Select Subsector</option>
                       {subsectorData?.map((item, index) => {
                         return (
                           <option

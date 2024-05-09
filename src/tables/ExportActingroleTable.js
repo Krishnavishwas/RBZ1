@@ -220,7 +220,6 @@ const ExportActingroleTable = () => {
         RoleID: rollId,
       })
       .then((res) => { 
-        console.log("res---acting", res)
         if (res.data.responseCode === "200") {
           setLoading(false);
           setData(res.data.responseData);

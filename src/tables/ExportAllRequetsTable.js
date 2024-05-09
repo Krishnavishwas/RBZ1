@@ -14,8 +14,8 @@ import "primeicons/primeicons.css";
 import logo from "../rbz_LOGO.png";
 import NoSign from "../NoSign.png";
 import { TailSpin } from "react-loader-spinner";
-import { Paginator } from 'primereact/paginator';
-import Spinner from 'react-bootstrap/Spinner';
+import { Paginator } from "primereact/paginator";
+import Spinner from "react-bootstrap/Spinner";
 import { Link } from "react-router-dom";
 
 const ExportAllRequetsTable = () => {
@@ -24,7 +24,9 @@ const ExportAllRequetsTable = () => {
   const bankID = Storage.getItem("bankID");
   const PdftargetRef = useRef();
   const [ExportsapproveRequests, setExportsapproveRequests] = useState([]);
-  const [ExportsapproveAllRequests, setExportsapproveAllRequests] = useState([]);
+  const [ExportsapproveAllRequests, setExportsapproveAllRequests] = useState(
+    []
+  );
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [applicationDetail, setApplicationDetail] = useState({});
   const [applicationmessage, setApplicationmessage] = useState("");
@@ -63,10 +65,7 @@ const ExportAllRequetsTable = () => {
     setGlobalFilterValue(value);
   };
 
-
-
   const action = (rowData) => {
-    // console.log("rowDataACTION", rowData);
     return (
       <>
         <i
@@ -84,8 +83,7 @@ const ExportAllRequetsTable = () => {
             e.target.style.color = "";
           }}
         ></i>
-        {
-          rowData.filePath != null ? (
+        {rowData.filePath != null ? (
           loader == rowData?.id ? (
             <TailSpin
               visible={true}
@@ -100,7 +98,7 @@ const ExportAllRequetsTable = () => {
           ) : rowData?.filePath != null ? (
             <Link
               style={{ color: "#4b5563" }}
-              target="_blank" 
+              target="_blank"
               to={rowData?.filePath}
             >
               <i
@@ -154,10 +152,6 @@ const ExportAllRequetsTable = () => {
     );
   };
 
-
-
-
-
   // ----- Start Code For Geting Table List Data
   const [tabCount, setTabCount] = useState("");
   const handleTabCount = async () => {
@@ -185,13 +179,13 @@ const ExportAllRequetsTable = () => {
         DataType: "All",
         BankID: bankID,
         LowerLimit: "0",
-        UpperLimit: "10"
+        UpperLimit: "10",
       })
       .then((res) => {
         if (res.data.responseCode === "200") {
           setPageLoader(false);
           // setExportsapproveRequests(res.data.responseData);
-          setExportsapproveAllRequests(res.data.responseData)
+          setExportsapproveAllRequests(res.data.responseData);
         } else if (res.data.responseMessage === "No data") {
           setPageLoader(false);
         }
@@ -208,7 +202,7 @@ const ExportAllRequetsTable = () => {
         DataType: "My",
         BankID: bankID,
         LowerLimit: "0",
-        UpperLimit: "10"
+        UpperLimit: "10",
       })
       .then((res) => {
         if (res.data.responseCode === "200") {
@@ -370,7 +364,7 @@ const ExportAllRequetsTable = () => {
 
   // pagination click loader end
   ///--------pagination start
-  const [first, setFirst] = useState('');
+  const [first, setFirst] = useState("");
   const [rows, setRows] = useState(10);
 
   const onPageChange = (event) => {
@@ -386,7 +380,7 @@ const ExportAllRequetsTable = () => {
           DataType: "All",
           BankID: bankID,
           LowerLimit: event.rows * event.page,
-          UpperLimit: event.rows
+          UpperLimit: event.rows,
         })
         .then((res) => {
           if (res.data.responseCode === "200") {
@@ -394,8 +388,7 @@ const ExportAllRequetsTable = () => {
             setExportsapproveAllRequests(res.data.responseData);
           }
         });
-    }
-    else {
+    } else {
       axios
         .post(APIURL + "ExportApplication/GetExportDatabyUserID", {
           UserID: useId.replace(/"/g, ""),
@@ -404,7 +397,7 @@ const ExportAllRequetsTable = () => {
           DataType: "My",
           BankID: bankID,
           LowerLimit: event.rows * event.page,
-          UpperLimit: event.rows
+          UpperLimit: event.rows,
         })
         .then((res) => {
           if (res.data.responseCode === "200") {
@@ -412,9 +405,7 @@ const ExportAllRequetsTable = () => {
           }
         });
     }
-
   };
-
 
   ////////-------end
   const renderHeader = () => {
@@ -429,12 +420,30 @@ const ExportAllRequetsTable = () => {
           />
         </span>
         <div>
-          {(tabDepId == "All" && tabCount?.allDataCount >= 9) ?
-            <Paginator className="custom-pagination" first={first} rows={rows} totalRecords={tabCount?.allDataCount} rowsPerPageOptions={[10, 50, 100, 500, 1000]} onPageChange={onPageChange} />
-            : " "}
-          {(tabDepId == "My" && tabCount?.myDataCount >= 9) ?
-            <Paginator className="custom-pagination" first={first} rows={rows} totalRecords={tabCount?.myDataCount} rowsPerPageOptions={[10, 50, 100, 500, 1000]} onPageChange={onPageChange} />
-            : " "}
+          {tabDepId == "All" && tabCount?.allDataCount >= 9 ? (
+            <Paginator
+              className="custom-pagination"
+              first={first}
+              rows={rows}
+              totalRecords={tabCount?.allDataCount}
+              rowsPerPageOptions={[10, 50, 100, 500, 1000]}
+              onPageChange={onPageChange}
+            />
+          ) : (
+            " "
+          )}
+          {tabDepId == "My" && tabCount?.myDataCount >= 9 ? (
+            <Paginator
+              className="custom-pagination"
+              first={first}
+              rows={rows}
+              totalRecords={tabCount?.myDataCount}
+              rowsPerPageOptions={[10, 50, 100, 500, 1000]}
+              onPageChange={onPageChange}
+            />
+          ) : (
+            " "
+          )}
         </div>
       </div>
     );
@@ -448,17 +457,18 @@ const ExportAllRequetsTable = () => {
     setExportsapproveAllRequests([]);
   }, [tabDepId]);
 
-  console.log("applicationDetail", applicationDetail);
   return (
     <>
       {tabHeader}
-      {pageLoader == true  ? (<label className="outerloader2">
-        {" "}
-        <span className="loader"></span>
-        <span className="loaderwait">Please Wait...</span>
-      </label>) : ExportsapproveAllRequests?.length == 0 || ExportsapproveRequests?.length == 0 ? (
+      {pageLoader == true ? (
+        <label className="outerloader2">
+          {" "}
+          <span className="loader"></span>
+          <span className="loaderwait">Please Wait...</span>
+        </label>
+      ) : ExportsapproveAllRequests?.length == 0 ||
+        ExportsapproveRequests?.length == 0 ? (
         <div className="p-3">No records to show</div>
-
       ) : (
         <>
           {loading == true ? (
@@ -469,7 +479,6 @@ const ExportAllRequetsTable = () => {
             </label>
           ) : (
             <>
-
               <div className="pagination-top pagination-top-right">
                 {/* <Paginator  className="custom-pagination" first={first} rows={rows} totalRecords={tabDepId == "All" ? tabCount?.allDataCount : tabCount?.myDataCount} rowsPerPageOptions={[10, 50, 100]} onPageChange={onPageChange} /> */}
               </div>
@@ -477,13 +486,16 @@ const ExportAllRequetsTable = () => {
               <DataTable
                 className="primeDatatTable"
                 //value={slicedData}
-                value={tabDepId == "All" ? ExportsapproveAllRequests : ExportsapproveRequests}
+                value={
+                  tabDepId == "All"
+                    ? ExportsapproveAllRequests
+                    : ExportsapproveRequests
+                }
                 scrollable
                 scrollHeight="500px"
                 // paginator={ExportsapproveRequests?.length > 10 ? true : false}
                 rowHover
                 filters={filters}
-
                 // paginatorPosition={"both"}
                 // paginatorLeft
                 // rows={10}
@@ -549,13 +561,30 @@ const ExportAllRequetsTable = () => {
                 ></Column>
               </DataTable>
 
-              {(tabDepId == "All" && tabCount?.allDataCount >= 9) ?
-                <Paginator className="custom-pagination" first={first} rows={rows} totalRecords={tabCount?.allDataCount} rowsPerPageOptions={[10, 50, 100, 500, 1000]} onPageChange={onPageChange} />
-                : " "}
-              {(tabDepId == "My" && tabCount?.myDataCount >= 9) ?
-                <Paginator className="custom-pagination" first={first} rows={rows} totalRecords={tabCount?.myDataCount} rowsPerPageOptions={[10, 50, 100, 500, 1000]} onPageChange={onPageChange} />
-                : " "}
-
+              {tabDepId == "All" && tabCount?.allDataCount >= 9 ? (
+                <Paginator
+                  className="custom-pagination"
+                  first={first}
+                  rows={rows}
+                  totalRecords={tabCount?.allDataCount}
+                  rowsPerPageOptions={[10, 50, 100, 500, 1000]}
+                  onPageChange={onPageChange}
+                />
+              ) : (
+                " "
+              )}
+              {tabDepId == "My" && tabCount?.myDataCount >= 9 ? (
+                <Paginator
+                  className="custom-pagination"
+                  first={first}
+                  rows={rows}
+                  totalRecords={tabCount?.myDataCount}
+                  rowsPerPageOptions={[10, 50, 100, 500, 1000]}
+                  onPageChange={onPageChange}
+                />
+              ) : (
+                " "
+              )}
             </>
           )}
 
@@ -604,13 +633,11 @@ const ExportAllRequetsTable = () => {
             centered
             className="paginationLoader"
           >
-
             <Modal.Body>
               <Spinner animation="border" size="md" />
 
               <p>Please wait loading data.</p>
             </Modal.Body>
-
           </Modal>
           {/* loader modal end */}
         </>
