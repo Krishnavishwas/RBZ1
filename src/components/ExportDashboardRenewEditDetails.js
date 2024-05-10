@@ -132,6 +132,7 @@ const ExportDashboardRenewEditDetails = ({
   const [sharefile, setsharefile] = useState([]);
   const [othersharefile, setOthersharefile] = useState([]);
   const [errors, setErrors] = useState({});
+  const [ValidateShow, setValidateShow] = useState(false);
   const [applicationType, setapplicationType] = useState([]);
   const [subsectorData, setsubsectorData] = useState([]);
   const [checkSupervisor, setcheckSupervisor] = useState(false);
@@ -149,6 +150,7 @@ const ExportDashboardRenewEditDetails = ({
     Notes: "",
     Comment: "",
   });
+  const [loader, setLoader] = useState(false);
   const [DateExpiryOption, setDateExpiryOption] = useState("");
   const [defaultnoExpiry, setdefaultnoExpiry] = useState("0");
   const [IsReturnOption, setIsReturnOption] = useState("");
@@ -163,12 +165,16 @@ const ExportDashboardRenewEditDetails = ({
   const [userRoleRecordofficer, setuserRoleRecordofficer] = useState([]);
   const [selectuserRoleRecordofficer, setselectuserRoleRecordofficer] =
     useState("");
+    const [ValidateRBZ, setValidateRBZ] = useState([]);
   const [getalluser, setGetalluser] = useState([]);
   const [getBlankFile, setgetBlankFile] = useState([]);
   const [viewShareFile, setviewShareFile] = useState([]);
   const [geninfoFile, setgeninfoFile] = useState([]);
   const [newData, setnewData] = useState([]);
   const [SubmitBtnLoader, setSubmitBtnLoader] = useState(false);
+  const [ValidateChange, setValidateChange] = useState({
+    relatedexchangeControlNumber: "",
+  });
 
   const applicationNumber = applicationDetail.rbzReferenceNumber;
 
@@ -529,7 +535,6 @@ const ExportDashboardRenewEditDetails = ({
 
   const SelectReturnFrequency = (e) => {
     const { name, value } = e.target;
-
     if (value == 1) {
       setGetFrequencyID(value);
       setIsReturnExpiringDate(new Date());
@@ -641,8 +646,6 @@ const ExportDashboardRenewEditDetails = ({
     }, 1500);
   };
 
-  /* Ends Here */
-
   const HandleNextleveldata = (e) => {
     const name = e.target.name;
     const value = e.target.value;
@@ -650,7 +653,6 @@ const ExportDashboardRenewEditDetails = ({
     const specialCharsnote = /[!@#$%^*|<>]/;
     let newErrors = {};
     let valid = true;
-
     if (name == "Notes" && value.charAt(0) === " ") {
       newErrors.Notes = "First character cannot be a blank space";
       valid = false;
@@ -683,6 +685,43 @@ const ExportDashboardRenewEditDetails = ({
       .catch((err) => {
         console.log(err);
       });
+  };
+
+  const validatePECANForm = () => {
+    let valid = true;
+    const newErrors = {};
+    if(ValidateChange.relatedexchangeControlNumber.trim().length < 4){
+      newErrors.relatedexchangeControlNumber = "Reference Number allow minimum 4 charecter";
+      valid = false;
+    }else if(ValidateChange.relatedexchangeControlNumber.trim().length > 6){
+      newErrors.relatedexchangeControlNumber = "Reference Number allow maximum 6 charecter";
+      valid = false;
+    }
+    setErrors(newErrors);
+    return valid;
+  };
+
+  const handleValidateRBZ = () => {
+    if (validatePECANForm()) {
+    setLoader(true);
+    axios
+      .post(APIURL + "ExportApplication/ValidateRBZReferenceNumber", {
+        RBZReferenceNumber: ValidateChange.relatedexchangeControlNumber.trim(),
+      })
+      .then((res) => { 
+        setErrors({})
+        setValidateShow(true);
+        setLoader(false);
+        if (res.data.responseCode == "200") {
+          setValidateRBZ(res.data.responseData);
+        } else {
+          setValidateRBZ([]);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+    }
   };
 
   const supervisorHangechangeRoleRecordofficer = (e) => {
@@ -926,7 +965,10 @@ const ExportDashboardRenewEditDetails = ({
       newErrors.sector = "Sector is required";
       valid = false;
     }
-    if ((applicationDetail.subSector === "" || checksectorchange === true) && applicationDetail.sector != 2) {
+    if (
+      (applicationDetail.subSector === "" || checksectorchange === true) &&
+      applicationDetail.sector != 2
+    ) {
       newErrors.subSector = "Sub sector is required";
       valid = false;
     }
@@ -1088,11 +1130,11 @@ const ExportDashboardRenewEditDetails = ({
             : AssignUserID && SupervisorRoleId == "" && nextlevelvalue != "20"
             ? parseInt(roleID) + 1
             : roleID,
-          IsDeferred:IsDeferred,
+          IsDeferred: IsDeferred,
           Notes: asignnextLeveldata.Notes,
           ExpiringDate: defaultnoExpiry == "0" ? "" : ExpiringDate,
           ApplicationStatus: applicationstaus,
-          ParentApplicationID : applicationDetail?.id,
+          ParentApplicationID: applicationDetail?.id,
           ActionStatus:
             (AssignUserID == "" || AssignUserID == null) &&
             roleID != 5 &&
@@ -1117,7 +1159,9 @@ const ExportDashboardRenewEditDetails = ({
               return {
                 id: v?.id,
                 fileName: v?.fileName,
-                label: v?.label.includes("Old") ? v?.label : "Old" + " " + v?.label,
+                label: v?.label.includes("Old")
+                  ? v?.label
+                  : "Old" + " " + v?.label,
                 filePath: v?.filePath,
                 departmentID: 2,
                 applicationID: res.data.responseData?.id,
@@ -1891,7 +1935,7 @@ const ExportDashboardRenewEditDetails = ({
                           )}
                         </label>
                       </div>
-                      <button type="button" className="primrybtn  v-button">
+                      <button type="button" className="primrybtn v-button"  onClick={(e) => handleValidateRBZ(e)}>
                         Validate
                       </button>
                     </div>
