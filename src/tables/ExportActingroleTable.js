@@ -208,18 +208,18 @@ const ExportActingroleTable = () => {
   const handleClickEditModal = () => {
     setshowEditForm(true);
   };
-    
+
   // ----- Start Code For Geting Table List Data
   const handleData = async () => {
     // setshowdataloader(true)
     setLoading(true);
     await axios
       .post(APIURL + "ExportApplication/GetActingDashboardData", {
-        DepartmentID:"2",
+        DepartmentID: "2",
         UserID: useId.replace(/"/g, ""),
         RoleID: rollId,
       })
-      .then((res) => { 
+      .then((res) => {
         if (res.data.responseCode === "200") {
           setLoading(false);
           setData(res.data.responseData);
@@ -271,7 +271,7 @@ const ExportActingroleTable = () => {
               ? // ? parseInt(roleID) - 1
                 value
               : roleID,
-              DepartmentID:"2",
+          DepartmentID: "2",
           UserID: useId.replace(/"/g, ""),
         })
         .then((res) => {
@@ -291,7 +291,7 @@ const ExportActingroleTable = () => {
     axios
       .post(APIURL + "User/GetUsersByRoleID", {
         RoleID: roleID,
-        DepartmentID:"2",
+        DepartmentID: "2",
         UserID: useId.replace(/"/g, ""),
       })
       .then((res) => {
@@ -492,8 +492,6 @@ const ExportActingroleTable = () => {
     };
   });
 
-   
- 
   return (
     <>
       {loading == true ? (
@@ -531,7 +529,6 @@ const ExportActingroleTable = () => {
             emptyMessage="No Data found."
             header={header}
           >
-             
             <Column
               field="rbzReferenceNumber"
               header="RBZ Reference Number"
@@ -565,7 +562,7 @@ const ExportActingroleTable = () => {
               body={amountwithCurrency}
               style={{ width: "150px" }}
             ></Column>
-              <Column
+            <Column
               field="assignedByName"
               header="Assigned By"
               sortable
@@ -624,8 +621,6 @@ const ExportActingroleTable = () => {
         </div>
       </Modal>
 
-     
-
       <Modal
         show={showEditForm}
         onHide={EditModalClose}
@@ -645,17 +640,15 @@ const ExportActingroleTable = () => {
                             ? "col-md-12"
                             : "col-md-6"
                         }
-                        style={{alignItems : "center"}}
+                        style={{ alignItems: "center" }}
                       >
                         Edit Export Request --{" "}
                         <big>
                           {applicationDetail?.rbzReferenceNumber
                             ? applicationDetail.rbzReferenceNumber
                             : ""}
-
                         </big>
                       </div>
-                      
                     </div>
                   </Modal.Title>
                 </Modal.Header>
@@ -696,8 +689,6 @@ const ExportActingroleTable = () => {
           </div>
         </div>
       </Modal>
-
-     
     </>
   );
 };

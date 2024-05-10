@@ -22,46 +22,83 @@ const SearchTable = () => {
   const [allcomment, setallcomment] = useState([]);
   const [tatHistory, setTatHistory] = useState([]);
   const [Actiondata, setActiondata] = useState([]);
+  const [errors, setErrors] = useState({});
 
   const handleFormClose = () => setShowUpdateModal(false);
 
   const handleClear = () => {
-    setActiondata([])
-    setTatHistory([])
-    setallcomment([])
-    setNoDataComment([])
-    setApplicationmessage("")
-    setApplicationDetail({})
-    setshowdataloader(false)
-    setresponceCount([])
-    setShowUpdateModal(false)
-    setLoading(false)
-    setNoSearchData("")
+    setActiondata([]);
+    setTatHistory([]);
+    setallcomment([]);
+    setNoDataComment([]);
+    setErrors({});
+    setApplicationmessage("");
+    setApplicationDetail({});
+    setshowdataloader(false);
+    setresponceCount([]);
+    setShowUpdateModal(false);
+    setLoading(false);
+    setNoSearchData("");
     if (SearchInputRef.current) SearchInputRef.current.value = "";
     setSearchData([]);
     setSearchInput("");
   };
 
+  const validateSearch = () => {
+    let valid = true;
+    const newErrors = {};
+    if (SearchInput.trim().length < 4) {
+      newErrors.SearchInput = "Reference Number allow minimum 4 charecter";
+      valid = false;
+    } else if (SearchInput.trim().length > 6) {
+      newErrors.SearchInput = "Reference Number allow maximum 6 charecter";
+      valid = false;
+    }
+    setErrors(newErrors);
+    return valid;
+  };
+
+  const changeHandelFormValidate = (e) => {
+    const { name, value } = e.target;
+    const specialChars = /[!@#$%^&*(),.?":{}|<>`~]/;
+    let newErrors = {};
+    let valid = true;
+    if (name == "SearchInput" && specialChars.test(value)) {
+      newErrors.SearchInput = "Special characters not allowed";
+      valid = false;
+    } else if (name == "SearchInput" && value == " ") {
+      newErrors.SearchInput = "First character cannot be a blank space";
+      valid = false;
+    } else {
+      setSearchInput(value);
+    }
+    setErrors(newErrors);
+  };
+
+  console.log("errors - ", errors);
+
   const GetSearchData = async () => {
-    try {
-      setLoading(true);
-      let getData = await axios.post(
-        APIURL + "ExportApplication/ExportApplicationSearch",
-        {
-          RBZReferenceNumber: SearchInput,
+    if (validateSearch()) {
+      try {
+        setLoading(true);
+        let getData = await axios.post(
+          APIURL + "ExportApplication/ExportApplicationSearch",
+          {
+            RBZReferenceNumber: SearchInput,
+          }
+        );
+        if (getData?.data.responseCode == 200) {
+          setSearchData(getData?.data?.responseData);
+          setLoading(false);
+        } else if (getData?.data.responseCode == 401) {
+          setLoading(false);
+          setSearchData([]);
+          setNoSearchData(getData?.data.responseMessage);
         }
-      );
-      if (getData?.data.responseCode == 200) {
-        setSearchData(getData?.data?.responseData);
+      } catch (error) {
         setLoading(false);
-      } else if (getData?.data.responseCode == 401) {
-        setLoading(false);
-        setSearchData([])
-        setNoSearchData(getData?.data.responseMessage);
+        console.log("Search Error - ", error);
       }
-    } catch (error) {
-      setLoading(false);
-      console.log("Search Error - ", error);
     }
   };
 
@@ -230,27 +267,49 @@ const SearchTable = () => {
     );
   };
 
+  const handleKeyDown = (event) => {
+    if (event.key === "Enter") {
+      GetSearchData();
+    }
+  };
+
   return (
     <div className="searchtable_bx">
-      <div className="searchtable_inner_bx">
+      <div
+        className={
+          errors.SearchInput
+            ? "searchtable_inner_bx-error"
+            : "searchtable_inner_bx"
+        }
+      >
         <input
           ref={SearchInputRef}
           type="text"
-          placeholder="Search"
-          onChange={(e) => setSearchInput(e.target.value)}
+          name="SearchInput"
+          placeholder="Search RBZ Reference Number"
+          className={errors.SearchInput ? "error" : ""}
+          value={SearchInput.trim()}
+          onKeyDown={handleKeyDown}
+          onChange={(e) => changeHandelFormValidate(e)}
         />
+        <span className="sspan"></span>
+        {errors.SearchInput ? (
+          <small className="errormsg">{errors.SearchInput}</small>
+        ) : (
+          ""
+        )}
         <button
           type="button"
           className="searchButton"
           disabled={SearchInput ? false : true}
           onClick={() => GetSearchData()}
+          onKeyDown={handleKeyDown}
         >
           Search
         </button>
         <button
           type="button"
-          className="btn btn-light resetButton"
-          disabled={SearchInput ? false : true}
+          className="resetButton"
           onClick={() => handleClear()}
         >
           Reset

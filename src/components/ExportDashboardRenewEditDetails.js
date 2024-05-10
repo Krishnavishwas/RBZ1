@@ -747,7 +747,6 @@ const ExportDashboardRenewEditDetails = ({
       });
   };
 
-
   useEffect(() => {
     GetApplicationTypes();
   }, []);
@@ -877,22 +876,23 @@ const ExportDashboardRenewEditDetails = ({
     setErrors(newErrors);
     return valid;
   };
-  
+
   const changeHandelFormValidate = (e) => {
-    const { name, value } = e.target; 
+    const { name, value } = e.target;
     const specialChars = /[!@#$%^&*(),.?":{}|<>`~]/;
     let newErrors = {};
     let valid = true;
     if (name == "recNumber" && specialChars.test(value)) {
       newErrors.relatedexchangeControlNumber = "Special characters not allowed";
-      valid = false; 
+      valid = false;
     } else if (name == "recNumber" && value == " ") {
-      newErrors.relatedexchangeControlNumber = "First character cannot be a blank space";
+      newErrors.relatedexchangeControlNumber =
+        "First character cannot be a blank space";
       valid = false;
     } else {
       setValidateChange({ ...ValidateChange, [name]: value });
-    } 
-    setErrors(newErrors)
+    }
+    setErrors(newErrors);
   };
 
   const handleValidateRBZ = () => {
@@ -949,7 +949,6 @@ const ExportDashboardRenewEditDetails = ({
 
   const handleuserByrecordOfficer = (e) => {
     const value = e.target.value;
-
     if (value == "") {
       setAssignUserID("");
       setSupervisorRoleId("");
@@ -1054,6 +1053,7 @@ const ExportDashboardRenewEditDetails = ({
         console.log(err);
       });
   };
+
   useEffect(() => {
     handleFIleview();
   }, [applicationDetail]);
@@ -1179,12 +1179,6 @@ const ExportDashboardRenewEditDetails = ({
       newErrors.assignedTo = "Bank supervisor is required";
       valid = false;
     }
-
-    // if(files.length < attachmentData.length){
-    //   newErrors.files = "All Files Required";
-    //   valid = false;
-    // }
-
     setErrors(newErrors);
     return valid;
   };
@@ -1195,12 +1189,9 @@ const ExportDashboardRenewEditDetails = ({
         ".p-multiselect-header > .p-multiselect-select-all"
       );
       if (selectAllCheckbox) {
-        // Create a new span element
         let selectAllSpan = document.createElement("span");
         selectAllSpan.className = "select_all";
         selectAllSpan.textContent = "Select All";
-
-        // Append the span after the select all checkbox
         selectAllCheckbox.after(selectAllSpan);
       }
     }, 0);
@@ -1442,7 +1433,6 @@ const ExportDashboardRenewEditDetails = ({
       setSubmitBtnLoader(false);
     }
   };
-  // End code for save form
 
   useEffect(() => {
     handleData();
@@ -1455,7 +1445,6 @@ const ExportDashboardRenewEditDetails = ({
   const handleInputChangecompany = (input) => {
     setInputValue(input);
     if (input?.length >= 3) {
-      // Filter options when input length is at least 3 characters
       const filteredOptions = companies
         ?.filter((company) =>
           company?.companyName?.toLowerCase().includes(input.toLowerCase())
@@ -1466,7 +1455,6 @@ const ExportDashboardRenewEditDetails = ({
         }));
       setOptions(filteredOptions?.length > 0 ? filteredOptions : []);
     } else {
-      // Reset options when input length is less than 3 characters
       setOptions([]);
     }
   };
@@ -2107,11 +2095,15 @@ const ExportDashboardRenewEditDetails = ({
                             type="text"
                             min={0}
                             name="relatedexchangeControlNumber"
-                            value={ValidateChange.relatedexchangeControlNumber ? ValidateChange.relatedexchangeControlNumber.trim() : applicationDetail?.recNumber}
+                            value={
+                              ValidateChange.relatedexchangeControlNumber
+                                ? ValidateChange.relatedexchangeControlNumber.trim()
+                                : applicationDetail?.recNumber
+                            }
                             defaultValue={applicationDetail?.rbzReferenceNumber}
                             onChange={(e) => {
                               // changeHandelForm(e);
-                              changeHandelFormValidate(e)
+                              changeHandelFormValidate(e);
                             }}
                             placeholder="Related Exchange Control Reference Number"
                             className={
@@ -2648,41 +2640,41 @@ const ExportDashboardRenewEditDetails = ({
               ""
             )}
           </form>
-            {/* view model start */}
-      <Modal
-        show={showUpdateModal}
-        onHide={handleFormClose}
-        backdrop="static"
-        className="max-width-600"
-      >
-        <div className="application-box">
-          <div className="login_inner">
-            <div className="login_form ">
-              <h5>
-                <Modal.Header closeButton className="p-0">
-                  <Modal.Title>
-                    View Export Request --{" "}
-                    <big>{applicationDetail?.rbzReferenceNumber}</big>
-                  </Modal.Title>
-                </Modal.Header>
-              </h5>
+          {/* view model start */}
+          <Modal
+            show={showUpdateModal}
+            onHide={handleFormClose}
+            backdrop="static"
+            className="max-width-600"
+          >
+            <div className="application-box">
+              <div className="login_inner">
+                <div className="login_form ">
+                  <h5>
+                    <Modal.Header closeButton className="p-0">
+                      <Modal.Title>
+                        View Export Request --{" "}
+                        <big>{applicationDetail?.rbzReferenceNumber}</big>
+                      </Modal.Title>
+                    </Modal.Header>
+                  </h5>
+                </div>
+                <div className="login_form_panel">
+                  <Modal.Body className="p-0">
+                    <ExportDashboardViewDetails
+                      applicationDetail={applicationDetail}
+                      handleFormClose={handleFormClose}
+                      allcomment={allcommentRenew}
+                      tatHistory={tatHistoryRenew}
+                      noDataComment={noDataCommentRenew}
+                      responceCount={responceCountRenew}
+                    />
+                  </Modal.Body>
+                </div>
+              </div>
             </div>
-            <div className="login_form_panel">
-              <Modal.Body className="p-0">
-                <ExportDashboardViewDetails
-                  applicationDetail={applicationDetail}
-                  handleFormClose={handleFormClose}
-                  allcomment={allcommentRenew}
-                  tatHistory={tatHistoryRenew}
-                  noDataComment={noDataCommentRenew}
-                  responceCount={responceCountRenew}
-                />
-              </Modal.Body>
-            </div>
-          </div>
-        </div>
-      </Modal>
-      {/* view modal end */}
+          </Modal>
+          {/* view modal end */}
         </>
       )}
     </>
