@@ -1935,7 +1935,7 @@ const ExportDashboardRenewEditDetails = ({
                           )}
                         </label>
                       </div>
-                      <button type="button" className="primrybtn v-button"  onClick={(e) => handleValidateRBZ(e)}>
+                      <button type="button" className="primrybtn  v-button">
                         Validate
                       </button>
                     </div>
