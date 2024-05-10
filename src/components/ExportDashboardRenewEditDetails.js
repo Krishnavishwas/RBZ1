@@ -949,7 +949,6 @@ const ExportDashboardRenewEditDetails = ({
 
   const handleuserByrecordOfficer = (e) => {
     const value = e.target.value;
-
     if (value == "") {
       setAssignUserID("");
       setSupervisorRoleId("");
@@ -1054,6 +1053,7 @@ const ExportDashboardRenewEditDetails = ({
         console.log(err);
       });
   };
+
   useEffect(() => {
     handleFIleview();
   }, [applicationDetail]);
@@ -1179,12 +1179,6 @@ const ExportDashboardRenewEditDetails = ({
       newErrors.assignedTo = "Bank supervisor is required";
       valid = false;
     }
-
-    // if(files.length < attachmentData.length){
-    //   newErrors.files = "All Files Required";
-    //   valid = false;
-    // }
-
     setErrors(newErrors);
     return valid;
   };
@@ -1195,12 +1189,9 @@ const ExportDashboardRenewEditDetails = ({
         ".p-multiselect-header > .p-multiselect-select-all"
       );
       if (selectAllCheckbox) {
-        // Create a new span element
         let selectAllSpan = document.createElement("span");
         selectAllSpan.className = "select_all";
         selectAllSpan.textContent = "Select All";
-
-        // Append the span after the select all checkbox
         selectAllCheckbox.after(selectAllSpan);
       }
     }, 0);
@@ -1442,7 +1433,6 @@ const ExportDashboardRenewEditDetails = ({
       setSubmitBtnLoader(false);
     }
   };
-  // End code for save form
 
   useEffect(() => {
     handleData();
@@ -1455,7 +1445,6 @@ const ExportDashboardRenewEditDetails = ({
   const handleInputChangecompany = (input) => {
     setInputValue(input);
     if (input?.length >= 3) {
-      // Filter options when input length is at least 3 characters
       const filteredOptions = companies
         ?.filter((company) =>
           company?.companyName?.toLowerCase().includes(input.toLowerCase())
@@ -1466,7 +1455,6 @@ const ExportDashboardRenewEditDetails = ({
         }));
       setOptions(filteredOptions?.length > 0 ? filteredOptions : []);
     } else {
-      // Reset options when input length is less than 3 characters
       setOptions([]);
     }
   };
