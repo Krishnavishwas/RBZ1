@@ -4629,11 +4629,9 @@ const ImportDashboardEditDetails = ({
                               padding: "9px 3px",
                               border: "0px",
                             }}
-                          >
-                            <b>
-                              Other File
-                              {index + 1}
-                            </b>
+                          >  
+                           Other File {index + 1}
+                            
                           </label>
                           <div className="browse-btn">
                             Browse{" "}
@@ -6220,10 +6218,10 @@ const ImportDashboardEditDetails = ({
                               border: "0px",
                             }}
                           >
-                            <b>
+                            
                               Other File
                               {index + 1}
-                            </b>
+                             
                           </label>
                           <div className="browse-btn">
                             Browse{" "}
@@ -7965,10 +7963,10 @@ const ImportDashboardEditDetails = ({
                               border: "0px",
                             }}
                           >
-                            <b>
+                             
                               Other File
                               {index + 1}
-                            </b>
+                            
                           </label>
                           <div className="browse-btn">
                             Browse{" "}
@@ -9702,10 +9700,10 @@ const ImportDashboardEditDetails = ({
                               border: "0px",
                             }}
                           >
-                            <b>
+                           
                               Other File
                               {index + 1}
-                            </b>
+                            
                           </label>
                           <div className="browse-btn">
                             Browse{" "}
@@ -11410,10 +11408,10 @@ const ImportDashboardEditDetails = ({
                               border: "0px",
                             }}
                           >
-                            <b>
+                            
                               Other File
                               {index + 1}
-                            </b>
+                            
                           </label>
                           <div className="browse-btn">
                             Browse{" "}
@@ -12541,11 +12539,11 @@ const ImportDashboardEditDetails = ({
             )}
 
             <>
-              <h5 className="section_top_subheading mt-3 py-3 btn-collapse_active ">
+              <h5 className={roleID > 3 ? "section_top_subheading mt-3 py-3 btn-collapse_active " : "d-none"}>
                 Application History
               </h5>
 
-              <div className="tab-content">
+              <div className={roleID > 3 ? "tab-content" : "d-none"}>
                 <div className="table-responsive">
                   <table className="table">
                     <thead>

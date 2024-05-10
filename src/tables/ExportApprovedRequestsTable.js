@@ -145,7 +145,7 @@ const ExportApprovedRequestsTable = () => {
                   <Link
                     style={{ color: "#4b5563" }}
                     target="_blank"
-                    rel="noopener noreferrer"
+                    // rel="noopener noreferrer"
                     to={rowData?.filePath}
                   >
                     <i
@@ -679,7 +679,7 @@ const ExportApprovedRequestsTable = () => {
             <DataTable
               value={ExportsapproveRequests}
               scrollable
-              scrollHeight="500px"
+              scrollHeight="600px"
               className="primeDatatTable"
               // paginator={ExportsapproveRequests.length > 10 ? true : false}
               filters={filters}

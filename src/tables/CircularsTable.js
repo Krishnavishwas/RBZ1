@@ -434,7 +434,7 @@ const CircularsTable = () => {
                 <DataTable
                   value={CricularRequests}
                   scrollable
-                  scrollHeight="500px"
+                  scrollHeight="600px"
                   // className="mt-4"
                   paginator
                   rowHover

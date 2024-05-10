@@ -866,11 +866,11 @@ const ExportDashboardRenewEditDetails = ({
     const newErrors = {};
     if (ValidateChange.relatedexchangeControlNumber.trim().length < 4) {
       newErrors.relatedexchangeControlNumber =
-        "Reference Number allow minimum 4 charecter";
+        "Reference Number allow minimum 4 numbers";
       valid = false;
     } else if (ValidateChange.relatedexchangeControlNumber.trim().length > 6) {
       newErrors.relatedexchangeControlNumber =
-        "Reference Number allow maximum 6 charecter";
+        "Reference Number allow maximum 6 numbers";
       valid = false;
     }
     setErrors(newErrors);
