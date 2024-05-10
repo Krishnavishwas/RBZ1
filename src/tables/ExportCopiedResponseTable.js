@@ -18,7 +18,7 @@ const ExportCopiedResponseTable = () => {
   const useId = Storage.getItem("userID");
   const rollId = Storage.getItem("roleIDs");
   const PdfUsername = Storage.getItem("name");
-  const PdfRolename = Storage.getItem("roleName");  
+  const PdfRolename = Storage.getItem("roleName");
   const bankID = Storage.getItem("bankID");
   const csvLinkRef = useRef();
 
@@ -60,10 +60,8 @@ const ExportCopiedResponseTable = () => {
     _filters["global"].value = value;
     setFilters(_filters);
     setGlobalFilterValue(value);
-  };  
+  };
 
-
- 
   const renderHeader = () => {
     return (
       <div className="flex justify-content-end">
@@ -109,17 +107,20 @@ const ExportCopiedResponseTable = () => {
               wrapperStyle={{}}
               wrapperClass=""
             />
+          ) : rowData?.filePath != null ? (
+            <Link
+              style={{ color: "#4b5563" }}
+              target="_blank"
+              rel="noopener noreferrer"
+              to={rowData?.filePath}
+            >
+              <i
+                className="pi pi-download p-2 nav-link"
+                style={{ padding: "12px", cursor: "pointer" }}
+              ></i>
+            </Link>
           ) : (
-            (rowData?.filePath !=null)?
-              (
-                <Link style={{color:"#4b5563"}} target="_blank" rel="noopener noreferrer" to={rowData?.filePath}>
-                  <i
-                    className="pi pi-download p-2 nav-link"
-                    style={{ padding: "12px", cursor: "pointer" }}            
-                  ></i>
-                </Link>
-              ):''
-
+            ""
           )}
         </div>
       </>
@@ -165,7 +166,7 @@ const ExportCopiedResponseTable = () => {
   const header = renderHeader();
 
   // ----- Start Code For Geting Table List Data
-  const [tabCount, setTabCount] = useState('');
+  const [tabCount, setTabCount] = useState("");
   const handleTabCount = async () => {
     await axios
       .post(APIURL + "ExportApplication/CountData", {
@@ -188,12 +189,12 @@ const ExportCopiedResponseTable = () => {
         UserID: useId.replace(/"/g, ""),
         Status: "10",
         RoleID: rollId,
-        DataType: "All",        
+        DataType: "All",
         BankID: bankID,
       })
       .then((res) => {
         if (res.data.responseCode === "200") {
-            setExportsCopiedResponse(res.data.responseData);
+          setExportsCopiedResponse(res.data.responseData);
         }
       });
   };
@@ -349,7 +350,7 @@ const ExportCopiedResponseTable = () => {
         console.log(err);
       });
 
-      await axios
+    await axios
       .post(APIURL + "ExportApplication/GetApplicationActionsByApplicationID", {
         ID: id,
       })
@@ -366,16 +367,12 @@ const ExportCopiedResponseTable = () => {
         console.log(err);
         // setshowdataloader(false)
       });
-      
 
-      // --------------------------vishwas start----------------------------
-      await axios
-      .post(
-        APIURL + "ExportApplication/GetCommentsInfoByRoleID",
-        {
-          ApplicationID: id,
-        }
-      )
+    // --------------------------vishwas start----------------------------
+    await axios
+      .post(APIURL + "ExportApplication/GetCommentsInfoByRoleID", {
+        ApplicationID: id,
+      })
       .then((res) => {
         if (res.data.responseCode == 200) {
           setNoDataComment(res.data.responseData);
@@ -386,7 +383,7 @@ const ExportCopiedResponseTable = () => {
       .catch((err) => {
         console.log(err);
       });
-      //---------------------------vishwas end------------------------------
+    //---------------------------vishwas end------------------------------
   };
 
   const GetApplicationCount = async (id) => {
@@ -432,11 +429,9 @@ const ExportCopiedResponseTable = () => {
     handleTabCount();
     setExportsCopiedResponse([]);
   }, []);
-console.log("ExportsCopiedResponse",ExportsCopiedResponse);
 
   return (
     <>
-    
       {ExportsCopiedResponse?.length === 0 ? (
         <div className="p-3">No records to show</div>
       ) : (
@@ -543,8 +538,8 @@ console.log("ExportsCopiedResponse",ExportsCopiedResponse);
                       allcomment={allcomment}
                       noDataComment={noDataComment}
                       tatHistory={tatHistory}
-                     Actiondata={Actiondata} 
-                     responceCount={responceCount}
+                      Actiondata={Actiondata}
+                      responceCount={responceCount}
                     />
                   </Modal.Body>
                 </div>

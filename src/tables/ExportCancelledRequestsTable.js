@@ -265,7 +265,6 @@ const ExportCancelledRequestsTable = () => {
       })
       .then((res) => {
         if (res.data.responseCode == 200) {
-          console.log("responceCount", res);
           setresponceCount(res.data.responseData);
         } else {
           setresponceCount([]);

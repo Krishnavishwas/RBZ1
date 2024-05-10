@@ -323,7 +323,6 @@ const ExportNewRequestForm = () => {
       })
       .then((res) => {
         if (res.data.responseCode == 200) {
-          console.log("responceCount", res);
           setresponceCount(res.data.responseData);
         } else {
           setresponceCount([]);
@@ -513,7 +512,7 @@ const ExportNewRequestForm = () => {
       newErrors.sector = "Sector is required";
       valid = false;
     }
-    if (exportForm.subsector === "") {
+    if (exportForm.subsector === "" && exportForm.sector != 2) {
       newErrors.subsector = "Subsector is required";
       valid = false;
     }
@@ -654,7 +653,7 @@ const ExportNewRequestForm = () => {
             axios
               .post(ImageAPI + "File/UploadFile", formData)
               .then((res) => {
-                // console.log("res99999",res);
+                 console.log("res99999");
               })
               .catch((err) => {
                 console.log("file Upload ", err);
@@ -925,7 +924,6 @@ setselectuserRole("")
   // ----- End Code For Open Poup
   // ----- Start Code For Geting Table Data
   const action = (rowData) => {
-    // console.log("rowDataACTION", rowData);
     return bankName.replace(/"/g, "") == rowData?.bankName ? (
       <>
         <i
@@ -1073,7 +1071,7 @@ setselectuserRole("")
   useEffect(() => {
     getRoleHandle();
   }, []);
-  console.log("ValidateShow", ValidateShow);
+
   return (
     <>
       <form>
@@ -1556,8 +1554,6 @@ setselectuserRole("")
           <label className="controlform">Application Date</label>
 
           <div className="form-bx">
-            {console.log("startDate", startDate)}
-            {/* <label> */}
             <DatePicker
               closeOnScroll={(e) => e.target === document}
               selected={startDate}
@@ -1574,7 +1570,7 @@ setselectuserRole("")
               showYearDropdown
               onKeyDown={(e) => {
                 const key = e.key;
-                const allowedKeys = /[0-9\/]/; // Allow numbers and '/'
+                const allowedKeys = /[0-9\/]/;
                 if (
                   !allowedKeys.test(key) &&
                   key !== "Backspace" &&
@@ -1583,20 +1579,15 @@ setselectuserRole("")
                   e.preventDefault();
                 }
               }}
-              dropdownMode="select" // Add this line
+              dropdownMode="select"
               dateFormat="dd/MMM/yyyy"
             />
-
             <span className="sspan"></span>
-            {/* </label> */}
           </div>
         </div>
-        {/* end form-bx  */}
 
         <div className="inner_form_new ">
           <label className="controlform">Application Type</label>
-          {console.log("errors", errors)}
-          {console.log("exportForm.applicationType", exportForm.applicationType)}
           <div className="form-bx">
             <label>
               <select

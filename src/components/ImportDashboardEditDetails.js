@@ -204,7 +204,6 @@ const ImportDashboardEditDetails = ({
   const fileInputRefs = [
     useRef(null),
     useRef(null),
-    useRef(null), 
     useRef(null),
     useRef(null),
     useRef(null),
@@ -213,7 +212,8 @@ const ImportDashboardEditDetails = ({
     useRef(null),
     useRef(null),
     useRef(null),
-    useRef(null), 
+    useRef(null),
+    useRef(null),
     useRef(null),
     useRef(null),
     useRef(null),
@@ -223,13 +223,29 @@ const ImportDashboardEditDetails = ({
     useRef(null),
     useRef(null),
   ];
-  const fileInputRefsother = [ useRef(null),useRef(null),useRef(null), useRef(null),useRef(null),useRef(null),useRef(null),useRef(null),useRef(null), useRef(null)];
+  const fileInputRefsother = [
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+  ];
 
   const heading = "Updated Successfully!";
   const para = "Import request updated successfully!";
   const applicationNumber = applicationDetail.rbzReferenceNumber;
 
-  const convertedRate = curRate * parseFloat(applicationDetail.amount);
+  // const convertedRate = curRate * parseFloat(applicationDetail.amount);
+  const ratevalue = applicationDetail?.rate;
+
+  const convertedRate =
+    parseFloat(curRate ? curRate : ratevalue) *
+    parseFloat(applicationDetail?.amount);
 
   const changeHandelForm = (e) => {
     const name = e.target.name;
@@ -304,20 +320,6 @@ const ImportDashboardEditDetails = ({
       newErrors.PECANNumber = "Special characters not allowed";
       valid = false;
     }
-    // else if (
-    //   name == "relatedexchangeControlNumber" &&
-    //   value.charAt(0) === " "
-    // ) {
-    //   newErrors.relatedexchangeControlNumber =
-    //     "First character cannot be a blank space";
-    //   valid = false;
-    // } else if (
-    //   name == "relatedexchangeControlNumber" &&
-    //   specialChars.test(value)
-    // ) {
-    //   newErrors.relatedexchangeControlNumber = "Special characters not allowed";
-    //   valid = false;
-    // }
     else {
       setErrors({});
       setApplicationDetail((prevState) => ({
@@ -327,7 +329,6 @@ const ImportDashboardEditDetails = ({
     }
 
     setErrors(newErrors);
-    console.log("name - value", name, value);
     if (name === "sector") {
       axios
         .post(APIURL + "Master/GetSubSectorBySectorID", {
@@ -513,8 +514,6 @@ const ImportDashboardEditDetails = ({
     }
   };
 
-  console.log("files - ", files);
-
   const HandleFileUpload = (e, label, indx) => {
     const file = e.target.files[0];
     const index = files?.findIndex((item, i) => i === indx);
@@ -617,16 +616,13 @@ const ImportDashboardEditDetails = ({
     }
   };
 
- 
- 
-  const clearInputFile = (index) => { 
-    
+  const clearInputFile = (index) => {
     if (fileInputRefs[index].current) fileInputRefs[index].current.value = "";
   };
-  const clearInputFileother = (index) =>{
-    if (fileInputRefsother[index]?.current) fileInputRefsother[index].current.value = "";
-   }
-  
+  const clearInputFileother = (index) => {
+    if (fileInputRefsother[index]?.current)
+      fileInputRefsother[index].current.value = "";
+  };
 
   const removefileImage = (label) => {
     const updatedUserFile = files?.filter((item, i) => item?.label != label);
@@ -649,7 +645,7 @@ const ImportDashboardEditDetails = ({
       axios
         .post(APIURL + "User/GetUsersByRoleID", {
           RoleID: value,
-          DepartmentID:"3",
+          DepartmentID: "3",
           UserID: UserID.replace(/"/g, ""),
         })
         .then((res) => {
@@ -747,19 +743,24 @@ const ImportDashboardEditDetails = ({
           );
         }
       };
-      const addWaterMark = doc => {
+      const addWaterMark = (doc) => {
         const pageCount = doc.internal.getNumberOfPages();
         for (var i = 1; i <= pageCount; i++) {
-          doc.setPage(i)
-          doc.setTextColor('#cccaca');
+          doc.setPage(i);
+          doc.setTextColor("#cccaca");
           doc.saveGraphicsState();
-          doc.setGState(new doc.GState({opacity: 0.4}));
+          doc.setGState(new doc.GState({ opacity: 0.4 }));
           doc.setFont("helvetica", "normal");
-          doc.setFontSize(80); 
-          doc.text(doc.internal.pageSize.width / 3, doc.internal.pageSize.height / 2, 'Preview', {angle: 45, });
-          doc.restoreGraphicsState();                  
+          doc.setFontSize(80);
+          doc.text(
+            doc.internal.pageSize.width / 3,
+            doc.internal.pageSize.height / 2,
+            "Preview",
+            { angle: 45 }
+          );
+          doc.restoreGraphicsState();
         }
-      } 
+      };
       doc.setFont("helvetica", "normal");
       doc.setFontSize(3);
       let docWidth = doc.internal.pageSize.getWidth();
@@ -932,7 +933,7 @@ const ImportDashboardEditDetails = ({
       if (optionExpirydisplayRef.current) optionExpirydisplayRef.current = "";
     }
   };
-  console.log("applicationDetail.subSector - ", applicationDetail.subSector);
+
   const validateForm = () => {
     let valid = true;
     const newErrors = {};
@@ -941,7 +942,7 @@ const ImportDashboardEditDetails = ({
       applicationDetail.companyName == "" &&
       !getCompanyName
     ) {
-      newErrors.companyName = "Company name is required";
+      newErrors.companyName = "Company Name is required";
       valid = false;
     }
     if (applicationDetail.applicationTypeID === "") {
@@ -1066,7 +1067,10 @@ const ImportDashboardEditDetails = ({
       newErrors.sector = "Sector is required";
       valid = false;
     }
-    if (applicationDetail.subSector === "" || checksectorchange === true) {
+    if (
+      (applicationDetail.subSector === "" || checksectorchange === true) &&
+      applicationDetail.sector != 2
+    ) {
       newErrors.subSector = "Sub sector is required";
       valid = false;
     }
@@ -1085,8 +1089,6 @@ const ImportDashboardEditDetails = ({
     setErrors(newErrors);
     return valid;
   };
-
-  console.log("applicationDetail - -", applicationDetail);
 
   const HandleSubmit = async (e) => {
     e.preventDefault();
@@ -1630,8 +1632,6 @@ const ImportDashboardEditDetails = ({
     }
   };
 
-  console.log("errors - ", errors);
-
   return (
     <>
       {showdataLoader == true || !noDataComment?.length ? (
@@ -1764,7 +1764,6 @@ const ImportDashboardEditDetails = ({
               <div className="inner_form_new ">
                 <label className="controlform">Type of Importer</label>
                 <div className="form-bx-radio mt-4">
-                  {console.log("registerusertype - ", registerusertype)}
                   {applicantTypes?.map((item, index) => {
                     return (
                       <>
@@ -1774,11 +1773,9 @@ const ImportDashboardEditDetails = ({
                             ref={typeExporterRef}
                             onChange={(e) => {
                               changeHandelForm(e);
-                              // handleUsertype(e);
                             }}
                             name="importType"
                             value={item.id}
-                            // checked={registerusertype == item.id}
                             checked={
                               applicationDetail?.applicantType == item?.id
                             }
@@ -1799,7 +1796,7 @@ const ImportDashboardEditDetails = ({
               </div>
 
               {/* {registerusertype === "1" && bankID !== "" ? ( */}
-              {applicationDetail?.applicantType === "1" && bankID !== "" ? (
+              {applicationDetail?.applicantType == "1" && bankID != "" ? (
                 <>
                   {/* <div className="inner_form_new ">
               <label className="controlform">Company Name</label>
@@ -1834,7 +1831,7 @@ const ImportDashboardEditDetails = ({
                         placeholder={
                           applicationDetail.companyName
                             ? applicationDetail.companyName
-                            : "Select company name"
+                            : "Select Company Name"
                         }
                         value={getCompanyName}
                         onChange={handleChangecompany}
@@ -1843,7 +1840,7 @@ const ImportDashboardEditDetails = ({
                         isSearchable
                         noOptionsMessage={({ inputValue }) =>
                           inputValue?.length >= 3
-                            ? "No company found"
+                            ? "No Company found"
                             : "Please provide at least 3 characters for auto search of Company Name"
                         }
                         onMenuClose={handleClear}
@@ -1856,7 +1853,6 @@ const ImportDashboardEditDetails = ({
                             : true
                         }
                       />
-
                       {errors.companyName &&
                       (getCompanyName === "Company Name" ||
                         getCompanyName == null) ? (
@@ -1989,9 +1985,6 @@ const ImportDashboardEditDetails = ({
                           : ""
                       }
                     >
-                      <option value="">
-                        {applicationDetail?.applicationType}
-                      </option>
                       {applicationType?.map((item, ind) => {
                         return (
                           <option
@@ -2027,6 +2020,7 @@ const ImportDashboardEditDetails = ({
                       type="text"
                       ref={BeneficiaryNameRef}
                       name="beneficiaryName"
+                      placeholder="Beneficiary Name"
                       onChange={(e) => {
                         changeHandelForm(e);
                       }}
@@ -2048,7 +2042,7 @@ const ImportDashboardEditDetails = ({
               </div>
 
               <div className="inner_form_new ">
-                <label className="controlform">Baneficiary Country</label>
+                <label className="controlform">Beneficiary Country</label>
                 <div className="form-bx">
                   <label>
                     <select
@@ -2058,7 +2052,9 @@ const ImportDashboardEditDetails = ({
                       }}
                     >
                       <option value="">
-                        {applicationDetail?.beneficiaryCountryName}
+                        {applicationDetail?.beneficiaryCountryName
+                          ? applicationDetail?.beneficiaryCountryName
+                          : "Select Beneficiary Country"}
                       </option>
                       {countries?.map((item, ind) => {
                         return (
@@ -2113,7 +2109,6 @@ const ImportDashboardEditDetails = ({
               ) : (
                 ""
               )}
-
               <div className="row">
                 <div className="col-md-6">
                   <div className="inner_form_new">
@@ -2132,22 +2127,18 @@ const ImportDashboardEditDetails = ({
                               : ""
                           }
                         >
-                          <option value="">
-                            {ImportForm?.currencyCode}
-                          </option>
+                          {/* <option value="">{ImportForm?.currencyCode}</option> */}
                           {currency?.map((cur, ind) => {
-                              return (
-                                <option
-                                  key={cur.id}
-                                  value={cur.id}
-                                  selected={
-                                    ImportForm?.currency == cur.id
-                                  }
-                                >
-                                  {cur.currencyCode}
-                                </option>
-                              );
-                            })}
+                            return (
+                              <option
+                                key={cur.id}
+                                value={cur.id}
+                                selected={applicationDetail?.currency == cur.id}
+                              >
+                                {cur.currencyCode}
+                              </option>
+                            );
+                          })}
                         </select>
                         <span className="sspan"></span>
                         {errors.currency && ImportForm.currency === "" ? (
@@ -2226,8 +2217,6 @@ const ImportDashboardEditDetails = ({
                 </div>
               </div>
 
-              
-
               <div className="inner_form_new ">
                 <label className="controlform">USD Equivalent</label>
                 <div className="form-bx">
@@ -2236,14 +2225,8 @@ const ImportDashboardEditDetails = ({
                       ref={usdEquivalentRef}
                       type="text"
                       name="usdEquivalent"
-                      // value={
-                      //   ImportForm.currency && ImportForm.amount
-                      //     ? convertedRate.toFixed(2)
-                      //     : applicationDetail?.usdEquivalent
-                      // }
                       value={
-                        applicationDetail?.currency &&
-                        applicationDetail?.amount
+                        applicationDetail?.currency && applicationDetail?.amount
                           ? convertedRate == NaN
                             ? applicationDetail?.usdEquivalent
                             : convertedRate.toFixed(2)
@@ -2275,14 +2258,9 @@ const ImportDashboardEditDetails = ({
                         errors.sector && ImportForm.sector === "" ? "error" : ""
                       }
                     >
-                      <option value="">
-                        {applicationDetail?.sectorName !== ""
-                          ? applicationDetail?.sectorName
-                          : "Select Sector"}
-                      </option>
                       {sectorData?.map((item, ind) => {
                         return (
-                          <option key={item.id} value={item.id}>
+                          <option key={item.id} value={item.id} selected={applicationDetail?.sector == item.id}>
                             {item.sectorName}
                           </option>
                         );
@@ -2324,7 +2302,7 @@ const ImportDashboardEditDetails = ({
                           : ""
                       }
                     >
-                      <option value="">Subsector</option>
+                      <option value="">Select Subsector</option>
                       {subsectorData?.map((item, index) => {
                         return (
                           <option
@@ -2528,7 +2506,10 @@ const ImportDashboardEditDetails = ({
                           <button
                             type="button"
                             className="remove-file"
-                            onClick={() => {removefileImage(items?.name); clearInputFile(index)}}
+                            onClick={() => {
+                              removefileImage(items?.name);
+                              clearInputFile(index);
+                            }}
                           >
                             Remove
                           </button>
@@ -2606,7 +2587,7 @@ const ImportDashboardEditDetails = ({
                       <div className="browse-btn">
                         Browse{" "}
                         <input
-                        ref={fileInputRefsother[index]}
+                          ref={fileInputRefsother[index]}
                           type="file"
                           onChange={(e) => {
                             handleFileChange(e, "other file" + (index + 1));
@@ -2625,11 +2606,10 @@ const ImportDashboardEditDetails = ({
                         <button
                           type="button"
                           className="remove-file"
-                          onClick={() =>{
+                          onClick={() => {
                             removefileImage("other file" + (index + 1));
-                            clearInputFileother(index)
-                          }
-                          }
+                            clearInputFileother(index);
+                          }}
                         >
                           Remove
                         </button>
@@ -13528,7 +13508,6 @@ const ImportDashboardEditDetails = ({
                             fontWeight: "800",
                           }}
                         >
-                           
                           Exchange &nbsp; Control &nbsp; Ref
                           <br />
                           Previous &nbsp; Exchange &nbsp; Control &nbsp; Ref

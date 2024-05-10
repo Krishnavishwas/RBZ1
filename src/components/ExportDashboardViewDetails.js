@@ -48,6 +48,7 @@ const ExportDashboardViewDetails = ({
       .catch((err) => {
         console.log(err);
       });
+
     axios
       .post(APIURL + "ExportApplication/GetFilesByApplicationID", {
         ID: applicationDetail.id,
@@ -64,8 +65,6 @@ const ExportDashboardViewDetails = ({
       });
   };
 
-  console.log("applicationDetail - ", applicationDetail);
-
   useEffect(() => {
     handleFIleview();
   }, [applicationDetail]);
@@ -75,8 +74,6 @@ const ExportDashboardViewDetails = ({
         <li key={i}>{v.bankName}</li>
       ))
     : null;
-
-  console.log("allcomment - ", allcomment);
 
   return (
     <>
@@ -828,7 +825,13 @@ const ExportDashboardViewDetails = ({
                                             </div>
                                           </div>
 
-                                          <div className={items?.actionNotes ? "inner_form_new " : "d-none"}>
+                                          <div
+                                            className={
+                                              items?.actionNotes
+                                                ? "inner_form_new "
+                                                : "d-none"
+                                            }
+                                          >
                                             <label className="controlform">
                                               Action Note
                                             </label>
@@ -848,7 +851,13 @@ const ExportDashboardViewDetails = ({
                                             </div>
                                           </div>
 
-                                          <div className={items?.actionComment ? "inner_form_new " : "d-none"}>
+                                          <div
+                                            className={
+                                              items?.actionComment
+                                                ? "inner_form_new "
+                                                : "d-none"
+                                            }
+                                          >
                                             <label className="controlform">
                                               Action Comment
                                             </label>
@@ -867,9 +876,15 @@ const ExportDashboardViewDetails = ({
                                               </label>
                                             </div>
                                           </div>
-                                        </div> 
+                                        </div>
 
-                                        <div className={items?.description ? "inner_form_new " : "d-none"}>
+                                        <div
+                                          className={
+                                            items?.description
+                                              ? "inner_form_new "
+                                              : "d-none"
+                                          }
+                                        >
                                           <label className="controlform">
                                             Recommendation
                                           </label>
@@ -926,11 +941,10 @@ const ExportDashboardViewDetails = ({
                                           </div>
                                         </div>
 
-                                       
                                         {/* {items?.assignedToName &&
                                     items?.roleName ? ( */}
                                         <div class="row">
-                                        <div class="col-md-6">
+                                          <div class="col-md-6">
                                             <div class="inner_form_new ">
                                               <label class="controlform">
                                                 Action
@@ -1032,338 +1046,347 @@ const ExportDashboardViewDetails = ({
 
             {userRoleID > 3 ? (
               <>
-              {
-                applicationDetail?.roleID !== 4 ?
-              <>
-                <h5
-                  className={
-                    recordTab
-                      ? "section_top_subheading mt-3 py-3 btn-collapse_active cursorpointer"
-                      : "section_top_subheading mt-3 py-3 cursorpointer"
-                  }
-                  onClick={() => setrecordTab(!recordTab)}
-                >
-                  Record Officer{" "}
-                  {responceCount?.map((item, i) => {
-                    if (item?.id == 4)
-                      return (
-                        <>
-                          {item?.count == 0 ? (
-                            ""
-                          ) : (
-                            <span className="counter-tab">{item?.count}</span>
-                          )}
-                        </>
-                      );
-                  })}
-                  <span className="btn-collapse">
-                    <i class="bi bi-caret-down-fill"></i>
-                  </span>
-                </h5>
-                {allcomment?.map((cur) => {
-                  if (cur.assignedToRoleID == 4) {
-                    return (
-                      <>
-                        {roleID > 4 || cur.assignedToRoleID == 4 ? (
+                {applicationDetail?.roleID !== 4 ? (
+                  <>
+                    <h5
+                      className={
+                        recordTab
+                          ? "section_top_subheading mt-3 py-3 btn-collapse_active cursorpointer"
+                          : "section_top_subheading mt-3 py-3 cursorpointer"
+                      }
+                      onClick={() => setrecordTab(!recordTab)}
+                    >
+                      Record Officer{" "}
+                      {responceCount?.map((item, i) => {
+                        if (item?.id == 4)
+                          return (
+                            <>
+                              {item?.count == 0 ? (
+                                ""
+                              ) : (
+                                <span className="counter-tab">
+                                  {item?.count}
+                                </span>
+                              )}
+                            </>
+                          );
+                      })}
+                      <span className="btn-collapse">
+                        <i class="bi bi-caret-down-fill"></i>
+                      </span>
+                    </h5>
+                    {allcomment?.map((cur) => {
+                      if (cur.assignedToRoleID == 4) {
+                        return (
                           <>
-                            <div className={recordTab ? "customtab" : "d-none"}>
-                              {allcomment?.length ? (
-                                allcomment?.map((cur) => {
-                                  return cur?.applicationActivityData.map(
-                                    (item, index) => {
-                                      if (cur?.assignedToRoleID == 4) {
-                                        return (
-                                          <>
-                                            <div className="bakgroundaction">
-                                          <div className="row">
-                                            <div className="col-md-6">
-                                              <div className="inner_form_new ">
-                                                <label className="controlform">
-                                                  Action Type
-                                                </label>
-                                                <div className="form-bx">
-                                                  <label>
-                                                    <input
-                                                      type="text"
-                                                      className=""
-                                                      disabled
-                                                      value={
-                                                        item?.actionStatusName ==
-                                                          "Approved" ||
-                                                        item?.actionStatusName ==
-                                                          "Reject" ||
-                                                        item?.actionStatusName ==
-                                                          "Cancelled"
-                                                          ? "Assigned"
-                                                          : item?.actionStatusName
-                                                      }
-                                                    />
-                                                  </label>
+                            {roleID > 4 || cur.assignedToRoleID == 4 ? (
+                              <>
+                                <div
+                                  className={recordTab ? "customtab" : "d-none"}
+                                >
+                                  {allcomment?.length ? (
+                                    allcomment?.map((cur) => {
+                                      return cur?.applicationActivityData.map(
+                                        (item, index) => {
+                                          if (cur?.assignedToRoleID == 4) {
+                                            return (
+                                              <>
+                                                <div className="bakgroundaction">
+                                                  <div className="row">
+                                                    <div className="col-md-6">
+                                                      <div className="inner_form_new ">
+                                                        <label className="controlform">
+                                                          Action Type
+                                                        </label>
+                                                        <div className="form-bx">
+                                                          <label>
+                                                            <input
+                                                              type="text"
+                                                              className=""
+                                                              disabled
+                                                              value={
+                                                                item?.actionStatusName ==
+                                                                  "Approved" ||
+                                                                item?.actionStatusName ==
+                                                                  "Reject" ||
+                                                                item?.actionStatusName ==
+                                                                  "Cancelled"
+                                                                  ? "Assigned"
+                                                                  : item?.actionStatusName
+                                                              }
+                                                            />
+                                                          </label>
+                                                        </div>
+                                                      </div>
+                                                    </div>
+
+                                                    <div className="col-md-3">
+                                                      <div className="inner_form_new-sm ">
+                                                        <label className="controlform-sm">
+                                                          User{" "}
+                                                          {item?.actionRoleName !=
+                                                          null ? (
+                                                            <i
+                                                              className="bi bi-info-circle icons-info"
+                                                              title={`Role : ${
+                                                                item?.actionRoleName
+                                                                  ? item?.actionRoleName
+                                                                  : "N/A"
+                                                              }`}
+                                                            ></i>
+                                                          ) : (
+                                                            ""
+                                                          )}
+                                                        </label>
+                                                        <div className="form-bx-sm">
+                                                          <label>
+                                                            <input
+                                                              type="text"
+                                                              className=""
+                                                              disabled
+                                                              value={
+                                                                item?.actionUserName
+                                                                  ? item?.actionUserName
+                                                                  : "N/A"
+                                                              }
+                                                            />
+                                                          </label>
+                                                        </div>
+                                                      </div>
+                                                    </div>
+
+                                                    <div className="col-md-3">
+                                                      <div className="inner_form_new-sm">
+                                                        <label className="controlform-sm">
+                                                          {
+                                                            item?.actionStatusName
+                                                          }{" "}
+                                                          Date
+                                                        </label>
+                                                        <div className="form-bx-sm">
+                                                          <label>
+                                                            <input
+                                                              type="text"
+                                                              className=""
+                                                              disabled
+                                                              value={
+                                                                item?.createdDate
+                                                                  ? moment(
+                                                                      item?.createdDate
+                                                                    ).format(
+                                                                      "DD/MMM/yyyy"
+                                                                    )
+                                                                  : "N/A"
+                                                              }
+                                                            />
+                                                          </label>
+                                                        </div>
+                                                      </div>
+                                                    </div>
+                                                  </div>
+
+                                                  <div className="inner_form_new ">
+                                                    <label className="controlform">
+                                                      Action Note
+                                                    </label>
+                                                    <div className="form-bx">
+                                                      <label>
+                                                        <textarea
+                                                          type="text"
+                                                          className=""
+                                                          disabled
+                                                          value={
+                                                            item?.actionNotes
+                                                              ? item?.actionNotes
+                                                              : "N/A"
+                                                          }
+                                                        />
+                                                      </label>
+                                                    </div>
+                                                  </div>
+
+                                                  <div className="inner_form_new ">
+                                                    <label className="controlform">
+                                                      Action Comment
+                                                    </label>
+                                                    <div className="form-bx">
+                                                      <label>
+                                                        <textarea
+                                                          type="text"
+                                                          className=""
+                                                          disabled
+                                                          value={
+                                                            item?.actionComment
+                                                              ? item?.actionComment
+                                                              : "N/A"
+                                                          }
+                                                        />
+                                                      </label>
+                                                    </div>
+                                                  </div>
                                                 </div>
-                                              </div>
-                                            </div>
-
-                                            <div className="col-md-3">
-                                              <div className="inner_form_new-sm ">
-                                                <label className="controlform-sm">
-                                                  User{" "}
-                                                  {item?.actionRoleName !=
-                                                  null ? (
-                                                    <i
-                                                      className="bi bi-info-circle icons-info"
-                                                      title={`Role : ${
-                                                        item?.actionRoleName
-                                                          ? item?.actionRoleName
-                                                          : "N/A"
-                                                      }`}
-                                                    ></i>
-                                                  ) : (
-                                                    ""
-                                                  )}
-                                                </label>
-                                                <div className="form-bx-sm">
-                                                  <label>
-                                                    <input
-                                                      type="text"
-                                                      className=""
-                                                      disabled
-                                                      value={
-                                                        item?.actionUserName
-                                                          ? item?.actionUserName
-                                                          : "N/A"
-                                                      }
-                                                    />
+                                                <div className="inner_form_new ">
+                                                  <label className="controlform">
+                                                    Notes
                                                   </label>
+                                                  <div className="form-bx">
+                                                    <label>
+                                                      <textarea
+                                                        name="Notes"
+                                                        placeholder="Notes"
+                                                        class=""
+                                                        value={
+                                                          item?.notes
+                                                            ? item?.notes
+                                                            : ""
+                                                        }
+                                                        disabled
+                                                      ></textarea>
+                                                    </label>
+                                                  </div>
                                                 </div>
-                                              </div>
-                                            </div>
-
-                                            <div className="col-md-3">
-                                              <div className="inner_form_new-sm">
-                                                <label className="controlform-sm">
-                                                  {item?.actionStatusName} Date
-                                                </label>
-                                                <div className="form-bx-sm">
-                                                  <label>
-                                                    <input
-                                                      type="text"
-                                                      className=""
-                                                      disabled
-                                                      value={
-                                                        item?.createdDate
-                                                          ? moment(
-                                                              item?.createdDate
-                                                            ).format(
-                                                              "DD/MMM/yyyy"
-                                                            )
-                                                          : "N/A"
-                                                      }
-                                                    />
+                                                <div className="inner_form_new ">
+                                                  <label className="controlform">
+                                                    Comments
                                                   </label>
+                                                  <div className="form-bx">
+                                                    <label>
+                                                      <textarea
+                                                        name="Notes"
+                                                        placeholder="Notes"
+                                                        class=""
+                                                        value={
+                                                          item?.comment
+                                                            ? item?.comment
+                                                            : ""
+                                                        }
+                                                        disabled
+                                                      ></textarea>
+                                                    </label>
+                                                  </div>
                                                 </div>
-                                              </div>
-                                            </div>
-                                          </div>
-
-                                          <div className="inner_form_new ">
-                                            <label className="controlform">
-                                              Action Note
-                                            </label>
-                                            <div className="form-bx">
-                                              <label>
-                                                <textarea
-                                                  type="text"
-                                                  className=""
-                                                  disabled
-                                                  value={
-                                                    item?.actionNotes
-                                                      ? item?.actionNotes
-                                                      : "N/A"
-                                                  }
-                                                />
-                                              </label>
-                                            </div>
-                                          </div>
-
-                                          <div className="inner_form_new ">
-                                            <label className="controlform">
-                                              Action Comment
-                                            </label>
-                                            <div className="form-bx">
-                                              <label>
-                                                <textarea
-                                                  type="text"
-                                                  className=""
-                                                  disabled
-                                                  value={
-                                                    item?.actionComment
-                                                      ? item?.actionComment
-                                                      : "N/A"
-                                                  }
-                                                />
-                                              </label>
-                                            </div>
-                                          </div>
-                                        </div> 
-                                            <div className="inner_form_new ">
-                                              <label className="controlform">
-                                                Notes
-                                              </label>
-                                              <div className="form-bx">
-                                                <label>
-                                                  <textarea
-                                                    name="Notes"
-                                                    placeholder="Notes"
-                                                    class=""
-                                                    value={
-                                                      item?.notes
-                                                        ? item?.notes
-                                                        : ""
-                                                    }
-                                                    disabled
-                                                  ></textarea>
-                                                </label>
-                                              </div>
-                                            </div>
-                                            <div className="inner_form_new ">
-                                              <label className="controlform">
-                                                Comments
-                                              </label>
-                                              <div className="form-bx">
-                                                <label>
-                                                  <textarea
-                                                    name="Notes"
-                                                    placeholder="Notes"
-                                                    class=""
-                                                    value={
-                                                      item?.comment
-                                                        ? item?.comment
-                                                        : ""
-                                                    }
-                                                    disabled
-                                                  ></textarea>
-                                                </label>
-                                              </div>
-                                            </div>
-                                            {/* {item?.assignedToName &&
+                                                {/* {item?.assignedToName &&
                                         item?.roleName ? ( */}
-                                            <div class="row">
-                                              <div class="col-md-6">
-                                                <div class="inner_form_new ">
-                                                  <label class="controlform">
-                                                    Assigned To Role
-                                                  </label>
-                                                  <div class="form-bx">
-                                                    <label>
-                                                      <input
-                                                        type="text"
-                                                        class=""
-                                                        disabled
-                                                        value={
-                                                          item?.roleName
-                                                            ? item?.roleName
-                                                            : "N/A"
-                                                        }
-                                                      />
-                                                    </label>
+                                                <div class="row">
+                                                  <div class="col-md-6">
+                                                    <div class="inner_form_new ">
+                                                      <label class="controlform">
+                                                        Assigned To Role
+                                                      </label>
+                                                      <div class="form-bx">
+                                                        <label>
+                                                          <input
+                                                            type="text"
+                                                            class=""
+                                                            disabled
+                                                            value={
+                                                              item?.roleName
+                                                                ? item?.roleName
+                                                                : "N/A"
+                                                            }
+                                                          />
+                                                        </label>
+                                                      </div>
+                                                    </div>
+                                                  </div>
+                                                  <div class="col-md-6">
+                                                    <div class="inner_form_new-sm ">
+                                                      <label class="controlform-sm">
+                                                        Assigned To User
+                                                      </label>
+                                                      <div class="form-bx-sm">
+                                                        <label>
+                                                          <input
+                                                            type="text"
+                                                            class=""
+                                                            disabled
+                                                            value={
+                                                              item?.assignedToName
+                                                                ? item?.assignedToName
+                                                                : "N/A"
+                                                            }
+                                                          />
+                                                        </label>
+                                                      </div>
+                                                    </div>
                                                   </div>
                                                 </div>
-                                              </div>
-                                              <div class="col-md-6">
-                                                <div class="inner_form_new-sm ">
-                                                  <label class="controlform-sm">
-                                                    Assigned To User
-                                                  </label>
-                                                  <div class="form-bx-sm">
-                                                    <label>
-                                                      <input
-                                                        type="text"
-                                                        class=""
-                                                        disabled
-                                                        value={
-                                                          item?.assignedToName
-                                                            ? item?.assignedToName
-                                                            : "N/A"
-                                                        }
-                                                      />
-                                                    </label>
-                                                  </div>
-                                                </div>
-                                              </div>
-                                            </div>
 
-                                            <div class="row">
-                                              <div class="col-md-12">
-                                                <div class="inner_form_new ">
-                                                  <label class="controlform">
-                                                    Action
-                                                  </label>
-                                                  <div class="form-bx">
-                                                    <label>
-                                                      <input
-                                                        type="text"
-                                                        class=""
-                                                        disabled
-                                                        value={
-                                                          item?.assignedAction ==
-                                                            "Approved" ||
-                                                          item?.assignedAction ==
-                                                            "Reject" ||
-                                                          item?.assignedAction ==
-                                                            "Cancelled"
-                                                            ? "Assigned"
-                                                            : item?.assignedAction
-                                                        }
-                                                        // value={
-                                                        //   item?.statusName
-                                                        //     ? item?.statusName
-                                                        //     : "N/A"
-                                                        // }
-                                                      />
-                                                    </label>
+                                                <div class="row">
+                                                  <div class="col-md-12">
+                                                    <div class="inner_form_new ">
+                                                      <label class="controlform">
+                                                        Action
+                                                      </label>
+                                                      <div class="form-bx">
+                                                        <label>
+                                                          <input
+                                                            type="text"
+                                                            class=""
+                                                            disabled
+                                                            value={
+                                                              item?.assignedAction ==
+                                                                "Approved" ||
+                                                              item?.assignedAction ==
+                                                                "Reject" ||
+                                                              item?.assignedAction ==
+                                                                "Cancelled"
+                                                                ? "Assigned"
+                                                                : item?.assignedAction
+                                                            }
+                                                            // value={
+                                                            //   item?.statusName
+                                                            //     ? item?.statusName
+                                                            //     : "N/A"
+                                                            // }
+                                                          />
+                                                        </label>
+                                                      </div>
+                                                    </div>
                                                   </div>
                                                 </div>
-                                              </div>
-                                            </div>
-                                            {/* ) : (
+                                                {/* ) : (
                                            ""
                                          )} */}
-                                          </>
-                                        );
+                                              </>
+                                            );
+                                          }
+                                        }
+                                      );
+                                    })
+                                  ) : (
+                                    <div
+                                      className={
+                                        banksuperTab ? "customtab" : "d-none"
                                       }
-                                    }
-                                  );
-                                })
-                              ) : (
-                                <div
-                                  className={
-                                    banksuperTab ? "customtab" : "d-none"
-                                  }
-                                >
-                                  <p className="text-center">No Record Found</p>
+                                    >
+                                      <p className="text-center">
+                                        No Record Found
+                                      </p>
+                                    </div>
+                                  )}
                                 </div>
-                              )}
-                            </div>
+                              </>
+                            ) : (
+                              ""
+                            )}
                           </>
-                        ) : (
-                          ""
-                        )}
-                      </>
-                    );
-                  }
-                })}
-                {noDataComment?.map((v, i) => {
-                  if (v.roleID == 4 && v.isDataAvailable == 0) {
-                    return (
-                      <div className={recordTab ? "customtab" : "d-none"}>
-                        <div class="text-center">No Data Found</div>
-                      </div>
-                    );
-                  }
-                })}
-</>
-                : " "
-              }
+                        );
+                      }
+                    })}
+                    {noDataComment?.map((v, i) => {
+                      if (v.roleID == 4 && v.isDataAvailable == 0) {
+                        return (
+                          <div className={recordTab ? "customtab" : "d-none"}>
+                            <div class="text-center">No Data Found</div>
+                          </div>
+                        );
+                      }
+                    })}
+                  </>
+                ) : (
+                  " "
+                )}
 
                 <h5
                   className={
@@ -4508,11 +4531,17 @@ const ExportDashboardViewDetails = ({
             )} */}
 
             <>
-              <h5 className="section_top_subheading mt-3 py-3 btn-collapse_active ">
+              <h5
+                className={
+                  roleID > 3
+                    ? "section_top_subheading mt-3 py-3 btn-collapse_active "
+                    : "d-none"
+                }
+              >
                 Application History
               </h5>
 
-              <div className="tab-content">
+              <div className={roleID > 2 ? "tab-content" : "d-none"}>
                 <div className="table-responsive">
                   <table class="table">
                     <thead>
@@ -4531,7 +4560,14 @@ const ExportDashboardViewDetails = ({
                               <>
                                 <tr>
                                   <td>{item.roleName}</td>
-                                  <td>{item.name ? item.name : "--"}</td>
+                                  <td>
+                                    {item.name ? item.name : "--"}{" "}
+                                    {item.actingRole == "1" ? (
+                                      <span className="act_sym">A</span>
+                                    ) : (
+                                      ""
+                                    )}
+                                  </td>
                                   <td>
                                     {item.createdDate
                                       ? moment(item.createdDate).format(

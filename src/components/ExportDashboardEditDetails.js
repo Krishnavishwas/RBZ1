@@ -1865,7 +1865,7 @@ useEffect(() => {
       newErrors.sector = "Sector is required";
       valid = false;
     }
-    if (applicationDetail.subSector === "" || checksectorchange === true) {
+    if ((applicationDetail.subSector === "" || checksectorchange === true) && applicationDetail.sector != 2 ) {
       newErrors.subSector = "Sub sector is required";
       valid = false;
     }
@@ -1881,19 +1881,10 @@ useEffect(() => {
       newErrors.assignedTo = "Bank supervisor is required";
       valid = false;
     }
-
-    // if(files.length < attachmentData.length){
-    //   newErrors.files = "All Files Required";
-    //   valid = false;
-    // }
-
     setErrors(newErrors);
     return valid;
   };
-  //console.log("--t", AssignUserID == "" , nextlevelvalue == "20" , nextlevelvalue == "10"  ,  checkSupervisor == true)
 
-  console.log("AssignUserID", AssignUserID);
-  console.log("nextlevelvalue", nextlevelvalue);
   const onShow = () => {
     setTimeout(() => {
       let selectAllCheckbox = document.querySelector(
@@ -2541,10 +2532,7 @@ useEffect(() => {
                 console.log("error", error);
               });
 
-            // sharefileupload
-
             for (let i = 0; i < sharefile?.length; i++) {
-              // Corrected loop condition
               shareformData.append("files", sharefile[i].file);
               shareformData.append("fileInfoID", sharefile[i].fileInfoID);
             }
@@ -2636,65 +2624,13 @@ useEffect(() => {
       ))
     : null;
 
-  // console.log("applicationDetail--applicationDetail", applicationDetail);
-
-  // const finalArray = getBlankFile?.map((blankFile) => {
-  //   const attachedFile = applicationDetail?.attachedFiles?.find(
-  //     (file) => file.label === blankFile.name
-  //   );
-  //   if (attachedFile) {
-  //     return {
-  //       ...attachedFile,
-  //       ...blankFile,
-  //     };
-  //   } else {
-  //     return blankFile;
-  //   }
-  // });
-
-  // Combine attachedFiles and getBlankFile arrays
-
-  //   const finalArray = applicationDetail?.attachedFiles?.map(attachedFile => {
-  //     const matchingFile = getBlankFile?.find(blankFile => blankFile.name == attachedFile.label);
-
-  //     if (matchingFile) {
-  //         // Combine properties from both objects
-  //         return { ...matchingFile, ...attachedFile };
-  //     } else {
-  //         // If there's no matching file, return the attachedFile as is
-  //         return attachedFile;
-  //     }
-  // });
-
-  // const labelSet = new Set(getBlankFile?.map((item) => item.name));
-  // geninfoFile?.forEach((item) => labelSet.add(item.label));
-
-  // Create the finalArray by merging attachedFiles and getBlankFile based on the labelSet
-
   useEffect(() => {
-    //     const finalArray = Array.from(labelSet)?.map(label => {
-    //       const attachedFile = geninfoFile?.find(item => item.label === label);
-    //       const getBlankFileItem = getBlankFile?.find(item => item.name === label);
-    //       if (attachedFile) {
-    //           return { ...attachedFile, status: 0 };
-    //       } else if (getBlankFileItem) {
-    //           return { ...getBlankFileItem, status: 0 };
-    //       }
-    //   });
-    //   console.log("finalArray", finalArray)
-    // if(finalArray){
-    // setFiles(finalArray)
-    // }
-
     let newData1 = getBlankFile?.filter((blankFile) => {
       return !geninfoFile?.some(
         (infoFile) => infoFile.label === blankFile.name
       );
     });
-
     setnewData(newData1);
-
-    // setFiles(geninfoFile);
   }, [applicationDetail, geninfoFile, allcomment]);
 
   const handleRemovfile = (id) => {
@@ -2709,8 +2645,6 @@ useEffect(() => {
         console.log("FileRemove Error", error);
       });
   };
-
-  console.log("errors", errors);
 
   const getLastComment = async (id) => {
     await axios
@@ -2727,8 +2661,6 @@ useEffect(() => {
         console.log("GetLastApplicationDataByID Error", error);
       });
   };
-  console.log("applicationDetail - ", applicationDetail);
-  console.log("lastComments - ", lastComments);
 
   return (
     <>
@@ -5596,17 +5528,13 @@ useEffect(() => {
                         role="tabpanel"
                         aria-labelledby="analyst"
                       >
-                        {console.log("Actiondata", Actiondata)}
                         {Actiondata?.map((cur) => {
-                          const firstItem = cur?.applicationActivityData?.[0]; // Accessing the first element directly
-
+                          const firstItem = cur?.applicationActivityData?.[0];
                           if (cur?.assignedToRoleID === 5 && firstItem) {
-                            // Check if firstItem exists
                             return (
                               <div className="bakgroundaction">
                                 <div key={firstItem.actionID}>
                                   {" "}
-                                  {/* Remember to add a unique key */}
                                   <div className="row">
                                     <div className="col-md-6">
                                       <div className="inner_form_new">
@@ -14704,14 +14632,14 @@ useEffect(() => {
               )}
 
               <>
-                <h5 className="section_top_subheading mt-3 py-3 btn-collapse_active ">
+                <h5 className={roleID > 3 ? "section_top_subheading mt-3 py-3 btn-collapse_active " : "d-none"}>
                   Application History{" "}
                   {/* <span className="btn-collapse">
               <i className="bi bi-caret-down-fill"></i>
             </span> */}
                 </h5>
 
-                <div className="tab-content">
+                <div className= {roleID > 2 ? "tab-content" : "d-none"}>
                   <div className="table-responsive">
                     <table className="table">
                       <thead>
@@ -14729,7 +14657,7 @@ useEffect(() => {
                               return (
                                 <tr key={index}>
                                   <td>{item.roleName}</td>
-                                  <td>{item.name ? item.name : "--"}</td>
+                                  <td>{item.name ? item.name : "--"} {item.actingRole == "1" ? <span className="act_sym">A</span> : ""}</td>
                                   <td>
                                     {item.createdDate
                                       ? moment(item.createdDate).format(
@@ -16009,18 +15937,10 @@ useEffect(() => {
                           }}
                         >
                           Dear{" "}
-                          {/* {applicationDetail?.applicantType == 1
-                            ? applicationDetail?.companyName
-                            : applicationDetail?.applicantType == 2
-                            ? applicationDetail?.name
-                            : applicationDetail?.applicantType == 3
-                            ? applicationDetail?.agencyName
-                            : " "} */}
                           {applicationDetail?.companyName == null ||
                           applicationDetail?.companyName == ""
                             ? applicationDetail?.name
                             : applicationDetail?.companyName}
-                          {console.log(applicationDetail)},
                         </td>
                       </tr>
                       <tr>
@@ -16072,7 +15992,6 @@ useEffect(() => {
                                 applicationDetail?.companyName == ""
                                   ? applicationDetail?.name
                                   : applicationDetail?.companyName}
-                                {console.log(applicationDetail)}
                               </td>
                             </tr>
                             <tr>
@@ -16620,18 +16539,10 @@ useEffect(() => {
                           }}
                         >
                           Dear{" "}
-                          {/* {applicationDetail?.applicantType == 1
-                            ? applicationDetail?.companyName
-                            : applicationDetail?.applicantType == 2
-                            ? applicationDetail?.name
-                            : applicationDetail?.applicantType == 3
-                            ? applicationDetail?.agencyName
-                            : " "} */}
                           {applicationDetail?.companyName == null ||
                           applicationDetail?.companyName == ""
                             ? applicationDetail?.name
                             : applicationDetail?.companyName}
-                          {console.log(applicationDetail)},
                         </td>
                       </tr>
                       <tr>
@@ -16660,31 +16571,6 @@ useEffect(() => {
                             <tr>
                               <td colSpan="2">&nbsp;</td>
                             </tr>
-                            {/* <tr>
-                              <td
-                                style={{
-                                  color: "#000",
-                                  fontSize: "18px",
-                                  fontWeight: "400",
-                                }}
-                              >
-                                Exporter
-                              </td>
-                              <td
-                                style={{
-                                  color: "#000",
-                                  fontSize: "18px",
-                                  fontWeight: "800",
-                                  letterSpacing: "0.01px"
-                                }}
-                              >
-                                :{" "}
-                                {applicationDetail?.companyName == null || applicationDetail?.companyName == ""
-                                  ? applicationDetail?.name
-                                  : applicationDetail?.companyName} 
-                                  {console.log(applicationDetail)}
-                              </td>
-                            </tr> */}
                             <tr>
                               <td
                                 style={{

@@ -63,7 +63,7 @@ const Sidebar = () => {
     menusCountHanlde()  
   }, [2000]);
 
-  const saveheadername = (id, name) => {
+  const saveheadername = (id, name) => {  
     sessionStorage.setItem("menuname", id);
     sessionStorage.setItem("submenuname", name);
   };

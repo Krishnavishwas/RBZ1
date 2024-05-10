@@ -1,3 +1,3 @@
-// export const Storage = sessionStorage;
+export const Storage = sessionStorage;
 
-export const Storage = localStorage;
+// export const Storage = localStorage;
