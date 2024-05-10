@@ -106,7 +106,18 @@ const ImportNewRequestForm = () => {
   const [options, setOptions] = useState([]);
   const [getBankID, setGetBankID] = useState("");
   const [getalluser, setGetalluser] = useState([]);
-  const fileInputRefsother = [ useRef(null),useRef(null),useRef(null), useRef(null),useRef(null),useRef(null),useRef(null),useRef(null),useRef(null), useRef(null)];
+  const fileInputRefsother = [
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+  ];
 
   const heading = "Application Submitted Successfully!";
   const para = "Import application request submitted successfully!";
@@ -594,9 +605,10 @@ const ImportNewRequestForm = () => {
     if (fileInputRefs[index].current) fileInputRefs[index].current.value = "";
   };
 
-  const clearInputFileother = (index) =>{
-    if (fileInputRefsother[index]?.current) fileInputRefsother[index].current.value = "";
-   }
+  const clearInputFileother = (index) => {
+    if (fileInputRefsother[index]?.current)
+      fileInputRefsother[index].current.value = "";
+  };
 
   const closePopupHandle = () => {
     navigate("/ImportDashboard");
@@ -674,7 +686,7 @@ const ImportNewRequestForm = () => {
       TIN: "",
       applicant: "",
       applicantReferenceNumber: "",
-      applicationType:"",
+      applicationType: "",
       exporterType: "",
       currency: "",
       amount: "",
@@ -942,7 +954,7 @@ const ImportNewRequestForm = () => {
               <label className="controlform">Company Name</label>
               <div className="form-bx">
                 <Select
-                ref={companyNameRef}
+                  ref={companyNameRef}
                   placeholder="Select Company Name"
                   value={getCompanyName}
                   onChange={handleChangecompany}
@@ -1621,7 +1633,10 @@ const ImportNewRequestForm = () => {
               <button
                 type="button"
                 className="remove-file"
-                onClick={() => {removeUserImage("other" + (index + 1)); clearInputFileother(index)}}
+                onClick={() => {
+                  removeUserImage("other" + (index + 1));
+                  clearInputFileother(index);
+                }}
               >
                 Remove
               </button>

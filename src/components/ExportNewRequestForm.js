@@ -111,7 +111,9 @@ const ExportNewRequestForm = () => {
   const [applicationType, setapplicationType] = useState([]);
   const [subsectorData, setsubsectorData] = useState([]);
   const [curRate, setCurrate] = useState();
-  const [checkSupervisor, setcheckSupervisor] = useState(roleID == 4 ? true : false);
+  const [checkSupervisor, setcheckSupervisor] = useState(
+    roleID == 4 ? true : false
+  );
   const [attachmentData, setAttachmentData] = useState([]);
   const [otherfilesupload, setOtherfilesupload] = useState([]);
   const [value, setValue] = useState("Company Name");
@@ -123,12 +125,22 @@ const ExportNewRequestForm = () => {
     applicantName: "",
     beneficiaryName: "",
   });
-  const fileInputRefsother = [ useRef(null),useRef(null),useRef(null), useRef(null),useRef(null),useRef(null),useRef(null),useRef(null),useRef(null), useRef(null)];
- 
+  const fileInputRefsother = [
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+  ];
+
   const fileInputRefs = [
     useRef(null),
     useRef(null),
-    useRef(null), 
     useRef(null),
     useRef(null),
     useRef(null),
@@ -137,7 +149,8 @@ const ExportNewRequestForm = () => {
     useRef(null),
     useRef(null),
     useRef(null),
-    useRef(null), 
+    useRef(null),
+    useRef(null),
     useRef(null),
     useRef(null),
     useRef(null),
@@ -314,8 +327,6 @@ const ExportNewRequestForm = () => {
       });
   };
 
-  
-
   const GetApplicationCount = async (id) => {
     await axios
       .post(APIURL + "ExportApplication/CountByApplicationID", {
@@ -422,7 +433,7 @@ const ExportNewRequestForm = () => {
         console.log(err);
       });
   };
- 
+
   const supervisorHangechangeRole = (e) => {
     const value = e.target.value;
     setErrors({});
@@ -433,7 +444,7 @@ const ExportNewRequestForm = () => {
       axios
         .post(APIURL + "User/GetUsersByRoleID", {
           RoleID: value,
-          DepartmentID:"2",
+          DepartmentID: "2",
           UserID: UserID.replace(/"/g, ""),
         })
         .then((res) => {
@@ -528,18 +539,16 @@ const ExportNewRequestForm = () => {
     return valid;
   };
 
-
   const validatePECANForm = () => {
     let valid = true;
-  
     const newErrors = {};
-
-   
-    if(ValidateChange.relatedexchangeControlNumber.trim().length < 4){
-      newErrors.relatedexchangeControlNumber = "Reference Number allow minimum 4 charecter";
+    if (ValidateChange.relatedexchangeControlNumber.trim().length < 4) {
+      newErrors.relatedexchangeControlNumber =
+        "Reference Number allow minimum 4 charecter";
       valid = false;
-    }else if(ValidateChange.relatedexchangeControlNumber.trim().length > 6){
-      newErrors.relatedexchangeControlNumber = "Reference Number allow maximum 6 charecter";
+    } else if (ValidateChange.relatedexchangeControlNumber.trim().length > 6) {
+      newErrors.relatedexchangeControlNumber =
+        "Reference Number allow maximum 6 charecter";
       valid = false;
     }
     setErrors(newErrors);
@@ -653,7 +662,7 @@ const ExportNewRequestForm = () => {
             axios
               .post(ImageAPI + "File/UploadFile", formData)
               .then((res) => {
-                 console.log("res99999");
+                console.log("res99999");
               })
               .catch((err) => {
                 console.log("file Upload ", err);
@@ -679,18 +688,15 @@ const ExportNewRequestForm = () => {
       setToastDisplayed(true);
     }
   };
- 
 
-  
-  const clearInputFile = (index) => { 
-    
+  const clearInputFile = (index) => {
     if (fileInputRefs[index]?.current) fileInputRefs[index].current.value = "";
   };
 
-  const clearInputFileother = (index) =>{
-    if (fileInputRefsother[index]?.current) fileInputRefsother[index].current.value = "";
-   }
-  
+  const clearInputFileother = (index) => {
+    if (fileInputRefsother[index]?.current)
+      fileInputRefsother[index].current.value = "";
+  };
 
   const closePopupHandle = () => {
     Navigate("/BankADLADashboard");
@@ -753,9 +759,9 @@ const ExportNewRequestForm = () => {
 
   const ResetHandleData = () => {
     setgetCompanyName(null);
-    setGetBankID(""); 
-setGetalluser([])
-setselectuserRole("")
+    setGetBankID("");
+    setGetalluser([]);
+    setselectuserRole("");
 
     setExportForm({
       user: "",
@@ -767,7 +773,7 @@ setselectuserRole("")
       BPNCode: "",
       TIN: "",
       applicant: "",
-      applicationType:"",
+      applicationType: "",
       applicantReferenceNumber: "",
       // applicantYear: "2024",
       // applicationDate:dateApp ,
@@ -811,8 +817,8 @@ setselectuserRole("")
     setFiles([]);
     setErrors({});
     setregisterusertype(bankidcheck);
-    if(roleID != 4){
-      setcheckSupervisor(false)
+    if (roleID != 4) {
+      setcheckSupervisor(false);
     }
   };
 
@@ -876,45 +882,45 @@ setselectuserRole("")
   });
 
   const changeHandelFormValidate = (e) => {
-    const { name, value } = e.target; 
+    const { name, value } = e.target;
 
     const specialChars = /[!@#$%^&*(),.?":{}|<>`~]/;
     let newErrors = {};
     let valid = true;
     if (name == "relatedexchangeControlNumber" && specialChars.test(value)) {
       newErrors.pknnumber = "Special characters not allowed";
-      valid = false; 
+      valid = false;
     } else if (name == "relatedexchangeControlNumber" && value == " ") {
       newErrors.pknnumber = "First character cannot be a blank space";
       valid = false;
     } else {
       setValidateChange({ ...ValidateChange, [name]: value });
-    } 
-    setErrors(newErrors)
+    }
+    setErrors(newErrors);
   };
 
   const handleValidateRBZ = () => {
     if (validatePECANForm()) {
-    setLoader(true);
-    axios
-      .post(APIURL + "ExportApplication/ValidateRBZReferenceNumber", {
-        RBZReferenceNumber: ValidateChange.relatedexchangeControlNumber.trim(),
-      })
-      .then((res) => { 
-        setErrors({})
-        setValidateShow(true);
-        setLoader(false);
-        if (res.data.responseCode == "200") {
-          setValidateRBZ(res.data.responseData);
-        } else {
-          setValidateRBZ([]);
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+      setLoader(true);
+      axios
+        .post(APIURL + "ExportApplication/ValidateRBZReferenceNumber", {
+          RBZReferenceNumber:
+            ValidateChange.relatedexchangeControlNumber.trim(),
+        })
+        .then((res) => {
+          setErrors({});
+          setValidateShow(true);
+          setLoader(false);
+          if (res.data.responseCode == "200") {
+            setValidateRBZ(res.data.responseData);
+          } else {
+            setValidateRBZ([]);
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     }
-      
   };
 
   // ----- Start Code For Open Poup
@@ -941,45 +947,51 @@ setselectuserRole("")
             e.target.style.color = "";
           }}
         ></i>
-       {
-        rowData.filePath ?  <Link to={rowData.filePath} target="_blank" ><i
-            className="pi pi-download p-2 nav-link p-0"
-            style={{ padding: "12px", marginLeft:"6px", cursor: "pointer" }}
-
-            aria-disabled
-            onMouseEnter={(e) => {
-              e.target.style.color = "var(--primary-color)";
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.color = "";
-            }}
-          ></i> </Link>: "" }
+        {rowData.filePath ? (
+          <Link to={rowData.filePath} target="_blank">
+            <i
+              className="pi pi-download p-2 nav-link p-0"
+              style={{ padding: "12px", marginLeft: "6px", cursor: "pointer" }}
+              aria-disabled
+              onMouseEnter={(e) => {
+                e.target.style.color = "var(--primary-color)";
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.color = "";
+              }}
+            ></i>{" "}
+          </Link>
+        ) : (
+          ""
+        )}
       </>
     ) : (
       <i
-      className="pi pi-eye p-0"
-      style={{ padding: "12px", cursor: "pointer" }}
-      onClick={() => {
-        handleViewData(rowData.id);
-        GetHandelDetail(rowData?.rbzReferenceNumber, rowData.id);
-        GetApplicationCount(rowData.id);
-      }}
-      onMouseEnter={(e) => {
-        e.target.style.color = "var(--primary-color)";
-      }}
-      onMouseLeave={(e) => {
-        e.target.style.color = "";
-      }}
-    ></i>
+        className="pi pi-eye p-0"
+        style={{ padding: "12px", cursor: "pointer" }}
+        onClick={() => {
+          handleViewData(rowData.id);
+          GetHandelDetail(rowData?.rbzReferenceNumber, rowData.id);
+          GetApplicationCount(rowData.id);
+        }}
+        onMouseEnter={(e) => {
+          e.target.style.color = "var(--primary-color)";
+        }}
+        onMouseLeave={(e) => {
+          e.target.style.color = "";
+        }}
+      ></i>
     );
   };
   const amountData = (rowData) => {
     return (
       <span>
-        {bankName.replace(/"/g, "") == rowData?.bankName ? rowData.amount + rowData.currencyCode : "--"}
+        {bankName.replace(/"/g, "") == rowData?.bankName
+          ? rowData.amount + rowData.currencyCode
+          : "--"}
       </span>
-    )
-  }
+    );
+  };
   const createdDate = (rowData) => {
     return <span>{moment(rowData?.createdDate).format("DD MMM YYYY")}</span>;
   };
@@ -1095,52 +1107,52 @@ setselectuserRole("")
         {/* end form-bx  */}
 
         <div className="inner_form_new ">
-            <label className="controlform">Name of Bank</label>
-            {roleID == 4 ? (
-              <div className="form-bx">
-                <label>
-                  <select
-                    ref={banknameRef}
-                    className={
-                      errors?.getBankID && getBankID == "" ? "error" : ""
-                    }
-                    name="BankID"
-                    onChange={(e) => {
-                      SelectBankRecordOfficer(e);
-                    }}
-                  >
-                    <option value="">Select Bank/ADLA Name</option>
-                    {masterBank?.map((item, index) => {
-                      return (
-                        <>
-                          <option value={item?.id} key={index}>
-                            {item?.bankName}
-                          </option>
-                        </>
-                      );
-                    })}
-                  </select>
-                  <span className="sspan"></span>
-                  {errors?.getBankID && getBankID == "" ? (
-                    <small className="errormsg">{errors.getBankID}</small>
-                  ) : (
-                    ""
-                  )}
-                </label>
-              </div>
-            ) : (
-              <div className="form-bx">
-                <label>
-                  <input
-                    type="text"
-                    value={bankName.replace(/"/g, "")}
-                    disabled
-                  />
-                  <span className="sspan"></span>
-                </label>
-              </div>
-            )}
-          </div>
+          <label className="controlform">Name of Bank</label>
+          {roleID == 4 ? (
+            <div className="form-bx">
+              <label>
+                <select
+                  ref={banknameRef}
+                  className={
+                    errors?.getBankID && getBankID == "" ? "error" : ""
+                  }
+                  name="BankID"
+                  onChange={(e) => {
+                    SelectBankRecordOfficer(e);
+                  }}
+                >
+                  <option value="">Select Bank/ADLA Name</option>
+                  {masterBank?.map((item, index) => {
+                    return (
+                      <>
+                        <option value={item?.id} key={index}>
+                          {item?.bankName}
+                        </option>
+                      </>
+                    );
+                  })}
+                </select>
+                <span className="sspan"></span>
+                {errors?.getBankID && getBankID == "" ? (
+                  <small className="errormsg">{errors.getBankID}</small>
+                ) : (
+                  ""
+                )}
+              </label>
+            </div>
+          ) : (
+            <div className="form-bx">
+              <label>
+                <input
+                  type="text"
+                  value={bankName.replace(/"/g, "")}
+                  disabled
+                />
+                <span className="sspan"></span>
+              </label>
+            </div>
+          )}
+        </div>
         {/* end form-bx  */}
 
         <div className="inner_form_new ">
@@ -1766,19 +1778,14 @@ setselectuserRole("")
                       min={0}
                       value={ValidateChange.relatedexchangeControlNumber.trim()}
                       name="relatedexchangeControlNumber"
-                      // onChange={(e) => {
-                      //   changeHandelForm(e);
-                      // }} 
                       onKeyDown={(e) => {
                         if (e.key === "-" || e.key === "+") {
                           e.preventDefault();
                         }
                       }}
-                      
                       onChange={(e) => {
                         changeHandelFormValidate(e);
                       }}
-                      // value={exportForm.relatedexchangeControlNumber?.trim()}
                       placeholder="Related Exchange Control Reference Number"
                       className={
                         errors.pknnumber
@@ -1789,22 +1796,13 @@ setselectuserRole("")
                       }
                     />
                     <span className="sspan"></span>
-                    {/* {errors.pknnumber ? (
-                      <small className="errormsg">
-                        {errors.pknnumber}
-                      </small>
-                    ) : (
-                      ""
-                    )} */}
-
-{errors.relatedexchangeControlNumber ? (
+                    {errors.relatedexchangeControlNumber ? (
                       <small className="errormsg">
                         {errors.relatedexchangeControlNumber}
                       </small>
                     ) : (
                       ""
                     )}
-
                   </label>
                   {/* validate data */}
 
@@ -1826,7 +1824,6 @@ setselectuserRole("")
                           value={ValidateRBZ}
                           scrollable
                           scrollHeight="500px"
-                          // className="mt-4"
                           paginator={ValidateRBZ?.length > 10 ? true : false}
                           rowHover
                           paginatorRight
@@ -1857,7 +1854,6 @@ setselectuserRole("")
                             header="Application Type"
                             style={{ minWidth: "250px" }}
                           ></Column>
-
                           <Column
                             field="amount"
                             header="Amount"
@@ -2153,7 +2149,6 @@ setselectuserRole("")
         )}
 
         <h5 className="section_top_subheading mt-3">Attachments</h5>
- 
 
         {attachmentData?.map((items, index) => {
           return (
@@ -2180,7 +2175,10 @@ setselectuserRole("")
                 <button
                   type="button"
                   className="remove-file"
-                  onClick={() => {removeUserImage(items?.name); clearInputFile(index)}}
+                  onClick={() => {
+                    removeUserImage(items?.name);
+                    clearInputFile(index);
+                  }}
                 >
                   Remove
                 </button>
@@ -2218,7 +2216,10 @@ setselectuserRole("")
               <button
                 type="button"
                 className="remove-file"
-                onClick={() => {removeUserImage("other" + (index + 1)); clearInputFileother(index)}}
+                onClick={() => {
+                  removeUserImage("other" + (index + 1));
+                  clearInputFileother(index);
+                }}
               >
                 Remove
               </button>

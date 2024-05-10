@@ -20,8 +20,11 @@ import SunEditor from "suneditor-react";
 import "suneditor/dist/css/suneditor.min.css";
 import NoSign from "../NoSign.png";
 import { MultiSelect } from "primereact/multiselect";
+import { DataTable } from "primereact/datatable";
+import { Column } from "primereact/column";
+import { TailSpin } from "react-loader-spinner";
 import jsPDF from "jspdf";
-// import MultiSelect from "react-multi-select-component";
+import ExportDashboardViewDetails from "./ExportDashboardViewDetails";
 
 const ExportDashboardRenewEditDetails = ({
   applicationDetail,
@@ -132,6 +135,7 @@ const ExportDashboardRenewEditDetails = ({
   const [sharefile, setsharefile] = useState([]);
   const [othersharefile, setOthersharefile] = useState([]);
   const [errors, setErrors] = useState({});
+  const [ValidateShow, setValidateShow] = useState(false);
   const [applicationType, setapplicationType] = useState([]);
   const [subsectorData, setsubsectorData] = useState([]);
   const [checkSupervisor, setcheckSupervisor] = useState(false);
@@ -149,11 +153,13 @@ const ExportDashboardRenewEditDetails = ({
     Notes: "",
     Comment: "",
   });
+  const [loader, setLoader] = useState(false);
   const [DateExpiryOption, setDateExpiryOption] = useState("");
   const [defaultnoExpiry, setdefaultnoExpiry] = useState("0");
   const [IsReturnOption, setIsReturnOption] = useState("");
   const [AllFrequency, setAllFrequency] = useState([]);
   const [getFrequencyID, setGetFrequencyID] = useState("0");
+  const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [IsReturn, setIsReturn] = useState("0");
   const [IsReturndisplay, setIsReturndisplay] = useState("");
   const [IsReturnExpiringDate, setIsReturnExpiringDate] = useState(new Date());
@@ -163,14 +169,25 @@ const ExportDashboardRenewEditDetails = ({
   const [userRoleRecordofficer, setuserRoleRecordofficer] = useState([]);
   const [selectuserRoleRecordofficer, setselectuserRoleRecordofficer] =
     useState("");
+  const [ValidateRBZ, setValidateRBZ] = useState([]);
   const [getalluser, setGetalluser] = useState([]);
   const [getBlankFile, setgetBlankFile] = useState([]);
   const [viewShareFile, setviewShareFile] = useState([]);
   const [geninfoFile, setgeninfoFile] = useState([]);
+  const [allcommentRenew, setallcomment] = useState([]);
   const [newData, setnewData] = useState([]);
   const [SubmitBtnLoader, setSubmitBtnLoader] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [applicationmessage, setApplicationmessage] = useState("");
+  const [tatHistoryRenew, setTatHistory] = useState([]);
+  const [noDataCommentRenew, setNoDataComment] = useState([]);
+  const [responceCountRenew, setresponceCount] = useState([]);
+  const [ValidateChange, setValidateChange] = useState({
+    relatedexchangeControlNumber: "",
+  });
 
   const applicationNumber = applicationDetail.rbzReferenceNumber;
+  const handleFormClose = () => setShowUpdateModal(false);
 
   const heading = "Application Submitted Successfully!";
   const para = "Export application request submitted successfully!";
@@ -529,7 +546,6 @@ const ExportDashboardRenewEditDetails = ({
 
   const SelectReturnFrequency = (e) => {
     const { name, value } = e.target;
-
     if (value == 1) {
       setGetFrequencyID(value);
       setIsReturnExpiringDate(new Date());
@@ -571,6 +587,170 @@ const ExportDashboardRenewEditDetails = ({
     const updatedUserFile = files?.filter((item, i) => item?.label != label);
     setFiles(updatedUserFile);
   };
+
+  const action = (rowData) => {
+    return bankName.replace(/"/g, "") == rowData?.bankName ? (
+      <>
+        <i
+          className="pi pi-eye p-0"
+          style={{ padding: "12px", cursor: "pointer" }}
+          onClick={() => {
+            handleViewData(rowData.id);
+            GetHandelDetailRenew(rowData?.rbzReferenceNumber, rowData.id);
+            GetApplicationCount(rowData.id);
+          }}
+          onMouseEnter={(e) => {
+            e.target.style.color = "var(--primary-color)";
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.color = "";
+          }}
+        ></i>
+      </>
+    ) : (
+      <i
+        className="pi pi-eye p-0"
+        style={{ padding: "12px", cursor: "pointer" }}
+        onClick={() => {
+          handleViewData(rowData.id);
+          GetHandelDetailRenew(rowData?.rbzReferenceNumber, rowData.id);
+          GetApplicationCount(rowData.id);
+        }}
+        onMouseEnter={(e) => {
+          e.target.style.color = "var(--primary-color)";
+        }}
+        onMouseLeave={(e) => {
+          e.target.style.color = "";
+        }}
+      ></i>
+    );
+  };
+
+  const amountData = (rowData) => {
+    return (
+      <span>
+        {bankName.replace(/"/g, "") == rowData?.bankName
+          ? rowData.amount + rowData.currencyCode
+          : "--"}
+      </span>
+    );
+  };
+
+  const createdDate = (rowData) => {
+    return <span>{moment(rowData?.createdDate).format("DD MMM YYYY")}</span>;
+  };
+
+  const applicantNAME = (rowData) => {
+    return <span>{rowData?.name ? rowData?.name : "N/A"}</span>;
+  };
+
+  const renderFooter = () => {
+    return (
+      <div className="flex justify-content-end">
+        <button
+          className="validateCrossIcon"
+          onClick={() => setValidateShow(false)}
+        >
+          <i class="bi bi-x-circle"></i>
+        </button>
+      </div>
+    );
+  };
+  const footer = renderFooter();
+
+  const GetHandelDetailRenew = async (rbzrefnumber, id) => {
+    setLoading(true);
+    await axios
+      .post(APIURL + "ExportApplication/GetRequestInfoByApplicationID", {
+        RBZReferenceNumber: `${rbzrefnumber}`,
+        ID: id,
+      })
+      .then((res) => {
+        if (res.data.responseCode === "200") {
+          setLoading(false);
+          setApplicationDetail(res.data.responseData);
+        } else {
+          setLoading(false);
+          setApplicationmessage(res.data.responseMessage);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+
+    await axios
+      .post(APIURL + "ExportApplication/GetNewComments", {
+        ID: id,
+      })
+      .then((res) => {
+        if (res.data.responseCode == 200) {
+          setallcomment(res.data.responseData);
+        } else {
+          setallcomment([]);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+
+    await axios
+      .post(APIURL + "ExportApplication/GetApplicationHistory", {
+        ID: id,
+      })
+      .then((res) => {
+        if (res.data.responseCode == 200) {
+          setTatHistory(res.data.responseData);
+        } else {
+          setTatHistory([]);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+
+    // --------------------------vishwas start----------------------------
+    await axios
+      .post(APIURL + "ExportApplication/GetCommentsInfoByRoleID", {
+        ApplicationID: id,
+      })
+      .then((res) => {
+        if (res.data.responseCode == 200) {
+          setNoDataComment(res.data.responseData);
+        } else {
+          setNoDataComment([]);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+    //---------------------------vishwas end------------------------------
+  };
+
+  const handleViewData = (id) => {
+    setShowUpdateModal(true);
+  };
+
+  const GetApplicationCount = async (id) => {
+    await axios
+      .post(APIURL + "ExportApplication/CountByApplicationID", {
+        ApplicationID: id,
+      })
+      .then((res) => {
+        if (res.data.responseCode == 200) {
+          setresponceCount(res.data.responseData);
+        } else {
+          setresponceCount([]);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+
+  useEffect(() => {
+    GetApplicationTypes();
+  }, []);
 
   /* PDF Preview code starts */
   const GetHandelDetailPDF = async () => {
@@ -641,8 +821,6 @@ const ExportDashboardRenewEditDetails = ({
     }, 1500);
   };
 
-  /* Ends Here */
-
   const HandleNextleveldata = (e) => {
     const name = e.target.name;
     const value = e.target.value;
@@ -650,7 +828,6 @@ const ExportDashboardRenewEditDetails = ({
     const specialCharsnote = /[!@#$%^*|<>]/;
     let newErrors = {};
     let valid = true;
-
     if (name == "Notes" && value.charAt(0) === " ") {
       newErrors.Notes = "First character cannot be a blank space";
       valid = false;
@@ -683,6 +860,63 @@ const ExportDashboardRenewEditDetails = ({
       .catch((err) => {
         console.log(err);
       });
+  };
+
+  const validatePECANForm = () => {
+    let valid = true;
+    const newErrors = {};
+    if (ValidateChange.relatedexchangeControlNumber.trim().length < 4) {
+      newErrors.relatedexchangeControlNumber =
+        "Reference Number allow minimum 4 charecter";
+      valid = false;
+    } else if (ValidateChange.relatedexchangeControlNumber.trim().length > 6) {
+      newErrors.relatedexchangeControlNumber =
+        "Reference Number allow maximum 6 charecter";
+      valid = false;
+    }
+    setErrors(newErrors);
+    return valid;
+  };
+  
+  const changeHandelFormValidate = (e) => {
+    const { name, value } = e.target; 
+    const specialChars = /[!@#$%^&*(),.?":{}|<>`~]/;
+    let newErrors = {};
+    let valid = true;
+    if (name == "recNumber" && specialChars.test(value)) {
+      newErrors.relatedexchangeControlNumber = "Special characters not allowed";
+      valid = false; 
+    } else if (name == "recNumber" && value == " ") {
+      newErrors.relatedexchangeControlNumber = "First character cannot be a blank space";
+      valid = false;
+    } else {
+      setValidateChange({ ...ValidateChange, [name]: value });
+    } 
+    setErrors(newErrors)
+  };
+
+  const handleValidateRBZ = () => {
+    if (validatePECANForm()) {
+      setLoader(true);
+      axios
+        .post(APIURL + "ExportApplication/ValidateRBZReferenceNumber", {
+          RBZReferenceNumber:
+            ValidateChange.relatedexchangeControlNumber.trim(),
+        })
+        .then((res) => {
+          setErrors({});
+          setValidateShow(true);
+          setLoader(false);
+          if (res.data.responseCode == "200") {
+            setValidateRBZ(res.data.responseData);
+          } else {
+            setValidateRBZ([]);
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
   };
 
   const supervisorHangechangeRoleRecordofficer = (e) => {
@@ -926,7 +1160,10 @@ const ExportDashboardRenewEditDetails = ({
       newErrors.sector = "Sector is required";
       valid = false;
     }
-    if ((applicationDetail.subSector === "" || checksectorchange === true) && applicationDetail.sector != 2) {
+    if (
+      (applicationDetail.subSector === "" || checksectorchange === true) &&
+      applicationDetail.sector != 2
+    ) {
       newErrors.subSector = "Sub sector is required";
       valid = false;
     }
@@ -1088,11 +1325,11 @@ const ExportDashboardRenewEditDetails = ({
             : AssignUserID && SupervisorRoleId == "" && nextlevelvalue != "20"
             ? parseInt(roleID) + 1
             : roleID,
-          IsDeferred:IsDeferred,
+          IsDeferred: IsDeferred,
           Notes: asignnextLeveldata.Notes,
           ExpiringDate: defaultnoExpiry == "0" ? "" : ExpiringDate,
           ApplicationStatus: applicationstaus,
-          ParentApplicationID : applicationDetail?.id,
+          ParentApplicationID: applicationDetail?.id,
           ActionStatus:
             (AssignUserID == "" || AssignUserID == null) &&
             roleID != 5 &&
@@ -1117,7 +1354,9 @@ const ExportDashboardRenewEditDetails = ({
               return {
                 id: v?.id,
                 fileName: v?.fileName,
-                label: v?.label.includes("Old") ? v?.label : "Old" + " " + v?.label,
+                label: v?.label.includes("Old")
+                  ? v?.label
+                  : "Old" + " " + v?.label,
                 filePath: v?.filePath,
                 departmentID: 2,
                 applicationID: res.data.responseData?.id,
@@ -1867,11 +2106,12 @@ const ExportDashboardRenewEditDetails = ({
                             ref={relatedexchangeControlNumberRef}
                             type="text"
                             min={0}
-                            name="recNumber"
-                            value={applicationDetail?.recNumber}
+                            name="relatedexchangeControlNumber"
+                            value={ValidateChange.relatedexchangeControlNumber ? ValidateChange.relatedexchangeControlNumber.trim() : applicationDetail?.recNumber}
                             defaultValue={applicationDetail?.rbzReferenceNumber}
                             onChange={(e) => {
-                              changeHandelForm(e);
+                              // changeHandelForm(e);
+                              changeHandelFormValidate(e)
                             }}
                             placeholder="Related Exchange Control Reference Number"
                             className={
@@ -1890,8 +2130,103 @@ const ExportDashboardRenewEditDetails = ({
                             ""
                           )}
                         </label>
+                        {loader == true ? (
+                          <TailSpin
+                            visible={true}
+                            height="20"
+                            width="20"
+                            color="#5e62a1"
+                            ariaLabel="tail-spin-loading"
+                            radius="1"
+                            wrapperStyle={{}}
+                            wrapperClass=""
+                          />
+                        ) : ValidateShow == true ? (
+                          <div className="card validatepecanfield">
+                            {ValidateRBZ.length > 0 ? (
+                              <DataTable
+                                value={ValidateRBZ}
+                                scrollable
+                                scrollHeight="500px"
+                                paginator={
+                                  ValidateRBZ?.length > 10 ? true : false
+                                }
+                                rowHover
+                                paginatorRight
+                                rows={10}
+                                dataKey="id"
+                                rowsPerPageOptions={[10, 50, 100]}
+                                emptyMessage="No Data found."
+                                footer={footer}
+                              >
+                                <Column
+                                  field="rbzReferenceNumber"
+                                  header="RBZ Reference Number"
+                                  style={{ minWidth: "200px" }}
+                                ></Column>
+                                <Column
+                                  field="name"
+                                  header="Applicant Name"
+                                  style={{ minWidth: "180px" }}
+                                  body={applicantNAME}
+                                ></Column>
+                                <Column
+                                  field="bankName"
+                                  header="Bank Name"
+                                  style={{ minWidth: "150px" }}
+                                ></Column>
+                                <Column
+                                  field="applicationType"
+                                  header="Application Type"
+                                  style={{ minWidth: "250px" }}
+                                ></Column>
+                                <Column
+                                  field="amount"
+                                  header="Amount"
+                                  style={{ minWidth: "150px" }}
+                                  body={amountData}
+                                ></Column>
+                                <Column
+                                  field="statusName"
+                                  header="Status"
+                                  style={{ minWidth: "200px" }}
+                                ></Column>
+                                <Column
+                                  field="createdDate"
+                                  header="Submitted Date"
+                                  style={{ minWidth: "150px" }}
+                                  body={createdDate}
+                                ></Column>
+                                <Column
+                                  field=""
+                                  header="Action"
+                                  style={{ minWidth: "100px" }}
+                                  frozen
+                                  alignFrozen="right"
+                                  body={action}
+                                ></Column>
+                              </DataTable>
+                            ) : (
+                              <div className="d-flex justify-content-between align-items-center p-2">
+                                <p className="mb-0">No Data</p>
+                                <button
+                                  className="validateCrossIcon"
+                                  onClick={() => setValidateShow(false)}
+                                >
+                                  <i class="bi bi-x-circle"></i>
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        ) : (
+                          " "
+                        )}
                       </div>
-                      <button type="button" className="primrybtn  v-button">
+                      <button
+                        type="button"
+                        className="primrybtn v-button"
+                        onClick={(e) => handleValidateRBZ(e)}
+                      >
                         Validate
                       </button>
                     </div>
@@ -2313,6 +2648,41 @@ const ExportDashboardRenewEditDetails = ({
               ""
             )}
           </form>
+            {/* view model start */}
+      <Modal
+        show={showUpdateModal}
+        onHide={handleFormClose}
+        backdrop="static"
+        className="max-width-600"
+      >
+        <div className="application-box">
+          <div className="login_inner">
+            <div className="login_form ">
+              <h5>
+                <Modal.Header closeButton className="p-0">
+                  <Modal.Title>
+                    View Export Request --{" "}
+                    <big>{applicationDetail?.rbzReferenceNumber}</big>
+                  </Modal.Title>
+                </Modal.Header>
+              </h5>
+            </div>
+            <div className="login_form_panel">
+              <Modal.Body className="p-0">
+                <ExportDashboardViewDetails
+                  applicationDetail={applicationDetail}
+                  handleFormClose={handleFormClose}
+                  allcomment={allcommentRenew}
+                  tatHistory={tatHistoryRenew}
+                  noDataComment={noDataCommentRenew}
+                  responceCount={responceCountRenew}
+                />
+              </Modal.Body>
+            </div>
+          </div>
+        </div>
+      </Modal>
+      {/* view modal end */}
         </>
       )}
     </>
