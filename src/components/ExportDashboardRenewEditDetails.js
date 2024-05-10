@@ -747,7 +747,6 @@ const ExportDashboardRenewEditDetails = ({
       });
   };
 
-
   useEffect(() => {
     GetApplicationTypes();
   }, []);
@@ -877,22 +876,23 @@ const ExportDashboardRenewEditDetails = ({
     setErrors(newErrors);
     return valid;
   };
-  
+
   const changeHandelFormValidate = (e) => {
-    const { name, value } = e.target; 
+    const { name, value } = e.target;
     const specialChars = /[!@#$%^&*(),.?":{}|<>`~]/;
     let newErrors = {};
     let valid = true;
     if (name == "recNumber" && specialChars.test(value)) {
       newErrors.relatedexchangeControlNumber = "Special characters not allowed";
-      valid = false; 
+      valid = false;
     } else if (name == "recNumber" && value == " ") {
-      newErrors.relatedexchangeControlNumber = "First character cannot be a blank space";
+      newErrors.relatedexchangeControlNumber =
+        "First character cannot be a blank space";
       valid = false;
     } else {
       setValidateChange({ ...ValidateChange, [name]: value });
-    } 
-    setErrors(newErrors)
+    }
+    setErrors(newErrors);
   };
 
   const handleValidateRBZ = () => {
@@ -2107,11 +2107,15 @@ const ExportDashboardRenewEditDetails = ({
                             type="text"
                             min={0}
                             name="relatedexchangeControlNumber"
-                            value={ValidateChange.relatedexchangeControlNumber ? ValidateChange.relatedexchangeControlNumber.trim() : applicationDetail?.recNumber}
+                            value={
+                              ValidateChange.relatedexchangeControlNumber
+                                ? ValidateChange.relatedexchangeControlNumber.trim()
+                                : applicationDetail?.recNumber
+                            }
                             defaultValue={applicationDetail?.rbzReferenceNumber}
                             onChange={(e) => {
                               // changeHandelForm(e);
-                              changeHandelFormValidate(e)
+                              changeHandelFormValidate(e);
                             }}
                             placeholder="Related Exchange Control Reference Number"
                             className={
@@ -2648,41 +2652,41 @@ const ExportDashboardRenewEditDetails = ({
               ""
             )}
           </form>
-            {/* view model start */}
-      <Modal
-        show={showUpdateModal}
-        onHide={handleFormClose}
-        backdrop="static"
-        className="max-width-600"
-      >
-        <div className="application-box">
-          <div className="login_inner">
-            <div className="login_form ">
-              <h5>
-                <Modal.Header closeButton className="p-0">
-                  <Modal.Title>
-                    View Export Request --{" "}
-                    <big>{applicationDetail?.rbzReferenceNumber}</big>
-                  </Modal.Title>
-                </Modal.Header>
-              </h5>
+          {/* view model start */}
+          <Modal
+            show={showUpdateModal}
+            onHide={handleFormClose}
+            backdrop="static"
+            className="max-width-600"
+          >
+            <div className="application-box">
+              <div className="login_inner">
+                <div className="login_form ">
+                  <h5>
+                    <Modal.Header closeButton className="p-0">
+                      <Modal.Title>
+                        View Export Request --{" "}
+                        <big>{applicationDetail?.rbzReferenceNumber}</big>
+                      </Modal.Title>
+                    </Modal.Header>
+                  </h5>
+                </div>
+                <div className="login_form_panel">
+                  <Modal.Body className="p-0">
+                    <ExportDashboardViewDetails
+                      applicationDetail={applicationDetail}
+                      handleFormClose={handleFormClose}
+                      allcomment={allcommentRenew}
+                      tatHistory={tatHistoryRenew}
+                      noDataComment={noDataCommentRenew}
+                      responceCount={responceCountRenew}
+                    />
+                  </Modal.Body>
+                </div>
+              </div>
             </div>
-            <div className="login_form_panel">
-              <Modal.Body className="p-0">
-                <ExportDashboardViewDetails
-                  applicationDetail={applicationDetail}
-                  handleFormClose={handleFormClose}
-                  allcomment={allcommentRenew}
-                  tatHistory={tatHistoryRenew}
-                  noDataComment={noDataCommentRenew}
-                  responceCount={responceCountRenew}
-                />
-              </Modal.Body>
-            </div>
-          </div>
-        </div>
-      </Modal>
-      {/* view modal end */}
+          </Modal>
+          {/* view modal end */}
         </>
       )}
     </>
