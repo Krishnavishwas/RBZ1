@@ -12,7 +12,7 @@ import { Storage } from "../login/Storagesetting";
 import { Link } from "react-router-dom";
 import Modal from "react-bootstrap/Modal";
 import ExportDashboardViewDetails from "../components/ExportDashboardViewDetails";
-import ExportDashboardEditDetails from "../components/ExportDashboardEditDetails";
+import ExportDashboardEditDetailsActing from "../components/ExportDashboardEditDetailsActing";
 import { TailSpin } from "react-loader-spinner";
 const ExportActingroleTable = () => {
   const useId = Storage.getItem("userID");
@@ -663,7 +663,7 @@ const ExportActingroleTable = () => {
             </div>
             <div className="login_form_panel">
               <Modal.Body className="p-0">
-                <ExportDashboardEditDetails
+                <ExportDashboardEditDetailsActing
                   applicationDetail={applicationDetail}
                   setApplicationDetail={setApplicationDetail}
                   EditModalClose={EditModalClose}
