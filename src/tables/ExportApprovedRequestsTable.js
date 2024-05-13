@@ -51,7 +51,7 @@ const ExportApprovedRequestsTable = () => {
       ? `${applicationDetail?.applicationStatus}`
       : "0"
   );
-  const [IsDeferred, setIsDeferred] = useState("0")
+  const [IsDeferred, setIsDeferred] = useState("0");
 
   const handleFormClose = () => setShowUpdateModal(false);
   const roleID = Storage.getItem("roleIDs");
@@ -281,7 +281,7 @@ const ExportApprovedRequestsTable = () => {
               ? // ? parseInt(roleID) - 1
                 value
               : roleID,
-              DepartmentID:"2",
+          DepartmentID: "2",
           UserID: useId.replace(/"/g, ""),
         })
         .then((res) => {
@@ -485,15 +485,12 @@ const ExportApprovedRequestsTable = () => {
       .then((res) => {
         if (res.data.responseCode == 200) {
           setActiondata(res.data.responseData);
-          // setshowdataloader(false)
         } else {
           setActiondata([]);
-          // setshowdataloader(false)
         }
       })
       .catch((err) => {
         console.log(err);
-        // setshowdataloader(false)
       });
 
     // --------------------------vishwas start----------------------------
@@ -594,7 +591,6 @@ const ExportApprovedRequestsTable = () => {
     setpaginationModalShow(true);
     setFirst(event.first);
     setRows(event.rows);
-
     axios
       .post(APIURL + "ExportApplication/GetExportDatabyUserID", {
         UserID: useId.replace(/"/g, ""),

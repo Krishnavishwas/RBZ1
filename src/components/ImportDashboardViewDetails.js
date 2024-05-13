@@ -325,6 +325,51 @@ const ImportDashboardViewDetails = ({
               </div>
             </div>
 
+            <div
+                class={
+                  applicationDetail?.applicationStatus == 0 ? "d-none" : "row"
+                }
+              >
+                <div class="col-md-6">
+                  <div class="inner_form_new ">
+                    <label class="controlform">Assigned To Role</label>
+                    <div class="form-bx">
+                      <label>
+                        <input
+                          type="text"
+                          class=""
+                          disabled
+                          value={
+                            applicationDetail?.assignedToRoleName
+                              ? applicationDetail?.assignedToRoleName
+                              : "N/A"
+                          }
+                        />
+                      </label>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="inner_form_new-sm ">
+                    <label class="controlform-sm">Assigned To User</label>
+                    <div class="form-bx-sm">
+                      <label>
+                        <input
+                          type="text"
+                          class=""
+                          disabled
+                          value={
+                            applicationDetail?.assignedToName
+                              ? applicationDetail?.assignedToName
+                              : "N/A"
+                          }
+                        />
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
             <h5 className="section_top_subheading">Attachments</h5>
             {(applicationDetail?.fileName || applicationDetail?.filePath) &&
             applicationDetail?.roleID !== 4 ? (

@@ -319,8 +319,7 @@ const ImportDashboardEditDetails = ({
     ) {
       newErrors.PECANNumber = "Special characters not allowed";
       valid = false;
-    }
-    else {
+    } else {
       setErrors({});
       setApplicationDetail((prevState) => ({
         ...prevState,
@@ -2260,7 +2259,11 @@ const ImportDashboardEditDetails = ({
                     >
                       {sectorData?.map((item, ind) => {
                         return (
-                          <option key={item.id} value={item.id} selected={applicationDetail?.sector == item.id}>
+                          <option
+                            key={item.id}
+                            value={item.id}
+                            selected={applicationDetail?.sector == item.id}
+                          >
                             {item.sectorName}
                           </option>
                         );
@@ -2348,6 +2351,51 @@ const ImportDashboardEditDetails = ({
                       ""
                     )}
                   </label>
+                </div>
+              </div>
+
+              <div
+                class={
+                  applicationDetail?.applicationStatus == 0 ? "d-none" : "row"
+                }
+              >
+                <div class="col-md-6">
+                  <div class="inner_form_new ">
+                    <label class="controlform">Assigned To Role</label>
+                    <div class="form-bx">
+                      <label>
+                        <input
+                          type="text"
+                          class=""
+                          disabled
+                          value={
+                            applicationDetail?.assignedToRoleName
+                              ? applicationDetail?.assignedToRoleName
+                              : "N/A"
+                          }
+                        />
+                      </label>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="inner_form_new-sm ">
+                    <label class="controlform-sm">Assigned To User</label>
+                    <div class="form-bx-sm">
+                      <label>
+                        <input
+                          type="text"
+                          class=""
+                          disabled
+                          value={
+                            applicationDetail?.assignedToName
+                              ? applicationDetail?.assignedToName
+                              : "N/A"
+                          }
+                        />
+                      </label>
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -4629,9 +4677,8 @@ const ImportDashboardEditDetails = ({
                               padding: "9px 3px",
                               border: "0px",
                             }}
-                          >  
-                           Other File {index + 1}
-                            
+                          >
+                            Other File {index + 1}
                           </label>
                           <div className="browse-btn">
                             Browse{" "}
@@ -6218,10 +6265,8 @@ const ImportDashboardEditDetails = ({
                               border: "0px",
                             }}
                           >
-                            
-                              Other File
-                              {index + 1}
-                             
+                            Other File
+                            {index + 1}
                           </label>
                           <div className="browse-btn">
                             Browse{" "}
@@ -7963,10 +8008,8 @@ const ImportDashboardEditDetails = ({
                               border: "0px",
                             }}
                           >
-                             
-                              Other File
-                              {index + 1}
-                            
+                            Other File
+                            {index + 1}
                           </label>
                           <div className="browse-btn">
                             Browse{" "}
@@ -9700,10 +9743,8 @@ const ImportDashboardEditDetails = ({
                               border: "0px",
                             }}
                           >
-                           
-                              Other File
-                              {index + 1}
-                            
+                            Other File
+                            {index + 1}
                           </label>
                           <div className="browse-btn">
                             Browse{" "}
@@ -11408,10 +11449,8 @@ const ImportDashboardEditDetails = ({
                               border: "0px",
                             }}
                           >
-                            
-                              Other File
-                              {index + 1}
-                            
+                            Other File
+                            {index + 1}
                           </label>
                           <div className="browse-btn">
                             Browse{" "}
@@ -12539,7 +12578,13 @@ const ImportDashboardEditDetails = ({
             )}
 
             <>
-              <h5 className={roleID > 3 ? "section_top_subheading mt-3 py-3 btn-collapse_active " : "d-none"}>
+              <h5
+                className={
+                  roleID > 3
+                    ? "section_top_subheading mt-3 py-3 btn-collapse_active "
+                    : "d-none"
+                }
+              >
                 Application History
               </h5>
 

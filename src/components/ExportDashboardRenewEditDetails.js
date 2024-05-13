@@ -2487,7 +2487,6 @@ const ExportDashboardRenewEditDetails = ({
                         border: "0px",
                       }}
                     >
-                      {/* <i className="bi bi-forward"></i> */}
                       <span style={{ fontWeight: "500" }}> {items.name} </span>
                     </label>
                     <div className="browse-btn">
