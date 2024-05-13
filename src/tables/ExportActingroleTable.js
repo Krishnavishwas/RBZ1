@@ -12,13 +12,17 @@ import { Storage } from "../login/Storagesetting";
 import { Link } from "react-router-dom";
 import Modal from "react-bootstrap/Modal";
 import ExportDashboardViewDetails from "../components/ExportDashboardViewDetails";
-import ExportDashboardEditDetailsActing from "../components/ExportDashboardEditDetailsActing";
+import ExportDashboardEditDetails from "../components/ExportDashboardEditDetails";
 import { TailSpin } from "react-loader-spinner";
+import ExportDashboardEditDetailsActing from "../components/ExportDashboardEditDetailsActing";
 const ExportActingroleTable = () => {
   const useId = Storage.getItem("userID");
   const rollId = Storage.getItem("roleIDs");
-  const roleID = Storage.getItem("roleIDs");
+  const roleIDs = Storage.getItem("roleIDs");
+  const roleID = parseInt(roleIDs) + 1;
+  // const roleID = Storage.getItem("roleIDs");
   const roleName = Storage.getItem("roleName");
+  
 
   const [exportdata, setexportdata] = useState([]);
   const [showEditForm, setshowEditForm] = useState(false);
@@ -208,18 +212,18 @@ const ExportActingroleTable = () => {
   const handleClickEditModal = () => {
     setshowEditForm(true);
   };
-
+    
   // ----- Start Code For Geting Table List Data
   const handleData = async () => {
     // setshowdataloader(true)
     setLoading(true);
     await axios
       .post(APIURL + "ExportApplication/GetActingDashboardData", {
-        DepartmentID: "2",
+        DepartmentID:"2",
         UserID: useId.replace(/"/g, ""),
         RoleID: rollId,
       })
-      .then((res) => {
+      .then((res) => { 
         if (res.data.responseCode === "200") {
           setLoading(false);
           setData(res.data.responseData);
@@ -271,7 +275,7 @@ const ExportActingroleTable = () => {
               ? // ? parseInt(roleID) - 1
                 value
               : roleID,
-          DepartmentID: "2",
+              DepartmentID:"2",
           UserID: useId.replace(/"/g, ""),
         })
         .then((res) => {
@@ -291,7 +295,7 @@ const ExportActingroleTable = () => {
     axios
       .post(APIURL + "User/GetUsersByRoleID", {
         RoleID: roleID,
-        DepartmentID: "2",
+        DepartmentID:"2",
         UserID: useId.replace(/"/g, ""),
       })
       .then((res) => {
@@ -492,6 +496,8 @@ const ExportActingroleTable = () => {
     };
   });
 
+   
+ 
   return (
     <>
       {loading == true ? (
@@ -505,7 +511,7 @@ const ExportActingroleTable = () => {
           <DataTable
             value={data}
             scrollable
-            scrollHeight="500px"
+            scrollHeight="600px"
             className={roleID >= 5 || roleID == 3 ? "mt-1" : "mt-1 tablehideth"}
             selection={selectedAppliation}
             onSelectionChange={(e) => setSelectedAppliation(e.value)}
@@ -529,6 +535,7 @@ const ExportActingroleTable = () => {
             emptyMessage="No Data found."
             header={header}
           >
+             
             <Column
               field="rbzReferenceNumber"
               header="RBZ Reference Number"
@@ -562,7 +569,7 @@ const ExportActingroleTable = () => {
               body={amountwithCurrency}
               style={{ width: "150px" }}
             ></Column>
-            <Column
+              <Column
               field="assignedByName"
               header="Assigned By"
               sortable
@@ -621,6 +628,8 @@ const ExportActingroleTable = () => {
         </div>
       </Modal>
 
+     
+
       <Modal
         show={showEditForm}
         onHide={EditModalClose}
@@ -640,15 +649,17 @@ const ExportActingroleTable = () => {
                             ? "col-md-12"
                             : "col-md-6"
                         }
-                        style={{ alignItems: "center" }}
+                        style={{alignItems : "center"}}
                       >
                         Edit Export Request --{" "}
                         <big>
                           {applicationDetail?.rbzReferenceNumber
                             ? applicationDetail.rbzReferenceNumber
                             : ""}
+
                         </big>
                       </div>
+                      
                     </div>
                   </Modal.Title>
                 </Modal.Header>
@@ -689,6 +700,8 @@ const ExportActingroleTable = () => {
           </div>
         </div>
       </Modal>
+
+     
     </>
   );
 };

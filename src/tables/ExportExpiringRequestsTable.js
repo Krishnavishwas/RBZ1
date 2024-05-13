@@ -144,7 +144,9 @@ const ExportExpiringRequestsTable = () => {
           ) : (
             (rowData?.filePath!=null)?
               (
-                <Link style={{color:"#4b5563"}} target="_blank" rel="noopener noreferrer" to={rowData?.filePath}>
+                <Link style={{color:"#4b5563"}} target="_blank" 
+                // rel="noopener noreferrer"
+                 to={rowData?.filePath}>
                   <i
                     className="pi pi-download p-2 nav-link"
                     style={{ padding: "12px", cursor: "pointer" }}            
@@ -439,7 +441,7 @@ const ExportExpiringRequestsTable = () => {
             <DataTable
               value={ExportsapproveRequests}
               scrollable
-              scrollHeight="500px"
+              scrollHeight="600px"
               className="mt-4"
               paginator={ExportsapproveRequests.length > 10 ? true : false}
               filters={filters}

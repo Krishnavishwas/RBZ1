@@ -653,7 +653,7 @@ const [showOldDataLoader, setShowOldDataLoader] = useState(false);
           <DataTable
             value={data}
             scrollable
-            scrollHeight="500px"
+            scrollHeight="600px"
             className={roleID >= 5 || roleID == 3 ? "mt-1" : "mt-1 tablehideth"}
             selection={selectedAppliation}
             onSelectionChange={(e) => setSelectedAppliation(e.value)}

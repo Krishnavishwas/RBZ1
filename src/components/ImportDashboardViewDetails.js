@@ -162,7 +162,7 @@ const ImportDashboardViewDetails = ({
                   <div className="form-bx">
                     <label>
                       <input
-                        value={applicationDetail?.tinNumber}
+                        value={applicationDetail?.tinNumber ? applicationDetail?.tinNumber : "N/A"}
                         disabled
                         className="text-uppercase"
                       />
@@ -601,7 +601,7 @@ const ImportDashboardViewDetails = ({
                                           </div>
                                         </div>
 
-                                        <div className="inner_form_new ">
+                                        <div className={items?.actionNotes ? "inner_form_new " : "d-none"}>
                                           <label className="controlform">
                                             Action Note
                                           </label>
@@ -621,7 +621,7 @@ const ImportDashboardViewDetails = ({
                                           </div>
                                         </div>
 
-                                        <div className="inner_form_new ">
+                                        <div className={items?.actionComment ? "inner_form_new " : "d-none"}>
                                           <label className="controlform">
                                             Action Comment
                                           </label>
@@ -4018,6 +4018,58 @@ const ImportDashboardViewDetails = ({
               <label className="notfound">File Not Found</label>
             )}
           </div>
+
+          <>
+              <h5 className={roleID > 3 ? "section_top_subheading mt-3 py-3 btn-collapse_active " : "d-none"}>
+                Application History
+              </h5>
+
+              <div className={roleID > 3 ? "tab-content" : "d-none"}>
+                <div className="table-responsive">
+                  <table className="table">
+                    <thead>
+                      <tr>
+                        <th scope="col">User Type</th>
+                        <th scope="col">User Name</th>
+                        <th scope="col">Receive Date</th>
+                        <th scope="col">Submit Date</th>
+                        <th scope="col">Turn Around Days</th>
+                      </tr>
+                    </thead>
+                    <tbody className="table-group-divider">
+                      {tatHistory?.length
+                        ? tatHistory?.map((item, index) => {
+                            return (
+                              <tr key={index}>
+                                <td>{item.roleName}</td>
+                                <td>{item.name ? item.name : "--"}</td>
+                                <td>
+                                  {item.createdDate
+                                    ? moment(item.createdDate).format(
+                                        "DD/MMM/yyyy hh:mm A"
+                                      )
+                                    : "--"}
+                                </td>
+                                <td>
+                                  {item.submittedDate
+                                    ? moment(item.submittedDate).format(
+                                        "DD/MMM/yyyy hh:mm A"
+                                      )
+                                    : "--"}
+                                </td>
+                                <td>
+                                  {item.workinG_DAYS}{" "}
+                                  {item.workinG_DAYS > 1 ? "Days" : "Day"}{" "}
+                                </td>
+                              </tr>
+                            );
+                          })
+                        : "No History Found"}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </>
 
           <div className="form-footer mt-5 mb-3">
             <button type="button" className="login" onClick={handleFormClose}>

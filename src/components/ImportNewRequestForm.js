@@ -9,7 +9,12 @@ import moment from "moment";
 import { toast } from "react-toastify";
 import Select from "react-select";
 import { useNavigate } from "react-router-dom";
+import { DataTable } from "primereact/datatable";
+import { Column } from "primereact/column";
+import Modal from "react-bootstrap/Modal";
+import { TailSpin } from "react-loader-spinner";
 import UpdatePopupMessage from "./UpdatePopupMessage";
+import ImportDashboardViewDetails from "./ImportDashboardViewDetails";
 
 const ImportNewRequestForm = () => {
   const navigate = useNavigate();
@@ -87,7 +92,24 @@ const ImportNewRequestForm = () => {
     applicantComments: "",
     bankSupervisor: "",
   });
-
+  const [ValidateChange, setValidateChange] = useState({
+    PECANNumber: "",
+  });
+  const [ValidateShow, setValidateShow] = useState(false);
+  const [ValidateRBZ, setValidateRBZ] = useState([]);
+  const [loader, setLoader] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [showUpdateModal, setShowUpdateModal] = useState(false);
+  const [allcommentRenew, setallcomment] = useState([]);
+  const [tatHistoryRenew, setTatHistory] = useState([]);
+  const [noDataCommentRenew, setNoDataComment] = useState([]);
+  const [applicationDetail, setApplicationDetail] = useState({});
+  const [applicationmessage, setApplicationmessage] = useState("");
+  const [responceCountRenew, setresponceCount] = useState([]);
+  const [Actiondata, setActiondata] = useState([]);
+  const handleViewData = (id) => {
+    setShowUpdateModal(true);
+  };
   const [files, setFiles] = useState([]);
   const [otherfiles, setOtherfiles] = useState([]);
   const [errors, setErrors] = useState({});
@@ -118,7 +140,7 @@ const ImportNewRequestForm = () => {
     useRef(null),
     useRef(null),
   ];
-
+  const handleFormClose = () => setShowUpdateModal(false);
   const heading = "Application Submitted Successfully!";
   const para = "Import application request submitted successfully!";
 
@@ -479,7 +501,7 @@ const ImportNewRequestForm = () => {
           RoleID: roleID,
           DepartmentID: "3",
           ApplicationDate: moment(startDate).format("YYYY-MM-DD"),
-          PECANumber: ImportForm.PECANNumber?.toUpperCase(),
+          PECANumber: ValidateChange.PECANNumber.toUpperCase(),
           ApplicantType: registerusertype,
           Name:
             registerusertype === "2" && bankID !== ""
@@ -770,6 +792,238 @@ const ImportNewRequestForm = () => {
     setGetBankID(value);
   };
 
+  const GetHandelDetailRenew = async (rbzrefnumber, id) => {
+    setLoading(true);
+    await axios
+      .post(APIURL + "ImportApplication/GetImportRequestInfoByApplicationID", {
+        RBZReferenceNumber: `${rbzrefnumber}`,
+        ID: id,
+      })
+      .then((res) => {
+        console.log("res", res);
+        if (res.data.responseCode === "200") {
+          setLoading(false);
+          setApplicationDetail(res.data.responseData);
+        } else {
+          setLoading(false);
+          setApplicationmessage(res.data.responseMessage);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+
+    await axios
+      .post(APIURL + "ImportApplication/GetNewCommentsImport", {
+        ID: id,
+      })
+      .then((res) => {
+        if (res.data.responseCode == 200) {
+          setallcomment(res.data.responseData);
+        } else {
+          setallcomment([]);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+
+    await axios
+      .post(APIURL + "ImportApplication/GetImportApplicationHistory", {
+        ID: id,
+      })
+      .then((res) => {
+        if (res.data.responseCode == 200) {
+          setTatHistory(res.data.responseData);
+        } else {
+          setTatHistory([]);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+      
+    await axios
+      .post(APIURL + "ImportApplication/GetActionsByApplicationID", {
+        ID: id,
+      })
+      .then((res) => {
+        if (res.data.responseCode == 200) {
+          setActiondata(res.data.responseData);
+        } else {
+          setActiondata([]);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+
+    // --------------------------vishwas start----------------------------
+    await axios
+      .post(APIURL + "ImportApplication/GetImportCommentsInfoByRoleID", {
+        ApplicationID: id,
+      })
+      .then((res) => {
+        if (res.data.responseCode == 200) {
+          setNoDataComment(res.data.responseData);
+        } else {
+          setNoDataComment([]);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+    //---------------------------vishwas end------------------------------
+  };
+
+  const GetApplicationCount = async (id) => {
+    await axios
+      .post(APIURL + "ExportApplication/CountByApplicationID", {
+        ApplicationID: id,
+      })
+      .then((res) => {
+        if (res.data.responseCode == 200) {
+          setresponceCount(res.data.responseData);
+        } else {
+          setresponceCount([]);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  useEffect(() => {
+    GetApplicationTypes();
+  }, []);
+
+  const action = (rowData) => {
+    return bankName.replace(/"/g, "") == rowData?.bankName ? (
+      <>
+        <i
+          className="pi pi-eye p-0"
+          style={{ padding: "12px", cursor: "pointer" }}
+          onClick={() => {
+            handleViewData(rowData.id);
+            GetHandelDetailRenew(rowData?.rbzReferenceNumber, rowData.id);
+            GetApplicationCount(rowData.id);
+          }}
+          onMouseEnter={(e) => {
+            e.target.style.color = "var(--primary-color)";
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.color = "";
+          }}
+        ></i>
+      </>
+    ) : (
+      <i
+        className="pi pi-eye p-0"
+        style={{ padding: "12px", cursor: "pointer" }}
+        onClick={() => {
+          handleViewData(rowData.id);
+          GetHandelDetailRenew(rowData?.rbzReferenceNumber, rowData.id);
+          GetApplicationCount(rowData.id);
+        }}
+        onMouseEnter={(e) => {
+          e.target.style.color = "var(--primary-color)";
+        }}
+        onMouseLeave={(e) => {
+          e.target.style.color = "";
+        }}
+      ></i>
+    );
+  };
+
+  const amountData = (rowData) => {
+    return (
+      <span>
+        {bankName.replace(/"/g, "") == rowData?.bankName
+          ? rowData.amount + rowData.currencyCode
+          : "--"}
+      </span>
+    );
+  };
+
+  const createdDate = (rowData) => {
+    return <span>{moment(rowData?.createdDate).format("DD MMM YYYY")}</span>;
+  };
+
+  const applicantNAME = (rowData) => {
+    return <span>{rowData?.name ? rowData?.name : "N/A"}</span>;
+  };
+
+  const renderFooter = () => {
+    return (
+      <div className="flex justify-content-end">
+        <button
+          className="validateCrossIcon"
+          onClick={() => setValidateShow(false)}
+        >
+          <i class="bi bi-x-circle"></i>
+        </button>
+      </div>
+    );
+  };
+  const footer = renderFooter();
+
+  const validatePECANForm = () => {
+    let valid = true;
+    const newErrors = {};
+    if (ValidateChange.PECANNumber.trim().length < 4) {
+      newErrors.PECANNumber =
+        "Prior exchange control authority number allow minimum 4 numbers";
+      valid = false;
+    } else if (ValidateChange.PECANNumber.trim().length > 6) {
+      newErrors.PECANNumber =
+        "Prior exchange control authority number allow maximum 6 numbers";
+      valid = false;
+    }
+    setErrors(newErrors);
+    return valid;
+  };
+
+  const changeHandelFormValidate = (e) => {
+    const { name, value } = e.target;
+    const specialChars = /[!@#$%^&*(),.?":{}|<>`~]/;
+    let newErrors = {};
+    let valid = true;
+    if (name == "PECANNumber" && specialChars.test(value)) {
+      newErrors.PECANNumber = "Special characters not allowed";
+      valid = false;
+    } else if (name == "PECANNumber" && value == " ") {
+      newErrors.PECANNumber = "First character cannot be a blank space";
+      valid = false;
+    } else {
+      setValidateChange({ ...ValidateChange, [name]: value });
+    }
+    setErrors(newErrors);
+  };
+
+  const handleValidateRBZ = () => {
+    if (validatePECANForm()) {
+      setLoader(true);
+      axios
+        .post(APIURL + "ImportApplication/ValidateRBZReferenceNumberImport", {
+          RBZReferenceNumber: ValidateChange.PECANNumber.trim(),
+        })
+        .then((res) => {
+          setErrors({});
+          setValidateShow(true);
+          setLoader(false);
+          if (res.data.responseCode == "200") {
+            setValidateRBZ(res.data.responseData);
+          } else {
+            setValidateRBZ([]);
+          }
+        })
+        .catch((err) => {
+          setLoader(false);
+          console.log(err);
+        });
+    }
+  };
+
   return (
     <>
       <form>
@@ -870,9 +1124,11 @@ const ImportNewRequestForm = () => {
                       type="text"
                       name="PECANNumber"
                       onChange={(e) => {
-                        changeHandelForm(e);
+                        // changeHandelForm(e);
+                        changeHandelFormValidate(e);
                       }}
-                      value={ImportForm.PECANNumber?.trim()}
+                      // value={ImportForm.PECANNumber?.trim()}
+                      value={ValidateChange.PECANNumber.trim()}
                       placeholder="PECAN"
                       className={
                         errors.PECANNumber
@@ -887,8 +1143,101 @@ const ImportNewRequestForm = () => {
                       ""
                     )}
                   </label>
+                  {loader == true ? (
+                    <TailSpin
+                      visible={true}
+                      height="20"
+                      width="20"
+                      color="#5e62a1"
+                      ariaLabel="tail-spin-loading"
+                      radius="1"
+                      wrapperStyle={{}}
+                      wrapperClass=""
+                    />
+                  ) : ValidateShow == true ? (
+                    <div className="card validatepecanfield">
+                      {ValidateRBZ.length > 0 ? (
+                        <DataTable
+                          value={ValidateRBZ}
+                          scrollable
+                          scrollHeight="500px"
+                          paginator={ValidateRBZ?.length > 10 ? true : false}
+                          rowHover
+                          paginatorRight
+                          rows={10}
+                          dataKey="id"
+                          rowsPerPageOptions={[10, 50, 100]}
+                          emptyMessage="No Data found."
+                          footer={footer}
+                        >
+                          <Column
+                            field="rbzReferenceNumber"
+                            header="RBZ Reference Number"
+                            style={{ minWidth: "200px" }}
+                          ></Column>
+                          <Column
+                            field="name"
+                            header="Applicant Name"
+                            style={{ minWidth: "180px" }}
+                            body={applicantNAME}
+                          ></Column>
+                          <Column
+                            field="bankName"
+                            header="Bank Name"
+                            style={{ minWidth: "150px" }}
+                          ></Column>
+                          <Column
+                            field="applicationType"
+                            header="Application Type"
+                            style={{ minWidth: "250px" }}
+                          ></Column>
+                          <Column
+                            field="amount"
+                            header="Amount"
+                            style={{ minWidth: "150px" }}
+                            body={amountData}
+                          ></Column>
+                          <Column
+                            field="statusName"
+                            header="Status"
+                            style={{ minWidth: "200px" }}
+                          ></Column>
+                          <Column
+                            field="createdDate"
+                            header="Submitted Date"
+                            style={{ minWidth: "150px" }}
+                            body={createdDate}
+                          ></Column>
+                          <Column
+                            field=""
+                            header="Action"
+                            style={{ minWidth: "100px" }}
+                            frozen
+                            alignFrozen="right"
+                            body={action}
+                          ></Column>
+                        </DataTable>
+                      ) : (
+                        <div className="d-flex justify-content-between align-items-center p-2">
+                          <p className="mb-0">No Data</p>
+                          <button
+                            className="validateCrossIcon"
+                            onClick={() => setValidateShow(false)}
+                          >
+                            <i class="bi bi-x-circle"></i>
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    " "
+                  )}
                 </div>
-                <button type="button" className="primrybtn  v-button">
+                <button
+                  type="button"
+                  className="primrybtn v-button"
+                  onClick={() => handleValidateRBZ()}
+                >
                   Validate
                 </button>
               </div>
@@ -896,7 +1245,6 @@ const ImportNewRequestForm = () => {
             <div className="col-md-3 text-right"></div>
           </div>
         </div>
-        {/* end form-bx  */}
 
         <div className="inner_form_new ">
           <label className="controlform">Type of Importer</label>
@@ -946,7 +1294,6 @@ const ImportNewRequestForm = () => {
             })}
           </div>
         </div>
-        {/* end form-bx  */}
 
         {registerusertype === "1" && bankID != "" ? (
           <>
@@ -1051,7 +1398,6 @@ const ImportNewRequestForm = () => {
         ) : (
           ""
         )}
-        {/* end form-bx  */}
 
         {registerusertype === "2" && bankID != "" ? (
           <>
@@ -1083,7 +1429,6 @@ const ImportNewRequestForm = () => {
         ) : (
           ""
         )}
-        {/* end form-bx  */}
 
         <div className="inner_form_new ">
           <label className="controlform">Application Type</label>
@@ -1119,7 +1464,6 @@ const ImportNewRequestForm = () => {
             </label>
           </div>
         </div>
-        {/* end form-bx  */}
 
         <div className="inner_form_new ">
           <label className="controlform">Beneficiary Name</label>
@@ -1144,7 +1488,6 @@ const ImportNewRequestForm = () => {
             </label>
           </div>
         </div>
-        {/* end form-bx  */}
 
         <div className="inner_form_new ">
           <label className="controlform">Beneficiary Country</label>
@@ -1360,7 +1703,6 @@ const ImportNewRequestForm = () => {
             </label>
           </div>
         </div>
-        {/* end form-bx  */}
 
         <div className="inner_form_new">
           <label className="controlform">Subsector</label>
@@ -1395,7 +1737,6 @@ const ImportNewRequestForm = () => {
             </label>
           </div>
         </div>
-        {/* end form-bx  */}
 
         <div className="inner_form_new ">
           <label className="controlform">Applicant Comments</label>
@@ -1420,7 +1761,6 @@ const ImportNewRequestForm = () => {
             </label>
           </div>
         </div>
-        {/* end form-bx  */}
 
         <div className={roleID == 4 ? "d-none" : "inner_form_new"}>
           <label className="controlform">
@@ -1436,7 +1776,6 @@ const ImportNewRequestForm = () => {
             }}
           />
         </div>
-        {/* end form-bx  */}
 
         {checkSupervisor == true && roleID == 2 ? (
           <div className="inner_form_new ">
@@ -1489,11 +1828,6 @@ const ImportNewRequestForm = () => {
                   onChange={(e) => {
                     supervisorHangechangeRole(e);
                   }}
-                  // className={
-                  //   errors.assignedTo && !SupervisorRoleId
-                  //     ? "error"
-                  //     : ""
-                  // }
                 >
                   <option value="">Select Role</option>
                   {userRole?.map((item, index) => {
@@ -1696,6 +2030,40 @@ const ImportNewRequestForm = () => {
           ""
         )}
       </form>
+      <Modal
+        show={showUpdateModal}
+        onHide={handleFormClose}
+        backdrop="static"
+        className="max-width-600"
+      >
+        <div className="application-box">
+          <div className="login_inner">
+            <div class="login_form ">
+              <h5>
+                <Modal.Header closeButton className="p-0">
+                  <Modal.Title>
+                    View Import Request --{" "}
+                    <big>{applicationDetail?.rbzReferenceNumber}</big>
+                  </Modal.Title>
+                </Modal.Header>
+              </h5>
+            </div>
+            <div className="login_form_panel">
+              <Modal.Body className="p-0">
+                <ImportDashboardViewDetails
+                  applicationDetail={applicationDetail}
+                  handleFormClose={handleFormClose}
+                  allcomment={allcommentRenew}
+                  noDataComment={noDataCommentRenew}
+                  tatHistory={tatHistoryRenew}
+                  Actiondata={Actiondata}
+                  responceCount={responceCountRenew}
+                />
+              </Modal.Body>
+            </div>
+          </div>
+        </div>
+      </Modal>
     </>
   );
 };

@@ -48,10 +48,10 @@ const SearchTable = () => {
     let valid = true;
     const newErrors = {};
     if (SearchInput.trim().length < 4) {
-      newErrors.SearchInput = "Reference Number allow minimum 4 charecter";
+      newErrors.SearchInput = "RBZ reference number allow minimum 4 numbers";
       valid = false;
     } else if (SearchInput.trim().length > 6) {
-      newErrors.SearchInput = "Reference Number allow maximum 6 charecter";
+      newErrors.SearchInput = "RBZ reference number allow maximum 6 numbers";
       valid = false;
     }
     setErrors(newErrors);
@@ -284,7 +284,7 @@ const SearchTable = () => {
       >
         <input
           ref={SearchInputRef}
-          type="text"
+          type="number"
           name="SearchInput"
           placeholder="Search RBZ Reference Number"
           className={errors.SearchInput ? "error" : ""}

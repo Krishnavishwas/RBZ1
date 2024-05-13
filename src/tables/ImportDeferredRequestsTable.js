@@ -96,7 +96,7 @@ const ImportDeferredRequestsTable = () => {
             <Link
               style={{ color: "#4b5563" }}
               target="_blank"
-              rel="noopener noreferrer"
+              // rel="noopener noreferrer"
               to={rowData?.filePath}
             >
               <i

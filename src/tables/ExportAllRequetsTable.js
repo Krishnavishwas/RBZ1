@@ -176,30 +176,7 @@ const ExportAllRequetsTable = () => {
         UserID: useId.replace(/"/g, ""),
         Status: "101",
         RoleID: rollId,
-        DataType: "All",
-        BankID: bankID,
-        LowerLimit: "0",
-        UpperLimit: "10",
-      })
-      .then((res) => {
-        if (res.data.responseCode === "200") {
-          setPageLoader(false);
-          // setExportsapproveRequests(res.data.responseData);
-          setExportsapproveAllRequests(res.data.responseData);
-        } else if (res.data.responseMessage === "No data") {
-          setPageLoader(false);
-        }
-      });
-  };
-  //--request tab data start
-  const handlereqData = async () => {
-    setPageLoader(true);
-    await axios
-      .post(APIURL + "ExportApplication/GetExportDatabyUserID", {
-        UserID: useId.replace(/"/g, ""),
-        Status: "101",
-        RoleID: rollId,
-        DataType: "My",
+        DataType: tabDepId,
         BankID: bankID,
         LowerLimit: "0",
         UpperLimit: "10",
@@ -208,11 +185,34 @@ const ExportAllRequetsTable = () => {
         if (res.data.responseCode === "200") {
           setPageLoader(false);
           setExportsapproveRequests(res.data.responseData);
+          // setExportsapproveAllRequests(res.data.responseData);
         } else if (res.data.responseMessage === "No data") {
           setPageLoader(false);
         }
       });
   };
+  //--request tab data start
+  // const handlereqData = async () => {
+  //   setPageLoader(true);
+  //   await axios
+  //     .post(APIURL + "ExportApplication/GetExportDatabyUserID", {
+  //       UserID: useId.replace(/"/g, ""),
+  //       Status: "101",
+  //       RoleID: rollId,
+  //       DataType: "My",
+  //       BankID: bankID,
+  //       LowerLimit: "0",
+  //       UpperLimit: "10",
+  //     })
+  //     .then((res) => {
+  //       if (res.data.responseCode === "200") {
+  //         setPageLoader(false);
+  //         setExportsapproveRequests(res.data.responseData);
+  //       } else if (res.data.responseMessage === "No data") {
+  //         setPageLoader(false);
+  //       }
+  //     });
+  // };
   //--request tab data end
   // ----- End Code For Geting Table List Data
 
@@ -371,13 +371,13 @@ const ExportAllRequetsTable = () => {
     setpaginationModalShow(true);
     setFirst(event.first);
     setRows(event.rows);
-    if (tabDepId == "All") {
+   
       axios
         .post(APIURL + "ExportApplication/GetExportDatabyUserID", {
           UserID: useId.replace(/"/g, ""),
           Status: "101",
           RoleID: rollId,
-          DataType: "All",
+          DataType: tabDepId,
           BankID: bankID,
           LowerLimit: event.rows * event.page,
           UpperLimit: event.rows,
@@ -385,26 +385,11 @@ const ExportAllRequetsTable = () => {
         .then((res) => {
           if (res.data.responseCode === "200") {
             setpaginationModalShow(false);
-            setExportsapproveAllRequests(res.data.responseData);
-          }
-        });
-    } else {
-      axios
-        .post(APIURL + "ExportApplication/GetExportDatabyUserID", {
-          UserID: useId.replace(/"/g, ""),
-          Status: "101",
-          RoleID: rollId,
-          DataType: "My",
-          BankID: bankID,
-          LowerLimit: event.rows * event.page,
-          UpperLimit: event.rows,
-        })
-        .then((res) => {
-          if (res.data.responseCode === "200") {
             setExportsapproveRequests(res.data.responseData);
           }
         });
-    }
+    
+   
   };
 
   ////////-------end
@@ -451,12 +436,12 @@ const ExportAllRequetsTable = () => {
   const header = renderHeader();
   useEffect(() => {
     handleData();
-    handlereqData();
+    // handlereqData();
     handleTabCount();
     setExportsapproveRequests([]);
-    setExportsapproveAllRequests([]);
+    // setExportsapproveAllRequests([]);
   }, [tabDepId]);
-
+  
   return (
     <>
       {tabHeader}
@@ -466,8 +451,8 @@ const ExportAllRequetsTable = () => {
           <span className="loader"></span>
           <span className="loaderwait">Please Wait...</span>
         </label>
-      ) : ExportsapproveAllRequests?.length == 0 ||
-        ExportsapproveRequests?.length == 0 ? (
+      ) : ExportsapproveRequests?.length == 0 ||
+      ExportsapproveRequests?.length == 0 ? (
         <div className="p-3">No records to show</div>
       ) : (
         <>
@@ -486,13 +471,9 @@ const ExportAllRequetsTable = () => {
               <DataTable
                 className="primeDatatTable"
                 //value={slicedData}
-                value={
-                  tabDepId == "All"
-                    ? ExportsapproveAllRequests
-                    : ExportsapproveRequests
-                }
+                value={ExportsapproveRequests}
                 scrollable
-                scrollHeight="500px"
+                scrollHeight="600px"
                 // paginator={ExportsapproveRequests?.length > 10 ? true : false}
                 rowHover
                 filters={filters}
