@@ -14,8 +14,8 @@ import { TailSpin } from "react-loader-spinner";
 import { Link } from "react-router-dom";
 import { Paginator } from "primereact/paginator";
 import Spinner from "react-bootstrap/Spinner";
-import ExportDashboardRenewEditDetails from "../components/ExportDashboardRenewEditDetails";
 import ImportDashboardViewDetails from "../components/ImportDashboardViewDetails";
+import ImportDashboardRenewEditDetails from "../components/ImportDashboardRenewEditDetails";
 
 const ImportApprovedRequestsTable = () => {
   const useId = Storage.getItem("userID");
@@ -46,6 +46,7 @@ const ImportApprovedRequestsTable = () => {
   const [exportdata, setexportdata] = useState([]);
   const [showdataLoader, setshowdataloader] = useState(false);
   const [userRole, setUserrole] = useState([]);
+  const [IsDeferred, setIsDeferred] = useState("0");
   const [applicationstaus, setapplicationstaus] = useState(
     applicationDetail?.applicationStatus
       ? `${applicationDetail?.applicationStatus}`
@@ -112,7 +113,7 @@ const ImportApprovedRequestsTable = () => {
             />
           ) : (
             <>
-              {/* {roleID == 2 ? (
+              {roleID == 2 ? (
                 <i
                   class="bi bi-copy"
                   style={{
@@ -137,7 +138,7 @@ const ImportApprovedRequestsTable = () => {
                 ></i>
               ) : (
                 ""
-              )} */}
+              )}
 
               {rowData?.filePath != null ? (
                 <>
@@ -255,7 +256,6 @@ const ImportApprovedRequestsTable = () => {
 
   const EditModalClose = () => {
     setshowEditForm(false);
-    // setapplicationstaus("0");
     setnextlevelvalue("");
   };
 
@@ -266,7 +266,6 @@ const ImportApprovedRequestsTable = () => {
       setSupervisorRoleId("");
       setAsignUser([]);
     } else {
-      // setSupervisorRoleId(value);
       axios
         .post(APIURL + "User/GetUsersByRoleID", {
           RoleID:
@@ -280,7 +279,7 @@ const ImportApprovedRequestsTable = () => {
               ? // ? parseInt(roleID) - 1
                 value
               : roleID,
-              DepartmentID:"3",
+          DepartmentID: "3",
           UserID: useId.replace(/"/g, ""),
         })
         .then((res) => {
@@ -425,7 +424,7 @@ const ImportApprovedRequestsTable = () => {
   };
 
   const handleClickEditModal = () => {
-    setshowEditForm(true);
+    setshowEditForm(true); 
   };
   // ----- End Code For Open Poup
 
@@ -517,7 +516,6 @@ const ImportApprovedRequestsTable = () => {
       })
       .then((res) => {
         if (res.data.responseCode == 200) {
-          console.log("responceCount", res);
           setresponceCount(res.data.responseData);
         } else {
           setresponceCount([]);
@@ -815,7 +813,7 @@ const ImportApprovedRequestsTable = () => {
                   <h5>
                     <Modal.Header closeButton className="p-0">
                       <Modal.Title>
-                        Edit Export Request --{" "}
+                        Edit Import Request --{" "}
                         <big>
                           {applicationDetail?.rbzReferenceNumber
                             ? applicationDetail.rbzReferenceNumber
@@ -827,7 +825,7 @@ const ImportApprovedRequestsTable = () => {
                 </div>
                 <div className="login_form_panel">
                   <Modal.Body className="p-0">
-                    <ExportDashboardRenewEditDetails
+                    <ImportDashboardRenewEditDetails
                       applicationDetail={applicationDetail}
                       setApplicationDetail={setApplicationDetail}
                       EditModalClose={EditModalClose}
@@ -856,6 +854,7 @@ const ImportApprovedRequestsTable = () => {
                       supervisorHangechangeRole={supervisorHangechangeRole}
                       setSupervisorRoleId={setSupervisorRoleId}
                       noDataComment={noDataComment}
+                      IsDeferred={IsDeferred}                      
                     />
                   </Modal.Body>
                 </div>

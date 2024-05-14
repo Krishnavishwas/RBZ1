@@ -842,7 +842,7 @@ const ImportNewRequestForm = () => {
       .catch((err) => {
         console.log(err);
       });
-      
+
     await axios
       .post(APIURL + "ImportApplication/GetActionsByApplicationID", {
         ID: id,
@@ -1121,13 +1121,12 @@ const ImportNewRequestForm = () => {
                   <label>
                     <input
                       ref={PECANNumberRef}
-                      type="text"
+                      type="number"
                       name="PECANNumber"
                       onChange={(e) => {
                         // changeHandelForm(e);
                         changeHandelFormValidate(e);
                       }}
-                      // value={ImportForm.PECANNumber?.trim()}
                       value={ValidateChange.PECANNumber.trim()}
                       placeholder="PECAN"
                       className={
@@ -1769,7 +1768,6 @@ const ImportNewRequestForm = () => {
           <input
             type="checkbox"
             className="mt-4"
-            checked={roleID == 4 ? true : false}
             disabled={roleID == 4 ? true : false}
             onChange={(e) => {
               HandelSupervisorcheck(e);
