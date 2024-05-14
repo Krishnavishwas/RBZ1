@@ -3331,12 +3331,12 @@ padding: 3px 0px;
   100% { transform: rotate(360deg); }
 }
 
-.p-multiselect-header{
+/* .p-multiselect-header{
   display: inline-block;
   width: 100%;
-}
+} */
 
-.p-multiselect-header .p-multiselect-select-all{
+/* .p-multiselect-header .p-multiselect-select-all{
   display: inline-block;
 }
 .p-multiselect-header .p-multiselect-close{
@@ -3344,7 +3344,7 @@ padding: 3px 0px;
 }
 .p-multiselect-panel .p-multiselect-header .p-checkbox {
   margin-right: 0px;
-}
+} */
 
 .viewbtn_file {
   font-size: 14px;
@@ -3654,6 +3654,7 @@ overflow-y: auto;
   .viewcopybtn{
     float: right;
     margin-top: 0px;
+    border-radius: 0px;
     margin-right: 22px !important;
   }
   .copybtn{

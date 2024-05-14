@@ -676,7 +676,7 @@ const ExportNewRequestForm = () => {
       setToastDisplayed(true);
     }
   };
- 
+ console.log("files", files)
 
   
   const clearInputFile = (index) => { 

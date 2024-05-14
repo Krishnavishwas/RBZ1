@@ -344,6 +344,7 @@ const ExportDashboardTable = () => {
   // ----- Start Code For Geting Table Data
   const GetHandelDetail = async (rbzrefnumber, id) => {
     setshowdataloader(true);
+    setApplicationDetail({})
     await axios
       .post(APIURL + "ExportApplication/GetRequestInfoByApplicationID", {
         RBZReferenceNumber: `${rbzrefnumber}`,
@@ -839,13 +840,13 @@ const [showOldDataLoader, setShowOldDataLoader] = useState(false);
                       </div>
                       <div
                         className={
-                          applicationDetail?.parentApplicationID == 0
+                          applicationDetail &&   applicationDetail?.parentApplicationID == 0
                             ? "d-none"
                             : "col-md-6 text-center"
                         }
                       >
                         <button
-                          className="btn btn-light viewcopybtn"
+                          className={applicationDetail?.parentApplicationID ? "btn btn-light viewcopybtn" : "d-none"}
                           onClick={() => {
                             handleOldViewData(
                               applicationDetail?.parentApplicationID

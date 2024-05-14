@@ -246,7 +246,7 @@ const ImportDashboardEditDetails = ({
   const convertedRate =
     parseFloat(curRate ? curRate : ratevalue) *
     parseFloat(applicationDetail?.amount);
-
+console.log("errors  - ", errors);
   const changeHandelForm = (e) => {
     const name = e.target.name;
     const value = e.target.value;
@@ -922,6 +922,8 @@ const ImportDashboardEditDetails = ({
     }
   };
 
+  console.log("Description -", Description);
+
   const HandleDateExpiryOption = (e) => {
     const { name, value } = e.target;
     setDateExpiryOption(e.target.value);
@@ -979,19 +981,25 @@ const ImportDashboardEditDetails = ({
       applicationDetail?.analystDescription == null &&
       roleID == 5
     ) {
-      newErrors.Description = "Description is required";
+      newErrors.Description = "Description is required...";
       valid = false;
     }
     if (
-      (checkSupervisor == false &&
-        nextlevelvalue == "" &&
+      Description == null ||
+      (Description == "<p></p>" &&
         roleID == 3 &&
-        Description == "") ||
-      (roleID == 3 && nextlevelvalue == "") ||
-      (nextlevelvalue == "10" && Description == "") ||
-      (Description == "" && supervisordecision == true)
+        nextlevelvalue == "" &&
+        nextlevelvalue != "20") ||
+      (nextlevelvalue == "10" &&
+        Description == "<p></p>" &&
+        roleID == 3 &&
+        nextlevelvalue != "20") ||
+      (Description == "<p></p>" &&
+        supervisordecision == true &&
+        roleID == 3 &&
+        nextlevelvalue != "20")
     ) {
-      newErrors.Description = "Description is required";
+      newErrors.Description = "Description is required!";
       valid = false;
     }
     if (
