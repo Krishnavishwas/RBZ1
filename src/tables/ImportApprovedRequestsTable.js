@@ -113,7 +113,7 @@ const ImportApprovedRequestsTable = () => {
             />
           ) : (
             <>
-              {roleID == 2 ? (
+              {roleID == 2 || roleID == 4 ? (
                 <i
                   class="bi bi-copy"
                   style={{

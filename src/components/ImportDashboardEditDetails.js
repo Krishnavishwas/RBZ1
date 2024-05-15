@@ -18,6 +18,20 @@ import "react-datepicker/dist/react-datepicker.css";
 import jsPDF from "jspdf";
 import { MultiSelect } from "primereact/multiselect";
 
+/* Tiptp Editor Starts */
+import Table from "@tiptap/extension-table";
+import TableCell from "@tiptap/extension-table-cell";
+import TableHeader from "@tiptap/extension-table-header";
+import TableRow from "@tiptap/extension-table-row";
+import { Color } from "@tiptap/extension-color";
+import ListItem from "@tiptap/extension-list-item";
+import TextStyle from "@tiptap/extension-text-style";
+import Text from "@tiptap/extension-text";
+import TextAlign from "@tiptap/extension-text-align";
+import { EditorContent, useEditor } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+/* Tiptp Editor Ends */
+
 const ImportDashboardEditDetails = ({
   applicationDetail,
   setApplicationDetail,
@@ -144,6 +158,7 @@ const ImportDashboardEditDetails = ({
   const [inputValue, setInputValue] = useState("");
   const [viewShareFile, setviewShareFile] = useState([]);
   const [applicationType, setapplicationType] = useState([]);
+  const [lastComments, setLastComments] = useState({});
   const [asignnextLeveldata, setasignnextLeveldata] = useState({
     Notes: "",
     Comment: "",
@@ -161,6 +176,7 @@ const ImportDashboardEditDetails = ({
   const [supervisordecision, setsupervisordecision] = useState(false);
   const [Description, setDescription] = useState("");
   const [value, setValue] = useState("");
+  const [content, setEditorContent] = useState("<p></p>");
   const [IsReturnOption, setIsReturnOption] = useState("");
   const [IsReturndisplay, setIsReturndisplay] = useState("");
   const [userfiles, setuserFiles] = useState([]);
@@ -239,21 +255,38 @@ const ImportDashboardEditDetails = ({
   const heading = "Updated Successfully!";
   const para = "Import request updated successfully!";
   const applicationNumber = applicationDetail.rbzReferenceNumber;
-
+  console.log("applicationstaus - ", applicationstaus);
   // const convertedRate = curRate * parseFloat(applicationDetail.amount);
   const ratevalue = applicationDetail?.rate;
 
   const convertedRate =
     parseFloat(curRate ? curRate : ratevalue) *
     parseFloat(applicationDetail?.amount);
-console.log("errors  - ", errors);
+
+  const CustomTableCell = TableCell.extend({
+    addAttributes() {
+      return {
+        ...this.parent?.(),
+        backgroundColor: {
+          default: null,
+          parseHTML: (element) => element.getAttribute("data-background-color"),
+          renderHTML: (attributes) => {
+            return {
+              "data-background-color": attributes.backgroundColor,
+              style: `background-color: ${attributes.backgroundColor}`,
+            };
+          },
+        },
+      };
+    },
+  });
+
   const changeHandelForm = (e) => {
     const name = e.target.name;
     const value = e.target.value;
     const specialChars = /[!@#$%^&*(),.?":{}|<>]/;
     let newErrors = {};
     let valid = true;
-
     if (name == "applicant" && value.charAt(0) === " ") {
       newErrors.applicant = "First character cannot be a blank space";
       valid = false;
@@ -618,6 +651,7 @@ console.log("errors  - ", errors);
   const clearInputFile = (index) => {
     if (fileInputRefs[index].current) fileInputRefs[index].current.value = "";
   };
+
   const clearInputFileother = (index) => {
     if (fileInputRefsother[index]?.current)
       fileInputRefsother[index].current.value = "";
@@ -823,6 +857,69 @@ console.log("errors  - ", errors);
     }
   }, [applicationDetail.sector]);
 
+  useEffect(() => {
+    setIsReturn(
+      applicationDetail?.isReturnNeeded
+        ? `${applicationDetail?.isReturnNeeded}`
+        : "0"
+    );
+    setIsReturnOption(
+      applicationDetail?.isReturnNeeded
+        ? `${applicationDetail?.isReturnNeeded}`
+        : "0"
+    );
+    setGetFrequencyID(
+      applicationDetail?.returnFrequencyType
+        ? `${applicationDetail?.returnFrequencyType}`
+        : "0"
+    );
+    setIsReturnExpiringDate(
+      applicationDetail?.returnDate ? applicationDetail?.returnDate : new Date()
+    );
+    setdefaultnoExpiry(applicationDetail?.expiringDate ? "1" : "0");
+    setDateExpiryOption(applicationDetail?.expiringDate ? "1" : "0");
+    setDateExpirydisplay(applicationDetail?.expiringDate ? "0" : "1");
+
+    const bankdtata = applicationDetail?.copiedResponses?.map((items, i) => {
+      return {
+        name: items.bankName,
+        code: items.bankID,
+      };
+    });
+
+    const lastResponseCCTodata = lastComments?.copiedResponseData?.map(
+      (items, i) => {
+        return {
+          name: items.bankName,
+          code: items.bankID,
+        };
+      }
+    );
+
+    setExpiringDate(
+      applicationDetail?.expiringDate
+        ? applicationDetail?.expiringDate
+        : new Date()
+    );
+
+    setSelectedBanks(lastResponseCCTodata ? lastResponseCCTodata : bankdtata);
+
+    if (applicationDetail?.isReturnNeeded == 1) {
+      axios
+        .post(APIURL + "Master/GetAllFrequencies")
+        .then((res) => {
+          if (res.data.responseCode == 200) {
+            setAllFrequency(res.data.responseData);
+          } else {
+            setAllFrequency([]);
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+  }, [applicationDetail, lastComments]);
+
   const onShow = () => {
     setTimeout(() => {
       let selectAllCheckbox = document.querySelector(
@@ -921,8 +1018,6 @@ console.log("errors  - ", errors);
       setIsReturnExpiringDate(new Date());
     }
   };
-
-  console.log("Description -", Description);
 
   const HandleDateExpiryOption = (e) => {
     const { name, value } = e.target;
@@ -1639,6 +1734,640 @@ console.log("errors  - ", errors);
     }
   };
 
+  const editor = useEditor({
+    extensions: [
+      Color.configure({ types: [TextStyle.name, ListItem.name] }),
+      TextStyle.configure({ types: [ListItem.name] }),
+      Table.configure({ resizable: true }),
+      Text,
+      Color,
+      TextAlign.configure({
+        types: ["heading", "paragraph"],
+      }),
+      TableRow,
+      TableHeader,
+      CustomTableCell,
+      StarterKit.configure({
+        bulletList: {
+          keepMarks: true,
+          keepAttributes: false,
+        },
+        orderedList: {
+          keepMarks: true,
+          keepAttributes: false,
+        },
+      }),
+    ],
+    content: content,
+    onUpdate({ editor }) {
+      setDescription(editor.getHTML());
+    },
+  });
+
+  useEffect(() => {
+    if (editor) {
+      editor.commands.setContent(
+        applicationDetail.parentApplicationID !== 0 && lastComments
+          ? lastComments?.description
+          : ""
+      );
+      setDescription(editor.getHTML());
+    }
+  }, [applicationDetail]);
+
+  useEffect(() => {
+    if (editorAnalyst) {
+      editorAnalyst.commands.setContent(
+        applicationDetail.parentApplicationID !== 0 && lastComments
+          ? lastComments?.description
+          : applicationDetail?.analystDescription
+      );
+      setDescription(editorAnalyst.getHTML());
+    }
+  }, [applicationDetail, lastComments]);
+
+  const editorAnalyst = useEditor({
+    extensions: [
+      Color.configure({ types: [TextStyle.name, ListItem.name] }),
+      TextStyle.configure({ types: [ListItem.name] }),
+      Table.configure({ resizable: true }),
+      Text,
+      Color,
+      TextAlign.configure({
+        types: ["heading", "paragraph"],
+      }),
+      TableRow,
+      TableHeader,
+      CustomTableCell,
+      StarterKit.configure({
+        bulletList: {
+          keepMarks: true,
+          keepAttributes: false,
+        },
+        orderedList: {
+          keepMarks: true,
+          keepAttributes: false,
+        },
+      }),
+    ],
+    content: applicationDetail.analystDescription,
+    onUpdate({ editor }) {
+      setDescription(editor.getHTML());
+    },
+  });
+
+  useEffect(() => {
+    if (editorSrAnalyst) {
+      editorSrAnalyst.commands.setContent(
+        applicationDetail.parentApplicationID !== 0 && lastComments
+          ? lastComments?.description
+          : applicationDetail?.analystDescription
+      );
+      setDescription(editorSrAnalyst.getHTML());
+    }
+  }, [applicationDetail, lastComments]);
+
+  const editorSrAnalyst = useEditor({
+    extensions: [
+      Color.configure({ types: [TextStyle.name, ListItem.name] }),
+      TextStyle.configure({ types: [ListItem.name] }),
+      Table.configure({ resizable: true }),
+      Text,
+      Color,
+      TextAlign.configure({
+        types: ["heading", "paragraph"],
+      }),
+      TableRow,
+      TableHeader,
+      CustomTableCell,
+      StarterKit.configure({
+        bulletList: {
+          keepMarks: true,
+          keepAttributes: false,
+        },
+        orderedList: {
+          keepMarks: true,
+          keepAttributes: false,
+        },
+      }),
+    ],
+    content: applicationDetail.analystDescription,
+    onUpdate({ editor }) {
+      setDescription(editor.getHTML());
+    },
+  });
+
+  const editorDeputy = useEditor({
+    extensions: [
+      Color.configure({ types: [TextStyle.name, ListItem.name] }),
+      TextStyle.configure({ types: [ListItem.name] }),
+      Table.configure({ resizable: true }),
+      Text,
+      Color,
+      TextAlign.configure({
+        types: ["heading", "paragraph"],
+      }),
+      TableRow,
+      TableHeader,
+      CustomTableCell,
+      StarterKit.configure({
+        bulletList: {
+          keepMarks: true,
+          keepAttributes: false,
+        },
+        orderedList: {
+          keepMarks: true,
+          keepAttributes: false,
+        },
+      }),
+    ],
+    content: applicationDetail.analystDescription,
+    onUpdate({ editor }) {
+      setDescription(editor.getHTML());
+    },
+  });
+
+  useEffect(() => {
+    if (editorDeputy) {
+      editorDeputy.commands.setContent(
+        applicationDetail.parentApplicationID !== 0 && lastComments
+          ? lastComments?.description
+          : applicationDetail?.analystDescription
+      );
+      setDescription(editorDeputy.getHTML());
+    }
+  }, [applicationDetail, lastComments]);
+
+  const editorPrincipleAnalyst = useEditor({
+    extensions: [
+      Color.configure({ types: [TextStyle.name, ListItem.name] }),
+      TextStyle.configure({ types: [ListItem.name] }),
+      Table.configure({ resizable: true }),
+      Text,
+      Color,
+      TextAlign.configure({
+        types: ["heading", "paragraph"],
+      }),
+      TableRow,
+      TableHeader,
+      CustomTableCell,
+      StarterKit.configure({
+        bulletList: {
+          keepMarks: true,
+          keepAttributes: false,
+        },
+        orderedList: {
+          keepMarks: true,
+          keepAttributes: false,
+        },
+      }),
+    ],
+    content: applicationDetail.analystDescription,
+    onUpdate({ editor }) {
+      setDescription(editor.getHTML());
+    },
+  });
+
+  useEffect(() => {
+    if (editorPrincipleAnalyst) {
+      editorPrincipleAnalyst.commands.setContent(
+        applicationDetail.parentApplicationID !== 0 && lastComments
+          ? lastComments?.description
+          : applicationDetail?.analystDescription
+      );
+      setDescription(editorPrincipleAnalyst.getHTML());
+    }
+  }, [applicationDetail, lastComments]);
+
+  console.log(
+    "applicationDetail?.analystDescription - ",
+    applicationDetail?.analystDescription
+  );
+
+  const editorDirector = useEditor({
+    extensions: [
+      Color.configure({ types: [TextStyle.name, ListItem.name] }),
+      TextStyle.configure({ types: [ListItem.name] }),
+      Table.configure({ resizable: true }),
+      Text,
+      Color,
+      TextAlign.configure({
+        types: ["heading", "paragraph"],
+      }),
+      TableRow,
+      TableHeader,
+      CustomTableCell,
+      StarterKit.configure({
+        bulletList: {
+          keepMarks: true,
+          keepAttributes: false,
+        },
+        orderedList: {
+          keepMarks: true,
+          keepAttributes: false,
+        },
+      }),
+    ],
+    content: applicationDetail.analystDescription,
+    onUpdate({ editor }) {
+      setDescription(editor.getHTML());
+    },
+  });
+
+  useEffect(() => {
+    if (editorDirector) {
+      editorDirector.commands.setContent(
+        applicationDetail.parentApplicationID !== 0 && lastComments
+          ? lastComments?.description
+          : applicationDetail?.analystDescription
+      );
+      setDescription(editorDirector.getHTML());
+    }
+  }, [applicationDetail, lastComments]);
+
+  const MenuBar = ({ editor }) => {
+    if (!editor) {
+      return null;
+    }
+    return (
+      <>
+        <button
+          type="button"
+          title="Insert Table"
+          onClick={() =>
+            editor
+              .chain()
+              .focus()
+              .insertTable({ rows: 3, cols: 3, withHeaderRow: true })
+              .run()
+          }
+        >
+          <i class="bi bi-table"></i>
+        </button>
+        <button
+          type="button"
+          title="Add Column Before"
+          onClick={() => editor.chain().focus().addColumnBefore().run()}
+          disabled={!editor.can().addColumnBefore()}
+        >
+          <i class="bi bi-list-columns-reverse"></i>
+        </button>
+        <button
+          type="button"
+          title="Add Column After"
+          onClick={() => editor.chain().focus().addColumnAfter().run()}
+          disabled={!editor.can().addColumnAfter()}
+        >
+          <i class="bi bi-list-columns"></i>
+        </button>
+        <button
+          type="button"
+          onClick={() => editor.chain().focus().deleteColumn().run()}
+          disabled={!editor.can().deleteColumn()}
+        >
+          <i class="bi bi-archive"></i>
+        </button>
+        <button
+          type="button"
+          onClick={() => editor.chain().focus().addRowBefore().run()}
+          disabled={!editor.can().addRowBefore()}
+        >
+          <i class="bi bi-arrow-bar-up"></i>
+        </button>
+        <button
+          type="button"
+          onClick={() => editor.chain().focus().addRowAfter().run()}
+          disabled={!editor.can().addRowAfter()}
+        >
+          <i class="bi bi-arrow-bar-down"></i>
+        </button>
+        <button
+          type="button"
+          onClick={() => editor.chain().focus().deleteRow().run()}
+          disabled={!editor.can().deleteRow()}
+        >
+          <i class="bi bi-archive"></i>
+        </button>
+        <button
+          type="button"
+          onClick={() => editor.chain().focus().deleteTable().run()}
+          disabled={!editor.can().deleteTable()}
+        >
+          <i class="bi bi-archive"></i>
+        </button>
+        <button
+          type="button"
+          onClick={() => editor.chain().focus().mergeCells().run()}
+          disabled={!editor.can().mergeCells()}
+        >
+          <i class="bi bi-union"></i>
+        </button>
+        <button
+          type="button"
+          onClick={() => editor.chain().focus().splitCell().run()}
+          disabled={!editor.can().splitCell()}
+        >
+          splitCell
+        </button>
+        <button
+          type="button"
+          onClick={() => editor.chain().focus().toggleHeaderColumn().run()}
+          disabled={!editor.can().toggleHeaderColumn()}
+        >
+          <i class="bi bi-layout-split"></i>
+        </button>
+        <button
+          type="button"
+          onClick={() => editor.chain().focus().toggleHeaderRow().run()}
+          disabled={!editor.can().toggleHeaderRow()}
+        >
+          <i class="bi bi-toggle-off"></i>
+        </button>
+        <button
+          type="button"
+          onClick={() => editor.chain().focus().toggleHeaderCell().run()}
+          disabled={!editor.can().toggleHeaderCell()}
+        >
+          <i class="bi bi-toggle-off"></i>
+        </button>
+        <button
+          type="button"
+          onClick={() => editor.chain().focus().mergeOrSplit().run()}
+          disabled={!editor.can().mergeOrSplit()}
+        >
+          <i class="bi bi-subtract"></i>
+        </button>
+        <button
+          type="button"
+          onClick={() =>
+            editor
+              .chain()
+              .focus()
+              .setCellAttribute("backgroundColor", "#FAF594")
+              .run()
+          }
+          disabled={
+            !editor.can().setCellAttribute("backgroundColor", "#FAF594")
+          }
+        >
+          <i class="bi bi-kanban"></i>
+        </button>
+        <button
+          type="button"
+          onClick={() => editor.chain().focus().fixTables().run()}
+          disabled={!editor.can().fixTables()}
+        >
+          <i class="bi bi-file-spreadsheet"></i>
+        </button>
+        <button
+          type="button"
+          onClick={() => editor.chain().focus().goToNextCell().run()}
+          disabled={!editor.can().goToNextCell()}
+        >
+          <i class="bi bi-arrow-right-square"></i>
+        </button>
+        <button
+          type="button"
+          onClick={() => editor.chain().focus().goToPreviousCell().run()}
+          disabled={!editor.can().goToPreviousCell()}
+        >
+          <i class="bi bi-arrow-left-square"></i>
+        </button>
+        <button
+          type="button"
+          title="Bold"
+          onClick={() => editor.chain().focus().toggleBold().run()}
+          disabled={!editor.can().chain().focus().toggleBold().run()}
+          className={editor.isActive("bold") ? "is-active" : ""}
+        >
+          <i class="bi bi-type-bold"></i>
+        </button>
+        <button
+          type="button"
+          title="Italic"
+          onClick={() => editor.chain().focus().toggleItalic().run()}
+          disabled={!editor.can().chain().focus().toggleItalic().run()}
+          className={editor.isActive("italic") ? "is-active" : ""}
+        >
+          <i class="bi bi-type-italic"></i>
+        </button>
+        <button
+          type="button"
+          title="Strike"
+          onClick={() => editor.chain().focus().toggleStrike().run()}
+          disabled={!editor.can().chain().focus().toggleStrike().run()}
+          className={editor.isActive("strike") ? "is-active" : ""}
+        >
+          <i class="bi bi-type-strikethrough"></i>
+        </button>
+        <button
+          type="button"
+          onClick={() => editor.chain().focus().toggleCode().run()}
+          disabled={!editor.can().chain().focus().toggleCode().run()}
+          className={editor.isActive("code") ? "is-active" : ""}
+        >
+          <i class="bi bi-code-slash"></i>
+        </button>
+        <button
+          type="button"
+          title="Paragraph"
+          onClick={() => editor.chain().focus().setParagraph().run()}
+          className={editor.isActive("paragraph") ? "is-active" : ""}
+        >
+          <i class="bi bi-paragraph"></i>
+        </button>
+        <button
+          type="button"
+          title="H1"
+          onClick={() =>
+            editor.chain().focus().toggleHeading({ level: 1 }).run()
+          }
+          className={
+            editor.isActive("heading", { level: 1 }) ? "is-active" : ""
+          }
+        >
+          <i class="bi bi-type-h1"></i>
+        </button>
+        <button
+          type="button"
+          title="H2"
+          onClick={() =>
+            editor.chain().focus().toggleHeading({ level: 2 }).run()
+          }
+          className={
+            editor.isActive("heading", { level: 2 }) ? "is-active" : ""
+          }
+        >
+          <i class="bi bi-type-h2"></i>
+        </button>
+        <button
+          type="button"
+          title="H3"
+          onClick={() =>
+            editor.chain().focus().toggleHeading({ level: 3 }).run()
+          }
+          className={
+            editor.isActive("heading", { level: 3 }) ? "is-active" : ""
+          }
+        >
+          <i class="bi bi-type-h3"></i>
+        </button>
+        <button
+          type="button"
+          title="H4"
+          onClick={() =>
+            editor.chain().focus().toggleHeading({ level: 4 }).run()
+          }
+          className={
+            editor.isActive("heading", { level: 4 }) ? "is-active" : ""
+          }
+        >
+          <i class="bi bi-type-h4"></i>
+        </button>
+        <button
+          type="button"
+          title="H5"
+          onClick={() =>
+            editor.chain().focus().toggleHeading({ level: 5 }).run()
+          }
+          className={
+            editor.isActive("heading", { level: 5 }) ? "is-active" : ""
+          }
+        >
+          <i class="bi bi-type-h5"></i>
+        </button>
+        <button
+          type="button"
+          title="H6"
+          onClick={() =>
+            editor.chain().focus().toggleHeading({ level: 6 }).run()
+          }
+          className={
+            editor.isActive("heading", { level: 6 }) ? "is-active" : ""
+          }
+        >
+          <i class="bi bi-type-h6"></i>
+        </button>
+        <button
+          type="button"
+          title="Bullet List"
+          onClick={() => editor.chain().focus().toggleBulletList().run()}
+          className={editor.isActive("bulletList") ? "is-active" : ""}
+        >
+          <i class="bi bi-list-ul"></i>
+        </button>
+        <button
+          type="button"
+          title="Ordered List"
+          onClick={() => editor.chain().focus().toggleOrderedList().run()}
+          className={editor.isActive("orderedList") ? "is-active" : ""}
+        >
+          <i class="bi bi-list-ol"></i>
+        </button>
+        <button
+          type="button"
+          title="Blockquote"
+          onClick={() => editor.chain().focus().toggleBlockquote().run()}
+          className={editor.isActive("blockquote") ? "is-active" : ""}
+        >
+          <i class="bi bi-quote"></i>
+        </button>
+        <button
+          type="button"
+          title="Horizontal Rule"
+          onClick={() => editor.chain().focus().setHorizontalRule().run()}
+        >
+          <i class="bi bi-hr"></i>
+        </button>
+        <button
+          type="button"
+          title="Hard Break"
+          onClick={() => editor.chain().focus().setHardBreak().run()}
+        >
+          <i class="bi bi-file-break"></i>
+        </button>
+        <button
+          type="button"
+          onClick={() => editor.chain().focus().setTextAlign("left").run()}
+          className={editor.isActive({ textAlign: "left" }) ? "is-active" : ""}
+        >
+          <i class="bi bi-text-left"></i>
+        </button>
+        <button
+          type="button"
+          onClick={() => editor.chain().focus().setTextAlign("center").run()}
+          className={
+            editor.isActive({ textAlign: "center" }) ? "is-active" : ""
+          }
+        >
+          <i class="bi bi-text-center"></i>
+        </button>
+        <button
+          type="button"
+          onClick={() => editor.chain().focus().setTextAlign("right").run()}
+          className={editor.isActive({ textAlign: "right" }) ? "is-active" : ""}
+        >
+          <i class="bi bi-text-right"></i>
+        </button>
+        <button
+          type="button"
+          onClick={() => editor.chain().focus().setTextAlign("justify").run()}
+          className={
+            editor.isActive({ textAlign: "justify" }) ? "is-active" : ""
+          }
+        >
+          <i class="bi bi-justify"></i>
+        </button>
+        <span className="setcolorcss">
+          <input
+            type="color"
+            className="colorswatch"
+            onInput={(event) =>
+              editor.chain().focus().setColor(event.target.value).run()
+            }
+            value={editor.getAttributes("textStyle").color}
+            data-testid="setColor"
+          />
+          <button
+            type="button"
+            onClick={() => editor.chain().focus().unsetColor().run()}
+            data-testid="unsetColor"
+          >
+            <i class="bi bi-palette-fill"></i>
+          </button>
+        </span>
+      </>
+    );
+  };
+
+  useEffect(() => {
+    setasignnextLeveldata({
+      Notes: lastComments?.notes,
+      Comment: lastComments?.comment,
+    });
+  }, [lastComments]);
+
+  const getLastComment = async (id) => {
+    await axios
+      .post(APIURL + "ImportApplication/GetLastApplicationDataByIDImport", {
+        ApplicationID: id,
+        RoleID: roleID,
+      })
+      .then((res) => {
+        if (res.data.responseCode == 200) {
+          setLastComments(res.data.responseData);
+          setDescription(res.data.responseData.description);
+        } else {
+          toast.warning(res.data.responseMessage);
+        }
+      })
+      .catch((error) => {
+        console.log("GetLastApplicationDataByIDImport Error", error);
+      });
+  };
+
+  console.log("lastComments - ", lastComments);
+
   return (
     <>
       {showdataLoader == true || !noDataComment?.length ? (
@@ -1742,7 +2471,11 @@ console.log("errors  - ", errors);
                             onChange={(e) => {
                               changeHandelForm(e);
                             }}
-                            value={applicationDetail?.pecaNumber}
+                            value={
+                              applicationDetail?.pecaNumber
+                                ? applicationDetail?.pecaNumber
+                                : "N/A"
+                            }
                             className={
                               errors.PECANNumber
                                 ? "text-uppercase error"
@@ -1802,35 +2535,8 @@ console.log("errors  - ", errors);
                 </div>
               </div>
 
-              {/* {registerusertype === "1" && bankID !== "" ? ( */}
               {applicationDetail?.applicantType == "1" && bankID != "" ? (
                 <>
-                  {/* <div className="inner_form_new ">
-              <label className="controlform">Company Name</label>
-              <div className="form-bx">
-                <SearchableDropdown
-                  options={companies}
-                  label="companyName"
-                  id={companies[value]}
-                  selectedVal={value}
-                  handleChange={(val) => {
-                    setValue(val);
-                  }}
-                />
-                {errors.companyName &&
-                (getCompanyName === "Company Name" ||
-                  getCompanyName == null) ? (
-                  <small className="errormsg">{errors.companyName}</small>
-                ) : (
-                  ""
-                )}
-                <small className="informgs">
-                  Please provide at least 3 characters for auto search of
-                  Company Name.
-                </small>
-              </div>
-            </div> */}
-
                   <div className="inner_form_new ">
                     <label className="controlform">Company Name</label>
                     <div className="form-bx">
@@ -1886,7 +2592,11 @@ console.log("errors  - ", errors);
                             changeHandelForm(e);
                           }}
                           disabled
-                          value={ImportForm.TINNumber?.trim()}
+                          value={
+                            ImportForm.TINNumber
+                              ? ImportForm.TINNumber?.trim()
+                              : "N/A"
+                          }
                           className={
                             errors.BPNCode
                               ? "error text-uppercase"
@@ -1915,7 +2625,11 @@ console.log("errors  - ", errors);
                           }}
                           disabled
                           value={ImportForm.BPNCode?.trim()}
-                          placeholder={applicationDetail?.bpnCode}
+                          placeholder={
+                            applicationDetail?.bpnCode
+                              ? applicationDetail?.bpnCode
+                              : "N/A"
+                          }
                           className={
                             errors.BPNCode
                               ? "error text-uppercase"
@@ -2031,9 +2745,11 @@ console.log("errors  - ", errors);
                       onChange={(e) => {
                         changeHandelForm(e);
                       }}
-                      // placeholder={applicationDetail?.beneficiaryName}
-                      // value={ImportForm.BeneficiaryName}
-                      value={applicationDetail?.beneficiaryName}
+                      value={
+                        applicationDetail?.beneficiaryName
+                          ? applicationDetail?.beneficiaryName
+                          : "N/A"
+                      }
                     />
                     <span className="sspan"></span>
                     {errors.BeneficiaryName ||
@@ -2116,6 +2832,7 @@ console.log("errors  - ", errors);
               ) : (
                 ""
               )}
+
               <div className="row">
                 <div className="col-md-6">
                   <div className="inner_form_new">
@@ -2134,7 +2851,6 @@ console.log("errors  - ", errors);
                               : ""
                           }
                         >
-                          {/* <option value="">{ImportForm?.currencyCode}</option> */}
                           {currency?.map((cur, ind) => {
                             return (
                               <option
@@ -2156,7 +2872,6 @@ console.log("errors  - ", errors);
                       </label>
                     </div>
                   </div>
-                  {/* end form-bx  */}
                 </div>
 
                 <div className="col-md-3">
@@ -2172,7 +2887,11 @@ console.log("errors  - ", errors);
                           onChange={(e) => {
                             changeHandelForm(e);
                           }}
-                          placeholder={applicationDetail?.amount}
+                          placeholder={
+                            applicationDetail?.amount
+                              ? applicationDetail?.amount
+                              : "N/A"
+                          }
                           className={
                             errors.amount && applicationDetail.amount === ""
                               ? "error"
@@ -2200,11 +2919,6 @@ console.log("errors  - ", errors);
                           ref={rateRef}
                           type="text"
                           name="rate"
-                          // value={
-                          //   ImportForm?.currency
-                          //     ? curRate
-                          //     : applicationDetail?.rate
-                          // }
                           value={
                             applicationDetail?.currency
                               ? curRate
@@ -2212,9 +2926,6 @@ console.log("errors  - ", errors);
                                 : applicationDetail.rate
                               : "Rate"
                           }
-                          // onChange={(e) => {
-                          //   changeHandelForm(e);
-                          // }}
                           disabled
                         />
                         <span className="sspan"></span>
@@ -2446,9 +3157,6 @@ console.log("errors  - ", errors);
                         <option value="">Select Bank Supervisor</option>
                         {Supervisors?.map((item, index) => {
                           return (
-                            // <option key={index} value={item.userID}>
-                            //   {item.name}
-                            // </option>
                             <option
                               key={index}
                               value={JSON?.stringify(item)}
@@ -2697,7 +3405,6 @@ console.log("errors  - ", errors);
                       ? "section_top_subheading mt-3 py-3 btn-collapse_active cursorpointer"
                       : "section_top_subheading mt-3 py-3 cursorpointer"
                   }
-                  onClick={() => setbanksuperTab(!banksuperTab)}
                 >
                   Bank Supervisor{" "}
                   {responceCount?.map((item, i) => {
@@ -2712,9 +3419,26 @@ console.log("errors  - ", errors);
                         </>
                       );
                   })}
-                  <span className="btn-collapse">
+                  <span
+                    className="btn-collapse"
+                    onClick={() => setbanksuperTab(!banksuperTab)}
+                  >
                     <i className="bi bi-caret-down-fill"></i>
                   </span>
+                  {applicationDetail?.parentApplicationID !== 0 &&
+                  roleID == 3 ? (
+                    <button
+                      type="button"
+                      className="btn btn-light mx-auto copybtn"
+                      onClick={() =>
+                        getLastComment(applicationDetail?.parentApplicationID)
+                      }
+                    >
+                      Copy Last Response
+                    </button>
+                  ) : (
+                    ""
+                  )}
                 </h5>
                 <div className={banksuperTab ? "customtab" : "d-none"}>
                   {allcomment?.map((cur, i) => {
@@ -2910,7 +3634,6 @@ console.log("errors  - ", errors);
                                     </label>
                                     <div className="form-bx">
                                       <label>
-                                        {" "}
                                         <textarea
                                           type="text"
                                           className=""
@@ -3045,7 +3768,6 @@ console.log("errors  - ", errors);
                               <>
                                 <div className="inner_form_new">
                                   <label className="controlform">User</label>
-
                                   <div className="form-bx">
                                     <label>
                                       <select
@@ -3221,48 +3943,10 @@ console.log("errors  - ", errors);
                           }
                         >
                           <label className="controlform">Recommendation</label>
-                          <div className="form-bx">
+                          <div className="form-bx editorFieldBox">
                             <div className="mt-2 py-1">
-                              <SunEditor
-                                setContents={
-                                  Description
-                                    ? Description
-                                    : applicationDetail?.analystDescription
-                                }
-                                onChange={(newcomment) =>
-                                  setDescription(newcomment)
-                                }
-                                setOptions={{
-                                  buttonList: [
-                                    ["undo", "redo"],
-                                    ["fontSize"],
-                                    [
-                                      "bold",
-                                      "underline",
-                                      "italic",
-                                      "strike",
-                                      "subscript",
-                                      "superscript",
-                                    ],
-                                    ["fontColor", "hiliteColor"],
-                                    ["align", "list", "lineHeight"],
-                                    ["outdent", "indent"],
-
-                                    [
-                                      "table",
-                                      "horizontalRule",
-                                      "link",
-                                      "image",
-                                      "video",
-                                    ],
-                                    ["preview", "print"],
-                                    ["removeFormat"],
-                                  ],
-                                  defaultTag: "div",
-                                  minHeight: "120px",
-                                  showPathLabel: false,
-                                }}
-                              />
+                              <MenuBar editor={editor} />
+                              <EditorContent editor={editor} />
                               <span className="sspan"></span>
                               {(errors.Description && Description == "") ||
                               Description == "<p><br></p>" ? (
@@ -3626,7 +4310,6 @@ console.log("errors  - ", errors);
                       ? "section_top_subheading mt-3 py-3 btn-collapse_active cursorpointer"
                       : "section_top_subheading mt-3 py-3 cursorpointer"
                   }
-                  onClick={() => setrecordTab(!recordTab)}
                 >
                   Record Officer{" "}
                   {responceCount?.map((item, i) => {
@@ -3641,9 +4324,26 @@ console.log("errors  - ", errors);
                         </>
                       );
                   })}
-                  <span className="btn-collapse">
+                  <span
+                    className="btn-collapse"
+                    onClick={() => setrecordTab(!recordTab)}
+                  >
                     <i className="bi bi-caret-down-fill"></i>
                   </span>
+                  {applicationDetail?.parentApplicationID !== 0 &&
+                  roleID == 4 ? (
+                    <button
+                      type="button"
+                      className="btn btn-light mx-auto copybtn"
+                      onClick={() =>
+                        getLastComment(applicationDetail?.parentApplicationID)
+                      }
+                    >
+                      Copy Last Response
+                    </button>
+                  ) : (
+                    ""
+                  )}
                 </h5>
 
                 <div className={recordTab ? "customtab" : "d-none"}>
@@ -4029,7 +4729,6 @@ console.log("errors  - ", errors);
                       ? "section_top_subheading mt-3 py-3 btn-collapse_active cursorpointer"
                       : "section_top_subheading mt-3 py-3 cursorpointer"
                   }
-                  onClick={() => setanalystTab(!analystTab)}
                 >
                   Analyst{" "}
                   {responceCount?.map((item, i) => {
@@ -4044,9 +4743,26 @@ console.log("errors  - ", errors);
                         </>
                       );
                   })}
-                  <span className="btn-collapse">
+                  <span
+                    className="btn-collapse"
+                    onClick={() => setanalystTab(!analystTab)}
+                  >
                     <i className="bi bi-caret-down-fill"></i>
                   </span>
+                  {applicationDetail?.parentApplicationID !== 0 &&
+                  roleID == 5 ? (
+                    <button
+                      type="button"
+                      className="btn btn-light mx-auto copybtn"
+                      onClick={() =>
+                        getLastComment(applicationDetail?.parentApplicationID)
+                      }
+                    >
+                      Copy Last Response
+                    </button>
+                  ) : (
+                    ""
+                  )}
                 </h5>
 
                 <div className={analystTab ? "customtab" : "d-none"}>
@@ -4362,48 +5078,10 @@ console.log("errors  - ", errors);
                         }
                       >
                         <label className="controlform">Recommendation</label>
-                        <div className="form-bx">
+                        <div className="form-bx editorFieldBox">
                           <div className="mt-2 py-1">
-                            <SunEditor
-                              setContents={
-                                Description
-                                  ? Description
-                                  : applicationDetail?.analystDescription
-                              }
-                              onChange={(newcomment) =>
-                                setDescription(newcomment)
-                              }
-                              setOptions={{
-                                buttonList: [
-                                  ["undo", "redo"],
-                                  ["font", "fontSize"],
-                                  [
-                                    "bold",
-                                    "underline",
-                                    "italic",
-                                    "strike",
-                                    "subscript",
-                                    "superscript",
-                                  ],
-                                  ["fontColor", "hiliteColor"],
-                                  ["align", "list", "lineHeight"],
-                                  ["outdent", "indent"],
-
-                                  [
-                                    "table",
-                                    "horizontalRule",
-                                    "link",
-                                    "image",
-                                    "video",
-                                  ],
-                                  ["preview", "print"],
-                                  ["removeFormat"],
-                                ],
-                                defaultTag: "div",
-                                minHeight: "120px",
-                                showPathLabel: false,
-                              }}
-                            />
+                            <MenuBar editor={editorAnalyst} />
+                            <EditorContent editor={editorAnalyst} />
 
                             <span className="sspan"></span>
                             {(errors.Description && Description == "") ||
@@ -5709,7 +6387,6 @@ console.log("errors  - ", errors);
                       ? "section_top_subheading mt-3 py-3 btn-collapse_active cursorpointer"
                       : "section_top_subheading mt-3 py-3 cursorpointer"
                   }
-                  onClick={() => setsranalystTab(!sranalystTab)}
                 >
                   Senior Analyst{" "}
                   {responceCount?.map((item, i) => {
@@ -5724,9 +6401,26 @@ console.log("errors  - ", errors);
                         </>
                       );
                   })}
-                  <span className="btn-collapse">
+                  <span
+                    className="btn-collapse"
+                    onClick={() => setsranalystTab(!sranalystTab)}
+                  >
                     <i className="bi bi-caret-down-fill"></i>
                   </span>
+                  {applicationDetail?.parentApplicationID !== 0 &&
+                  roleID == 6 ? (
+                    <button
+                      type="button"
+                      className="btn btn-light mx-auto copybtn"
+                      onClick={() =>
+                        getLastComment(applicationDetail?.parentApplicationID)
+                      }
+                    >
+                      Copy Last Response
+                    </button>
+                  ) : (
+                    ""
+                  )}
                 </h5>
 
                 <div className={sranalystTab ? "customtab" : "d-none"}>
@@ -6331,47 +7025,10 @@ console.log("errors  - ", errors);
                         }
                       >
                         <label className="controlform">Recommendation</label>
-                        <div className="form-bx">
+                        <div className="form-bx editorFieldBox">
                           <div className="mt-2 py-1">
-                            <SunEditor
-                              setContents={
-                                Description
-                                  ? Description
-                                  : applicationDetail?.analystDescription
-                              }
-                              onChange={(newcomment) =>
-                                setDescription(newcomment)
-                              }
-                              setOptions={{
-                                buttonList: [
-                                  ["undo", "redo"],
-                                  ["font", "fontSize"],
-                                  [
-                                    "bold",
-                                    "underline",
-                                    "italic",
-                                    "strike",
-                                    "subscript",
-                                    "superscript",
-                                  ],
-                                  ["fontColor", "hiliteColor"],
-                                  ["align", "list", "lineHeight"],
-                                  ["outdent", "indent"],
-                                  [
-                                    "table",
-                                    "horizontalRule",
-                                    "link",
-                                    "image",
-                                    "video",
-                                  ],
-                                  ["preview", "print"],
-                                  ["removeFormat"],
-                                ],
-                                defaultTag: "div",
-                                minHeight: "120px",
-                                showPathLabel: false,
-                              }}
-                            />
+                            <MenuBar editor={editorSrAnalyst} />
+                            <EditorContent editor={editorSrAnalyst} />
                             <span className="sspan"></span>
                             {(errors.Description && Description == "") ||
                             Description == "<p><br></p>" ? (
@@ -7445,7 +8102,6 @@ console.log("errors  - ", errors);
                       ? "section_top_subheading mt-3 py-3 btn-collapse_active cursorpointer"
                       : "section_top_subheading mt-3 py-3 cursorpointer"
                   }
-                  onClick={() => setprincipalanalystTab(!principalanalystTab)}
                 >
                   Principal Analyst{" "}
                   {responceCount?.map((item, i) => {
@@ -7460,9 +8116,26 @@ console.log("errors  - ", errors);
                         </>
                       );
                   })}
-                  <span className="btn-collapse">
+                  <span
+                    className="btn-collapse"
+                    onClick={() => setprincipalanalystTab(!principalanalystTab)}
+                  >
                     <i className="bi bi-caret-down-fill"></i>
                   </span>
+                  {applicationDetail?.parentApplicationID !== 0 &&
+                  roleID == 7 ? (
+                    <button
+                      type="button"
+                      className="btn btn-light mx-auto copybtn"
+                      onClick={() =>
+                        getLastComment(applicationDetail?.parentApplicationID)
+                      }
+                    >
+                      Copy Last Response
+                    </button>
+                  ) : (
+                    ""
+                  )}
                 </h5>
 
                 <div className={principalanalystTab ? "customtab" : "d-none"}>
@@ -8075,48 +8748,10 @@ console.log("errors  - ", errors);
                         }
                       >
                         <label className="controlform">Recommendation</label>
-                        <div className="form-bx">
+                        <div className="form-bx editorFieldBox">
                           <div className="mt-2 py-1">
-                            <SunEditor
-                              setContents={
-                                Description
-                                  ? Description
-                                  : applicationDetail?.analystDescription
-                              }
-                              onChange={(newcomment) =>
-                                setDescription(newcomment)
-                              }
-                              setOptions={{
-                                buttonList: [
-                                  ["undo", "redo"],
-                                  ["font", "fontSize"],
-                                  [
-                                    "bold",
-                                    "underline",
-                                    "italic",
-                                    "strike",
-                                    "subscript",
-                                    "superscript",
-                                  ],
-                                  ["fontColor", "hiliteColor"],
-                                  ["align", "list", "lineHeight"],
-                                  ["outdent", "indent"],
-
-                                  [
-                                    "table",
-                                    "horizontalRule",
-                                    "link",
-                                    "image",
-                                    "video",
-                                  ],
-                                  ["preview", "print"],
-                                  ["removeFormat"],
-                                ],
-                                defaultTag: "div",
-                                minHeight: "120px",
-                                showPathLabel: false,
-                              }}
-                            />
+                            <MenuBar editor={editorPrincipleAnalyst} />
+                            <EditorContent editor={editorPrincipleAnalyst} />
                             <span className="sspan"></span>
                             {errors.Description && !Description ? (
                               <small className="errormsg">
@@ -9189,7 +9824,6 @@ console.log("errors  - ", errors);
                       ? "section_top_subheading mt-3 py-3 btn-collapse_active cursorpointer"
                       : "section_top_subheading mt-3 py-3 cursorpointer"
                   }
-                  onClick={() => setdeputyTab(!deputyTab)}
                 >
                   Deputy Director{" "}
                   {responceCount?.map((item, i) => {
@@ -9204,9 +9838,26 @@ console.log("errors  - ", errors);
                         </>
                       );
                   })}
-                  <span className="btn-collapse">
+                  <span
+                    className="btn-collapse"
+                    onClick={() => setdeputyTab(!deputyTab)}
+                  >
                     <i className="bi bi-caret-down-fill"></i>
                   </span>
+                  {applicationDetail?.parentApplicationID !== 0 &&
+                  roleID == 8 ? (
+                    <button
+                      type="button"
+                      className="btn btn-light mx-auto copybtn"
+                      onClick={() =>
+                        getLastComment(applicationDetail?.parentApplicationID)
+                      }
+                    >
+                      Copy Last Response
+                    </button>
+                  ) : (
+                    ""
+                  )}
                 </h5>
 
                 <div className={deputyTab ? "customtab" : "d-none"}>
@@ -9805,48 +10456,10 @@ console.log("errors  - ", errors);
                         className={roleID == 8 ? "inner_form_new " : "d-none"}
                       >
                         <label className="controlform">Recommendation</label>
-                        <div className="form-bx">
+                        <div className="form-bx editorFieldBox">
                           <div className="mt-2 py-1">
-                            <SunEditor
-                              setContents={
-                                Description
-                                  ? Description
-                                  : applicationDetail?.analystDescription
-                              }
-                              onChange={(newcomment) =>
-                                setDescription(newcomment)
-                              }
-                              setOptions={{
-                                buttonList: [
-                                  ["undo", "redo"],
-                                  ["font", "fontSize"],
-                                  [
-                                    "bold",
-                                    "underline",
-                                    "italic",
-                                    "strike",
-                                    "subscript",
-                                    "superscript",
-                                  ],
-                                  ["fontColor", "hiliteColor"],
-                                  ["align", "list", "lineHeight"],
-                                  ["outdent", "indent"],
-
-                                  [
-                                    "table",
-                                    "horizontalRule",
-                                    "link",
-                                    "image",
-                                    "video",
-                                  ],
-                                  ["preview", "print"],
-                                  ["removeFormat"],
-                                ],
-                                defaultTag: "div",
-                                minHeight: "120px",
-                                showPathLabel: false,
-                              }}
-                            />
+                            <MenuBar editor={editorDeputy} />
+                            <EditorContent editor={editorDeputy} />
                             <span className="sspan"></span>
                             {errors.Description && !Description ? (
                               <small className="errormsg">
@@ -10915,7 +11528,6 @@ console.log("errors  - ", errors);
                       ? "section_top_subheading mt-3 py-3 btn-collapse_active cursorpointer"
                       : "section_top_subheading mt-3 py-3 cursorpointer"
                   }
-                  onClick={() => setdirector(!director)}
                 >
                   Director{" "}
                   {responceCount?.map((item, i) => {
@@ -10930,9 +11542,26 @@ console.log("errors  - ", errors);
                         </>
                       );
                   })}
-                  <span className="btn-collapse">
+                  <span
+                    className="btn-collapse"
+                    onClick={() => setdirector(!director)}
+                  >
                     <i className="bi bi-caret-down-fill"></i>
                   </span>
+                  {applicationDetail?.parentApplicationID !== 0 &&
+                  roleID == 9 ? (
+                    <button
+                      type="button"
+                      className="btn btn-light mx-auto copybtn"
+                      onClick={() =>
+                        getLastComment(applicationDetail?.parentApplicationID)
+                      }
+                    >
+                      Copy Last Response
+                    </button>
+                  ) : (
+                    ""
+                  )}
                 </h5>
 
                 <div className={director ? "customtab mb-3" : "d-none"}>
@@ -11517,22 +12146,10 @@ console.log("errors  - ", errors);
                         }
                       >
                         <label className="controlform">Recommendation</label>
-                        <div className="form-bx">
+                        <div className="form-bx editorFieldBox">
                           <div className="mt-2 py-1">
-                            <ReactQuill
-                              theme="snow"
-                              value={
-                                Description
-                                  ? Description
-                                  : applicationDetail?.analystDescription
-                              }
-                              modules={modules}
-                              readOnly={false}
-                              preserveWhitespace
-                              onChange={(newcomment) =>
-                                setDescription(newcomment)
-                              }
-                            />
+                            <MenuBar editor={editorDirector} />
+                            <EditorContent editor={editorDirector} />
                             <span className="sspan"></span>
                             {(errors.Description && Description == "") ||
                             Description == "<p><br></p>" ? (
