@@ -92,7 +92,7 @@ const ImportDashboardViewDetails = ({
                   <input
                     disabled
                     value={moment(applicationDetail?.applicationDate).format(
-                      "MM/DD/YYYY"
+                      "DD/MMM/yyyy"
                     )}
                     className="text-uppercase"
                   />
@@ -202,7 +202,7 @@ const ImportDashboardViewDetails = ({
             )}
 
             <div className="inner_form_new ">
-              <label className="controlform">Application Type</label>
+              <label className="controlform">Nature of Application</label>
               <div className="form-bx">
                 <label>
                   <input value={applicationDetail?.applicationType} disabled />
@@ -562,6 +562,7 @@ const ImportDashboardViewDetails = ({
                                               <label className="controlform">
                                                 Action Type
                                               </label>
+                                              {console.log("items?.actionStatusName - ", items?.actionStatusName)}
                                               <div className="form-bx">
                                                 <label>
                                                   <input
@@ -583,7 +584,7 @@ const ImportDashboardViewDetails = ({
                                               </div>
                                             </div>
                                           </div>
-
+{console.log("items?.actionRoleName - ", items?.actionRoleName)}
                                           <div className="col-md-3">
                                             <div className="inner_form_new-sm ">
                                               <label className="controlform-sm">
@@ -4015,6 +4016,9 @@ const ImportDashboardViewDetails = ({
             ""
           )}
 
+
+{roleID >= 5 ? (
+              <>  
           <h5
             className={
               sharefiletab
@@ -4063,7 +4067,11 @@ const ImportDashboardViewDetails = ({
               <label className="notfound">File Not Found</label>
             )}
           </div>
-
+          </>
+            ) : (
+              ""
+            )}
+            
           <>
               <h5 className={roleID > 3 ? "section_top_subheading mt-3 py-3 btn-collapse_active " : "d-none"}>
                 Application History

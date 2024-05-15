@@ -15,6 +15,7 @@ import { Link } from "react-router-dom";
 import { Paginator } from "primereact/paginator";
 import Spinner from "react-bootstrap/Spinner";
 import ImportDashboardViewDetails from "../components/ImportDashboardViewDetails";
+import ImportDashboardRenewEditDetails from "../components/ImportDashboardRenewEditDetails";
 
 const ImportDeferredRequestsTable = () => {
   const useId = Storage.getItem("userID");
@@ -30,6 +31,10 @@ const ImportDeferredRequestsTable = () => {
   const [applicationDetail, setApplicationDetail] = useState({});
   const [applicationmessage, setApplicationmessage] = useState("");
   const [searchText, setSearchText] = useState("");
+  const [showEditForm, setshowEditForm] = useState(false);
+  const [nextlevelvalue, setnextlevelvalue] = useState("");
+  const [exportdata, setexportdata] = useState([]);
+  const [userRole, setUserrole] = useState([]);
   const [tatHistory, setTatHistory] = useState([]);
   const [allcomment, setallcomment] = useState([]);
   const handleFormClose = () => setShowUpdateModal(false);
@@ -37,6 +42,17 @@ const ImportDeferredRequestsTable = () => {
   const [pageLoader, setPageLoader] = useState("");
   const [loader, setLoader] = useState("");
   const [responceCount, setresponceCount] = useState([]);
+  const [showdataLoader, setshowdataloader] = useState(false);
+  const [asignUser, setAsignUser] = useState([]);
+  const [AssignUserID, setAssignUserID] = useState("");
+  const [Actiondata, setActiondata] = useState([]);
+  const [IsDeferred, setIsDeferred] = useState("1");
+  const [SupervisorRoleId, setSupervisorRoleId] = useState("");
+  const [applicationstaus, setapplicationstaus] = useState(
+    applicationDetail?.applicationStatus
+      ? `${applicationDetail?.applicationStatus}`
+      : "0"
+  );
   FilterService.register("custom_activity", (value, filters) => {
     const [from, to] = filters ?? [null, null];
     if (from === null && to === null) return true;
@@ -92,11 +108,38 @@ const ImportDeferredRequestsTable = () => {
               wrapperStyle={{}}
               wrapperClass=""
             />
-          ) : rowData?.filePath != null ? (
+          ) : (
+            <>
+              {rollId == 2 || rollId == 4 ? (
+                <i
+                  class="bi bi-copy"
+                  style={{
+                    padding: "10px 5px",
+                    marginRight: "10px",
+                    cursor: "pointer",
+                  }}
+                  key={rowData.title}
+                  onClick={() => {
+                    handleClickEditModal(rowData.title);
+                    GetHandelDetail(rowData?.rbzReferenceNumber, rowData.id);
+                    GetRoleHandle(applicationstaus);
+                    handleData();
+                    GetApplicationCount(rowData.id);
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.color = "var(--primary-color)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.color = "";
+                  }}
+                ></i>
+              ) : (
+                ""
+              )}
+          {rowData?.filePath != null ? (
             <Link
               style={{ color: "#4b5563" }}
               target="_blank"
-              // rel="noopener noreferrer"
               to={rowData?.filePath}
             >
               <i
@@ -106,6 +149,8 @@ const ImportDeferredRequestsTable = () => {
             </Link>
           ) : (
             ""
+          )}
+          </>
           )}
         </div>
       </>
@@ -164,6 +209,93 @@ const ImportDeferredRequestsTable = () => {
         }
       });
   };
+
+    // Renew Start
+    const handleClickEditModal = () => {
+      setshowEditForm(true); 
+    };
+
+    const EditModalClose = () => {
+      setshowEditForm(false);
+      setnextlevelvalue("");
+    };
+  
+    const GetRoleHandle = async (id) => {
+      setUserrole([]);
+      await axios
+        .post(APIURL + "Master/GetRoles", {
+          RoleID: rollId,
+          Status: `${id}`,
+        })
+        .then((res) => {
+          if (res.data.responseCode == 200) {
+            setUserrole(res.data.responseData);
+          } else {
+            setUserrole([]);
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    };
+  
+    const supervisorHangechangeRole = (e) => {
+      const { name, value } = e.target;
+      if (value == "90A" || value == "") {
+        setAssignUserID("");
+        setSupervisorRoleId("");
+        setAsignUser([]);
+      } else {
+        axios
+          .post(APIURL + "User/GetUsersByRoleID", {
+            RoleID:
+              value == "10" || value == "40" || value == "25" || value == "30"
+                ? parseInt(rollId) + 1
+                : value == "15" ||
+                  value == "5" ||
+                  value == "6" ||
+                  value == "7" ||
+                  value == "8"
+                ? // ? parseInt(roleID) - 1
+                  value
+                : rollId,
+            DepartmentID: "3",
+            UserID: useId.replace(/"/g, ""),
+          })
+          .then((res) => {
+            if (res.data.responseCode == 200) {
+              setAsignUser(res.data.responseData);
+            } else {
+              setSupervisorRoleId("");
+            }
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      }
+    };
+  
+    const supervisorHangechange = (e) => {
+      const { name, value } = e.target;
+      if (value == "") {
+        setAssignUserID(null);
+      } else {
+        setAssignUserID(value);
+      }
+    };
+  
+    const supervisorHangechangeBankuser = (e) => {
+      const { value } = e.target;
+      if (value == "") {
+        setAssignUserID("");
+        setSupervisorRoleId("");
+      } else {
+        const { userID, roleID } = JSON?.parse(value);
+        setAssignUserID(userID);
+        setSupervisorRoleId(roleID);
+      }
+    };
+  // Renew End
 
   // ----- Start Code For Geting Table List Data
   const handleData = async () => {
@@ -471,7 +603,7 @@ const ImportDeferredRequestsTable = () => {
               ></Column>
               <Column
                 field="applicationType"
-                header="Application Type"
+                header="Nature of Application"
                 sortable
                 style={{ width: "200px" }}
               ></Column>
@@ -550,6 +682,67 @@ const ImportDeferredRequestsTable = () => {
                       noDataComment={noDataComment}
                       tatHistory={tatHistory}
                       responceCount={responceCount}
+                    />
+                  </Modal.Body>
+                </div>
+              </div>
+            </div>
+          </Modal>
+
+          <Modal
+            show={showEditForm}
+            onHide={EditModalClose}
+            backdrop="static"
+            className="max-width-600"
+          >
+            <div className="application-box">
+              <div className="login_inner">
+                <div className="login_form ">
+                  <h5>
+                    <Modal.Header closeButton className="p-0">
+                      <Modal.Title>
+                        Edit Import Request --{" "}
+                        <big>
+                          {applicationDetail?.rbzReferenceNumber
+                            ? applicationDetail.rbzReferenceNumber
+                            : ""}
+                        </big>
+                      </Modal.Title>
+                    </Modal.Header>
+                  </h5>
+                </div>
+                <div className="login_form_panel">
+                  <Modal.Body className="p-0">
+                    <ImportDashboardRenewEditDetails
+                      applicationDetail={applicationDetail}
+                      setApplicationDetail={setApplicationDetail}
+                      EditModalClose={EditModalClose}
+                      setexportdata={setexportdata}
+                      handleData={handleData}
+                      showdataLoader={showdataLoader}
+                      allcomment={allcomment}
+                      GetRoleHandle={GetRoleHandle}
+                      setapplicationstaus={setapplicationstaus}
+                      applicationstaus={applicationstaus}
+                      setnextlevelvalue={setnextlevelvalue}
+                      nextlevelvalue={nextlevelvalue}
+                      asignUser={asignUser}
+                      userRole={userRole}
+                      responceCount={responceCount}
+                      setAsignUser={setAsignUser}
+                      supervisorHangechange={supervisorHangechange}
+                      supervisorHangechangeBankuser={
+                        supervisorHangechangeBankuser
+                      }
+                      tatHistory={tatHistory}
+                      AssignUserID={AssignUserID}
+                      setAssignUserID={setAssignUserID}
+                      Actiondata={Actiondata}
+                      SupervisorRoleId={SupervisorRoleId}
+                      supervisorHangechangeRole={supervisorHangechangeRole}
+                      setSupervisorRoleId={setSupervisorRoleId}
+                      noDataComment={noDataComment}
+                      IsDeferred={IsDeferred}                      
                     />
                   </Modal.Body>
                 </div>

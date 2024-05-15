@@ -4451,8 +4451,8 @@ const ExportDashboardViewDetails = ({
               ""
             )}
 
-            {/* {roleID >= 5 ? (
-              <> */}
+            {roleID >= 5 ? (
+              <>  
             <h5
               className={
                 sharefiletab
@@ -4501,11 +4501,11 @@ const ExportDashboardViewDetails = ({
               ) : (
                 <label className="notfound">File Not Found</label>
               )}
-            </div>
-            {/* </>
+            </div>  
+            </>
             ) : (
               ""
-            )} */}
+            )}
 
             <>
               <h5 className={roleID > 3 ? "section_top_subheading mt-3 py-3 btn-collapse_active " : "d-none"}>

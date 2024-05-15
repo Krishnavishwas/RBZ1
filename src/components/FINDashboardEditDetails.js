@@ -95,6 +95,7 @@ const FINDashboardEditDetails = ({
     sectorData,
     Supervisors,
     masterBank,
+    countries
   } = ExportformDynamicField();
 
   const BPNCodeRef = useRef(null);
@@ -958,7 +959,7 @@ useEffect(() => {
   const GetApplicationTypes = async () => {
     await axios
       .post(APIURL + "Master/GetApplicationTypesByDepartmentID", {
-        DepartmentID: "2",
+        DepartmentID: "4",
       })
       .then((res) => {
         if (res.data.responseCode === "200") {
@@ -1930,7 +1931,7 @@ useEffect(() => {
   const PdfPrivewsupervisorRef = useRef();
 
   const closePopupHandle = () => {
-    navigate("/BankADLADashboard");
+    navigate("/FINVDashboard");
     EditModalClose();
     handleData();
     setupdatepopup(false);
@@ -2794,7 +2795,7 @@ useEffect(() => {
                   </div>
                 )}
 
-                <div className="inner_form_new ">
+                {/* <div className="inner_form_new ">
                   <label className="controlform">
                     Purpose of the Application
                   </label>
@@ -2822,7 +2823,7 @@ useEffect(() => {
                       )}
                     </label>
                   </div>
-                </div>
+                </div> */}
 
                 <div className="inner_form_new ">
                   <label className="controlform">Type of Exporter</label>
@@ -3152,7 +3153,7 @@ useEffect(() => {
                 {/* end form-bx  */}
 
                 <div className="inner_form_new ">
-                  <label className="controlform">Application Type</label>
+                  <label className="controlform">Application Category</label>
 
                   <div className="form-bx">
                     <label>
@@ -3176,7 +3177,7 @@ useEffect(() => {
                                 item?.id
                               }
                             >
-                              {item.name}
+                              {item.name} 
                             </option>
                           );
                         })}
@@ -3193,6 +3194,59 @@ useEffect(() => {
                   </div>
                 </div>
                 {/* end form-bx  */}
+
+                <div className="inner_form_new ">
+          <label className="controlform">Beneficiary Name</label>
+          <div className="form-bx">
+            <label>
+              <input
+                type="text"
+                ref={BeneficiaryNameRef}
+                name="BeneficiaryName"
+                onChange={(e) => {
+                  changeHandelForm(e);
+                }}
+                placeholder="Beneficiary Name"
+                value={applicationDetail.beneficiaryName}
+              />
+              <span className="sspan"></span>
+              {errors.BeneficiaryName || applicationDetail.BeneficiaryName === "" ? (
+                <small className="errormsg">{errors.BeneficiaryName}</small>
+              ) : (
+                ""
+              )}
+            </label>
+          </div>
+        </div>
+
+        <div className="inner_form_new ">
+          <label className="controlform">Baneficiary Country</label>
+          <div className="form-bx">
+            <label>
+              <select
+                name="baneficiaryCountry"
+                onChange={(e) => {
+                  changeHandelForm(e);
+                }}
+                // className={
+                //   errors.baneficiaryCountry && FINForm.baneficiaryCountry === ""
+                //     ? "error"
+                //     : ""
+                // }
+              >
+                <option value="">Select Baneficiary Country</option>
+                {countries?.map((item, ind) => {
+                  return (
+                    <option key={item.id} value={item.id}>
+                      {item.countryName}
+                    </option>
+                  );
+                })}
+              </select>
+              <span className="sspan"></span>
+            </label>
+          </div>
+        </div>
 
                 <div className="row">
                   <div className="col-md-6">

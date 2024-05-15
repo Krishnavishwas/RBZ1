@@ -1166,7 +1166,7 @@ setselectuserRole("")
 
         <div className="inner_form_new ">
           <label className="controlform">Type of Exporter</label>
-          <div className="form-bx-radio mt-4">
+          <div className="form-bx-radio">
             {applicantTypes.map((item, index) => {
               return (
                 <>

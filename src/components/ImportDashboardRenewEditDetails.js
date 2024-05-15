@@ -49,7 +49,7 @@ const ImportDashboardRenewEditDetails = ({
     applicantTypes,
     sectorData,
     masterBank,
-    Supervisors,
+    ImpSupervisors,
     applicantName,
     countries,
   } = ExportformDynamicField();
@@ -956,7 +956,7 @@ const ImportDashboardRenewEditDetails = ({
       valid = false;
     }
     if (applicationDetail.applicationTypeID === "") {
-      newErrors.applicationTypeID = "Application type is required";
+      newErrors.applicationTypeID = "Nature of Application is required";
       valid = false;
     }
     if (
@@ -1070,7 +1070,7 @@ const ImportDashboardRenewEditDetails = ({
       valid = false;
     }
     if (applicationDetail.applicationType === "") {
-      newErrors.applicationType = "Application Type number is required";
+      newErrors.applicationType = "Nature of Application number is required";
       valid = false;
     }
     if (applicationDetail.sector === "") {
@@ -1351,6 +1351,7 @@ const ImportDashboardRenewEditDetails = ({
                             ref={PECANNumberRef}
                             type="text"
                             name="pecaNumber"
+                            placeholder="Prior Exchange Control Authority Number(PECAN)"
                             onChange={(e) => {
                               changeHandelForm(e);
                             }}
@@ -1584,7 +1585,7 @@ const ImportDashboardRenewEditDetails = ({
               )}
 
               <div className="inner_form_new ">
-                <label className="controlform">Application Type</label>
+                <label className="controlform">Nature of Application</label>
                 <div className="form-bx">
                   <label>
                     <select
@@ -1995,7 +1996,7 @@ const ImportDashboardRenewEditDetails = ({
                         }
                       >
                         <option value="">Select Bank Supervisor</option>
-                        {Supervisors?.map((item, index) => {
+                        {ImpSupervisors?.map((item, index) => {
                           return (
                             <option
                               key={index}

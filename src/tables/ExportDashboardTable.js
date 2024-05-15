@@ -286,7 +286,7 @@ const ExportDashboardTable = () => {
               ? // ? parseInt(roleID) - 1
                 value
               : roleID,
-          DepartmentID: "2",
+              DepartmentID:"2",
           UserID: useId.replace(/"/g, ""),
         })
         .then((res) => {
@@ -306,7 +306,7 @@ const ExportDashboardTable = () => {
     axios
       .post(APIURL + "User/GetUsersByRoleID", {
         RoleID: roleID,
-        DepartmentID: "2",
+        DepartmentID:"2",
         UserID: useId.replace(/"/g, ""),
       })
       .then((res) => {
@@ -344,7 +344,7 @@ const ExportDashboardTable = () => {
   // ----- Start Code For Geting Table Data
   const GetHandelDetail = async (rbzrefnumber, id) => {
     setshowdataloader(true);
-    setApplicationDetail({});
+    setApplicationDetail({})
     await axios
       .post(APIURL + "ExportApplication/GetRequestInfoByApplicationID", {
         RBZReferenceNumber: `${rbzrefnumber}`,
@@ -531,13 +531,13 @@ const ExportDashboardTable = () => {
 
   // OLD
   const [showOldModal, setShowOldModal] = useState(false);
-  const [oldApplicationDetail, setOldApplicationDetail] = useState({});
-  const [oldNoDataComment, setOldNoDataComment] = useState([]);
-  const [oldAllcomment, setOldAllcomment] = useState([]);
-  const [oldTatHistory, setOldTatHistory] = useState([]);
-  const [oldActiondata, setOldActiondata] = useState([]);
-  const [oldResponceCount, setOldResponceCount] = useState([]);
-  const [showOldDataLoader, setShowOldDataLoader] = useState(false);
+const [oldApplicationDetail, setOldApplicationDetail] = useState({});
+const [oldNoDataComment, setOldNoDataComment] = useState([]);
+const [oldAllcomment, setOldAllcomment] = useState([]);
+const [oldTatHistory, setOldTatHistory] = useState([]);
+const [oldActiondata, setOldActiondata] = useState([]);
+const [oldResponceCount, setOldResponceCount] = useState([]);
+const [showOldDataLoader, setShowOldDataLoader] = useState(false);
 
   const handleOldClose = () => setShowOldModal(false);
 
@@ -828,29 +828,25 @@ const ExportDashboardTable = () => {
                             ? "col-md-12"
                             : "col-md-6"
                         }
-                        style={{ alignItems: "center" }}
+                        style={{alignItems : "center"}}
                       >
                         Edit Export Request --{" "}
                         <big>
                           {applicationDetail?.rbzReferenceNumber
                             ? applicationDetail.rbzReferenceNumber
                             : ""}
+
                         </big>
                       </div>
                       <div
                         className={
-                          applicationDetail &&
-                          applicationDetail?.parentApplicationID == 0
+                          applicationDetail &&   applicationDetail?.parentApplicationID == 0
                             ? "d-none"
                             : "col-md-6 text-center"
                         }
                       >
                         <button
-                          className={
-                            applicationDetail?.parentApplicationID
-                              ? "btn btn-light viewcopybtn"
-                              : "d-none"
-                          }
+                          className={applicationDetail?.parentApplicationID ? "btn btn-light viewcopybtn" : "d-none"}
                           onClick={() => {
                             handleOldViewData(
                               applicationDetail?.parentApplicationID

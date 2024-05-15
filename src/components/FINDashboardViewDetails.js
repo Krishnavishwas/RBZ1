@@ -139,7 +139,7 @@ const FINDashboardViewDetails = ({
                 </div>
               </div>
 
-              <div className="inner_form_new ">
+              {/* <div className="inner_form_new ">
                 <label className="controlform">
                   Purpose of the Application
                 </label>
@@ -158,7 +158,7 @@ const FINDashboardViewDetails = ({
                     <span className="sspan"></span>
                   </label>
                 </div>
-              </div>
+              </div> */}
 
               <div className="inner_form_new ">
                 <label className="controlform">Type of Exporter</label>

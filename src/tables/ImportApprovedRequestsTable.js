@@ -372,7 +372,7 @@ const ImportApprovedRequestsTable = () => {
       ),
     },
     {
-      name: "Application Type",
+      name: "Nature of Application",
       selector: (row) => row.applicationType,
       sortable: true,
       cell: (row) => (
@@ -660,7 +660,6 @@ const ImportApprovedRequestsTable = () => {
       {tabHeader}
       {pageLoader == true ? (
         <label className="outerloader2">
-          {" "}
           <span className="loader"></span>
           <span className="loaderwait">Please Wait...</span>
         </label>
@@ -714,7 +713,7 @@ const ImportApprovedRequestsTable = () => {
               ></Column>
               <Column
                 field="applicationType"
-                header="Application Type"
+                header="Nature of Application"
                 sortable
                 style={{ width: "200px" }}
               ></Column>
