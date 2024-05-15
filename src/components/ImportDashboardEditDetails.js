@@ -7,12 +7,14 @@ import { APIURL, ImageAPI } from "../constant";
 import Select from "react-select";
 import moment from "moment";
 import { Link, useNavigate } from "react-router-dom";
-import SunEditor from "suneditor-react";
+import Modal from "react-bootstrap/Modal";
 import UpdatePopupMessage from "./UpdatePopupMessage";
 import "suneditor/dist/css/suneditor.min.css";
 import { toast } from "react-toastify";
 import logo from "../rbz_LOGO.png";
-import ReactQuill from "react-quill";
+import { DataTable } from "primereact/datatable";
+import { Column } from "primereact/column";
+import { TailSpin } from "react-loader-spinner";
 import NoSign from "../NoSign.png";
 import "react-datepicker/dist/react-datepicker.css";
 import jsPDF from "jspdf";
@@ -30,6 +32,7 @@ import Text from "@tiptap/extension-text";
 import TextAlign from "@tiptap/extension-text-align";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
+import ImportDashboardViewDetails from "./ImportDashboardViewDetails";
 /* Tiptp Editor Ends */
 
 const ImportDashboardEditDetails = ({
@@ -142,6 +145,7 @@ const ImportDashboardEditDetails = ({
   const [sharefile, setsharefile] = useState([]);
   const [registerusertype, setregisterusertype] = useState(bankidcheck);
   const [subsectorData, setsubsectorData] = useState([]);
+  const [ValidateRBZ, setValidateRBZ] = useState([]);
   const [checkSupervisor, setcheckSupervisor] = useState(false);
   const [curRate, setCurrate] = useState();
   const [DateExpirydisplay, setDateExpirydisplay] = useState("");
@@ -151,6 +155,7 @@ const ImportDashboardEditDetails = ({
   const [analystTab, setanalystTab] = useState(roleID == 5 ? true : false);
   const [btnLoader, setBtnLoader] = useState(false);
   const [sranalystTab, setsranalystTab] = useState(roleID == 6 ? true : false);
+  const [ValidateShow, setValidateShow] = useState(false);
   const [principalanalystTab, setprincipalanalystTab] = useState(
     roleID == 7 ? true : false
   );
@@ -189,9 +194,12 @@ const ImportDashboardEditDetails = ({
   const [IsReturn, setIsReturn] = useState("0");
   const [checksectorchange, setchecksectorchange] = useState(false);
   const [getFrequencyID, setGetFrequencyID] = useState("0");
+  const [loading, setLoading] = useState(false);
   const [AllFrequency, setAllFrequency] = useState([]);
   const [getalluser, setGetalluser] = useState([]);
+  const [loader, setLoader] = useState(false);
   const [othersharefile, setOthersharefile] = useState([]);
+  const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [SubmitBtnLoader, setSubmitBtnLoader] = useState(false);
   const [ImportForm, setImporttForm] = useState({
     user: "",
@@ -218,6 +226,7 @@ const ImportDashboardEditDetails = ({
     applicantComments: "",
     bankSupervisor: "",
   });
+
   const fileInputRefs = [
     useRef(null),
     useRef(null),
@@ -256,9 +265,11 @@ const ImportDashboardEditDetails = ({
   const heading = "Updated Successfully!";
   const para = "Import request updated successfully!";
   const applicationNumber = applicationDetail.rbzReferenceNumber;
-  console.log("applicationstaus - ", applicationstaus);
   // const convertedRate = curRate * parseFloat(applicationDetail.amount);
   const ratevalue = applicationDetail?.rate;
+
+  const handleViewData = (id) => setShowUpdateModal(true);
+  const handleFormClose = () => setShowUpdateModal(false);
 
   const convertedRate =
     parseFloat(curRate ? curRate : ratevalue) *
@@ -281,11 +292,6 @@ const ImportDashboardEditDetails = ({
       };
     },
   });
-
-  console.log(
-    "applicationDetail.beneficiaryCountry - ",
-    applicationDetail.beneficiaryCountry
-  );
 
   const changeHandelForm = (e) => {
     const name = e.target.name;
@@ -2501,6 +2507,7 @@ const ImportDashboardEditDetails = ({
                             onChange={(e) => {
                               changeHandelForm(e);
                             }}
+                            placeholder="Prior Exchange Control Authority Number(PECAN)"
                             value={
                               applicationDetail?.pecaNumber
                                 ? applicationDetail?.pecaNumber
@@ -2522,6 +2529,95 @@ const ImportDashboardEditDetails = ({
                             ""
                           )}
                         </label>
+                        {/* {loader == true ? (
+                    <TailSpin
+                      visible={true}
+                      height="20"
+                      width="20"
+                      color="#5e62a1"
+                      ariaLabel="tail-spin-loading"
+                      radius="1"
+                      wrapperStyle={{}}
+                      wrapperClass=""
+                    />
+                  ) : ValidateShow == true ? (
+                    <div className="card validatepecanfield">
+                      {ValidateRBZ.length > 0 ? (
+                        <DataTable
+                          value={ValidateRBZ}
+                          scrollable
+                          scrollHeight="500px"
+                          paginator={ValidateRBZ?.length > 10 ? true : false}
+                          rowHover
+                          paginatorRight
+                          rows={10}
+                          dataKey="id"
+                          rowsPerPageOptions={[10, 50, 100]}
+                          emptyMessage="No Data found."
+                          footer={footer}
+                        >
+                          <Column
+                            field="rbzReferenceNumber"
+                            header="RBZ Reference Number"
+                            style={{ minWidth: "200px" }}
+                          ></Column>
+                          <Column
+                            field="name"
+                            header="Applicant Name"
+                            style={{ minWidth: "180px" }}
+                            body={applicantNAME}
+                          ></Column>
+                          <Column
+                            field="bankName"
+                            header="Bank Name"
+                            style={{ minWidth: "150px" }}
+                          ></Column>
+                          <Column
+                            field="applicationType"
+                            header="Nature of Application"
+                            style={{ minWidth: "250px" }}
+                          ></Column>
+                          <Column
+                            field="amount"
+                            header="Amount"
+                            style={{ minWidth: "150px" }}
+                            body={amountData}
+                          ></Column>
+                          <Column
+                            field="statusName"
+                            header="Status"
+                            style={{ minWidth: "200px" }}
+                          ></Column>
+                          <Column
+                            field="createdDate"
+                            header="Submitted Date"
+                            style={{ minWidth: "150px" }}
+                            body={createdDate}
+                          ></Column>
+                          <Column
+                            field=""
+                            header="Action"
+                            style={{ minWidth: "100px" }}
+                            frozen
+                            alignFrozen="right"
+                            body={action}
+                          ></Column>
+                        </DataTable>
+                      ) : (
+                        <div className="d-flex justify-content-between align-items-center p-2">
+                          <p className="mb-0">No Data</p>
+                          <button
+                            className="validateCrossIcon"
+                            onClick={() => setValidateShow(false)}
+                          >
+                            <i class="bi bi-x-circle"></i>
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    " "
+                  )} */}
                       </div>
                       <button type="button" className="primrybtn  v-button">
                         Validate
@@ -3163,15 +3259,6 @@ const ImportDashboardEditDetails = ({
                         className={
                           errors.assignedTo && !AssignUserID ? "error" : ""
                         }
-                        // onChange={(e) => {
-                        //   changeHandelForm(e);
-                        // }}
-                        // className={
-                        //   errors.bankSupervisor &&
-                        //   ImportForm.bankSupervisor === ""
-                        //     ? "error"
-                        //     : ""
-                        // }
                       >
                         <option value="">Select Bank Supervisor</option>
                         {ImpSupervisors?.map((item, index) => {
@@ -15422,6 +15509,40 @@ const ImportDashboardEditDetails = ({
               )}
             </div>
           </form>
+          {/* <Modal
+        show={showUpdateModal}
+        onHide={handleFormClose}
+        backdrop="static"
+        className="max-width-600"
+      >
+        <div className="application-box">
+          <div className="login_inner">
+            <div class="login_form ">
+              <h5>
+                <Modal.Header closeButton className="p-0">
+                  <Modal.Title>
+                    View Import Request --{" "}
+                    <big>{applicationDetail?.rbzReferenceNumber}</big>
+                  </Modal.Title>
+                </Modal.Header>
+              </h5>
+            </div>
+            <div className="login_form_panel">
+              <Modal.Body className="p-0">
+                <ImportDashboardViewDetails
+                  applicationDetail={applicationDetail}
+                  handleFormClose={handleFormClose}
+                  allcomment={allcommentRenew}
+                  noDataComment={noDataCommentRenew}
+                  tatHistory={tatHistoryRenew}
+                  Actiondata={Actiondata}
+                  responceCount={responceCountRenew}
+                />
+              </Modal.Body>
+            </div>
+          </div>
+        </div>
+      </Modal> */}
         </>
       )}
     </>

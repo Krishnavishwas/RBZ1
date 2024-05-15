@@ -1128,7 +1128,7 @@ const ImportNewRequestForm = () => {
                         changeHandelFormValidate(e);
                       }}
                       value={ValidateChange.PECANNumber.trim()}
-                      placeholder="PECAN"
+                      placeholder="Prior Exchange Control Authority Number(PECAN)"
                       className={
                         errors.PECANNumber
                           ? "text-uppercase error"
