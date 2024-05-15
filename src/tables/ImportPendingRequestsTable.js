@@ -205,7 +205,7 @@ const ImportPendingRequestsTable = () => {
       ),
     },
     {
-      name: "Application Type",
+      name: "Nature of Application",
       selector: (row) => row.applicationType,
       sortable: true,
       cell: (row) => (
@@ -542,7 +542,7 @@ const ImportPendingRequestsTable = () => {
               ></Column>
               <Column
                 field="applicationType"
-                header="Application Type"
+                header="Nature of Application"
                 sortable
                 style={{ width: "200px" }}
               ></Column>

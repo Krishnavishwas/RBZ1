@@ -67,7 +67,7 @@ const ImportDashboardEditDetails = ({
     applicantTypes,
     sectorData,
     masterBank,
-    Supervisors,
+    ImpSupervisors,
     applicantName,
     countries,
   } = ExportformDynamicField();
@@ -94,6 +94,7 @@ const ImportDashboardEditDetails = ({
 
   const PdftargetRef = useRef();
   const PdfPrivewRef = useRef();
+  const PdfPrivewsupervisorRef = useRef();
   const CoverigLetterRef = useRef(null);
   const BPNCodeRef = useRef(null);
   const TINRef = useRef(null);
@@ -199,7 +200,7 @@ const ImportDashboardEditDetails = ({
     pecaNumber: "",
     typeExporter: "",
     BeneficiaryName: "",
-    baneficiaryCountry: "",
+    beneficiaryCountry: "",
     govtAgencie: "",
     BPNCode: "",
     TINNumber: "",
@@ -280,6 +281,11 @@ const ImportDashboardEditDetails = ({
       };
     },
   });
+
+  console.log(
+    "applicationDetail.beneficiaryCountry - ",
+    applicationDetail.beneficiaryCountry
+  );
 
   const changeHandelForm = (e) => {
     const name = e.target.name;
@@ -785,6 +791,7 @@ const ImportDashboardEditDetails = ({
           doc.setGState(new doc.GState({ opacity: 0.4 }));
           doc.setFont("helvetica", "normal");
           doc.setFontSize(80);
+          //doc.text("PREVIEW", 50, 150, {align: 'center', baseline: 'middle'})
           doc.text(
             doc.internal.pageSize.width / 3,
             doc.internal.pageSize.height / 2,
@@ -797,12 +804,18 @@ const ImportDashboardEditDetails = ({
       doc.setFont("helvetica", "normal");
       doc.setFontSize(3);
       let docWidth = doc.internal.pageSize.getWidth();
-      doc.html(PdfPrivewRef.current, {
+      const refpdfview =
+        roleID == 3 && nextlevelvalue == 10
+          ? PdfPrivewsupervisorRef
+          : roleID == 3 && nextlevelvalue == ""
+          ? CoverigLetterRef
+          : PdfPrivewRef;
+      doc.html(refpdfview.current, {
         x: 12,
         y: 12,
-        width: docWidth,
+        width: 513,
         height: doc.internal.pageSize.getHeight(),
-        margin: [110, 10, 40, 0],
+        margin: [110, 80, 60, 35],
         windowWidth: 1000,
         pagebreak: true,
         async callback(doc) {
@@ -1065,18 +1078,34 @@ const ImportDashboardEditDetails = ({
     }
     if (nextlevelvalue == "" && roleID == 3 && supervisordecision == false) {
       newErrors.supervisoraction = "Action is required";
+      valid = false;
     }
     if (
-      (Description == " " ||
-        Description == null ||
-        Description == "<p><br></p>" ||
-        !Description ||
-        Description == "<h1><br></h1>" ||
-        Description == "<h2><br></h2>") &&
+      (Description == "" || Description == "<p></p>") &&
       applicationDetail?.analystDescription == null &&
-      roleID == 5
+      roleID >= 5
     ) {
-      newErrors.Description = "Description is required...";
+      newErrors.Description = "Description is required";
+      valid = false;
+    }
+
+    if (
+      //  (checkSupervisor == false && nextlevelvalue == "" &&  roleID == 3 && Description == "<p></p>") ||
+      Description == null ||
+      (Description == "<p></p>" &&
+        roleID == 3 &&
+        nextlevelvalue == "" &&
+        nextlevelvalue != "20") ||
+      (nextlevelvalue == "10" &&
+        Description == "<p></p>" &&
+        roleID == 3 &&
+        nextlevelvalue != "20") ||
+      (Description == "<p></p>" &&
+        supervisordecision == true &&
+        roleID == 3 &&
+        nextlevelvalue != "20")
+    ) {
+      newErrors.Description = "Description is required";
       valid = false;
     }
     if (
@@ -1244,7 +1273,7 @@ const ImportDashboardEditDetails = ({
             filtertin_bpn || filtertin_bpn != undefined
               ? filtertin_bpn?.tinNumber?.toUpperCase()
               : applicationDetail?.tinNumber,
-          BeneficiaryCountry: applicationDetail?.baneficiaryCountry,
+          BeneficiaryCountry: applicationDetail?.beneficiaryCountry,
           UserID: UserID.replace(/"/g, ""),
           RoleID: roleID,
           Comment: asignnextLeveldata.Comment,
@@ -2438,6 +2467,7 @@ const ImportDashboardEditDetails = ({
                     minDate="01/01/2018"
                     maxDate={new Date()}
                     showYearDropdown
+                    disabled={roleID == 2 || roleID == 3 ? false : true}
                     dropdownMode="select"
                     onKeyDown={(e) => {
                       const key = e.key;
@@ -2476,6 +2506,7 @@ const ImportDashboardEditDetails = ({
                                 ? applicationDetail?.pecaNumber
                                 : "N/A"
                             }
+                            disabled={roleID == 2 || roleID == 3 ? false : true}
                             className={
                               errors.PECANNumber
                                 ? "text-uppercase error"
@@ -2557,6 +2588,7 @@ const ImportDashboardEditDetails = ({
                             : "Please provide at least 3 characters for auto search of Company Name"
                         }
                         onMenuClose={handleClear}
+                        disabled={roleID == 2 || roleID == 3 ? false : true}
                         className="selectinput"
                         isDisabled={
                           roleID == 2 ||
@@ -2658,6 +2690,7 @@ const ImportDashboardEditDetails = ({
                       <label>
                         <input
                           type="text"
+                          disabled={roleID == 2 || roleID == 3 ? false : true}
                           ref={applicantRef}
                           name="applicant"
                           onChange={(e) => {
@@ -2682,7 +2715,7 @@ const ImportDashboardEditDetails = ({
               )}
 
               <div className="inner_form_new ">
-                <label className="controlform">Application Type</label>
+                <label className="controlform">Nature of Application</label>
                 <div className="form-bx">
                   <label>
                     <select
@@ -2692,13 +2725,7 @@ const ImportDashboardEditDetails = ({
                       onChange={(e) => {
                         changeHandelForm(e);
                       }}
-                      disabled={
-                        roleID == 2 ||
-                        roleID == 3 ||
-                        applicationDetail?.roleID == 4
-                          ? false
-                          : true
-                      }
+                      disabled={roleID == 2 || roleID == 3 ? false : true}
                       className={
                         errors.applicationType &&
                         ImportForm.applicationType === ""
@@ -2742,6 +2769,7 @@ const ImportDashboardEditDetails = ({
                       ref={BeneficiaryNameRef}
                       name="beneficiaryName"
                       placeholder="Beneficiary Name"
+                      disabled={roleID == 2 || roleID == 3 ? false : true}
                       onChange={(e) => {
                         changeHandelForm(e);
                       }}
@@ -2769,10 +2797,11 @@ const ImportDashboardEditDetails = ({
                 <div className="form-bx">
                   <label>
                     <select
-                      name="baneficiaryCountry"
+                      name="beneficiaryCountry"
                       onChange={(e) => {
                         changeHandelForm(e);
                       }}
+                      disabled={roleID == 2 || roleID == 3 ? false : true}
                     >
                       <option value="">
                         {applicationDetail?.beneficiaryCountryName
@@ -2800,6 +2829,7 @@ const ImportDashboardEditDetails = ({
                       <select
                         ref={govtAgencieRef}
                         name="govtAgencie"
+                        disabled={roleID == 2 || roleID == 3 ? false : true}
                         onChange={(e) => {
                           changeHandelForm(e);
                         }}
@@ -2842,6 +2872,7 @@ const ImportDashboardEditDetails = ({
                         <select
                           ref={currencyRef}
                           name="currency"
+                          disabled={roleID == 2 || roleID == 3 ? false : true}
                           onChange={(e) => {
                             changeHandelForm(e);
                           }}
@@ -2882,6 +2913,7 @@ const ImportDashboardEditDetails = ({
                         <input
                           ref={amountRef}
                           type="number"
+                          disabled={roleID == 2 || roleID == 3 ? false : true}
                           min={0}
                           name="amount"
                           onChange={(e) => {
@@ -2968,6 +3000,7 @@ const ImportDashboardEditDetails = ({
                   <label>
                     <select
                       ref={sectorRef}
+                      disabled={roleID == 2 || roleID == 3 ? false : true}
                       name="sector"
                       onChange={(e) => {
                         changeHandelForm(e);
@@ -3004,25 +3037,10 @@ const ImportDashboardEditDetails = ({
                   <label>
                     <select
                       ref={subsectorRef}
+                      disabled={roleID == 2 || roleID == 3 ? false : true}
                       name="subSector"
-                      onChange={(e) => {
-                        changeHandelForm(e);
-                      }}
-                      disabled={
-                        applicationDetail.sector === "" ||
-                        (roleID == 2 ||
-                        roleID == 3 ||
-                        applicationDetail?.roleID == 4
-                          ? false
-                          : true)
-                          ? true
-                          : false
-                      }
-                      className={
-                        errors.subSector && ImportForm.subSector === ""
-                          ? "error"
-                          : ""
-                      }
+                      onChange={(e) => changeHandelForm(e)} 
+                      className={errors.subSector && ImportForm.subSector == "" ? "error" : "" }
                     >
                       <option value="">Select Subsector</option>
                       {subsectorData?.map((item, index) => {
@@ -3054,6 +3072,7 @@ const ImportDashboardEditDetails = ({
                     <textarea
                       ref={applicantCommentsRef}
                       name="applicantComments"
+                      disabled={roleID == 2 || roleID == 3 ? false : true}
                       onChange={(e) => {
                         changeHandelForm(e);
                       }}
@@ -3155,7 +3174,7 @@ const ImportDashboardEditDetails = ({
                         // }
                       >
                         <option value="">Select Bank Supervisor</option>
-                        {Supervisors?.map((item, index) => {
+                        {ImpSupervisors?.map((item, index) => {
                           return (
                             <option
                               key={index}
@@ -3231,7 +3250,7 @@ const ImportDashboardEditDetails = ({
                 ""
               )}
 
-              {roleID == 2 || roleID == 3 || applicationDetail?.roleID == 4
+              {roleID == 2 || roleID == 3
                 ? newData?.map((items, index) => {
                     return (
                       <div className="attachemt_form-bx" key={items.id}>
@@ -3331,7 +3350,7 @@ const ImportDashboardEditDetails = ({
                 <div className="text-center">File Not Found</div>
               )}
 
-              {roleID == 2 || roleID == 3 || applicationDetail?.roleID == 4
+              {roleID == 2 || roleID == 3
                 ? otherfiles?.map((file, index) => (
                     <div
                       key={"other file" + (index + 1)}
@@ -3384,7 +3403,7 @@ const ImportDashboardEditDetails = ({
                   ))
                 : ""}
 
-              {roleID == 2 || roleID == 3 || applicationDetail?.roleID == 4 ? (
+              {roleID == 2 || roleID == 3 ? (
                 <button
                   type="button"
                   className="addmore-btn mb-2"
@@ -3948,17 +3967,20 @@ const ImportDashboardEditDetails = ({
                               <MenuBar editor={editor} />
                               <EditorContent editor={editor} />
                               <span className="sspan"></span>
-                              {(errors.Description && Description == "") ||
-                              Description == "<p><br></p>" ? (
-                                <small
-                                  className="errormsg"
-                                  style={{ bottom: "-13px" }}
-                                >
-                                  {errors.Description}
-                                </small>
-                              ) : (
-                                ""
-                              )}
+                                {(errors.Description && Description == " ") ||
+                                Description == null ||
+                                Description == "<p></p>" ||
+                                !Description ? (
+                                  <small
+                                    className="errormsg"
+                                    style={{ bottom: "-18px" }}
+                                  >
+                                    {errors.Description}
+                                  </small>
+                                ) : (
+                                  ""
+                                )}
+                                
                             </div>
                           </div>
                         </div>
@@ -5701,7 +5723,7 @@ const ImportDashboardEditDetails = ({
                         }
                       >
                         <label className="controlform">
-                          Is Expiry Required ?
+                          Is Expiry Required?
                         </label>
                         <div className="hidden-toggles">
                           <input
@@ -7426,7 +7448,7 @@ const ImportDashboardEditDetails = ({
                         }
                       >
                         <label className="controlform">
-                          Is Expiry Required ?
+                          Is Expiry Required?
                         </label>
                         <div className="hidden-toggles">
                           <input
@@ -9049,7 +9071,7 @@ const ImportDashboardEditDetails = ({
                         }
                       >
                         <label className="controlform">
-                          Is Expiry Required ?
+                          Is Expiry Required?
                         </label>
                         <div className="hidden-toggles">
                           <input
@@ -10354,7 +10376,7 @@ const ImportDashboardEditDetails = ({
                               }}
                             >
                               <span style={{ fontWeight: "500" }}>
-                                {items.filename}dffdfdsd
+                                {items.filename}
                               </span>
                             </label>
                             <div className="browse-btn">
@@ -10757,7 +10779,7 @@ const ImportDashboardEditDetails = ({
                         }
                       >
                         <label className="controlform">
-                          Is Expiry Required ?
+                          Is Expiry Required?
                         </label>
                         <div className="hidden-toggles">
                           <input
@@ -12450,7 +12472,7 @@ const ImportDashboardEditDetails = ({
                         }
                       >
                         <label className="controlform">
-                          Is Expiry Required ?
+                          Is Expiry Required?
                         </label>
                         <div className="hidden-toggles">
                           <input
@@ -13272,25 +13294,33 @@ const ImportDashboardEditDetails = ({
               </button>
 
               <div>
-                {(roleID > 5 && recomdAnalyst == "121") ||
-                (roleID == 3 && applicationstaus && applicationstaus != 0) ? (
-                  <>
-                    <button
-                      type="button"
-                      className="login m-end-4"
-                      onClick={() => GetHandelDetailPDF()}
-                      disabled={btnLoader}
-                    >
-                      {btnLoader ? (
-                        <span className="loaderwait">Please Wait...</span>
-                      ) : (
-                        <span>Preview PDF</span>
-                      )}
-                    </button>
-                  </>
-                ) : (
-                  ""
-                )}
+              {(roleID > 5 &&
+                    recomdAnalyst == "121" &&
+                    applicationstaus != "25") ||
+                  (roleID == 3 &&
+                    applicationstaus &&
+                    applicationstaus != 0 &&
+                    applicationstaus != "25") ||
+                  (roleID == 3 &&
+                    nextlevelvalue == "10" &&
+                    applicationstaus != "25") ? (
+                    <>
+                      <button
+                        type="button"
+                        className="login m-end-4"
+                        onClick={() => GetHandelDetailPDF()}
+                        disabled={btnLoader}
+                      >
+                        {btnLoader ? (
+                          <span className="loaderwait">Please Wait...</span>
+                        ) : (
+                          <span>Preview PDF</span>
+                        )}
+                      </button>
+                    </>
+                  ) : (
+                    ""
+                  )}
 
                 <button
                   type="button"
@@ -13335,6 +13365,7 @@ const ImportDashboardEditDetails = ({
                 </button>
               </div>
 
+              {/* pdf-preview data start Arun Verma Final Pdf Generation and Preview */}
               <div className="login_inner" style={{ display: "none" }}>
                 <div className="login_form_panel" style={{ display: "none" }}>
                   <div
@@ -13364,6 +13395,7 @@ const ImportDashboardEditDetails = ({
                               fontSize: "18px",
                               textAlign: "left",
                               fontWeight: "800",
+                              letterSpacing: "0.01px",
                             }}
                           >
                             : {applicationDetail?.rbzReferenceNumber}
@@ -13381,6 +13413,7 @@ const ImportDashboardEditDetails = ({
                             color: "#000",
                             fontSize: "18px",
                             fontWeight: "600",
+                            letterSpacing: "0.01px",
                           }}
                         >
                           {moment(
@@ -13398,6 +13431,7 @@ const ImportDashboardEditDetails = ({
                             color: "#000",
                             fontSize: "18px",
                             fontWeight: "600",
+                            letterSpacing: "0.01px",
                           }}
                         >
                           The Head - Exchange Control
@@ -13408,20 +13442,23 @@ const ImportDashboardEditDetails = ({
                           applicationDetail?.bankAddress1 != ""
                             ? applicationDetail?.bankAddress1 + "," + " "
                             : ""}
+                          <br></br>
                           {applicationDetail?.bankAddress2 != null ||
                           applicationDetail?.bankAddress2 != ""
                             ? applicationDetail?.bankAddress2 + "," + " "
                             : ""}
+                          <br></br>
                           {applicationDetail?.bankAddress3 != null ||
                           applicationDetail?.bankAddress3 != ""
                             ? applicationDetail?.bankAddress3
                             : ""}
                           <br />
-                          <span
+                          {/* <span
                             style={{
                               borderBottom: "1px solid #000",
                               fontWeight: "800",
                               fontSize: "18px",
+                              letterSpacing: "0.01px"
                             }}
                             className="text-uppercase"
                           >
@@ -13429,7 +13466,7 @@ const ImportDashboardEditDetails = ({
                             applicationDetail?.bankCity != ""
                               ? applicationDetail?.bankCity
                               : ""}
-                          </span>
+                          </span> */}
                         </td>
                       </tr>
                       <tr>
@@ -13442,17 +13479,21 @@ const ImportDashboardEditDetails = ({
                             color: "#000",
                             fontSize: "18px",
                             fontWeight: "600",
+                            letterSpacing: "0.01px",
                           }}
                         >
                           Dear{" "}
-                          {applicationDetail?.applicantType == 1
+                          {/* {applicationDetail?.applicantType == 1
                             ? applicationDetail?.companyName
                             : applicationDetail?.applicantType == 2
                             ? applicationDetail?.name
                             : applicationDetail?.applicantType == 3
                             ? applicationDetail?.agencyName
-                            : " "}
-                          ,
+                            : " "} */}
+                          {applicationDetail?.companyName == null ||
+                          applicationDetail?.companyName == ""
+                            ? applicationDetail?.name
+                            : applicationDetail?.companyName}
                         </td>
                       </tr>
                       <tr>
@@ -13470,6 +13511,7 @@ const ImportDashboardEditDetails = ({
                                     fontWeight: "800",
                                     borderBottom: "1px solid #000",
                                     marginBottom: "0px",
+                                    letterSpacing: "0.01px",
                                   }}
                                 >
                                   RE &nbsp;:&nbsp;{" "}
@@ -13495,12 +13537,1063 @@ const ImportDashboardEditDetails = ({
                                   color: "#000",
                                   fontSize: "18px",
                                   fontWeight: "800",
+                                  letterSpacing: "0.01px",
                                 }}
                               >
                                 :{" "}
-                                {applicationDetail?.companyName != null
-                                  ? applicationDetail?.companyName
-                                  : applicationDetail?.name}
+                                {applicationDetail?.companyName == null ||
+                                applicationDetail?.companyName == ""
+                                  ? applicationDetail?.name
+                                  : applicationDetail?.companyName}
+                              </td>
+                            </tr>
+                            <tr>
+                              <td
+                                style={{
+                                  color: "#000",
+                                  fontSize: "18px",
+                                  fontWeight: "400",
+                                  letterSpacing: "0.01px",
+                                }}
+                              >
+                                Date Submitted
+                              </td>
+                              <td
+                                style={{
+                                  color: "#000",
+                                  fontSize: "18px",
+                                  fontWeight: "800",
+                                  letterSpacing: "0.01px",
+                                }}
+                              >
+                                :{" "}
+                                {moment(
+                                  applicationDetail?.applicationSubmittedDate
+                                ).format("DD MMMM YYYY")}
+                              </td>
+                            </tr>
+                            <tr>
+                              <td
+                                style={{
+                                  color: "#000",
+                                  fontSize: "18px",
+                                  fontWeight: "400",
+                                  letterSpacing: "0.01px",
+                                }}
+                              >
+                                Currency and Amount
+                              </td>
+                              <td
+                                style={{
+                                  color: "#000",
+                                  fontSize: "18px",
+                                  fontWeight: "800",
+                                }}
+                              >
+                                :{" "}
+                                <span
+                                  style={{
+                                    minWidth: "45px",
+                                    display: "inline-block",
+                                    paddingRight: "5px",
+                                    fontWeight: "800",
+                                  }}
+                                >
+                                  {applicationDetail?.currencyCode}
+                                </span>
+                                <span
+                                  style={{
+                                    fontSize: "18px",
+                                    fontWeight: "800",
+                                  }}
+                                >
+                                  {applicationDetail?.amount}
+                                </span>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td
+                                style={{
+                                  color: "#000",
+                                  fontSize: "18px",
+                                  fontWeight: "400",
+                                  letterSpacing: "0.01px",
+                                }}
+                              >
+                                USD Equivalent
+                              </td>
+                              <td
+                                style={{
+                                  color: "#000",
+                                  fontSize: "18px",
+                                  fontWeight: "800",
+                                }}
+                              >
+                                :{" "}
+                                <span
+                                  style={{
+                                    minWidth: "45px",
+                                    display: "inline-block",
+                                    paddingRight: "5px",
+                                    fontWeight: "800",
+                                  }}
+                                >
+                                  USD
+                                </span>
+                                <span
+                                  style={{
+                                    fontSize: "18px",
+                                    fontWeight: "800",
+                                  }}
+                                >
+                                  {applicationDetail?.usdEquivalent}
+                                </span>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td
+                                style={{
+                                  color: "#000",
+                                  fontSize: "18px",
+                                  fontWeight: "400",
+                                  letterSpacing: "0.01px",
+                                }}
+                              >
+                                Status/Decision
+                              </td>
+                              <td
+                                style={{
+                                  color: "#000",
+                                  fontSize: "18px",
+                                  fontWeight: "800",
+                                  letterSpacing: "0.01px",
+                                }}
+                              >
+                                :{" "}
+                                {applicationstaus == "10"
+                                  ? "Approved"
+                                  : applicationstaus == "30"
+                                  ? "Rejected"
+                                  : applicationstaus == "40"
+                                  ? "Deferred"
+                                  : applicationstaus == "25"
+                                  ? "Cancelled"
+                                  : ""}
+                                {/* {applicationDetail?.statusName} */}
+                              </td>
+                            </tr>
+                            <tr
+                              className={
+                                applicationDetail?.expiringDate == null ||
+                                applicationDetail?.expiringDate == ""
+                                  ? "d-none"
+                                  : ""
+                              }
+                            >
+                              <td
+                                style={{
+                                  color: "#000",
+                                  fontSize: "18px",
+                                  fontWeight: "400",
+                                  letterSpacing: "0.01px",
+                                }}
+                              >
+                                Expiry Date
+                              </td>
+                              <td
+                                style={{
+                                  color: "#000",
+                                  fontSize: "18px",
+                                  fontWeight: "800",
+                                  letterSpacing: "0.01px",
+                                }}
+                              >
+                                :{" "}
+                                {applicationDetail?.expiringDate == null ||
+                                applicationDetail?.expiringDate == "" ||
+                                applicationDetail?.expiringDate ==
+                                  "0001-01-01T00:00:00"
+                                  ? "N/A"
+                                  : moment(
+                                      applicationDetail?.expiringDate
+                                    ).format("DD MMMM YYYY")}
+                              </td>
+                            </tr>
+                            <tr
+                              className={
+                                applicationDetail?.returnFrequencyName ==
+                                  null ||
+                                applicationDetail?.returnFrequencyName == ""
+                                  ? "d-none"
+                                  : ""
+                              }
+                            >
+                              <td
+                                style={{
+                                  fontSize: "18px",
+                                  fontWeight: "400",
+                                  color: "#000",
+                                  letterSpacing: "0.01px",
+                                }}
+                              >
+                                Returns Frequency
+                              </td>
+                              <td
+                                style={{
+                                  color: "#000",
+                                  fontSize: "18px",
+                                  fontWeight: "800",
+                                  letterSpacing: "0.01px",
+                                }}
+                              >
+                                :{" "}
+                                {applicationDetail?.returnFrequencyName ==
+                                  null ||
+                                applicationDetail?.returnFrequencyName == ""
+                                  ? "N/A"
+                                  : applicationDetail?.returnFrequencyName}
+                              </td>
+                            </tr>
+                            {applicationDetail?.returnFrequencyName ==
+                            "Once" ? (
+                              <tr>
+                                <td
+                                  style={{
+                                    fontSize: "18px",
+                                    fontWeight: "400",
+                                    color: "#000",
+                                    letterSpacing: "0.01px",
+                                  }}
+                                >
+                                  Returns Date
+                                </td>
+                                <td
+                                  style={{
+                                    color: "#000",
+                                    fontSize: "18px",
+                                    fontWeight: "800",
+                                    letterSpacing: "0.01px",
+                                  }}
+                                >
+                                  :{" "}
+                                  {applicationDetail?.returnDate == null ||
+                                  applicationDetail?.returnDate == "" ||
+                                  applicationDetail?.returnDate ==
+                                    "0001-01-01T00:00:00"
+                                    ? "N/A"
+                                    : moment(
+                                        applicationDetail?.returnDate
+                                      ).format("DD MMMM YYYY")}
+                                </td>
+                              </tr>
+                            ) : (
+                              ""
+                            )}
+                          </table>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td colSpan="2">&nbsp;</td>
+                      </tr>
+                      <tr>
+                        <td colSpan="2">
+                          <table>
+                            <tr>
+                              <td colSpan="2">
+                                <table width="100%">
+                                  <tr>
+                                    <td
+                                      style={{
+                                        color: "#000",
+                                        fontSize: "18px",
+                                        fontWeight: "400",
+                                      }}
+                                    >
+                                      <div>
+                                        <span
+                                          style={{
+                                            fontWeight: "800",
+                                            padding: "15px 0px 15px",
+                                            letterSpacing: "0.01px",
+                                          }}
+                                        >
+                                          Response / Conditions
+                                        </span>
+                                      </div>
+                                      <div
+                                        className="tableEditorData"
+                                        dangerouslySetInnerHTML={{
+                                          __html: Description
+                                            ? Description
+                                            : applicationDetail?.analystDescription,
+                                        }}
+                                        style={{ letterSpacing: "0.01px" }}
+                                      />
+                                    </td>
+                                  </tr>
+                                </table>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td colSpan="2">&nbsp;</td>
+                            </tr>
+                            <tr>
+                              <td
+                                colSpan="2"
+                                style={{
+                                  color: "#000",
+                                  fontSize: "18px",
+                                  fontWeight: "400",
+                                }}
+                              >
+                                <span
+                                  style={{
+                                    color: "#000",
+                                    fontSize: "18px",
+                                    fontWeight: "400",
+                                    display: "inline-block",
+                                    letterSpacing: "0.01px",
+                                  }}
+                                >
+                                  {" "}
+                                  Yours Sincerely,
+                                </span>
+                                <img
+                                  src={
+                                    applicationDetail?.getUserData?.filePath
+                                      ? applicationDetail?.getUserData.filePath
+                                      : NoSign
+                                  }
+                                  alt="Signature"
+                                  style={{
+                                    width: "120px",
+                                    height: "50px",
+                                    display: "block",
+                                    objectFit: "contain",
+                                  }}
+                                />
+                                <p
+                                  style={{
+                                    marginBottom: "0px",
+                                    color: "#000",
+                                    fontSize: "14px",
+                                    fontWeight: "400",
+                                    padding: "15px 0px 3px",
+                                    lineHeight: "13px",
+                                    letterSpacing: "0.01px",
+                                  }}
+                                >
+                                  {PdfUsername
+                                    ? PdfUsername?.replace(/"/g, "")
+                                    : "N/A"}
+                                </p>
+                                <p
+                                  style={{
+                                    marginBottom: "0px",
+                                    color: "#000",
+                                    fontSize: "14px",
+                                    fontWeight: "400",
+                                    padding: "5px 0px",
+                                    lineHeight: "13px",
+                                    letterSpacing: "0.01px",
+                                  }}
+                                >
+                                  {PdfRolename
+                                    ? PdfRolename?.replace(/"/g, "")
+                                    : "N/A"}
+                                </p>
+                                <h3
+                                  style={{
+                                    color: "#000",
+                                    fontSize: "18px",
+                                    fontWeight: "800",
+                                  }}
+                                >
+                                  EXCHANGE &nbsp; CONTROL
+                                </h3>
+                                <div
+                                  style={{
+                                    marginBottom: "0px",
+                                    color: "#000",
+                                    fontSize: "18px",
+                                    fontWeight: "400",
+                                    padding: "25px 0px 5px",
+                                    lineHeight: "13px",
+                                    display: "flex",
+                                  }}
+                                >
+                                  {applicationDetail?.copiedResponses?.length || selectedBanks?.length >
+                                  0 ? (
+                                    <>
+                                      <p
+                                        style={{
+                                          marginBottom: "0px",
+                                          fontSize: "18px",
+                                          fontWeight: "400",
+                                          paddingRight: "10px",
+                                        }}
+                                      >
+                                        CC:
+                                      </p>
+                                      <div>
+                                        {selectedBanks.map((item) => {
+                                          return (
+                                            <p
+                                              style={{
+                                                marginBottom: "3px",
+                                                letterSpacing: "0.01px",
+                                                fontSize: "18px",
+                                                fontWeight: "400",
+                                              }}
+                                            >
+                                              {item.name}
+                                            </p>
+                                          );
+                                        })}
+                                      </div>
+                                    </>
+                                  ) : (
+                                    ""
+                                  )}
+                                </div>
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                    </table>
+                  </div>
+                </div>
+              </div>
+              {/* pdf-preview data end */}
+
+              {/* Supervisor level final close application Arun Verma */}
+              <div className="login_inner" style={{ display: "none" }}>
+                <div className="login_form_panel" style={{ display: "none" }}>
+                  <div
+                    ref={CoverigLetterRef}
+                    className="p-5"
+                    style={{ position: "relative" }}
+                  >
+                    <table width="100%">
+                      <tr>
+                        <td
+                          style={{
+                            marginBottom: "0px",
+                            color: "#000",
+                            fontSize: "18px",
+                            fontWeight: "800",
+                          }}
+                        >
+                          Exchange &nbsp; Control &nbsp; Ref
+                          <br />
+                          Previous &nbsp; Exchange &nbsp; Control &nbsp; Ref
+                        </td>
+                        <td>
+                          <p
+                            style={{
+                              marginBottom: "0px",
+                              color: "#000",
+                              fontSize: "18px",
+                              textAlign: "left",
+                              fontWeight: "800",
+                              letterSpacing: "0.01px",
+                            }}
+                          >
+                            : {applicationDetail?.rbzReferenceNumber}
+                            <br />: N/A
+                          </p>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td colSpan="2">&nbsp;</td>
+                      </tr>
+                      <tr>
+                        <td
+                          colSpan="2"
+                          style={{
+                            color: "#000",
+                            fontSize: "18px",
+                            fontWeight: "600",
+                            letterSpacing: "0.01px",
+                          }}
+                        >
+                          {moment(
+                            applicationDetail?.applicationSubmittedDate
+                          ).format("DD MMMM YYYY")}
+                        </td>
+                      </tr>
+                      <tr>
+                        <td colSpan="2">&nbsp;</td>
+                      </tr>
+                      <tr>
+                        <td
+                          colSpan="2"
+                          style={{
+                            color: "#000",
+                            fontSize: "18px",
+                            fontWeight: "600",
+                            letterSpacing: "0.01px",
+                          }}
+                        >
+                          The Head - Exchange Control
+                          <br />
+                          {applicationDetail?.bankName}
+                          <br />
+                          {applicationDetail?.bankAddress1 != null ||
+                          applicationDetail?.bankAddress1 != ""
+                            ? applicationDetail?.bankAddress1 + "," + " "
+                            : ""}
+                          <br></br>
+                          {applicationDetail?.bankAddress2 != null ||
+                          applicationDetail?.bankAddress2 != ""
+                            ? applicationDetail?.bankAddress2 + "," + " "
+                            : ""}
+                          <br></br>
+                          {applicationDetail?.bankAddress3 != null ||
+                          applicationDetail?.bankAddress3 != ""
+                            ? applicationDetail?.bankAddress3
+                            : ""}
+                          <br />
+                        </td>
+                      </tr>
+                      <tr>
+                        <td colSpan="2">&nbsp;</td>
+                      </tr>
+                      <tr>
+                        <td
+                          colSpan="2"
+                          style={{
+                            color: "#000",
+                            fontSize: "18px",
+                            fontWeight: "600",
+                            letterSpacing: "0.01px",
+                          }}
+                        >
+                          Dear{" "}
+                          {applicationDetail?.companyName == null ||
+                          applicationDetail?.companyName == ""
+                            ? applicationDetail?.name
+                            : applicationDetail?.companyName}
+                          ,
+                        </td>
+                      </tr>
+                      <tr>
+                        <td colSpan="2">&nbsp;</td>
+                      </tr>
+                      <tr>
+                        <td colSpan="2">
+                          <table width="100%">
+                            <tr>
+                              <td colSpan="2">
+                                <p
+                                  style={{
+                                    color: "#000",
+                                    fontSize: "18px",
+                                    fontWeight: "800",
+                                    borderBottom: "1px solid #000",
+                                    marginBottom: "0px",
+                                    letterSpacing: "0.01px",
+                                  }}
+                                >
+                                  RE &nbsp;:&nbsp;{" "}
+                                  {applicationDetail?.applicationType}
+                                </p>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td colSpan="2">&nbsp;</td>
+                            </tr>
+                            <tr>
+                              <td
+                                style={{
+                                  color: "#000",
+                                  fontSize: "18px",
+                                  fontWeight: "400",
+                                }}
+                              >
+                                Exporter
+                              </td>
+                              <td
+                                style={{
+                                  color: "#000",
+                                  fontSize: "18px",
+                                  fontWeight: "800",
+                                  letterSpacing: "0.01px",
+                                }}
+                              >
+                                :{" "}
+                                {applicationDetail?.companyName == null ||
+                                applicationDetail?.companyName == ""
+                                  ? applicationDetail?.name
+                                  : applicationDetail?.companyName}
+                              </td>
+                            </tr>
+                            <tr>
+                              <td
+                                style={{
+                                  color: "#000",
+                                  fontSize: "18px",
+                                  fontWeight: "400",
+                                  letterSpacing: "0.01px",
+                                }}
+                              >
+                                Date Submitted
+                              </td>
+                              <td
+                                style={{
+                                  color: "#000",
+                                  fontSize: "18px",
+                                  fontWeight: "800",
+                                  letterSpacing: "0.01px",
+                                }}
+                              >
+                                :{" "}
+                                {moment(
+                                  applicationDetail?.applicationSubmittedDate
+                                ).format("DD MMMM YYYY")}
+                              </td>
+                            </tr>
+                            <tr>
+                              <td
+                                style={{
+                                  color: "#000",
+                                  fontSize: "18px",
+                                  fontWeight: "400",
+                                  letterSpacing: "0.01px",
+                                }}
+                              >
+                                Currency and Amount
+                              </td>
+                              <td
+                                style={{
+                                  color: "#000",
+                                  fontSize: "18px",
+                                  fontWeight: "800",
+                                }}
+                              >
+                                :{" "}
+                                <span
+                                  style={{
+                                    minWidth: "45px",
+                                    display: "inline-block",
+                                    paddingRight: "5px",
+                                    fontWeight: "800",
+                                  }}
+                                >
+                                  {applicationDetail?.currencyCode}
+                                </span>
+                                <span
+                                  style={{
+                                    fontSize: "18px",
+                                    fontWeight: "800",
+                                  }}
+                                >
+                                  {applicationDetail?.amount}
+                                </span>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td
+                                style={{
+                                  color: "#000",
+                                  fontSize: "18px",
+                                  fontWeight: "400",
+                                  letterSpacing: "0.01px",
+                                }}
+                              >
+                                USD Equivalent
+                              </td>
+                              <td
+                                style={{
+                                  color: "#000",
+                                  fontSize: "18px",
+                                  fontWeight: "800",
+                                }}
+                              >
+                                :{" "}
+                                <span
+                                  style={{
+                                    minWidth: "45px",
+                                    display: "inline-block",
+                                    paddingRight: "5px",
+                                    fontWeight: "800",
+                                  }}
+                                >
+                                  USD
+                                </span>
+                                <span
+                                  style={{
+                                    fontSize: "18px",
+                                    fontWeight: "800",
+                                  }}
+                                >
+                                  {applicationDetail?.usdEquivalent}
+                                </span>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td
+                                style={{
+                                  color: "#000",
+                                  fontSize: "18px",
+                                  fontWeight: "400",
+                                  letterSpacing: "0.01px",
+                                }}
+                              >
+                                Status/Decision
+                              </td>
+                              <td
+                                style={{
+                                  color: "#000",
+                                  fontSize: "18px",
+                                  fontWeight: "800",
+                                  letterSpacing: "0.01px",
+                                }}
+                              >
+                                :{" "}
+                                {applicationstaus == "10"
+                                  ? "Approved"
+                                  : applicationstaus == "30"
+                                  ? "Rejected"
+                                  : applicationstaus == "40"
+                                  ? "Deferred"
+                                  : applicationstaus == "25"
+                                  ? "Cancelled"
+                                  : ""}
+                                {/* {applicationDetail?.statusName} */}
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td colSpan="2">&nbsp;</td>
+                      </tr>
+                      <tr>
+                        <td colSpan="2">
+                          <table>
+                            <tr>
+                              <td colSpan="2">
+                                <table width="100%">
+                                  <tr>
+                                    <td
+                                      style={{
+                                        color: "#000",
+                                        fontSize: "18px",
+                                        fontWeight: "400",
+                                      }}
+                                    >
+                                      <div>
+                                        <span
+                                          style={{
+                                            fontWeight: "800",
+                                            padding: "15px 0px 15px",
+                                            letterSpacing: "0.01px",
+                                          }}
+                                        >
+                                          Description
+                                        </span>
+                                      </div>
+                                      <div
+                                        className="tableEditorData"
+                                        dangerouslySetInnerHTML={{
+                                          __html: asignnextLeveldata
+                                            ? // ? asignnextLeveldata.Notes
+                                              Description
+                                            : "",
+                                        }}
+                                        style={{
+                                          paddingBottom: "60px",
+                                          letterSpacing: "0.01px",
+                                        }}
+                                      />
+                                    </td>
+                                  </tr>
+                                </table>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td colSpan="2">&nbsp;</td>
+                            </tr>
+                            <tr>
+                              <td
+                                colSpan="2"
+                                style={{
+                                  color: "#000",
+                                  fontSize: "18px",
+                                  fontWeight: "400",
+                                }}
+                              >
+                                <span
+                                  style={{
+                                    color: "#000",
+                                    fontSize: "18px",
+                                    fontWeight: "400",
+                                    display: "inline-block",
+                                    letterSpacing: "0.01px",
+                                  }}
+                                >
+                                  {" "}
+                                  Yours Sincerely,
+                                </span>
+                                <img
+                                  src={
+                                    applicationDetail?.getUserData?.filePath
+                                      ? applicationDetail?.getUserData.filePath
+                                      : NoSign
+                                  }
+                                  alt="Signature"
+                                  style={{
+                                    width: "120px",
+                                    height: "50px",
+                                    display: "block",
+                                    objectFit: "contain",
+                                  }}
+                                />
+                                <p
+                                  style={{
+                                    marginBottom: "0px",
+                                    color: "#000",
+                                    fontSize: "14px",
+                                    fontWeight: "400",
+                                    padding: "15px 0px 3px",
+                                    lineHeight: "13px",
+                                    letterSpacing: "0.01px",
+                                  }}
+                                >
+                                  {PdfUsername
+                                    ? PdfUsername?.replace(/"/g, "")
+                                    : "N/A"}
+                                </p>
+                                <p
+                                  style={{
+                                    marginBottom: "0px",
+                                    color: "#000",
+                                    fontSize: "14px",
+                                    fontWeight: "400",
+                                    padding: "5px 0px",
+                                    lineHeight: "13px",
+                                    letterSpacing: "0.01px",
+                                  }}
+                                >
+                                  {PdfRolename
+                                    ? PdfRolename?.replace(/"/g, "")
+                                    : "N/A"}
+                                </p>
+                                <h3
+                                  style={{
+                                    color: "#000",
+                                    fontSize: "18px",
+                                    fontWeight: "800",
+                                    letterSpacing: "0.01px",
+                                  }}
+                                >
+                                  {applicationDetail?.bankName}
+                                </h3>
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                    </table>
+                  </div>
+                </div>
+              </div>
+              {/* coveri letter data end Arun Verma */}
+
+              <div className="login_inner" style={{ display: "none" }}>
+                <div className="login_form_panel" style={{ display: "none" }}>
+                  <div
+                    ref={PdfPrivewRef}
+                    className="p-5"
+                    style={{ position: "relative" }}
+                  >
+                    <table width="100%">
+                      <tr>
+                        <td
+                          style={{
+                            marginBottom: "0px",
+                            color: "#000",
+                            fontSize: "18px",
+                            fontWeight: "800",
+                          }}
+                        >
+                          Exchange &nbsp; Control &nbsp; Ref
+                          <br />
+                          Previous &nbsp; Exchange &nbsp; Control &nbsp; Ref
+                        </td>
+                        <td>
+                          <p
+                            style={{
+                              marginBottom: "0px",
+                              color: "#000",
+                              fontSize: "18px",
+                              textAlign: "left",
+                              fontWeight: "800",
+                              letterSpacing: "0.01px",
+                            }}
+                          >
+                            : {applicationDetail?.rbzReferenceNumber}
+                            <br />: N/A
+                          </p>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td colSpan="2">&nbsp;</td>
+                      </tr>
+                      <tr>
+                        <td
+                          colSpan="2"
+                          style={{
+                            color: "#000",
+                            fontSize: "18px",
+                            fontWeight: "600",
+                            letterSpacing: "0.01px",
+                          }}
+                        >
+                          {moment(
+                            applicationDetail?.applicationSubmittedDate
+                          ).format("DD MMMM YYYY")}
+                        </td>
+                      </tr>
+                      <tr>
+                        <td colSpan="2">&nbsp;</td>
+                      </tr>
+                      <tr>
+                        <td
+                          colSpan="2"
+                          style={{
+                            color: "#000",
+                            fontSize: "18px",
+                            fontWeight: "600",
+                            letterSpacing: "0.01px",
+                          }}
+                        >
+                          The Head - Exchange Control
+                          <br />
+                          {applicationDetail?.bankName
+                            ? applicationDetail?.bankName
+                            : ""}
+                          {applicationDetail?.bankName == null ? (
+                            <span>
+                              Reserve Bank of Zimbabwe. 80 Samora Machel Avenue,{" "}
+                              <br /> P.O. Box 1283, Harare, Zimbabwe.
+                            </span>
+                          ) : (
+                            <>
+                              <br />
+                              {applicationDetail?.bankAddress1 != null ||
+                              applicationDetail?.bankAddress1 != ""
+                                ? applicationDetail?.bankAddress1 + "," + " "
+                                : ""}
+                              <br></br>
+                              {applicationDetail?.bankAddress2 != null ||
+                              applicationDetail?.bankAddress2 != ""
+                                ? applicationDetail?.bankAddress2 + "," + " "
+                                : ""}
+                              <br></br>
+                              {applicationDetail?.bankAddress3 != null ||
+                              applicationDetail?.bankAddress3 != ""
+                                ? applicationDetail?.bankAddress3
+                                : ""}
+                              <br />
+                            </>
+                          )}
+                          {/* <span
+                            style={{
+                              borderBottom: "1px solid #000",
+                              fontWeight: "800",
+                              fontSize: "18px",
+                              letterSpacing: "0.01px"
+                            }}
+                            className="text-uppercase"
+                          >
+                            {applicationDetail?.bankCity != null ||
+                            applicationDetail?.bankCity != ""
+                              ? applicationDetail?.bankCity
+                              : ""}
+                          </span> */}
+                        </td>
+                      </tr>
+                      <tr>
+                        <td colSpan="2">&nbsp;</td>
+                      </tr>
+                      <tr>
+                        <td
+                          colSpan="2"
+                          style={{
+                            color: "#000",
+                            fontSize: "18px",
+                            fontWeight: "600",
+                            letterSpacing: "0.01px",
+                          }}
+                        >
+                          Dear{" "}
+                          {/* {applicationDetail?.applicantType == 1
+                            ? applicationDetail?.companyName
+                            : applicationDetail?.applicantType == 2
+                            ? applicationDetail?.name
+                            : applicationDetail?.applicantType == 3
+                            ? applicationDetail?.agencyName
+                            : " "} */}
+                          {applicationDetail?.companyName == null ||
+                          applicationDetail?.companyName == ""
+                            ? applicationDetail?.name
+                            : applicationDetail?.companyName}
+                          {console.log(applicationDetail)},
+                        </td>
+                      </tr>
+                      <tr>
+                        <td colSpan="2">&nbsp;</td>
+                      </tr>
+                      <tr>
+                        <td colSpan="2">
+                          <table width="100%">
+                            <tr>
+                              <td colSpan="2">
+                                <p
+                                  style={{
+                                    color: "#000",
+                                    fontSize: "18px",
+                                    fontWeight: "800",
+                                    borderBottom: "1px solid #000",
+                                    marginBottom: "0px",
+                                    letterSpacing: "0.01px",
+                                  }}
+                                >
+                                  RE &nbsp;:&nbsp;{" "}
+                                  {applicationDetail?.applicationType}
+                                </p>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td colSpan="2">&nbsp;</td>
+                            </tr>
+                            <tr>
+                              <td
+                                style={{
+                                  color: "#000",
+                                  fontSize: "18px",
+                                  fontWeight: "400",
+                                }}
+                              >
+                                Exporter
+                              </td>
+                              <td
+                                style={{
+                                  color: "#000",
+                                  fontSize: "18px",
+                                  fontWeight: "800",
+                                  letterSpacing: "0.01px",
+                                }}
+                              >
+                                :{" "}
+                                {applicationDetail?.companyName == null ||
+                                applicationDetail?.companyName == ""
+                                  ? applicationDetail?.name
+                                  : applicationDetail?.companyName}
+                                {console.log(applicationDetail)}
                               </td>
                             </tr>
                             <tr>
@@ -13518,12 +14611,13 @@ const ImportDashboardEditDetails = ({
                                   color: "#000",
                                   fontSize: "18px",
                                   fontWeight: "800",
+                                  letterSpacing: "0.01px",
                                 }}
                               >
                                 :{" "}
                                 {moment(
                                   applicationDetail?.applicationSubmittedDate
-                                ).format("DD MMMM YYYY")}
+                                ).format("DD MMMM  YYYY")}
                               </td>
                             </tr>
                             <tr>
@@ -13532,6 +14626,7 @@ const ImportDashboardEditDetails = ({
                                   color: "#000",
                                   fontSize: "18px",
                                   fontWeight: "400",
+                                  letterSpacing: "0.01px",
                                 }}
                               >
                                 Currency and Amount
@@ -13608,6 +14703,7 @@ const ImportDashboardEditDetails = ({
                                   color: "#000",
                                   fontSize: "18px",
                                   fontWeight: "400",
+                                  letterSpacing: "0.01px",
                                 }}
                               >
                                 Status/Decision
@@ -13617,17 +14713,36 @@ const ImportDashboardEditDetails = ({
                                   color: "#000",
                                   fontSize: "18px",
                                   fontWeight: "800",
+                                  letterSpacing: "0.01px",
                                 }}
                               >
-                                : {applicationDetail?.statusName}
+                                :{" "}
+                                {applicationstaus == "10"
+                                  ? "Approved"
+                                  : applicationstaus == "30"
+                                  ? "Rejected"
+                                  : applicationstaus == "40"
+                                  ? "Deferred"
+                                  : applicationstaus == "25"
+                                  ? "Cancelled"
+                                  : ""}
+                                {/* {applicationDetail?.statusName} */}
                               </td>
                             </tr>
-                            <tr>
+                            <tr
+                              className={
+                                applicationDetail?.expiringDate == null ||
+                                applicationDetail?.expiringDate == ""
+                                  ? "d-none"
+                                  : ""
+                              }
+                            >
                               <td
                                 style={{
                                   color: "#000",
                                   fontSize: "18px",
                                   fontWeight: "400",
+                                  letterSpacing: "0.01px",
                                 }}
                               >
                                 Expiry Date
@@ -13637,6 +14752,7 @@ const ImportDashboardEditDetails = ({
                                   color: "#000",
                                   fontSize: "18px",
                                   fontWeight: "800",
+                                  letterSpacing: "0.01px",
                                 }}
                               >
                                 :{" "}
@@ -13650,12 +14766,21 @@ const ImportDashboardEditDetails = ({
                                     ).format("DD MMMM YYYY")}
                               </td>
                             </tr>
-                            <tr>
+                            <tr
+                              className={
+                                applicationDetail?.returnFrequencyName ==
+                                  null ||
+                                applicationDetail?.returnFrequencyName == ""
+                                  ? "d-none"
+                                  : ""
+                              }
+                            >
                               <td
                                 style={{
                                   fontSize: "18px",
                                   fontWeight: "400",
                                   color: "#000",
+                                  letterSpacing: "0.01px",
                                 }}
                               >
                                 Returns Frequency
@@ -13692,6 +14817,7 @@ const ImportDashboardEditDetails = ({
                                     color: "#000",
                                     fontSize: "18px",
                                     fontWeight: "800",
+                                    letterSpacing: "0.01px",
                                   }}
                                 >
                                   :{" "}
@@ -13702,7 +14828,7 @@ const ImportDashboardEditDetails = ({
                                     ? "N/A"
                                     : moment(
                                         applicationDetail?.returnDate
-                                      ).format("DD MMMM YYYY")}
+                                      ).format("DD MMMM  YYYY")}
                                 </td>
                               </tr>
                             ) : (
@@ -13739,334 +14865,15 @@ const ImportDashboardEditDetails = ({
                                         </span>
                                       </div>
                                       <div
+                                        className="tableEditorData"
                                         dangerouslySetInnerHTML={{
                                           __html: Description
                                             ? Description
                                             : applicationDetail?.analystDescription,
                                         }}
-                                      />
-                                    </td>
-                                  </tr>
-                                </table>
-                              </td>
-                            </tr>
-                            <tr>
-                              <td colSpan="2">&nbsp;</td>
-                            </tr>
-                            <tr>
-                              <td
-                                colSpan="2"
-                                style={{
-                                  color: "#000",
-                                  fontSize: "18px",
-                                  fontWeight: "400",
-                                }}
-                              >
-                                <span
-                                  style={{
-                                    color: "#000",
-                                    fontSize: "18px",
-                                    fontWeight: "400",
-                                    display: "inline-block",
-                                  }}
-                                >
-                                  Yours Sincerely,
-                                </span>
-                                <img
-                                  src={
-                                    applicationDetail?.getUserData?.filePath
-                                      ? applicationDetail?.getUserData.filePath
-                                      : NoSign
-                                  }
-                                  alt="Signature"
-                                  style={{
-                                    width: "120px",
-                                    height: "50px",
-                                    display: "block",
-                                    objectFit: "contain",
-                                  }}
-                                />
-                                <p
-                                  style={{
-                                    marginBottom: "0px",
-                                    color: "#000",
-                                    fontSize: "14px",
-                                    fontWeight: "400",
-                                    padding: "15px 0px 3px",
-                                    lineHeight: "13px",
-                                  }}
-                                >
-                                  {PdfUsername
-                                    ? PdfUsername.replace(/"/g, "")
-                                    : "N/A"}
-                                </p>
-                                <p
-                                  style={{
-                                    marginBottom: "0px",
-                                    color: "#000",
-                                    fontSize: "14px",
-                                    fontWeight: "400",
-                                    padding: "5px 0px",
-                                    lineHeight: "13px",
-                                  }}
-                                >
-                                  {PdfRolename
-                                    ? PdfRolename.replace(/"/g, "")
-                                    : "N/A"}
-                                </p>
-                                <h3
-                                  style={{
-                                    color: "#000",
-                                    fontSize: "18px",
-                                    fontWeight: "800",
-                                  }}
-                                >
-                                  EXCHANGE &nbsp; CONTROL
-                                </h3>
-                                <div
-                                  style={{
-                                    marginBottom: "0px",
-                                    color: "#000",
-                                    fontSize: "18px",
-                                    fontWeight: "400",
-                                    padding: "25px 0px 5px",
-                                    lineHeight: "13px",
-                                    display: "flex",
-                                  }}
-                                >
-                                  {applicationDetail?.copiedResponses?.length >
-                                  0 ? (
-                                    <>
-                                      <p
                                         style={{
-                                          marginBottom: "0px",
-                                          fontSize: "18px",
-                                          fontWeight: "400",
-                                          paddingRight: "10px",
-                                        }}
-                                      >
-                                        CC:
-                                      </p>
-                                      <div>
-                                        {selectedBanks?.map((item) => {
-                                          return (
-                                            <p
-                                              style={{
-                                                marginBottom: "3px",
-
-                                                fontSize: "18px",
-                                                fontWeight: "400",
-                                              }}
-                                            >
-                                              {item.name}
-                                            </p>
-                                          );
-                                        })}
-                                      </div>
-                                    </>
-                                  ) : (
-                                    ""
-                                  )}
-                                </div>
-                              </td>
-                            </tr>
-                          </table>
-                        </td>
-                      </tr>
-                    </table>
-                  </div>
-                </div>
-              </div>
-              {/* pdf-preview data end */}
-
-              {/* Covering letter data start Arun Verma */}
-              <div className="login_inner" style={{ display: "none" }}>
-                <div className="login_form_panel" style={{ display: "none" }}>
-                  <div
-                    ref={CoverigLetterRef}
-                    className="p-5"
-                    style={{ position: "relative" }}
-                  >
-                    <table width="100%">
-                      <tr>
-                        <td
-                          style={{
-                            marginBottom: "0px",
-                            color: "#000",
-                            fontSize: "18px",
-                            fontWeight: "800",
-                          }}
-                        >
-                          Exchange &nbsp; Control &nbsp; Ref
-                          <br />
-                          Previous &nbsp; Exchange &nbsp; Control &nbsp; Ref
-                        </td>
-                        <td>
-                          <p
-                            style={{
-                              marginBottom: "0px",
-                              color: "#000",
-                              fontSize: "18px",
-                              textAlign: "left",
-                              fontWeight: "800",
-                            }}
-                          >
-                            : {applicationDetail?.rbzReferenceNumber}
-                            <br />: N/A
-                          </p>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td colSpan="2">&nbsp;</td>
-                      </tr>
-                      <tr>
-                        <td
-                          colSpan="2"
-                          style={{
-                            color: "#000",
-                            fontSize: "18px",
-                            fontWeight: "600",
-                          }}
-                        >
-                          {moment(
-                            applicationDetail?.applicationSubmittedDate
-                          ).format("DD MMMM YYYY")}
-                        </td>
-                      </tr>
-                      <tr>
-                        <td colSpan="2">&nbsp;</td>
-                      </tr>
-                      <tr>
-                        <td
-                          colSpan="2"
-                          style={{
-                            color: "#000",
-                            fontSize: "18px",
-                            fontWeight: "600",
-                          }}
-                        >
-                          The Head - Exchange Control
-                          <br />
-                          Reserve Bank of Zimbabwe
-                          <br />
-                          80 Samora Machel Avenue
-                          <br />
-                          P.O. Box 1283
-                          <br />
-                          Harare
-                          <br />
-                          <span
-                            style={{
-                              borderBottom: "1px solid #000",
-                              fontWeight: "800",
-                              fontSize: "18px",
-                            }}
-                            className="text-uppercase"
-                          >
-                            Zimbabwe
-                          </span>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td colSpan="2">&nbsp;</td>
-                      </tr>
-                      <tr>
-                        <td
-                          colSpan="2"
-                          style={{
-                            color: "#000",
-                            fontSize: "18px",
-                            fontWeight: "600",
-                          }}
-                        >
-                          Dear Sir/Madam,
-                        </td>
-                      </tr>
-                      <tr>
-                        <td colSpan="2">&nbsp;</td>
-                      </tr>
-                      <tr>
-                        <td colSpan="2">
-                          <table width="100%">
-                            <tr>
-                              <td colSpan="2">
-                                <p
-                                  style={{
-                                    color: "#000",
-                                    fontSize: "18px",
-                                    fontWeight: "800",
-                                    borderBottom: "1px solid #000",
-                                    marginBottom: "0px",
-                                  }}
-                                >
-                                  RE &nbsp;:&nbsp;{" "}
-                                  {applicationDetail?.applicationType}
-                                </p>
-                              </td>
-                            </tr>
-                            <tr>
-                              <td colSpan="2">&nbsp;</td>
-                            </tr>
-
-                            <tr>
-                              <td
-                                style={{
-                                  color: "#000",
-                                  fontSize: "18px",
-                                  fontWeight: "400",
-                                }}
-                              >
-                                Date Submitted
-                              </td>
-                              <td
-                                style={{
-                                  color: "#000",
-                                  fontSize: "18px",
-                                  fontWeight: "800",
-                                }}
-                              >
-                                :{" "}
-                                {moment(
-                                  applicationDetail?.applicationSubmittedDate
-                                ).format("DD MMMM YYYY")}
-                              </td>
-                            </tr>
-                          </table>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td colSpan="2">&nbsp;</td>
-                      </tr>
-                      <tr>
-                        <td colSpan="2">
-                          <table>
-                            <tr>
-                              <td colSpan="2">
-                                <table width="100%">
-                                  <tr>
-                                    <td
-                                      style={{
-                                        color: "#000",
-                                        fontSize: "18px",
-                                        fontWeight: "400",
-                                      }}
-                                    >
-                                      <div>
-                                        <span
-                                          style={{
-                                            fontWeight: "800",
-                                            padding: "15px 0px 15px",
-                                          }}
-                                        >
-                                          Notes &nbsp;/&nbsp; Description
-                                        </span>
-                                      </div>
-                                      <div
-                                        dangerouslySetInnerHTML={{
-                                          __html: asignnextLeveldata
-                                            ? // ? asignnextLeveldata.Notes
-                                              Description
-                                            : "",
+                                          paddingBottom: "60px",
+                                          letterSpacing: "0.01px",
                                         }}
                                       />
                                     </td>
@@ -14119,10 +14926,11 @@ const ImportDashboardEditDetails = ({
                                     fontWeight: "400",
                                     padding: "15px 0px 3px",
                                     lineHeight: "13px",
+                                    letterSpacing: "0.01px",
                                   }}
                                 >
                                   {PdfUsername
-                                    ? PdfUsername.replace(/"/g, "")
+                                    ? PdfUsername?.replace(/"/g, "")
                                     : "N/A"}
                                 </p>
                                 <p
@@ -14133,10 +14941,11 @@ const ImportDashboardEditDetails = ({
                                     fontWeight: "400",
                                     padding: "5px 0px",
                                     lineHeight: "13px",
+                                    letterSpacing: "0.01px",
                                   }}
                                 >
                                   {PdfRolename
-                                    ? PdfRolename.replace(/"/g, "")
+                                    ? PdfRolename?.replace(/"/g, "")
                                     : "N/A"}
                                 </p>
                                 <h3
@@ -14146,8 +14955,55 @@ const ImportDashboardEditDetails = ({
                                     fontWeight: "800",
                                   }}
                                 >
-                                  {applicationDetail?.bankName}
+                                  EXCHANGE &nbsp; CONTROL
                                 </h3>
+                                <div
+                                  style={{
+                                    marginBottom: "0px",
+                                    color: "#000",
+                                    fontSize: "18px",
+                                    fontWeight: "400",
+                                    padding: "25px 0px 5px",
+                                    lineHeight: "13px",
+                                    display: "flex",
+                                  }}
+                                >
+                                  
+                                  {applicationDetail?.copiedResponses?.length || selectedBanks?.length >
+                                  0 ? (
+                                    <>
+                                      <p
+                                        style={{
+                                          marginBottom: "0px",
+                                          fontSize: "18px",
+                                          fontWeight: "400",
+                                          paddingRight: "10px",
+                                          letterSpacing: "0.01px",
+                                        }}
+                                      >
+                                        CC:
+                                      </p>
+                                      <div>
+                                        {selectedBanks.map((item) => {
+                                          return (
+                                            <p
+                                              style={{
+                                                marginBottom: "3px",
+                                                letterSpacing: "0.01px",
+                                                fontSize: "18px",
+                                                fontWeight: "400",
+                                              }}
+                                            >
+                                              {item.name}
+                                            </p>
+                                          );
+                                        })}
+                                      </div>
+                                    </>
+                                  ) : (
+                                    ""
+                                  )}
+                                </div>
                               </td>
                             </tr>
                           </table>
@@ -14157,12 +15013,11 @@ const ImportDashboardEditDetails = ({
                   </div>
                 </div>
               </div>
-              {/* cover letter data end Arun Verma */}
 
               <div className="login_inner" style={{ display: "none" }}>
                 <div className="login_form_panel" style={{ display: "none" }}>
                   <div
-                    ref={PdfPrivewRef}
+                    ref={PdfPrivewsupervisorRef}
                     className="p-5"
                     style={{ position: "relative" }}
                   >
@@ -14188,6 +15043,7 @@ const ImportDashboardEditDetails = ({
                               fontSize: "18px",
                               textAlign: "left",
                               fontWeight: "800",
+                              letterSpacing: "0.01px",
                             }}
                           >
                             : {applicationDetail?.rbzReferenceNumber}
@@ -14205,6 +15061,7 @@ const ImportDashboardEditDetails = ({
                             color: "#000",
                             fontSize: "18px",
                             fontWeight: "600",
+                            letterSpacing: "0.01px",
                           }}
                         >
                           {moment(
@@ -14222,30 +15079,45 @@ const ImportDashboardEditDetails = ({
                             color: "#000",
                             fontSize: "18px",
                             fontWeight: "600",
+                            letterSpacing: "0.01px",
                           }}
                         >
                           The Head - Exchange Control
                           <br />
-                          {applicationDetail?.bankName}
-                          <br />
-                          {applicationDetail?.bankAddress1 != null ||
-                          applicationDetail?.bankAddress1 != ""
-                            ? applicationDetail?.bankAddress1 + "," + " "
+                          {applicationDetail?.bankName
+                            ? applicationDetail?.bankName
                             : ""}
-                          {applicationDetail?.bankAddress2 != null ||
-                          applicationDetail?.bankAddress2 != ""
-                            ? applicationDetail?.bankAddress2 + "," + " "
-                            : ""}
-                          {applicationDetail?.bankAddress3 != null ||
-                          applicationDetail?.bankAddress3 != ""
-                            ? applicationDetail?.bankAddress3
-                            : ""}
-                          <br />
-                          <span
+                          {applicationDetail?.bankName == null ? (
+                            <span>
+                              Reserve Bank of Zimbabwe. 80 Samora Machel Avenue,{" "}
+                              <br /> P.O. Box 1283, Harare, Zimbabwe.
+                            </span>
+                          ) : (
+                            <>
+                              <br />
+                              {applicationDetail?.bankAddress1 == null ||
+                              applicationDetail?.bankAddress1 == ""
+                                ? ""
+                                : applicationDetail?.bankAddress1 + "," + " "}
+                              <br></br>
+                              {applicationDetail?.bankAddress2 == null ||
+                              applicationDetail?.bankAddress2 == ""
+                                ? ""
+                                : applicationDetail?.bankAddress2 + "," + " "}
+                              <br></br>
+                              {applicationDetail?.bankAddress3 != null ||
+                              applicationDetail?.bankAddress3 != ""
+                                ? applicationDetail?.bankAddress3
+                                : ""}
+                              <br />
+                            </>
+                          )}
+                          {/* <span
                             style={{
                               borderBottom: "1px solid #000",
                               fontWeight: "800",
                               fontSize: "18px",
+                              letterSpacing: "0.01px"
                             }}
                             className="text-uppercase"
                           >
@@ -14253,7 +15125,7 @@ const ImportDashboardEditDetails = ({
                             applicationDetail?.bankCity != ""
                               ? applicationDetail?.bankCity
                               : ""}
-                          </span>
+                          </span> */}
                         </td>
                       </tr>
                       <tr>
@@ -14266,17 +15138,22 @@ const ImportDashboardEditDetails = ({
                             color: "#000",
                             fontSize: "18px",
                             fontWeight: "600",
+                            letterSpacing: "0.01px",
                           }}
                         >
                           Dear{" "}
-                          {applicationDetail?.applicantType == 1
+                          {/* {applicationDetail?.applicantType == 1
                             ? applicationDetail?.companyName
                             : applicationDetail?.applicantType == 2
                             ? applicationDetail?.name
                             : applicationDetail?.applicantType == 3
                             ? applicationDetail?.agencyName
-                            : " "}
-                          ,
+                            : " "} */}
+                          {applicationDetail?.companyName == null ||
+                          applicationDetail?.companyName == ""
+                            ? applicationDetail?.name
+                            : applicationDetail?.companyName}
+                          {console.log(applicationDetail)},
                         </td>
                       </tr>
                       <tr>
@@ -14294,6 +15171,7 @@ const ImportDashboardEditDetails = ({
                                     fontWeight: "800",
                                     borderBottom: "1px solid #000",
                                     marginBottom: "0px",
+                                    letterSpacing: "0.01px",
                                   }}
                                 >
                                   RE &nbsp;:&nbsp;{" "}
@@ -14304,7 +15182,7 @@ const ImportDashboardEditDetails = ({
                             <tr>
                               <td colSpan="2">&nbsp;</td>
                             </tr>
-                            <tr>
+                            {/* <tr>
                               <td
                                 style={{
                                   color: "#000",
@@ -14319,14 +15197,16 @@ const ImportDashboardEditDetails = ({
                                   color: "#000",
                                   fontSize: "18px",
                                   fontWeight: "800",
+                                  letterSpacing: "0.01px"
                                 }}
                               >
                                 :{" "}
-                                {applicationDetail?.companyName != null
-                                  ? applicationDetail?.companyName
-                                  : applicationDetail?.name}
+                                {applicationDetail?.companyName == null || applicationDetail?.companyName == ""
+                                  ? applicationDetail?.name
+                                  : applicationDetail?.companyName} 
+                                  {console.log(applicationDetail)}
                               </td>
-                            </tr>
+                            </tr> */}
                             <tr>
                               <td
                                 style={{
@@ -14342,6 +15222,7 @@ const ImportDashboardEditDetails = ({
                                   color: "#000",
                                   fontSize: "18px",
                                   fontWeight: "800",
+                                  letterSpacing: "0.01px",
                                 }}
                               >
                                 :{" "}
@@ -14350,188 +15231,6 @@ const ImportDashboardEditDetails = ({
                                 ).format("DD MMMM  YYYY")}
                               </td>
                             </tr>
-                            <tr>
-                              <td
-                                style={{
-                                  color: "#000",
-                                  fontSize: "18px",
-                                  fontWeight: "400",
-                                }}
-                              >
-                                Currency and Amount
-                              </td>
-                              <td
-                                style={{
-                                  color: "#000",
-                                  fontSize: "18px",
-                                  fontWeight: "800",
-                                }}
-                              >
-                                :{" "}
-                                <span
-                                  style={{
-                                    minWidth: "45px",
-                                    display: "inline-block",
-                                    paddingRight: "5px",
-                                    fontWeight: "800",
-                                  }}
-                                >
-                                  {applicationDetail?.currencyCode}
-                                </span>
-                                <span
-                                  style={{
-                                    fontSize: "18px",
-                                    fontWeight: "800",
-                                  }}
-                                >
-                                  {applicationDetail?.amount}
-                                </span>
-                              </td>
-                            </tr>
-                            <tr>
-                              <td
-                                style={{
-                                  color: "#000",
-                                  fontSize: "18px",
-                                  fontWeight: "400",
-                                }}
-                              >
-                                USD &nbsp; Equivalent
-                              </td>
-                              <td
-                                style={{
-                                  color: "#000",
-                                  fontSize: "18px",
-                                  fontWeight: "800",
-                                }}
-                              >
-                                :{" "}
-                                <span
-                                  style={{
-                                    minWidth: "45px",
-                                    display: "inline-block",
-                                    paddingRight: "5px",
-                                    fontWeight: "800",
-                                  }}
-                                >
-                                  USD
-                                </span>
-                                <span
-                                  style={{
-                                    fontSize: "18px",
-                                    fontWeight: "800",
-                                  }}
-                                >
-                                  {applicationDetail?.usdEquivalent}
-                                </span>
-                              </td>
-                            </tr>
-                            <tr>
-                              <td
-                                style={{
-                                  color: "#000",
-                                  fontSize: "18px",
-                                  fontWeight: "400",
-                                }}
-                              >
-                                Status/Decision
-                              </td>
-                              <td
-                                style={{
-                                  color: "#000",
-                                  fontSize: "18px",
-                                  fontWeight: "800",
-                                }}
-                              >
-                                : {applicationDetail?.statusName}
-                              </td>
-                            </tr>
-                            <tr>
-                              <td
-                                style={{
-                                  color: "#000",
-                                  fontSize: "18px",
-                                  fontWeight: "400",
-                                }}
-                              >
-                                Expiry Date
-                              </td>
-                              <td
-                                style={{
-                                  color: "#000",
-                                  fontSize: "18px",
-                                  fontWeight: "800",
-                                }}
-                              >
-                                :{" "}
-                                {applicationDetail?.expiringDate == null ||
-                                applicationDetail?.expiringDate == "" ||
-                                applicationDetail?.expiringDate ==
-                                  "0001-01-01T00:00:00"
-                                  ? "N/A"
-                                  : moment(
-                                      applicationDetail?.expiringDate
-                                    ).format("DD MMMM YYYY")}
-                              </td>
-                            </tr>
-                            <tr>
-                              <td
-                                style={{
-                                  fontSize: "18px",
-                                  fontWeight: "400",
-                                  color: "#000",
-                                }}
-                              >
-                                Returns Frequency
-                              </td>
-                              <td
-                                style={{
-                                  color: "#000",
-                                  fontSize: "18px",
-                                  fontWeight: "800",
-                                }}
-                              >
-                                :{" "}
-                                {applicationDetail?.returnFrequencyName ==
-                                  null ||
-                                applicationDetail?.returnFrequencyName == ""
-                                  ? "N/A"
-                                  : applicationDetail?.returnFrequencyName}
-                              </td>
-                            </tr>
-                            {applicationDetail?.returnFrequencyName ==
-                            "Once" ? (
-                              <tr>
-                                <td
-                                  style={{
-                                    fontSize: "18px",
-                                    fontWeight: "400",
-                                    color: "#000",
-                                  }}
-                                >
-                                  Returns Date
-                                </td>
-                                <td
-                                  style={{
-                                    color: "#000",
-                                    fontSize: "18px",
-                                    fontWeight: "800",
-                                  }}
-                                >
-                                  :{" "}
-                                  {applicationDetail?.returnDate == null ||
-                                  applicationDetail?.returnDate == "" ||
-                                  applicationDetail?.returnDate ==
-                                    "0001-01-01T00:00:00"
-                                    ? "N/A"
-                                    : moment(
-                                        applicationDetail?.returnDate
-                                      ).format("DD MMMM  YYYY")}
-                                </td>
-                              </tr>
-                            ) : (
-                              ""
-                            )}
                           </table>
                         </td>
                       </tr>
@@ -14559,14 +15258,19 @@ const ImportDashboardEditDetails = ({
                                             padding: "15px 0px 15px",
                                           }}
                                         >
-                                          Response &nbsp;/&nbsp; Conditions
+                                          Description
                                         </span>
                                       </div>
                                       <div
+                                        className="tableEditorData"
                                         dangerouslySetInnerHTML={{
                                           __html: Description
                                             ? Description
                                             : applicationDetail?.analystDescription,
+                                        }}
+                                        style={{
+                                          paddingBottom: "60px",
+                                          letterSpacing: "0.01px",
                                         }}
                                       />
                                     </td>
@@ -14594,6 +15298,7 @@ const ImportDashboardEditDetails = ({
                                     display: "inline-block",
                                   }}
                                 >
+                                  {" "}
                                   Yours Sincerely,
                                 </span>
                                 <img
@@ -14618,10 +15323,11 @@ const ImportDashboardEditDetails = ({
                                     fontWeight: "400",
                                     padding: "15px 0px 3px",
                                     lineHeight: "13px",
+                                    letterSpacing: "0.01px",
                                   }}
                                 >
                                   {PdfUsername
-                                    ? PdfUsername.replace(/"/g, "")
+                                    ? PdfUsername?.replace(/"/g, "")
                                     : "N/A"}
                                 </p>
                                 <p
@@ -14632,10 +15338,11 @@ const ImportDashboardEditDetails = ({
                                     fontWeight: "400",
                                     padding: "5px 0px",
                                     lineHeight: "13px",
+                                    letterSpacing: "0.01px",
                                   }}
                                 >
                                   {PdfRolename
-                                    ? PdfRolename.replace(/"/g, "")
+                                    ? PdfRolename?.replace(/"/g, "")
                                     : "N/A"}
                                 </p>
                                 <h3
@@ -14658,7 +15365,7 @@ const ImportDashboardEditDetails = ({
                                     display: "flex",
                                   }}
                                 >
-                                  {applicationDetail?.copiedResponses?.length >
+                                 {applicationDetail?.copiedResponses?.length || selectedBanks?.length >
                                   0 ? (
                                     <>
                                       <p
@@ -14667,17 +15374,18 @@ const ImportDashboardEditDetails = ({
                                           fontSize: "18px",
                                           fontWeight: "400",
                                           paddingRight: "10px",
+                                          letterSpacing: "0.01px",
                                         }}
                                       >
                                         CC:
                                       </p>
                                       <div>
-                                        {selectedBanks?.map((item) => {
+                                        {selectedBanks.map((item) => {
                                           return (
                                             <p
                                               style={{
                                                 marginBottom: "3px",
-
+                                                letterSpacing: "0.01px",
                                                 fontSize: "18px",
                                                 fontWeight: "400",
                                               }}

@@ -26,7 +26,7 @@ const ImportNewRequestForm = () => {
     applicantTypes,
     sectorData,
     masterBank,
-    Supervisors,
+    ImpSupervisors,
     countries,
   } = ExportformDynamicField();
 
@@ -438,7 +438,7 @@ const ImportNewRequestForm = () => {
       valid = false;
     }
     if (ImportForm.applicationType === "") {
-      newErrors.applicationType = "Application type is required";
+      newErrors.applicationType = "Nature of Application is required";
       valid = false;
     }
     if (checkSupervisor === true && selectuserRole === "" && roleID == 4) {
@@ -1187,7 +1187,7 @@ const ImportNewRequestForm = () => {
                           ></Column>
                           <Column
                             field="applicationType"
-                            header="Application Type"
+                            header="Nature of Application"
                             style={{ minWidth: "250px" }}
                           ></Column>
                           <Column
@@ -1430,7 +1430,7 @@ const ImportNewRequestForm = () => {
         )}
 
         <div className="inner_form_new ">
-          <label className="controlform">Application Type</label>
+          <label className="controlform">Nature of Application</label>
           <div className="form-bx">
             <label>
               <select
@@ -1445,7 +1445,7 @@ const ImportNewRequestForm = () => {
                     : ""
                 }
               >
-                <option value="">Select Application Type</option>
+                <option value="">Select Nature of Application</option>
                 {applicationType?.map((item, ind) => {
                   return (
                     <option key={item.id} value={item.id}>
@@ -1795,7 +1795,7 @@ const ImportNewRequestForm = () => {
                   <option value="" selected>
                     Select Bank Supervisor
                   </option>
-                  {Supervisors?.map((item, index) => {
+                  {ImpSupervisors?.map((item, index) => {
                     return (
                       <option key={index} value={item.userID}>
                         {item.name}

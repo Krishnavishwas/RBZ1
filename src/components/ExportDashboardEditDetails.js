@@ -1716,7 +1716,7 @@ useEffect(() => {
       roleID == 5 &&
       checkSupervisor == true
     ) {
-      newErrors.assignUserID = "User is required--";
+      newErrors.assignUserID = "User is required";
       valid = false;
     }
     if (getFrequencyID == "0" && IsReturn == "1" && roleID >= 5) {
@@ -1743,6 +1743,7 @@ useEffect(() => {
     }
     if (nextlevelvalue == "" && roleID == 3 && supervisordecision == false) {
       newErrors.supervisoraction = "Action is required";
+      valid = false;
     }
     if (
       (Description == "" || Description == "<p></p>") &&
@@ -1769,7 +1770,7 @@ useEffect(() => {
         roleID == 3 &&
         nextlevelvalue != "20")
     ) {
-      newErrors.Description = "Description is required-11";
+      newErrors.Description = "Description is required";
       valid = false;
     }
     if (
@@ -1893,7 +1894,7 @@ useEffect(() => {
     return valid;
   };
   //console.log("--t", AssignUserID == "" , nextlevelvalue == "20" , nextlevelvalue == "10"  ,  checkSupervisor == true)
-
+console.log("supervisordecision", supervisordecision)
   console.log("AssignUserID", AssignUserID);
   console.log("nextlevelvalue", nextlevelvalue);
   // const onShow = () => {
@@ -1980,7 +1981,7 @@ useEffect(() => {
     if (validateForm()) {
       setSubmitBtnLoader(true);
       await axios
-        .post(APIURL + "ExportApplication/UpdateExportApplications", {
+        .post(APIURL + "ExportApplication/UpdateExportApplicationss", {
           RBZReferenceNumber: applicationDetail?.rbzReferenceNumber,
           ID: applicationDetail?.id,
           DepartmentID: "2",
@@ -14799,8 +14800,7 @@ useEffect(() => {
                     </>
                   ) : (
                     ""
-                  )}
-
+                  )} 
                   <button
                     type="button"
                     // onClick={(e) => { (asignnextLeveldata.Notes ==""  || asignnextLeveldata.Comment =="") && roleID == 3 ? closePopupHandle() :
@@ -14824,7 +14824,8 @@ useEffect(() => {
                       (nextlevelvalue == "" && roleID == 5) ||
                       ((applicationstaus == "0" || applicationstaus == "") &&
                         roleID == 5) ||
-                      SubmitBtnLoader == true
+                      SubmitBtnLoader == true ||
+                      (applicationstaus == "0" && nextlevelvalue =="" && roleID >= 5)
                         ? true
                         : false
                     }
@@ -14920,20 +14921,20 @@ useEffect(() => {
                           <br />
                           {applicationDetail?.bankName}
                           <br />
-                          {applicationDetail?.bankAddress1 != null ||
-                          applicationDetail?.bankAddress1 != ""
-                            ? applicationDetail?.bankAddress1 + "," + " "
-                            : ""}
+                          {applicationDetail?.bankAddress1 == null ||
+                          applicationDetail?.bankAddress1 == ""
+                            ? ""
+                            : applicationDetail?.bankAddress1 + "," + " "}
                           <br></br>
-                          {applicationDetail?.bankAddress2 != null ||
-                          applicationDetail?.bankAddress2 != ""
-                            ? applicationDetail?.bankAddress2 + "," + " "
-                            : ""}
+                          {applicationDetail?.bankAddress2 == null ||
+                          applicationDetail?.bankAddress2 == ""
+                            ? ""
+                            : applicationDetail?.bankAddress2 + "," + " "}
                           <br></br>
-                          {applicationDetail?.bankAddress3 != null ||
-                          applicationDetail?.bankAddress3 != ""
-                            ? applicationDetail?.bankAddress3
-                            : ""}
+                          {applicationDetail?.bankAddress3 == null ||
+                          applicationDetail?.bankAddress3 == ""
+                            ? ""
+                            : applicationDetail?.bankAddress3}
                           <br />
                           {/* <span
                             style={{
@@ -15404,7 +15405,7 @@ useEffect(() => {
                                     display: "flex",
                                   }}
                                 >
-                                  {applicationDetail?.copiedResponses?.length >
+                                  {applicationDetail?.copiedResponses?.length || selectedBanks?.length >
                                   0 ? (
                                     <>
                                       <p
@@ -15520,22 +15521,23 @@ useEffect(() => {
                         >
                           The Head - Exchange Control
                           <br />
-                          {applicationDetail?.bankName}
+                          
+                            {applicationDetail?.bankName}
                           <br />
-                          {applicationDetail?.bankAddress1 != null ||
-                          applicationDetail?.bankAddress1 != ""
-                            ? applicationDetail?.bankAddress1 + "," + " "
-                            : ""}
+                          {applicationDetail?.bankAddress1 == null ||
+                          applicationDetail?.bankAddress1 == ""
+                            ? ""
+                            : applicationDetail?.bankAddress1 + "," + " "}
                           <br></br>
-                          {applicationDetail?.bankAddress2 != null ||
-                          applicationDetail?.bankAddress2 != ""
-                            ? applicationDetail?.bankAddress2 + "," + " "
-                            : ""}
+                          {applicationDetail?.bankAddress2 == null ||
+                          applicationDetail?.bankAddress2 == ""
+                            ? ""
+                            : applicationDetail?.bankAddress2 + "," + " "}
                           <br></br>
-                          {applicationDetail?.bankAddress3 != null ||
-                          applicationDetail?.bankAddress3 != ""
-                            ? applicationDetail?.bankAddress3
-                            : ""}
+                          {applicationDetail?.bankAddress3 == null ||
+                          applicationDetail?.bankAddress3 == ""
+                            ? ""
+                            : applicationDetail?.bankAddress3}
                           <br />
                         </td>
                       </tr>
@@ -15965,20 +15967,20 @@ useEffect(() => {
                           ) : (
                             <>
                               <br />
-                              {applicationDetail?.bankAddress1 != null ||
-                              applicationDetail?.bankAddress1 != ""
-                                ? applicationDetail?.bankAddress1 + "," + " "
-                                : ""}
+                              {applicationDetail?.bankAddress1 == null ||
+                              applicationDetail?.bankAddress1 == ""
+                                ? ""
+                                : applicationDetail?.bankAddress1 + "," + " "}
                               <br></br>
-                              {applicationDetail?.bankAddress2 != null ||
-                              applicationDetail?.bankAddress2 != ""
-                                ? applicationDetail?.bankAddress2 + "," + " "
-                                : ""}
+                              {applicationDetail?.bankAddress2 == null ||
+                              applicationDetail?.bankAddress2 == ""
+                                ? ""
+                                : applicationDetail?.bankAddress2 + "," + " "}
                               <br></br>
-                              {applicationDetail?.bankAddress3 != null ||
-                              applicationDetail?.bankAddress3 != ""
-                                ? applicationDetail?.bankAddress3
-                                : ""}
+                              {applicationDetail?.bankAddress3 == null ||
+                              applicationDetail?.bankAddress3 == ""
+                                ? ""
+                                : applicationDetail?.bankAddress3}
                               <br />
                             </>
                           )}
@@ -16450,7 +16452,8 @@ useEffect(() => {
                                     display: "flex",
                                   }}
                                 >
-                                  {applicationDetail?.copiedResponses?.length >
+                                  
+                                  {applicationDetail?.copiedResponses?.length || selectedBanks?.length >
                                   0 ? (
                                     <>
                                       <p
@@ -16846,7 +16849,7 @@ useEffect(() => {
                                     display: "flex",
                                   }}
                                 >
-                                  {applicationDetail?.copiedResponses?.length >
+                                 {applicationDetail?.copiedResponses?.length || selectedBanks?.length >
                                   0 ? (
                                     <>
                                       <p
