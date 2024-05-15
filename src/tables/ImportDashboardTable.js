@@ -202,6 +202,14 @@ const ImportDashboardTable = () => {
     setshowDelegateModal(true);
   };
 
+  useEffect(() => {
+    setapplicationstaus(
+      applicationDetail?.analystRecommendation
+        ? applicationDetail?.analystRecommendation
+        : "0"
+    );
+  }, [applicationDetail]);
+
   const GetRoleHandle = async (id) => {
     setUserrole([]);
     await axios
@@ -365,7 +373,7 @@ const ImportDashboardTable = () => {
               ? // ? parseInt(roleID) - 1
                 value
               : roleID,
-              DepartmentID:"3",
+          DepartmentID: "3",
           UserID: useId.replace(/"/g, ""),
         })
         .then((res) => {
@@ -427,7 +435,7 @@ const ImportDashboardTable = () => {
     axios
       .post(APIURL + "User/GetUsersByRoleID", {
         RoleID: roleID,
-        DepartmentID:"3",
+        DepartmentID: "3",
         UserID: useId.replace(/"/g, ""),
       })
       .then((res) => {
@@ -499,6 +507,118 @@ const ImportDashboardTable = () => {
     setDelegateComment("");
     setDelegateNote("");
     setSelectedAppliation(null);
+  };
+
+  // OLD
+  const [showOldModal, setShowOldModal] = useState(false);
+  const [oldApplicationDetail, setOldApplicationDetail] = useState({});
+  const [oldNoDataComment, setOldNoDataComment] = useState([]);
+  const [oldAllcomment, setOldAllcomment] = useState([]);
+  const [oldTatHistory, setOldTatHistory] = useState([]);
+  const [oldActiondata, setOldActiondata] = useState([]);
+  const [oldResponceCount, setOldResponceCount] = useState([]);
+  const [showOldDataLoader, setShowOldDataLoader] = useState(false);
+
+  const handleOldClose = () => setShowOldModal(false);
+
+  const handleOldViewData = (id) => {
+    setShowOldModal(true);
+  };
+
+  const GetOldHandelDetail = async (id) => {
+    setShowOldDataLoader(true);
+    await axios
+      .post(APIURL + "ImportApplication/GetImportRequestInfoByApplicationID", {
+        ID: id,
+      })
+      .then((res) => {
+        if (res.data.responseCode === "200") {
+          setOldApplicationDetail(res.data.responseData);
+          setTimeout(() => {
+            setShowOldDataLoader(false);
+          }, 2000);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+
+    await axios
+      .post(APIURL + "ImportApplication/GetImportCommentsInfoByRoleID", {
+        ApplicationID: id,
+      })
+      .then((res) => {
+        if (res.data.responseCode == 200) {
+          setOldNoDataComment(res.data.responseData);
+        } else {
+          setOldNoDataComment([]);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+
+    await axios
+      .post(APIURL + "ImportApplication/GetNewCommentsImport", {
+        ID: id,
+      })
+      .then((res) => {
+        if (res.data.responseCode == 200) {
+          setOldAllcomment(res.data.responseData);
+        } else {
+          setOldAllcomment([]);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+
+    await axios
+      .post(APIURL + "ImportApplication/GetImportApplicationHistory", {
+        ID: id,
+      })
+      .then((res) => {
+        if (res.data.responseCode == 200) {
+          setOldTatHistory(res.data.responseData);
+        } else {
+          setOldTatHistory([]);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+
+    await axios
+      .post(APIURL + "ImportApplication/GetActionsByApplicationID", {
+        ID: id,
+      })
+      .then((res) => {
+        if (res.data.responseCode == 200) {
+          setOldActiondata(res.data.responseData);
+        } else {
+          setOldActiondata([]);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  const GetOldApplicationCount = async (id) => {
+    await axios
+      .post(APIURL + "ImportApplication/CountByApplicationIDImport", {
+        ApplicationID: id,
+      })
+      .then((res) => {
+        if (res.data.responseCode == 200) {
+          setOldResponceCount(res.data.responseData);
+        } else {
+          setOldResponceCount({});
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
 
   return (
@@ -643,13 +763,53 @@ const ImportDashboardTable = () => {
                 <div className="login_form ">
                   <h5>
                     <Modal.Header closeButton className="p-0">
-                      <Modal.Title>
-                        Edit Import Request --{" "}
-                        <big>
-                          {applicationDetail?.rbzReferenceNumber
-                            ? applicationDetail?.rbzReferenceNumber
-                            : ""}
-                        </big>
+                      <Modal.Title style={{ width: "100%" }}>
+                        <div className="row">
+                          <div
+                            className={
+                              applicationDetail?.parentApplicationID == 0
+                                ? "col-md-12"
+                                : "col-md-6"
+                            }
+                            style={{ alignItems: "center" }}
+                          >
+                            Edit Import Request --{" "}
+                            <big>
+                              {applicationDetail?.rbzReferenceNumber
+                                ? applicationDetail.rbzReferenceNumber
+                                : ""}
+                            </big>
+                          </div>
+                          <div
+                            className={
+                              (applicationDetail &&
+                              applicationDetail?.parentApplicationID == 0)
+                                ? "d-none"
+                                : "col-md-6 text-center"
+                            }
+                          >
+                            <button
+                              className={
+                                applicationDetail?.parentApplicationID
+                                  ? "btn btn-light viewcopybtn"
+                                  : "d-none"
+                              }
+                              onClick={() => {
+                                handleOldViewData(
+                                  applicationDetail?.parentApplicationID
+                                );
+                                GetOldHandelDetail(
+                                  applicationDetail?.parentApplicationID
+                                );
+                                GetOldApplicationCount(
+                                  applicationDetail?.parentApplicationID
+                                );
+                              }}
+                            >
+                              View Old Application
+                            </button>
+                          </div>
+                        </div>
                       </Modal.Title>
                     </Modal.Header>
                   </h5>
@@ -685,6 +845,42 @@ const ImportDashboardTable = () => {
                       supervisorHangechangeRole={supervisorHangechangeRole}
                       setSupervisorRoleId={setSupervisorRoleId}
                       noDataComment={noDataComment}
+                    />
+                  </Modal.Body>
+                </div>
+              </div>
+            </div>
+          </Modal>
+
+          <Modal
+            show={showOldModal}
+            onHide={handleOldClose}
+            backdrop="static"
+            className="max-width-600 oldModal-full"
+          >
+            <div className="application-box">
+              <div className="login_inner">
+                <div className="login_form ">
+                  <h5>
+                    <Modal.Header closeButton className="p-0">
+                      <Modal.Title>
+                        View Old Export Request --{" "}
+                        <big>{oldApplicationDetail?.rbzReferenceNumber}</big>
+                      </Modal.Title>
+                    </Modal.Header>
+                  </h5>
+                </div>
+                <div className="login_form_panel">
+                  <Modal.Body className="p-0">
+                    <ImportDashboardViewDetails
+                      applicationDetail={oldApplicationDetail}
+                      handleFormClose={handleOldClose}
+                      allcomment={oldAllcomment}
+                      tatHistory={oldTatHistory}
+                      Actiondata={oldActiondata}
+                      noDataComment={oldNoDataComment}
+                      showdataLoader={showOldDataLoader}
+                      responceCount={oldResponceCount}
                     />
                   </Modal.Body>
                 </div>

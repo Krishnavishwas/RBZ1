@@ -64,6 +64,7 @@ const SubApplicationTypeTable = () => {
     // application api start with dpt id start
     const [applicationData, setApplicationData] = useState([])
     const application_Data = async () => {
+ 
         const depy_data = {
             "DepartmentID": applicationSubTypeForm.depID ? applicationSubTypeForm.depID : updateData?.departmentID
         }
@@ -228,6 +229,7 @@ const SubApplicationTypeTable = () => {
 
     }
     
+
     // sub application list api start
     const table_Data = async () => {
         const deptID = {

@@ -507,81 +507,103 @@ const ExportDashboardRenewEditDetails = ({
     }
   };
 
-  const HandleDateExpiryOption = (e) => {
-    const { name, value } = e.target;
-    setDateExpiryOption(e.target.value);
-    setdefaultnoExpiry(value);
-    if (value == 0) {
-      setDateExpirydisplay("");
-      if (dateExpirydisplayRef.current) dateExpirydisplayRef.current.value = "";
-      if (optionExpirydisplayRef.current) optionExpirydisplayRef.current = "";
-    }
-  };
+  const HandleDateCurrRate = (e) => { 
+    axios
+      .post(APIURL + "Master/GetRateByCurrencyID", {
+        Id: applicationDetail.currency,
+      })
+      .then((res) => {
+        if (res.data.responseCode == "200") {
+          setCurrate(res.data.responseData.currencyRate);
+        } else {
+          setCurrate([]);
+          console.log(res.data.responseMessage);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      }); 
+};
+useEffect(()=>{
+  HandleDateCurrRate()
+},[curRate])
+ 
 
-  const HandleIsReturnOption = (e) => {
-    const { name, value } = e.target;
-    setIsReturnOption(e.target.value);
-    setIsReturn(value);
-    if (value == 0) {
-      setIsReturndisplay("");
-      setIsReturnExpiringDate(new Date());
-      setGetFrequencyID("");
-      if (FrequencyRef.current) FrequencyRef.current.value = "";
-      if (FrequencyDateRef.current) FrequencyDateRef.current = "";
-    } else {
-      axios
-        .post(APIURL + "Master/GetAllFrequencies")
-        .then((res) => {
-          if (res.data.responseCode == 200) {
-            setAllFrequency(res.data.responseData);
-          } else {
-            setAllFrequency([]);
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    }
-  };
+  // const HandleDateExpiryOption = (e) => {
+  //   const { name, value } = e.target;
+  //   setDateExpiryOption(e.target.value);
+  //   setdefaultnoExpiry(value);
+  //   if (value == 0) {
+  //     setDateExpirydisplay("");
+  //     if (dateExpirydisplayRef.current) dateExpirydisplayRef.current.value = "";
+  //     if (optionExpirydisplayRef.current) optionExpirydisplayRef.current = "";
+  //   }
+  // };
 
-  const SelectReturnFrequency = (e) => {
-    const { name, value } = e.target;
-    if (value == 1) {
-      setGetFrequencyID(value);
-      setIsReturnExpiringDate(new Date());
-    } else {
-      setGetFrequencyID(value);
-      setIsReturnExpiringDate(new Date());
-    }
-  };
+  // const HandleIsReturnOption = (e) => {
+  //   const { name, value } = e.target;
+  //   setIsReturnOption(e.target.value);
+  //   setIsReturn(value);
+  //   if (value == 0) {
+  //     setIsReturndisplay("");
+  //     setIsReturnExpiringDate(new Date());
+  //     setGetFrequencyID("");
+  //     if (FrequencyRef.current) FrequencyRef.current.value = "";
+  //     if (FrequencyDateRef.current) FrequencyDateRef.current = "";
+  //   } else {
+  //     axios
+  //       .post(APIURL + "Master/GetAllFrequencies")
+  //       .then((res) => {
+  //         if (res.data.responseCode == 200) {
+  //           setAllFrequency(res.data.responseData);
+  //         } else {
+  //           setAllFrequency([]);
+  //         }
+  //       })
+  //       .catch((err) => {
+  //         console.log(err);
+  //       });
+  //   }
+  // };
 
-  const handleshareFileChange = (e, id) => {
-    const file = e.target.files[0];
-    const index = userfiles?.findIndex((item) => item.id === id);
-    if (index !== -1) {
-      setsharefile((prevFiles) => {
-        const newFiles = [...prevFiles];
-        newFiles[index] = { file, id };
-        return newFiles;
-      });
-    } else {
-      setsharefile((prevFiles) => [...prevFiles, { file, id }]);
-    }
-  };
+  // const SelectReturnFrequency = (e) => {
+  //   const { name, value } = e.target;
+  //   if (value == 1) {
+  //     setGetFrequencyID(value);
+  //     setIsReturnExpiringDate(new Date());
+  //   } else {
+  //     setGetFrequencyID(value);
+  //     setIsReturnExpiringDate(new Date());
+  //   }
+  // };
 
-  const handlesharefileAddMore = (e) => {
-    setOthersharefile([...othersharefile, null]);
-  };
+  // const handleshareFileChange = (e, id) => {
+  //   const file = e.target.files[0];
+  //   const index = userfiles?.findIndex((item) => item.id === id);
+  //   if (index !== -1) {
+  //     setsharefile((prevFiles) => {
+  //       const newFiles = [...prevFiles];
+  //       newFiles[index] = { file, id };
+  //       return newFiles;
+  //     });
+  //   } else {
+  //     setsharefile((prevFiles) => [...prevFiles, { file, id }]);
+  //   }
+  // };
 
-  const removeshareImage = (index, id) => {
-    const updatedShareFile = sharefile?.filter((item) => item.id !== id);
-    setsharefile(updatedShareFile);
-  };
+  // const handlesharefileAddMore = (e) => {
+  //   setOthersharefile([...othersharefile, null]);
+  // };
 
-  const removeUserImage = (index, id) => {
-    const updatedUserFile = userfiles?.filter((item) => item.id !== id);
-    setuserFiles(updatedUserFile);
-  };
+  // const removeshareImage = (index, id) => {
+  //   const updatedShareFile = sharefile?.filter((item) => item.id !== id);
+  //   setsharefile(updatedShareFile);
+  // };
+
+  // const removeUserImage = (index, id) => {
+  //   const updatedUserFile = userfiles?.filter((item) => item.id !== id);
+  //   setuserFiles(updatedUserFile);
+  // };
 
   const removefileImage = (label) => {
     const updatedUserFile = files?.filter((item, i) => item?.label != label);
@@ -2031,13 +2053,14 @@ const ExportDashboardRenewEditDetails = ({
                           ref={rateRef}
                           type="text"
                           name="rate"
-                          value={
-                            applicationDetail?.currency
-                              ? curRate
-                                ? curRate
-                                : applicationDetail.rate
-                              : "Rate"
-                          }
+                          value={curRate}
+                          // value={
+                          //   applicationDetail?.currency
+                          //     ? curRate
+                          //       ? curRate
+                          //       : applicationDetail.rate
+                          //     : "Rate"
+                          // }
                           onChange={(e) => {
                             changeHandelForm(e);
                           }}
@@ -2487,6 +2510,7 @@ const ExportDashboardRenewEditDetails = ({
                         border: "0px",
                       }}
                     >
+                      {/* <i className="bi bi-forward"></i> */}
                       <span style={{ fontWeight: "500" }}> {items.name} </span>
                     </label>
                     <div className="browse-btn">

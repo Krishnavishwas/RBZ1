@@ -447,7 +447,9 @@ const ExportDashboardViewDetails = ({
                   </label>
                 </div>
               </div>
-            
+              {/* end form-bx  */}
+
+              {/* {applicationDetail?.sectorName ? ( */}
               <div className="inner_form_new ">
                 <label className="controlform">Sector</label>
                 <div className="form-bx">
@@ -461,7 +463,11 @@ const ExportDashboardViewDetails = ({
                   </label>
                 </div>
               </div>
-              
+              {/* ) : (
+                ""
+              )} */}
+
+              {/* {applicationDetail?.subSectorName ? ( */}
               <div className="inner_form_new">
                 <label className="controlform">Subsector</label>
                 <div className="form-bx">
@@ -475,6 +481,9 @@ const ExportDashboardViewDetails = ({
                   </label>
                 </div>
               </div>
+              {/* ) : (
+                ""
+              )} */}
 
               <div className="inner_form_new ">
                 <label className="controlform">Applicant Comments</label>
@@ -493,6 +502,8 @@ const ExportDashboardViewDetails = ({
                 </div>
               </div>
 
+              {/* {applicationDetail?.assignedToName &&
+              applicationDetail.assignedToRoleName ? ( */}
               <div
                 class={
                   applicationDetail?.applicationStatus == 0 ? "d-none" : "row"
@@ -537,6 +548,9 @@ const ExportDashboardViewDetails = ({
                   </div>
                 </div>
               </div>
+              {/* ) : (
+                 ""
+               )} */}
 
               <h5 className="section_top_subheading mt-3">Attachments</h5>
               {(applicationDetail?.fileName || applicationDetail?.filePath) &&

@@ -1,9 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import ExportformDynamicField from "./ExportformDynamicField";
+import MultiSelectComponent from "./SearchUI/MultiSelectComponent";
 import { Storage } from "../login/Storagesetting";
 import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
+// import "react-datepicker/dist/react-datepicker.css";
 import axios from "axios";
 import { APIURL, ImageAPI } from "../constant";
 import moment from "moment";
@@ -13,7 +14,7 @@ import UpdatePopupMessage from "./UpdatePopupMessage";
 import "react-quill/dist/quill.snow.css";
 import logo from "../rbz_LOGO.png";
 import NoSign from "../NoSign.png";
-import { MultiSelect } from "primereact/multiselect";
+
 import jsPDF from "jspdf";
 
 /* Tiptp Editor Starts */
@@ -29,6 +30,8 @@ import TextAlign from "@tiptap/extension-text-align";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 /* Tiptp Editor Ends */
+
+// import MultiSelect from "react-multi-select-component";
 
 const ExportDashboardEditDetails = ({
   applicationDetail,
@@ -64,7 +67,10 @@ const ExportDashboardEditDetails = ({
   const CustomTableCell = TableCell.extend({
     addAttributes() {
       return {
+        // extend the existing attributes …
         ...this.parent?.(),
+
+        // and add a new one …
         backgroundColor: {
           default: null,
           parseHTML: (element) => element.getAttribute("data-background-color"),
@@ -122,6 +128,7 @@ const ExportDashboardEditDetails = ({
   const PdfRolename = Storage.getItem("roleName");
   const bankidcheck = bankID !== "" ? "1" : "3";
   const roleID = Storage.getItem("roleIDs");
+
   const userSign = Storage.getItem("signImageURL");
 
   const navigate = useNavigate();
@@ -218,6 +225,7 @@ const ExportDashboardEditDetails = ({
   });
   const [DateExpiryOption, setDateExpiryOption] = useState("");
   const [defaultnoExpiry, setdefaultnoExpiry] = useState("0");
+
   const [IsReturnOption, setIsReturnOption] = useState("");
   const [AllFrequency, setAllFrequency] = useState([]);
   const [getFrequencyID, setGetFrequencyID] = useState("0");
@@ -226,10 +234,12 @@ const ExportDashboardEditDetails = ({
   const [IsReturnExpiringDate, setIsReturnExpiringDate] = useState(new Date());
   const [DateExpirydisplay, setDateExpirydisplay] = useState("");
   const [curRate, setCurrate] = useState();
+
   const [userRoleRecordofficer, setuserRoleRecordofficer] = useState([]);
   const [selectuserRoleRecordofficer, setselectuserRoleRecordofficer] =
     useState("");
   const [getalluser, setGetalluser] = useState([]);
+
   const [getBlankFile, setgetBlankFile] = useState([]);
   const [viewShareFile, setviewShareFile] = useState([]);
   const [geninfoFile, setgeninfoFile] = useState([]);
@@ -243,6 +253,8 @@ const ExportDashboardEditDetails = ({
   const ChangeApplicationStatus = (e) => {
     const values = e.target.value;
     setapplicationstaus(values);
+    // setAsignUser([]);
+    // setAssignUserID("");
   };
 
   const handleUserRole = (e) => {
@@ -534,6 +546,13 @@ const ExportDashboardEditDetails = ({
         >
           <i class="bi bi-list-ol"></i>
         </button>
+        {/* <button
+          type="button"
+          onClick={() => editor.chain().focus().toggleCodeBlock().run()}
+          className={editor.isActive('codeBlock') ? 'is-active' : ''}
+        >
+          code block
+        </button> */}
         <button
           type="button"
           title="Blockquote"
@@ -633,11 +652,11 @@ const ExportDashboardEditDetails = ({
       StarterKit.configure({
         bulletList: {
           keepMarks: true,
-          keepAttributes: false,
+          keepAttributes: false, // TODO : Making this as `false` becase marks are not preserved when I try to preserve attrs, awaiting a bit of help
         },
         orderedList: {
           keepMarks: true,
-          keepAttributes: false,
+          keepAttributes: false, // TODO : Making this as `false` becase marks are not preserved when I try to preserve attrs, awaiting a bit of help
         },
       }),
     ],
@@ -685,11 +704,11 @@ const ExportDashboardEditDetails = ({
       StarterKit.configure({
         bulletList: {
           keepMarks: true,
-          keepAttributes: false,
+          keepAttributes: false, // TODO : Making this as `false` becase marks are not preserved when I try to preserve attrs, awaiting a bit of help
         },
         orderedList: {
           keepMarks: true,
-          keepAttributes: false,
+          keepAttributes: false, // TODO : Making this as `false` becase marks are not preserved when I try to preserve attrs, awaiting a bit of help
         },
       }),
     ],
@@ -726,11 +745,11 @@ const ExportDashboardEditDetails = ({
       StarterKit.configure({
         bulletList: {
           keepMarks: true,
-          keepAttributes: false,
+          keepAttributes: false, // TODO : Making this as `false` becase marks are not preserved when I try to preserve attrs, awaiting a bit of help
         },
         orderedList: {
           keepMarks: true,
-          keepAttributes: false,
+          keepAttributes: false, // TODO : Making this as `false` becase marks are not preserved when I try to preserve attrs, awaiting a bit of help
         },
       }),
     ],
@@ -767,11 +786,11 @@ const ExportDashboardEditDetails = ({
       StarterKit.configure({
         bulletList: {
           keepMarks: true,
-          keepAttributes: false,
+          keepAttributes: false, // TODO : Making this as `false` becase marks are not preserved when I try to preserve attrs, awaiting a bit of help
         },
         orderedList: {
           keepMarks: true,
-          keepAttributes: false,
+          keepAttributes: false, // TODO : Making this as `false` becase marks are not preserved when I try to preserve attrs, awaiting a bit of help
         },
       }),
     ],
@@ -808,11 +827,11 @@ const ExportDashboardEditDetails = ({
       StarterKit.configure({
         bulletList: {
           keepMarks: true,
-          keepAttributes: false,
+          keepAttributes: false, // TODO : Making this as `false` becase marks are not preserved when I try to preserve attrs, awaiting a bit of help
         },
         orderedList: {
           keepMarks: true,
-          keepAttributes: false,
+          keepAttributes: false, // TODO : Making this as `false` becase marks are not preserved when I try to preserve attrs, awaiting a bit of help
         },
       }),
     ],
@@ -849,11 +868,11 @@ const ExportDashboardEditDetails = ({
       StarterKit.configure({
         bulletList: {
           keepMarks: true,
-          keepAttributes: false,
+          keepAttributes: false, // TODO : Making this as `false` becase marks are not preserved when I try to preserve attrs, awaiting a bit of help
         },
         orderedList: {
           keepMarks: true,
-          keepAttributes: false,
+          keepAttributes: false, // TODO : Making this as `false` becase marks are not preserved when I try to preserve attrs, awaiting a bit of help
         },
       }),
     ],
@@ -867,6 +886,7 @@ const ExportDashboardEditDetails = ({
     const value = e.target.value;
     setSupervisorRoleId("");
     setSupervisorRoleId("");
+
     setnextlevelvalue(value);
     setAsignUser([]);
   };
@@ -916,6 +936,9 @@ const ExportDashboardEditDetails = ({
             setgetBlankFile(res.data.responseData);
           } else {
             setgetBlankFile([]);
+            // setFiles([]);
+            // setOtherfiles([]);
+            // setOtherfilesupload([]);
           }
         });
     }
@@ -1062,6 +1085,10 @@ const ExportDashboardEditDetails = ({
       newErrors.applicationPurpose = "First character cannot be a blank space";
       valid = false;
     }
+    //  else if (name == "applicationPurpose" && specialChars.test(value.charAt(0))) {
+    //   newErrors.applicationPurpose = "Special characters not allowed";
+    //   valid = false;
+    // }
     else if (name == "applicant" && value.charAt(0) === " ") {
       newErrors.applicant = "First character cannot be a blank space";
       valid = false;
@@ -1148,7 +1175,9 @@ const ExportDashboardEditDetails = ({
         [name]: value,
       }));
     }
+
     setErrors(newErrors);
+
     if (name === "sector") {
       axios
         .post(APIURL + "Master/GetSubSectorBySectorID", {
@@ -1170,6 +1199,7 @@ const ExportDashboardEditDetails = ({
     if (name == "subSector") {
       setchecksectorchange(false);
     }
+
     if (name === "currency" && value != "") {
       axios
         .post(APIURL + "Master/GetRateByCurrencyID", {
@@ -1212,6 +1242,7 @@ const ExportDashboardEditDetails = ({
     const { name, value } = e.target;
     setDateExpiryOption(e.target.value);
     setdefaultnoExpiry(value);
+
     if (value == 0) {
       setDateExpirydisplay("");
       if (dateExpirydisplayRef.current) dateExpirydisplayRef.current.value = "";
@@ -1223,6 +1254,7 @@ const ExportDashboardEditDetails = ({
     const { name, value } = e.target;
     setIsReturnOption(e.target.value);
     setIsReturn(value);
+
     if (value == 0) {
       setIsReturndisplay("");
       setIsReturnExpiringDate(new Date());
@@ -1246,6 +1278,7 @@ const ExportDashboardEditDetails = ({
   };
   const SelectReturnFrequency = (e) => {
     const { name, value } = e.target;
+
     if (value == 1) {
       setGetFrequencyID(value);
       setIsReturnExpiringDate(new Date());
@@ -1291,7 +1324,6 @@ const ExportDashboardEditDetails = ({
   const clearInputFile = (index) => {
     if (fileInputRefs[index].current) fileInputRefs[index].current.value = "";
   };
-
   const clearInputFileother = (index) => {
     if (fileInputRefsother[index]?.current)
       fileInputRefsother[index].current.value = "";
@@ -1334,6 +1366,7 @@ const ExportDashboardEditDetails = ({
             } else {
               var footerImage = "";
             }
+
             const addHeader = (doc) => {
               if (roleID != 3) {
                 const pageCount = doc.internal.getNumberOfPages();
@@ -1406,6 +1439,7 @@ const ExportDashboardEditDetails = ({
                 doc.setGState(new doc.GState({ opacity: 0.4 }));
                 doc.setFont("helvetica", "normal");
                 doc.setFontSize(80);
+                //doc.text("PREVIEW", 50, 150, {align: 'center', baseline: 'middle'})
                 doc.text(
                   doc.internal.pageSize.width / 3,
                   doc.internal.pageSize.height / 2,
@@ -1459,6 +1493,7 @@ const ExportDashboardEditDetails = ({
     const specialCharsnote = /[!@#$%^*|<>]/;
     let newErrors = {};
     let valid = true;
+
     if (name == "Notes" && value.charAt(0) === " ") {
       newErrors.Notes = "First character cannot be a blank space";
       valid = false;
@@ -1523,6 +1558,7 @@ const ExportDashboardEditDetails = ({
 
   const handleuserByrecordOfficer = (e) => {
     const value = e.target.value;
+
     if (value == "") {
       setAssignUserID("");
       setSupervisorRoleId("");
@@ -1627,13 +1663,13 @@ const ExportDashboardEditDetails = ({
         console.log(err);
       });
   };
-
   useEffect(() => {
     handleFIleview();
   }, [applicationDetail]);
 
   const HandelSupervisorcheck = () => {
     setcheckSupervisor(!checkSupervisor);
+    //Temporary Solution  later we will pass 0
     if (roleID == 3 && checkSupervisor == true) {
       setAssignUserID("0");
     } else if (roleID == 3 && checkSupervisor == false) {
@@ -1646,6 +1682,7 @@ const ExportDashboardEditDetails = ({
 
   const getNextvaluesupervisor = (e) => {
     const value = e.target.checked;
+
     if (value == false) {
       setnextlevelvalue("");
     }
@@ -1655,6 +1692,7 @@ const ExportDashboardEditDetails = ({
   const validateForm = () => {
     let valid = true;
     const newErrors = {};
+
     if (applicationDetail.applicationPurpose === "") {
       newErrors.applicationPurpose = "Purpose of the application is required";
       valid = false;
@@ -1713,7 +1751,9 @@ const ExportDashboardEditDetails = ({
       newErrors.Description = "Description is required";
       valid = false;
     }
+
     if (
+      //  (checkSupervisor == false && nextlevelvalue == "" &&  roleID == 3 && Description == "<p></p>") ||
       Description == null ||
       (Description == "<p></p>" &&
         roleID == 3 &&
@@ -1740,6 +1780,7 @@ const ExportDashboardEditDetails = ({
       newErrors.Descsupervisruser = "User is required";
       valid = false;
     }
+
     if (
       bankID == "" &&
       registerusertype === "3" &&
@@ -1755,10 +1796,28 @@ const ExportDashboardEditDetails = ({
       newErrors.applicant = "Applicant name is required";
       valid = false;
     }
+    // if (
+    //   asignnextLeveldata.Notes === "" &&
+    //   (AssignUserID == "" || AssignUserID == null) &&
+    //   roleID >= 5
+    // ) {
+    //   newErrors.Notes = "Notes is required";
+    //   valid = false;
+    // }
+    // if (
+    //   asignnextLeveldata.Comment === "" &&
+    //   (AssignUserID == "" || AssignUserID == null) &&
+    //   roleID >= 5
+    // ) {
+    //   newErrors.Comment = "Comments is required";
+    //   valid = false;
+    // }
+
     if (AssignUserID == "" && checkSupervisor == true && roleID == 2) {
       newErrors.assignedTo = "Bank Supervisor is required";
       valid = false;
     }
+
     if (
       selectuserRoleRecordofficer == "" &&
       checkSupervisor == true &&
@@ -1771,14 +1830,17 @@ const ExportDashboardEditDetails = ({
       newErrors.AssignUserID = "User is required";
       valid = false;
     }
+
     if (
       DateExpirydisplay == 0 &&
       DateExpiryOption == 1 &&
+      // roleID == "5" &&
       (ExpiringDate === "" || ExpiringDate == null)
     ) {
       newErrors.ExpiringDate = "Expiry Date is required";
       valid = false;
     }
+
     if (
       IsReturn == 1 &&
       getFrequencyID == 1 &&
@@ -1823,23 +1885,35 @@ const ExportDashboardEditDetails = ({
       newErrors.assignedTo = "Bank supervisor is required";
       valid = false;
     }
+
+    // if(files.length < attachmentData.length){
+    //   newErrors.files = "All Files Required";
+    //   valid = false;
+    // }
+
     setErrors(newErrors);
     return valid;
   };
-  
-  const onShow = () => {
-    setTimeout(() => {
-      let selectAllCheckbox = document.querySelector(
-        ".p-multiselect-header > .p-multiselect-select-all"
-      );
-      if (selectAllCheckbox) {
-        let selectAllSpan = document.createElement("span");
-        selectAllSpan.className = "select_all";
-        selectAllSpan.textContent = "Select All";
-        selectAllCheckbox.after(selectAllSpan);
-      }
-    }, 0);
-  };
+  //console.log("--t", AssignUserID == "" , nextlevelvalue == "20" , nextlevelvalue == "10"  ,  checkSupervisor == true)
+
+  console.log("AssignUserID", AssignUserID);
+  console.log("nextlevelvalue", nextlevelvalue);
+  // const onShow = () => {
+  //   setTimeout(() => {
+  //     let selectAllCheckbox = document.querySelector(
+  //       ".p-multiselect-header > .p-multiselect-select-all"
+  //     );
+  //     if (selectAllCheckbox) {
+  //       // Create a new span element
+  //       let selectAllSpan = document.createElement("span");
+  //       selectAllSpan.className = "select_all";
+  //       selectAllSpan.textContent = "Select All";
+
+  //       // Append the span after the select all checkbox
+  //       selectAllCheckbox.after(selectAllSpan);
+  //     }
+  //   }, 0);
+  // };
 
   const filtertin_bpn = companies?.find((company) => {
     if (company.id === getCompanyName?.value) {
@@ -1876,6 +1950,7 @@ const ExportDashboardEditDetails = ({
     if (BeneficiaryNameRef.current) BeneficiaryNameRef.current.value = "";
     if (applicantReferenceNumberRef.current)
       applicantReferenceNumberRef.current.value = "";
+    // if(applicantYearRef.current) applicantYearRef.current.value = '';
     if (applicationTypeRef.current) applicationTypeRef.current.value = "";
     if (assignedToRef.current) assignedToRef.current.value = "";
     if (companyNameRef.current) companyNameRef.current.value = "";
@@ -1899,6 +1974,7 @@ const ExportDashboardEditDetails = ({
 
   // Code start for save form
   const HandleSubmit = async (e) => {
+    // setSubmitBtnLoader(true);
     e.preventDefault();
     let formData = new FormData();
     let shareformData = new FormData();
@@ -1913,11 +1989,20 @@ const ExportDashboardEditDetails = ({
           UserID: UserID.replace(/"/g, ""),
           RoleID: roleID,
           AssignedTo:
+            // checkSupervisor == true
+            //   ? AssignUserID
+            //     ? AssignUserID
+            //     : UserID.replace(/"/g, "")
+            //   : UserID.replace(/"/g, "")
+
+            // AssignUserID ? AssignUserID : UserID.replace(/"/g, ""),
+
             roleID >= 3 && AssignUserID == ""
               ? ""
               : AssignUserID
               ? AssignUserID
               : UserID.replace(/"/g, ""),
+
           BankID: applicationDetail?.bankID,
           CompanyID:
             (applicationDetail?.applicantType == "1" ||
@@ -1929,6 +2014,10 @@ const ExportDashboardEditDetails = ({
               : "",
           ApplicationPurpose: applicationDetail?.applicationPurpose,
           UserTypeID: applicationDetail?.userTypeID,
+          // Name: applicationDetail?.userTypeID == "1" && applicationDetail?.bankID !==""
+          // ? getCompanyName ? getCompanyName :  applicationDetail?.companyName
+          // : applicationDetail?.userTypeID == "2" && applicationDetail?.bankID !== ""
+          // ? applicationDetail?.name : "",
           Name: applicationDetail?.name,
           BeneficiaryName: applicationDetail?.beneficiaryName,
           BPNCode:
@@ -1956,6 +2045,12 @@ const ExportDashboardEditDetails = ({
             ? startDate
             : applicationDetail?.applicationDate,
           Comment: asignnextLeveldata.Comment,
+          // AssignedToRoleID: SupervisorRoleId
+          //   ? SupervisorRoleId
+          //   : AssignUserID && SupervisorRoleId == ""
+          //   ? parseInt(roleID) + 1
+          //   : roleID,
+
           AssignedToRoleID: SupervisorRoleId
             ? SupervisorRoleId
             : AssignUserID && SupervisorRoleId == "" && nextlevelvalue != "20"
@@ -1994,17 +2089,21 @@ const ExportDashboardEditDetails = ({
             if (roleID == 2 || roleID == 4 || roleID == 5) {
               setupdatepopup(true);
             }
+
+            // setupdatepopup(true);
             if (
               (AssignUserID == "" || AssignUserID == null) &&
               roleID != 5 &&
               roleID != 2 &&
               roleID != 4
             ) {
+              //When application gets closed by bank supervisor
               setTimeout(() => {
                 const doc = new jsPDF({
                   format: "a4",
                   unit: "pt",
                 });
+
                 axios
                   .post(APIURL + "Admin/GetBankByID", {
                     id: applicationDetail?.bankID,
@@ -2039,6 +2138,7 @@ const ExportDashboardEditDetails = ({
                       }
 
                       const addFooters = (doc) => {
+                        //if (roleID != 3) {
                         const pageCount = doc.internal.getNumberOfPages();
                         const footerpositionfromleft =
                           doc.internal.pageSize.width - 10;
@@ -2057,6 +2157,45 @@ const ExportDashboardEditDetails = ({
                             }
                           );
                         }
+                        //} else {
+                        // if (footerImage != "") {
+                        //   const footerpositionfromTop =
+                        //     doc.internal.pageSize.height - 90;
+                        //   const pageCount = doc.internal.getNumberOfPages();
+
+                        //   var pagewidth = doc.internal.pageSize.width;
+                        //   if (pagewidth > footerImagewidth) {
+                        //     var diff =
+                        //       parseInt(pagewidth) -
+                        //       parseInt(footerImagewidth);
+                        //     var positionLeftFooter = parseInt(diff / 2);
+                        //   } else {
+                        //     var positionLeftFooter = 250;
+                        //   }
+
+                        //   for (var i = 1; i <= pageCount; i++) {
+                        //     doc.setPage(i);
+                        //     doc.addImage(
+                        //       footerImage,
+                        //       "png",
+                        //       positionLeftFooter,
+                        //       footerpositionfromTop,
+                        //       150,
+                        //       80,
+                        //       "Footer",
+                        //       "NONE",
+                        //       0
+                        //     );
+                        //   }
+                        // }
+
+                        /*const footerpositionfromTop = doc.internal.pageSize.height-90;
+                          const pageCount = doc.internal.getNumberOfPages();
+                          for (var i = 1; i <= pageCount; i++) {
+                            doc.setPage(i)
+                            doc.addImage(footerImage, 'png', 230, footerpositionfromTop, 150, 80, 'DMS-RBZ','NONE', 0)
+                          }*/
+                        //}
                       };
 
                       const addHeader = (doc) => {
@@ -2121,6 +2260,12 @@ const ExportDashboardEditDetails = ({
                             doc.setFontSize(20);
                             doc.text("Final Letter", 250, 40);
                           }
+
+                          /*const pageCount = doc.internal.getNumberOfPages();
+                          for (var i = 1; i <= pageCount; i++) {
+                            doc.setPage(i)
+                            doc.addImage(headerImage, 'png', 250, 10, 80, 80, 'DMS-RBZ2','NONE', 0)                                            
+                          }*/
                         }
                       };
 
@@ -2139,6 +2284,7 @@ const ExportDashboardEditDetails = ({
                           pagebreak: true,
                           async callback(doc) {
                             addHeader(doc);
+                            //addFooters(doc);
                             const blobPDF = doc.output("datauristring");
                             let formData = new FormData();
 
@@ -2166,10 +2312,16 @@ const ExportDashboardEditDetails = ({
                                 } else {
                                   setupdatepopup(true);
                                 }
+                                // setSupervisorRoleId("");
+                                // setupdatepopup(true);
+                                //   setSubmitBtnLoader(false);
+                                // setAssignUserID("");
+                                // setselectuserRoleRecordofficer("");
                               })
                               .catch((error) =>
                                 console.log("DATA SAVE ERROR--", error)
                               );
+                            //doc.save('result');
                           },
                         })
                         .then(async (response) => {
@@ -2178,8 +2330,10 @@ const ExportDashboardEditDetails = ({
                         .catch((error) => console.log("pdferror--", error));
                     }
                   });
+                // setBtnLoader(false);
               }, 1500);
             } else {
+              //When application moved to next step
               if (roleID == 3 && nextlevelvalue == "10") {
                 setTimeout(async () => {
                   const doc = new jsPDF({
@@ -2206,6 +2360,7 @@ const ExportDashboardEditDetails = ({
                         } else {
                           var headerImage = "";
                         }
+                        //console.log('FooterData---',response.data.responseData.headerFooterData['1']);
                         if (
                           response.data.responseData?.headerFooterData["1"]
                             ?.fileType == "FooterFile"
@@ -2302,6 +2457,7 @@ const ExportDashboardEditDetails = ({
                             pagebreak: true,
                             async callback(doc) {
                               addHeader(doc);
+                              //addFooters(doc);
                               const blobPDF = doc.output("datauristring");
                               let formData = new FormData();
                               formData.append(
@@ -2335,6 +2491,7 @@ const ExportDashboardEditDetails = ({
                                 .catch((error) =>
                                   console.log("DATA SAVE ERROR--", error)
                                 );
+                              //doc.save('coveringletter');
                             },
                           })
                           .then(async (response) => {
@@ -2354,6 +2511,7 @@ const ExportDashboardEditDetails = ({
             const fileupload = userfiles.length > 0 ? userfiles : files;
 
             for (let i = 0; i < fileupload?.length; i++) {
+              // Corrected loop condition
               formData.append("files", fileupload[i].file);
               formData.append("Label", fileupload[i].label);
             }
@@ -2384,7 +2542,11 @@ const ExportDashboardEditDetails = ({
               .catch((error) => {
                 console.log("error", error);
               });
+
+            // sharefileupload
+
             for (let i = 0; i < sharefile?.length; i++) {
+              // Corrected loop condition
               shareformData.append("files", sharefile[i].file);
               shareformData.append("fileInfoID", sharefile[i].fileInfoID);
             }
@@ -2402,12 +2564,21 @@ const ExportDashboardEditDetails = ({
               .catch((err) => {
                 console.log("sharefile Upload ", err);
               });
+
             handleData();
+
+            // setSupervisorRoleId("");
+            // setupdatepopup(true);
+            //   setSubmitBtnLoader(false);
+            // setAssignUserID("");
+            // setselectuserRoleRecordofficer("");
           } else {
             toast.error(res.data.responseMessage);
+            // setSubmitBtnLoader(false);
           }
         })
         .catch((err) => {
+          // setSubmitBtnLoader(false);
           console.log(err);
         });
     } else {
@@ -2415,6 +2586,7 @@ const ExportDashboardEditDetails = ({
         toast.warning("Please fill all mandatory fields");
       }
       setToastDisplayed(true);
+      // setSubmitBtnLoader(false);
     }
   };
   // End code for save form
@@ -2430,6 +2602,7 @@ const ExportDashboardEditDetails = ({
   const handleInputChangecompany = (input) => {
     setInputValue(input);
     if (input?.length >= 3) {
+      // Filter options when input length is at least 3 characters
       const filteredOptions = companies
         ?.filter((company) =>
           company?.companyName?.toLowerCase().includes(input.toLowerCase())
@@ -2440,6 +2613,7 @@ const ExportDashboardEditDetails = ({
         }));
       setOptions(filteredOptions?.length > 0 ? filteredOptions : []);
     } else {
+      // Reset options when input length is less than 3 characters
       setOptions([]);
     }
   };
@@ -3475,7 +3649,6 @@ const ExportDashboardEditDetails = ({
                             border: "0px",
                           }}
                         >
-                          {/* <i className="bi bi-forward"></i> */}
                           <span style={{ fontWeight: "500" }}>
                             {" "}
                             {items.name}{" "}
@@ -3737,12 +3910,6 @@ const ExportDashboardEditDetails = ({
                                     aria-controls="home"
                                     aria-selected="true"
                                   >
-                                    {/* {index == 0
-                ? "Recent"
-                : `Response ${
-                    cur?.applicationActivityData.length -
-                    index
-                  }`} */}
                                     Response{" "}
                                     {cur?.applicationActivityData?.length -
                                       index}
@@ -6104,16 +6271,10 @@ const ExportDashboardEditDetails = ({
                         <label className="controlform">CC To</label>
                         <div className=" cccto">
                           <div className="flex justify-content-center multiSelect">
-                            <MultiSelect
-                              value={selectedBanks}
-                              onChange={(e) => setSelectedBanks(e.value)}
-                              options={vOption}
-                              optionLabel="name"
-                              onShow={onShow}
-                              placeholder="Select Banks"
-                              // maxSelectedLabels={3}
-                              className="w-full md:w-20rem"
-                              display="chip"
+                            <MultiSelectComponent
+                              selectedBanks={selectedBanks}
+                              setSelectedBanks={setSelectedBanks}
+                              vOption={vOption}
                             />
 
                             {/* <MultiSelect
@@ -7887,16 +8048,21 @@ const ExportDashboardEditDetails = ({
                         <label className="controlform">CC To</label>
                         <div className=" cccto">
                           <div className="flex justify-content-center multiSelect">
-                            <MultiSelect
-                              value={selectedBanks}
-                              onChange={(e) => setSelectedBanks(e.value)}
-                              options={vOption}
-                              onShow={onShow}
-                              optionLabel="name"
-                              placeholder="Select Banks"
-                              // maxSelectedLabels={3}
-                              display="chip"
-                              className="w-full md:w-20rem"
+                            {/* <MultiSelect
+                                value={selectedBanks}
+                                onChange={(e) => setSelectedBanks(e.value)}
+                                options={vOption}
+                                onShow={onShow}
+                                optionLabel="name"
+                                placeholder="Select Banks"
+                                // maxSelectedLabels={3}
+                                display="chip"
+                                className="w-full md:w-20rem"
+                              /> */}
+                            <MultiSelectComponent
+                              selectedBanks={selectedBanks}
+                              setSelectedBanks={setSelectedBanks}
+                              vOption={vOption}
                             />
 
                             {/* <MultiSelect
@@ -9678,16 +9844,21 @@ const ExportDashboardEditDetails = ({
                         <label className="controlform">CC To</label>
                         <div className=" cccto">
                           <div className="flex justify-content-center multiSelect">
-                            <MultiSelect
-                              value={selectedBanks}
-                              onChange={(e) => setSelectedBanks(e.value)}
-                              options={vOption}
-                              onShow={onShow}
-                              optionLabel="name"
-                              placeholder="Select Banks"
-                              // maxSelectedLabels={3}
-                              display="chip"
-                              className="w-full md:w-20rem"
+                            {/* <MultiSelect
+                                value={selectedBanks}
+                                onChange={(e) => setSelectedBanks(e.value)}
+                                options={vOption}
+                                onShow={onShow}
+                                optionLabel="name"
+                                placeholder="Select Banks"
+                                // maxSelectedLabels={3}
+                                display="chip"
+                                className="w-full md:w-20rem"
+                              /> */}
+                            <MultiSelectComponent
+                              selectedBanks={selectedBanks}
+                              setSelectedBanks={setSelectedBanks}
+                              vOption={vOption}
                             />
                             {/* <MultiSelect
         options={vOption}
@@ -11468,17 +11639,23 @@ const ExportDashboardEditDetails = ({
                         <label className="controlform">CC To</label>
                         <div className=" cccto">
                           <div className="flex justify-content-center multiSelect">
-                            <MultiSelect
-                              value={selectedBanks}
-                              onChange={(e) => setSelectedBanks(e.value)}
-                              options={vOption}
-                              onShow={onShow}
-                              optionLabel="name"
-                              placeholder="Select Banks"
-                              // maxSelectedLabels={3}
-                              display="chip"
-                              className="w-full md:w-20rem"
+                            {/* <MultiSelect
+                                value={selectedBanks}
+                                onChange={(e) => setSelectedBanks(e.value)}
+                                options={vOption}
+                                onShow={onShow}
+                                optionLabel="name"
+                                placeholder="Select Banks"
+                                // maxSelectedLabels={3}
+                                display="chip"
+                                className="w-full md:w-20rem"
+                              /> */}
+                            <MultiSelectComponent
+                              selectedBanks={selectedBanks}
+                              setSelectedBanks={setSelectedBanks}
+                              vOption={vOption}
                             />
+
                             {/* <MultiSelect
         options={vOption}
         value={selectedBanks}
@@ -13225,17 +13402,23 @@ const ExportDashboardEditDetails = ({
                         <label className="controlform">CC To</label>
                         <div className=" cccto">
                           <div className="flex justify-content-center multiSelect">
-                            <MultiSelect
-                              value={selectedBanks}
-                              onChange={(e) => setSelectedBanks(e.value)}
-                              options={vOption}
-                              onShow={onShow}
-                              optionLabel="name"
-                              placeholder="Select Banks"
-                              // maxSelectedLabels={3}
-                              display="chip"
-                              className="w-full md:w-20rem"
+                            {/* <MultiSelect
+                                value={selectedBanks}
+                                onChange={(e) => setSelectedBanks(e.value)}
+                                options={vOption}
+                                onShow={onShow}
+                                optionLabel="name"
+                                placeholder="Select Banks"
+                                // maxSelectedLabels={3}
+                                display="chip"
+                                className="w-full md:w-20rem"
+                              /> */}
+                            <MultiSelectComponent
+                              selectedBanks={selectedBanks}
+                              setSelectedBanks={setSelectedBanks}
+                              vOption={vOption}
                             />
+
                             {/* <MultiSelect
         options={vOption}
         value={selectedBanks}

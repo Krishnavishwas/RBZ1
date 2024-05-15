@@ -1,14 +1,20 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import ExportformDynamicField from "./ExportformDynamicField";
 import { Storage } from "../login/Storagesetting";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import axios from "axios";
-import { APIURL } from "../constant";
+import { APIURL, ImageAPI } from "../constant";
 import Select from "react-select";
 import moment from "moment";
 import { toast } from "react-toastify";
+import { TailSpin } from "react-loader-spinner";
+import { DataTable } from "primereact/datatable";
+import { Column } from "primereact/column";
+import Modal from "react-bootstrap/Modal";
+import ExportDashboardViewDetails from "./ExportDashboardViewDetails";
+import UpdatePopupMessage from "./UpdatePopupMessage";
 
 const FINVNewRequestForm = () => {
   const navigate = useNavigate();
@@ -40,9 +46,13 @@ const FINVNewRequestForm = () => {
   const typeExporterRef = useRef(null); //delete
   const rateRef = useRef(null);
   const usdEquivalentRef = useRef(null);
+
   const relatedapplicationreferenceNumberRef = useRef(null); //delete
+  const purposeApplicationRef = useRef(null);
+  const banknameRef = useRef(null);
 
   const UserID = Storage.getItem("userID");
+  const roleID = Storage.getItem("roleIDs");
   const bankID = Storage.getItem("bankID");
   const userName = Storage.getItem("userName");
   const bankName = Storage.getItem("bankName");
@@ -50,9 +60,14 @@ const FINVNewRequestForm = () => {
 
   const [startDate, setStartDate] = useState(new Date());
   const [toastDisplayed, setToastDisplayed] = useState(false);
-  const [getCompanyName, setgetCompanyName] = useState();
-
+  const [getCompanyName, setgetCompanyName] = useState(null);
+  const [userRole, setUserrole] = useState([]);
+  const [selectuserRole, setselectuserRole] = useState("");
+  const [getalluser, setGetalluser] = useState([]);
   const [registerusertype, setregisterusertype] = useState(bankidcheck);
+  const [submitbuttonhide, setsubmitbuttonhide] = useState(false);
+  const [updatepopup, setupdatepopup] = useState(false);
+
   const [FINForm, setFINForm] = useState({
     UserID: UserID.replace(/"/g, ""),
     user: "",
@@ -78,7 +93,8 @@ const FINVNewRequestForm = () => {
     applicantComments: "",
     bankSupervisor: "",
   });
-
+  const heading = "Application Submitted Successfully!";
+  const para = "Export application request submitted successfully!";
   const [files, setFiles] = useState([]);
   const [otherfiles, setOtherfiles] = useState([]);
   const [errors, setErrors] = useState({});
@@ -92,6 +108,94 @@ const FINVNewRequestForm = () => {
   const [inputValue, setInputValue] = useState("");
   const [options, setOptions] = useState([]);
   const [value, setValue] = useState("");
+
+  const [ValidateRBZ, setValidateRBZ] = useState([]);
+  const [loader, setLoader] = useState(false);
+  const [ValidateShow, setValidateShow] = useState(false);
+  const [ValidateChange, setValidateChange] = useState({
+    relatedexchangeControlNumber: "",
+  });
+
+  const [getBankID, setGetBankID] = useState("");
+
+  const [showUpdateModal, setShowUpdateModal] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [applicationDetail, setApplicationDetail] = useState({});
+  const [applicationmessage, setApplicationmessage] = useState("");
+  const [tatHistory, setTatHistory] = useState([]);
+  const [allcomment, setallcomment] = useState([]);
+  const [noDataComment, setNoDataComment] = useState([]);
+  const [responceCount, setresponceCount] = useState([]);
+  const handleFormClose = () => setShowUpdateModal(false);
+  const Navigate = useNavigate();
+  const fileInputRefsother = [
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+  ];
+
+  const fileInputRefs = [
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+  ];
+  const relatedexchangeControlNumberRef = useRef(null);
+
+  const validatePECANForm = () => {
+    let valid = true;
+    const newErrors = {};
+    if (ValidateChange.relatedexchangeControlNumber.trim().length < 4) {
+      newErrors.relatedexchangeControlNumber =
+        "Reference Number allow minimum 4 numbers";
+      valid = false;
+    } else if (ValidateChange.relatedexchangeControlNumber.trim().length > 6) {
+      newErrors.relatedexchangeControlNumber =
+        "Reference Number allow maximum 6 numbers";
+      valid = false;
+    }
+    setErrors(newErrors);
+    return valid;
+  };
+
+  const changeHandelFormValidate = (e) => {
+    const { name, value } = e.target;
+
+    const specialChars = /[!@#$%^&*(),.?":{}|<>`~]/;
+    let newErrors = {};
+    let valid = true;
+    if (name == "relatedexchangeControlNumber" && specialChars.test(value)) {
+      newErrors.pknnumber = "Special characters not allowed";
+      valid = false;
+    } else if (name == "relatedexchangeControlNumber" && value == " ") {
+      newErrors.pknnumber = "First character cannot be a blank space";
+      valid = false;
+    } else {
+      setValidateChange({ ...ValidateChange, [name]: value });
+    }
+    setErrors(newErrors);
+  };
 
   const changeHandelForm = (e) => {
     let newErrors = {};
@@ -256,6 +360,10 @@ const FINVNewRequestForm = () => {
           ID: value,
         })
         .then((res) => {
+          console.log(
+            "res--Nature of Application(Consultancy Service Agreements)",
+            res
+          );
           if (res.data.responseCode === "200") {
             setapplicationSubType(res.data.responseData);
           } else {
@@ -266,6 +374,46 @@ const FINVNewRequestForm = () => {
           }
         });
     }
+    if (name == "applicationSubType") {
+      axios
+        .post(APIURL + "Master/GetAttachmentData", {
+          ApplicationTypeID: value != "" ? value : -1,
+          ApplicationSubTypeID: "0",
+        })
+        .then((res) => {
+          if (res.data.responseCode == "200") {
+            setAttachmentData(res.data.responseData);
+          } else {
+            setAttachmentData([]);
+            setFiles([]);
+            setOtherfiles([]);
+            setOtherfilesupload([]);
+          }
+        });
+    }
+  };
+  const handleValidateRBZ = () => {
+    if (validatePECANForm()) {
+      setLoader(true);
+      axios
+        .post(APIURL + "ExportApplication/ValidateRBZReferenceNumber", {
+          RBZReferenceNumber:
+            ValidateChange.relatedexchangeControlNumber.trim(),
+        })
+        .then((res) => {
+          setErrors({});
+          setValidateShow(true);
+          setLoader(false);
+          if (res.data.responseCode == "200") {
+            setValidateRBZ(res.data.responseData);
+          } else {
+            setValidateRBZ([]);
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
   };
 
   const convertedRate = curRate * parseFloat(FINForm.amount);
@@ -273,7 +421,7 @@ const FINVNewRequestForm = () => {
   const GetApplicationTypes = async () => {
     await axios
       .post(APIURL + "Master/GetApplicationTypesByDepartmentID", {
-        DepartmentID: "3",
+        DepartmentID: "4",
       })
       .then((res) => {
         if (res.data.responseCode === "200") {
@@ -285,6 +433,244 @@ const FINVNewRequestForm = () => {
       .catch((err) => {
         console.log(err);
       });
+  };
+
+  const GetApplicationCount = async (id) => {
+    await axios
+      .post(APIURL + "ExportApplication/CountByApplicationID", {
+        ApplicationID: id,
+      })
+      .then((res) => {
+        if (res.data.responseCode == 200) {
+          setresponceCount(res.data.responseData);
+        } else {
+          setresponceCount([]);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  const removeUserImage = (label) => {
+    const updatedUserFile = files?.filter((item) => item.label !== label);
+    setFiles(updatedUserFile);
+  };
+
+   
+  const clearInputFile = (index) => { 
+    
+    if (fileInputRefs[index]?.current) fileInputRefs[index].current.value = "";
+  };
+
+  const clearInputFileother = (index) =>{
+    if (fileInputRefsother[index]?.current) fileInputRefsother[index].current.value = "";
+   }
+  
+   console.log("files", files)
+  const getRoleHandle = async () => {
+    await axios
+      .post(APIURL + "Master/GetRoles", {
+        RoleID: "4",
+        Status: "35",
+      })
+      .then((res) => {
+        if (res.data.responseCode == 200) {
+          setUserrole(res.data.responseData);
+        } else {
+          setUserrole([]);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  // ----- Start Code For Open Poup
+  const handleViewData = (id) => {
+    setShowUpdateModal(true);
+  };
+  // ----- End Code For Open Poup
+  // ----- Start Code For Geting Table Data
+  const action = (rowData) => {
+    return bankName.replace(/"/g, "") == rowData?.bankName ? (
+      <>
+        <i
+          className="pi pi-eye p-0"
+          style={{ padding: "12px", cursor: "pointer" }}
+          onClick={() => {
+            handleViewData(rowData.id);
+            GetHandelDetail(rowData?.rbzReferenceNumber, rowData.id);
+            GetApplicationCount(rowData.id);
+          }}
+          onMouseEnter={(e) => {
+            e.target.style.color = "var(--primary-color)";
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.color = "";
+          }}
+        ></i>
+        {rowData.filePath ? (
+          <Link to={rowData.filePath} target="_blank">
+            <i
+              className="pi pi-download p-2 nav-link p-0"
+              style={{ padding: "12px", marginLeft: "6px", cursor: "pointer" }}
+              aria-disabled
+              onMouseEnter={(e) => {
+                e.target.style.color = "var(--primary-color)";
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.color = "";
+              }}
+            ></i>{" "}
+          </Link>
+        ) : (
+          ""
+        )}
+      </>
+    ) : (
+      <i
+        className="pi pi-eye p-0"
+        style={{ padding: "12px", cursor: "pointer" }}
+        onClick={() => {
+          handleViewData(rowData.id);
+          GetHandelDetail(rowData?.rbzReferenceNumber, rowData.id);
+          GetApplicationCount(rowData.id);
+        }}
+        onMouseEnter={(e) => {
+          e.target.style.color = "var(--primary-color)";
+        }}
+        onMouseLeave={(e) => {
+          e.target.style.color = "";
+        }}
+      ></i>
+    );
+  };
+  const amountData = (rowData) => {
+    return (
+      <span>
+        {bankName.replace(/"/g, "") == rowData?.bankName
+          ? rowData.amount + rowData.currencyCode
+          : "--"}
+      </span>
+    );
+  };
+  const createdDate = (rowData) => {
+    return <span>{moment(rowData?.createdDate).format("DD MMM YYYY")}</span>;
+  };
+
+  const applicantNAME = (rowData) => {
+    return <span>{rowData?.name ? rowData?.name : "N/A"}</span>;
+  };
+  const renderFooter = () => {
+    return (
+      <div className="flex justify-content-end">
+        <button
+          className="validateCrossIcon"
+          onClick={() => setValidateShow(false)}
+        >
+          <i class="bi bi-x-circle"></i>
+        </button>
+      </div>
+    );
+  };
+  const footer = renderFooter();
+  const GetHandelDetail = async (rbzrefnumber, id) => {
+    setLoading(true);
+    await axios
+      .post(APIURL + "ExportApplication/GetRequestInfoByApplicationID", {
+        RBZReferenceNumber: `${rbzrefnumber}`,
+        ID: id,
+      })
+      .then((res) => {
+        if (res.data.responseCode === "200") {
+          setLoading(false);
+          setApplicationDetail(res.data.responseData);
+        } else {
+          setLoading(false);
+          setApplicationmessage(res.data.responseMessage);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+
+    await axios
+      .post(APIURL + "ExportApplication/GetNewComments", {
+        ID: id,
+      })
+      .then((res) => {
+        if (res.data.responseCode == 200) {
+          setallcomment(res.data.responseData);
+        } else {
+          setallcomment([]);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+
+    await axios
+      .post(APIURL + "ExportApplication/GetApplicationHistory", {
+        ID: id,
+      })
+      .then((res) => {
+        if (res.data.responseCode == 200) {
+          setTatHistory(res.data.responseData);
+        } else {
+          setTatHistory([]);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+
+    // --------------------------vishwas start----------------------------
+    await axios
+      .post(APIURL + "ExportApplication/GetCommentsInfoByRoleID", {
+        ApplicationID: id,
+      })
+      .then((res) => {
+        if (res.data.responseCode == 200) {
+          setNoDataComment(res.data.responseData);
+        } else {
+          setNoDataComment([]);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+    //---------------------------vishwas end------------------------------
+  };
+  // ----- End Code For Geting Table Data
+  useEffect(() => {
+    getRoleHandle();
+  }, []);
+
+  const supervisorHangechangeRole = (e) => {
+    const value = e.target.value;
+    setErrors({});
+    setselectuserRole(value);
+    if (value == "") {
+      setGetalluser([]);
+    } else {
+      axios
+        .post(APIURL + "User/GetUsersByRoleID", {
+          RoleID: value,
+          DepartmentID: "2",
+          UserID: UserID.replace(/"/g, ""),
+        })
+        .then((res) => {
+          if (res.data.responseCode == "200") {
+            setGetalluser(res.data.responseData);
+          } else {
+            setGetalluser([]);
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
   };
 
   useEffect(() => {
@@ -299,9 +685,18 @@ const FINVNewRequestForm = () => {
     setOtherfiles([...otherfiles, null]);
   };
 
-  const handleFileChange = (e, id) => {
+  const handleFileChange = (e, label) => {
     const file = e.target.files[0];
-    setFiles((prevFiles) => [...prevFiles, { file, id }]);
+    const index = files.findIndex((item) => item.label === label);
+    if (index !== -1) {
+      setFiles((prevFiles) => {
+        const newFiles = [...prevFiles];
+        newFiles[index] = { file, label };
+        return newFiles;
+      });
+    } else {
+      setFiles((prevFiles) => [...prevFiles, { file, label }]);
+    }
   };
 
   const handleOthrefile = (e, id) => {
@@ -341,11 +736,11 @@ const FINVNewRequestForm = () => {
       newErrors.applicant = "Applicant name is required";
       valid = false;
     }
-    if (FINForm.relatedapplicationreferenceNumber === "") {
-      newErrors.relatedapplicationreferenceNumber =
-        "Related Application Reference Number is required";
-      valid = false;
-    }
+    // if (FINForm.relatedapplicationreferenceNumber === "") {
+    //   newErrors.relatedapplicationreferenceNumber =
+    //     "Related Application Reference Number is required";
+    //   valid = false;
+    // }
     if (FINForm.currency === "") {
       newErrors.currency = "Currency is required";
       valid = false;
@@ -362,8 +757,8 @@ const FINVNewRequestForm = () => {
       newErrors.sector = "Sector is required";
       valid = false;
     }
-    if (FINForm.subsector === "") {
-      newErrors.subsector = "Sub sector is required";
+    if (FINForm.subsector === "" && FINForm.sector != 2) {
+      newErrors.subsector = "Subsector is required";
       valid = false;
     }
     if (FINForm.applicantComments === "") {
@@ -399,6 +794,17 @@ const FINVNewRequestForm = () => {
     }
   };
 
+  const filtertin_bpn = companies?.find((company) => {
+    if (company.id === getCompanyName?.value) {
+      return {
+        getbpn: company.bpnNumber,
+        gettin: company.tinNumber,
+      };
+    }
+  });
+
+  console.log("filtertin_bpn", filtertin_bpn);
+
   const handleClear = () => {
     setValue(null);
     setInputValue("");
@@ -410,11 +816,15 @@ const FINVNewRequestForm = () => {
   };
 
   const HandleSubmit = async (e) => {
+    setsubmitbuttonhide(true);
+
+    let formData = new FormData();
+
     e.preventDefault();
     const randomNumber = generateRandomNumber();
     const generatedNumber = `FIN/${userName
       .toUpperCase()
-      .replace(/"/g, "")}NMBLZWHX/018363${randomNumber}`; 
+      .replace(/"/g, "")}NMBLZWHX/018363${randomNumber}`;
 
     if (validateForm()) {
       await axios
@@ -425,7 +835,7 @@ const FINVNewRequestForm = () => {
           ApplicationDate: moment(startDate).format("YYYY-MM-DD"),
           RBZReferenceNumber: generatedNumber,
           RelatedApplicationReferenceNumber:
-            FINForm.relatedapplicationreferenceNumber?.toUpperCase(),
+            ValidateChange.relatedexchangeControlNumber.trim(),
           Name:
             registerusertype === "2" && bankID !== "" ? FINForm.applicant : "",
           CompanyID:
@@ -438,9 +848,13 @@ const FINVNewRequestForm = () => {
           BeneficiaryName: FINForm.BeneficiaryName,
           BeneficiaryCountry: FINForm.baneficiaryCountry,
           BPNCode:
-            registerusertype === "1" && bankID !== "" ? FINForm.BPNCode?.toUpperCase() : "",
+            registerusertype === "1" && bankID !== ""
+              ? filtertin_bpn?.bpnNumber?.toUpperCase()
+              : "",
           TINNumber:
-            registerusertype === "1" && bankID !== "" ? FINForm.TINNumber?.toUpperCase() : "",
+            registerusertype === "1" && bankID !== ""
+              ? filtertin_bpn?.tinNumber?.toUpperCase()
+              : "",
           Currency: FINForm.currency,
           Amount: FINForm.amount,
           Rate: curRate,
@@ -452,16 +866,46 @@ const FINVNewRequestForm = () => {
         })
         .then((res) => {
           if (res.data.responseCode === "200") {
-            toast.success(res.data.responseMessage);
-            setTimeout(() => {
-              navigate("/FINVDashboard");
-            }, 1200);
+            setsubmitbuttonhide(false);
+            setupdatepopup(true);
+
+            for (let i = 0; i < files?.length; i++) {
+              // Corrected loop condition
+              formData.append("files", files[i].file);
+              formData.append("Label", files[i].label);
+            }
+
+            formData.append(
+              "RBZReferenceNumber",
+              res.data.responseData.rbzReferenceNumber
+            );
+            formData.append("ApplicationID", res.data.responseData.id);
+            formData.append("DepartmentID", "4");
+            formData.append("UserID", UserID.replace(/"/g, ""));
+
+            axios
+              .post(ImageAPI + "File/UploadFile", formData)
+              .then((res) => {
+                console.log("res99999");
+              })
+              .catch((err) => {
+                console.log("file Upload ", err);
+              });
+
+            Storage.setItem(
+              "generatedNumber",
+              res.data.responseData.rbzReferenceNumber
+            );
+
+             
           } else {
             toast.error(res.data.responseMessage);
+            setsubmitbuttonhide(false);
           }
         })
         .catch((err) => {
           console.log(err);
+          setsubmitbuttonhide(false);
         });
 
       setFINForm({
@@ -513,14 +957,76 @@ const FINVNewRequestForm = () => {
         relatedapplicationreferenceNumberRef.current.value = "";
     } else {
       if (!toastDisplayed) {
-        toast.warning("Please fill all fields");
+        toast.warning("Please fill all mandatory fields");
       }
       setToastDisplayed(true);
     }
   };
 
+  const closePopupHandle = () => {
+    Navigate("/FINVDashboard");
+    setupdatepopup(false);
+    setGetBankID("");
+    setFINForm({
+      UserID: UserID.replace(/"/g, ""),
+      user: "",
+      bankName: bankName,
+      typeFIN: "",
+      BeneficiaryName: "",
+      baneficiaryCountry: "",
+      govtAgencie: "",
+      BPNCode: "",
+      TINNumber: "",
+      applicant: "",
+      applicantReferenceNumber: "",
+      applicationType: "",
+      applicationSubType: "",
+      exporterType: registerusertype,
+      currency: "",
+      amount: "",
+      rate: "",
+      usdEquivalent: "",
+      relatedapplicationreferenceNumber: "",
+      sector: "",
+      subsector: "",
+      applicantComments: "",
+      bankSupervisor: "",
+    });
+    if (applicantRef.current) applicantRef.current.value = "";
+    if (BeneficiaryNameRef.current) BeneficiaryNameRef.current.value = "";
+    if (BPNCodeRef.current) BPNCodeRef.current.value = "";
+    if (TINRef.current) TINRef.current.value = "";
+    if (amountRef.current) amountRef.current.value = "";
+    if (applicantRef.current) applicantRef.current.value = "";
+    if (applicantCommentsRef.current) applicantCommentsRef.current.value = "";
+    if (BeneficiaryNameRef.current) BeneficiaryNameRef.current.value = "";
+    if (applicantReferenceNumberRef.current)
+      applicantReferenceNumberRef.current.value = "";
+    // if(applicantYearRef.current) applicantYearRef.current.value = '';
+    if (applicationTypeRef.current) applicationTypeRef.current.value = "";
+    if (bankSupervisorRef.current) bankSupervisorRef.current.value = "";
+    if (companyNameRef.current) companyNameRef.current.value = "";
+    if (currencyRef.current) currencyRef.current.value = "";
+    if (govtAgencieRef.current) govtAgencieRef.current.value = "";
+
+    if (purposeApplicationRef.current) purposeApplicationRef.current.value = "";
+    if (relatedexchangeControlNumberRef.current)
+      relatedexchangeControlNumberRef.current.value = "";
+    if (sectorRef.current) sectorRef.current.value = "";
+    if (subsectorRef.current) subsectorRef.current.value = "";
+
+    if (typeExporterRef.current) typeExporterRef.current.value = "";
+    if (usdEquivalentRef.current) usdEquivalentRef.current.value = "";
+
+    if (rateRef.current) rateRef.current.value = "";
+    if (banknameRef.current) banknameRef.current.value = "";
+  };
+
   const ResetHandleData = () => {
-    setgetCompanyName("");
+    setgetCompanyName(null);
+    setGetalluser([]);
+    setselectuserRole("");
+
     setFINForm({
       user: "",
       applicantYear: "2024",
@@ -621,11 +1127,16 @@ const FINVNewRequestForm = () => {
             {applicantTypes.map((item, index) => {
               return (
                 <>
-                  <label key={index} className={bankID != "" && item.id === 3
-                      ? "cur-dis"
-                      : bankidcheck == "3"
-                      ? "cur-dis"
-                      : ""}>
+                  <label
+                    key={index}
+                    className={
+                      bankID != "" && item.id === 3
+                        ? "cur-dis"
+                        : bankidcheck == "3"
+                        ? "cur-dis"
+                        : ""
+                    }
+                  >
                     <input
                       type="radio"
                       ref={typeExporterRef}
@@ -636,11 +1147,13 @@ const FINVNewRequestForm = () => {
                       name="importType"
                       value={item.id}
                       checked={registerusertype == item.id}
-                      className={bankID != "" && item.id === 3
-                      ? "cur-dis"
-                      : bankidcheck == "3"
-                      ? "cur-dis"
-                      : ""}
+                      className={
+                        bankID != "" && item.id === 3
+                          ? "cur-dis"
+                          : bankidcheck == "3"
+                          ? "cur-dis"
+                          : ""
+                      }
                       disabled={
                         bankID !== "" && item.id == 3
                           ? true
@@ -702,10 +1215,12 @@ const FINVNewRequestForm = () => {
                       changeHandelForm(e);
                     }}
                     placeholder="TIN Number"
-                    value={FINForm.TINNumber?.trim()}
-                    className={
-                      errors.TINNumber ? "error text-uppercase" : "text-uppercase"
+                    // value={exportForm.TINNumber?.trim()}
+                    value={
+                      filtertin_bpn ? filtertin_bpn?.tinNumber : "TIN Number"
                     }
+                    disabled
+                    className={filtertin_bpn?.tinNumber ? "text-uppercase" : ""}
                   />
                   <span className="sspan"></span>
                   {errors.TINNumber ? (
@@ -723,18 +1238,27 @@ const FINVNewRequestForm = () => {
                   <input
                     ref={BPNCodeRef}
                     type="text"
+                    min={0}
                     name="BPNCode"
                     onChange={(e) => {
                       changeHandelForm(e);
                     }}
-                    value={FINForm.BPNCode?.trim()}
+                    // value={exportForm?.BPNCode?.trim()}
+                    value={
+                      filtertin_bpn ? filtertin_bpn?.bpnNumber : "BPN Code"
+                    }
                     placeholder="BPN Code"
                     className={
-                      errors.BPNCode ? "error text-uppercase" : "text-uppercase"
+                      errors.BPNCode
+                        ? "error text-uppercase"
+                        : filtertin_bpn?.bpnNumber
+                        ? "text-uppercase"
+                        : ""
                     }
+                    disabled
                   />
                   <span className="sspan"></span>
-                  {errors.BPNCode ? (
+                  {errors.BPNCode && filtertin_bpn?.bpnNumber == "" ? (
                     <small className="errormsg">{errors.BPNCode}</small>
                   ) : (
                     ""
@@ -787,7 +1311,7 @@ const FINVNewRequestForm = () => {
               selected={startDate}
               onChange={(date) => setStartDate(date)}
               peekNextMonth
-              minDate='01/01/2018'
+              minDate="01/01/2018"
               showMonthDropdown
               maxDate={new Date()}
               showYearDropdown
@@ -803,51 +1327,6 @@ const FINVNewRequestForm = () => {
             ) : (
               ""
             )}
-          </div>
-        </div>
-        {/* end form-bx  */}
-
-        <div className="inner_form_new ">
-          <label className="controlform">
-            Related Application Reference Number
-          </label>
-          <div className="row">
-            <div className="col-md-12">
-              <div className="d-flex">
-                <div className="form-bx">
-                  <label>
-                    <input
-                      ref={relatedapplicationreferenceNumberRef}
-                      type="text"
-                      name="relatedapplicationreferenceNumber"
-                      onChange={(e) => {
-                        changeHandelForm(e);
-                      }}
-                      value={FINForm.relatedapplicationreferenceNumber?.trim()}
-                      placeholder="Related Application Reference Number"
-                      className={
-                        errors.relatedapplicationreferenceNumber
-                          ? "text-uppercase error"
-                          : "text-uppercase"
-                      }
-                    />
-                    <span className="sspan"></span>
-                    {errors.relatedapplicationreferenceNumber ||
-                    FINForm.relatedapplicationreferenceNumber !== "" ? (
-                      <small className="errormsg">
-                        {errors.relatedapplicationreferenceNumber}
-                      </small>
-                    ) : (
-                      ""
-                    )}
-                  </label>
-                </div>
-                <button type="button" className="primrybtn  v-button">
-                  Validate
-                </button>
-              </div>
-            </div>
-            <div className="col-md-3 text-right"></div>
           </div>
         </div>
         {/* end form-bx  */}
@@ -1147,6 +1626,153 @@ const FINVNewRequestForm = () => {
         </div>
         {/* end form-bx  */}
 
+        <div className="inner_form_new align-items-start">
+          <label className="controlform">
+            Related Exchange Control Reference Number
+          </label>
+
+          <div className="row">
+            <div className="col-md-12">
+              <div className="d-flex">
+                <div className="form-bx position-relative">
+                  <label>
+                    <input
+                      ref={relatedexchangeControlNumberRef}
+                      type="number"
+                      min={0}
+                      value={ValidateChange.relatedexchangeControlNumber.trim()}
+                      name="relatedexchangeControlNumber"
+                      onKeyDown={(e) => {
+                        if (e.key === "-" || e.key === "+") {
+                          e.preventDefault();
+                        }
+                      }}
+                      onChange={(e) => {
+                        changeHandelFormValidate(e);
+                      }}
+                      placeholder="Related Exchange Control Reference Number"
+                      className={
+                        errors.pknnumber
+                          ? "error"
+                          : ValidateShow.relatedexchangeControlNumber
+                          ? "text-uppercase"
+                          : ""
+                      }
+                    />
+                    <span className="sspan"></span>
+                    {errors.relatedexchangeControlNumber ? (
+                      <small className="errormsg">
+                        {errors.relatedexchangeControlNumber}
+                      </small>
+                    ) : (
+                      ""
+                    )}
+                  </label>
+                  {/* validate data */}
+
+                  {loader == true ? (
+                    <TailSpin
+                      visible={true}
+                      height="20"
+                      width="20"
+                      color="#5e62a1"
+                      ariaLabel="tail-spin-loading"
+                      radius="1"
+                      wrapperStyle={{}}
+                      wrapperClass=""
+                    />
+                  ) : ValidateShow == true ? (
+                    <div className="card validatepecanfield">
+                      {ValidateRBZ.length > 0 ? (
+                        <DataTable
+                          value={ValidateRBZ}
+                          scrollable
+                          scrollHeight="500px"
+                          paginator={ValidateRBZ?.length > 10 ? true : false}
+                          rowHover
+                          paginatorRight
+                          rows={10}
+                          dataKey="id"
+                          rowsPerPageOptions={[10, 50, 100]}
+                          emptyMessage="No Data found."
+                          footer={footer}
+                        >
+                          <Column
+                            field="rbzReferenceNumber"
+                            header="RBZ Reference Number"
+                            style={{ minWidth: "200px" }}
+                          ></Column>
+                          <Column
+                            field="name"
+                            header="Applicant Name"
+                            style={{ minWidth: "180px" }}
+                            body={applicantNAME}
+                          ></Column>
+                          <Column
+                            field="bankName"
+                            header="Bank Name"
+                            style={{ minWidth: "150px" }}
+                          ></Column>
+                          <Column
+                            field="applicationType"
+                            header="Application Type"
+                            style={{ minWidth: "250px" }}
+                          ></Column>
+                          <Column
+                            field="amount"
+                            header="Amount"
+                            style={{ minWidth: "150px" }}
+                            body={amountData}
+                          ></Column>
+                          <Column
+                            field="statusName"
+                            header="Status"
+                            style={{ minWidth: "200px" }}
+                          ></Column>
+                          <Column
+                            field="createdDate"
+                            header="Submitted Date"
+                            style={{ minWidth: "150px" }}
+                            body={createdDate}
+                          ></Column>
+                          <Column
+                            field=""
+                            header="Action"
+                            style={{ minWidth: "100px" }}
+                            frozen
+                            alignFrozen="right"
+                            body={action}
+                          ></Column>
+                        </DataTable>
+                      ) : (
+                        <div className="d-flex justify-content-between align-items-center p-2">
+                          <p className="mb-0">No Data</p>
+                          <button
+                            className="validateCrossIcon"
+                            onClick={() => setValidateShow(false)}
+                          >
+                            <i class="bi bi-x-circle"></i>
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    " "
+                  )}
+                </div>
+                <button
+                  type="button"
+                  className="primrybtn  v-button"
+                  onClick={(e) => handleValidateRBZ(e)}
+                >
+                  Validate
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        {/* end form-bx  */}
+
         <div className="inner_form_new ">
           <label className="controlform">Sector</label>
           <div className="form-bx">
@@ -1244,7 +1870,7 @@ const FINVNewRequestForm = () => {
           <label className="controlform">Submit to Bank Supervisor</label>
           <input
             type="checkbox"
-            className="mt-4"
+            className=""
             onChange={(e) => {
               HandelSupervisorcheck(e);
             }}
@@ -1252,7 +1878,7 @@ const FINVNewRequestForm = () => {
         </div>
         {/* end form-bx  */}
 
-        {checkSupervisor === true ? (
+        {checkSupervisor === true && roleID == 2 ? (
           <div className="inner_form_new ">
             <label className="controlform">Select Bank Supervisor</label>
             <div className="form-bx">
@@ -1294,6 +1920,90 @@ const FINVNewRequestForm = () => {
         )}
         {/* end form-bx  */}
 
+        {checkSupervisor == true && roleID == 4 ? (
+          <div className="inner_form_new ">
+            <label className="controlform">RBZ Record Officer Submit to</label>
+            <div className="form-bx">
+              <label>
+                <select
+                  name="SupervisorRoleId"
+                  onChange={(e) => {
+                    supervisorHangechangeRole(e);
+                  }}
+                  // className={
+                  //   errors.assignedTo && !SupervisorRoleId
+                  //     ? "error"
+                  //     : ""
+                  // }
+                >
+                  <option value="">Select Role</option>
+                  {userRole?.map((item, index) => {
+                    return (
+                      <option key={index} value={item.id}>
+                        {item.designation}
+                      </option>
+                    );
+                  })}
+                </select>
+                <span className="sspan"></span>
+                {errors.selectuserRole && selectuserRole === "" ? (
+                  <small className="errormsg">Role is required</small>
+                ) : (
+                  ""
+                )}
+              </label>
+            </div>
+          </div>
+        ) : (
+          ""
+        )}
+        {/* end form-bx  */}
+
+        {checkSupervisor == true && roleID == 4 && selectuserRole ? (
+          <div className="w-100">
+            <div className="inner_form_new">
+              <label className="controlform">User</label>
+
+              <div className="form-bx">
+                <label>
+                  <select
+                    ref={bankSupervisorRef}
+                    name="bankSupervisor"
+                    onChange={(e) => {
+                      changeHandelForm(e);
+                    }}
+                    className={
+                      errors.bankSupervisor && FINForm.bankSupervisor === ""
+                        ? "error"
+                        : ""
+                    }
+                  >
+                    <option value="" selected>
+                      Select User
+                    </option>
+                    {getalluser?.map((item, index) => {
+                      return (
+                        <option key={index} value={item.userID}>
+                          {item.name}
+                        </option>
+                      );
+                    })}
+                  </select>
+                  <span className="sspan"></span>
+                  {errors.bankSupervisor && FINForm.bankSupervisor === "" ? (
+                    <small className="errormsg">User is required</small>
+                  ) : (
+                    ""
+                  )}
+                </label>
+              </div>
+            </div>
+          </div>
+        ) : (
+          ""
+        )}
+        {console.log("errors", errors)}
+
         <h5 className="section_top_subheading mt-3">Attachments</h5>
 
         {attachmentData?.map((items, index) => {
@@ -1304,16 +2014,33 @@ const FINVNewRequestForm = () => {
                 {items.name}
               </label>
               <div className="browse-btn">
-                Browse
+                Browse{" "}
                 <input
                   type="file"
-                  onChange={(e) => handleFileChange(e, items.id)}
+                  ref={fileInputRefs[index]}
+                  onChange={(e) => handleFileChange(e, items.name)}
                 />
               </div>
               <span className="filename">
-                {files.find((f) => f.id === items?.id)?.file?.name ||
+                {files.find((f) => f.label === items?.name)?.file?.name ||
                   "No file chosen"}
               </span>
+
+              {files?.length &&
+              files?.find((f) => f.label === items.name)?.file?.name ? (
+                <button
+                  type="button"
+                  className="remove-file"
+                  onClick={() => {
+                    removeUserImage(items?.name);
+                    clearInputFile(index);
+                  }}
+                >
+                  Remove
+                </button>
+              ) : (
+                ""
+              )}
             </div>
           );
         })}
@@ -1327,6 +2054,7 @@ const FINVNewRequestForm = () => {
               Browse{" "}
               <input
                 type="file"
+                ref={fileInputRefsother[index]}
                 onChange={(e) => {
                   handleFileChange(e, "other" + (index + 1));
                   handleOthrefile(e, "other" + (index + 1));
@@ -1334,9 +2062,26 @@ const FINVNewRequestForm = () => {
               />
             </div>
             <span className="filename">
-              {files.find((f) => f.id === "other" + (index + 1))?.file?.name ||
-                "No file chosen"}
+              {files.find((f) => f.label === "other" + (index + 1))?.file
+                ?.name || "No file chosen"}
             </span>
+
+            {files?.length &&
+            files?.find((f) => f.label === "other" + (index + 1))?.file
+              ?.name ? (
+              <button
+                type="button"
+                className="remove-file"
+                onClick={() => {
+                  removeUserImage("other" + (index + 1));
+                  clearInputFileother(index);
+                }}
+              >
+                Remove
+              </button>
+            ) : (
+              ""
+            )}
           </div>
         ))}
 
@@ -1346,7 +2091,8 @@ const FINVNewRequestForm = () => {
             className="addmore-btn"
             onClick={(e) => handleAddMore(e)}
           >
-            Add More File
+            {" "}
+            Add More File{" "}
           </button>
         ) : (
           ""
@@ -1372,7 +2118,55 @@ const FINVNewRequestForm = () => {
             Submit
           </button>
         </div>
+
+        {updatepopup == true ? (
+          <UpdatePopupMessage
+            heading={heading}
+            para={para}
+            closePopupHandle={closePopupHandle}
+          ></UpdatePopupMessage>
+        ) : (
+          ""
+        )}
+        
       </form>
+
+      {/* view model start */}
+      <Modal
+        show={showUpdateModal}
+        onHide={handleFormClose}
+        backdrop="static"
+        className="max-width-600"
+      >
+        <div className="application-box">
+          <div className="login_inner">
+            <div className="login_form ">
+              <h5>
+                <Modal.Header closeButton className="p-0">
+                  <Modal.Title>
+                    View Export Request --{" "}
+                    <big>{applicationDetail?.rbzReferenceNumber}</big>
+                  </Modal.Title>
+                </Modal.Header>
+              </h5>
+            </div>
+            <div className="login_form_panel">
+              <Modal.Body className="p-0">
+                <ExportDashboardViewDetails
+                  applicationDetail={applicationDetail}
+                  // applicationmessage={applicationmessage}
+                  handleFormClose={handleFormClose}
+                  allcomment={allcomment}
+                  tatHistory={tatHistory}
+                  noDataComment={noDataComment}
+                  responceCount={responceCount}
+                />
+              </Modal.Body>
+            </div>
+          </div>
+        </div>
+      </Modal>
+      {/* view modal end */}
     </>
   );
 };
