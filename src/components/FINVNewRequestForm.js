@@ -23,8 +23,7 @@ const FINVNewRequestForm = () => {
     companies,
     GovernmentAgencies,
     applicantTypes,
-    sectorData,
-    Supervisors,
+    sectorData, 
     countries,
   } = ExportformDynamicField();
 
@@ -102,7 +101,7 @@ const FINVNewRequestForm = () => {
   const [applicationSubType, setapplicationSubType] = useState([]);
   const [subsectorData, setsubsectorData] = useState([]);
   const [curRate, setCurrate] = useState();
-  const [checkSupervisor, setcheckSupervisor] = useState(false);
+  const [checkSupervisor, setcheckSupervisor] = useState(roleID == 4 ? true : false);
   const [attachmentData, setAttachmentData] = useState([]);
   const [otherfilesupload, setOtherfilesupload] = useState([]);
   const [inputValue, setInputValue] = useState("");
@@ -117,7 +116,7 @@ const FINVNewRequestForm = () => {
   });
 
   const [getBankID, setGetBankID] = useState("");
-
+const [Supervisors, setSupervisors] = useState([])
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [loading, setLoading] = useState(false);
   const [applicationDetail, setApplicationDetail] = useState({});
@@ -162,6 +161,30 @@ const FINVNewRequestForm = () => {
     useRef(null),
   ];
   const relatedexchangeControlNumberRef = useRef(null);
+
+
+  const handeSupervisor = async ()=>{
+
+    await axios
+      .post(APIURL + "User/GetSupervisors", {
+        BankID: bankID,
+        UserID: UserID,
+        DepartmentID:"4",
+        RoleID: roleID,
+      })
+      .then((res) => {
+        if (res.data.responseCode === "200") {
+          setSupervisors(res.data.responseData);
+        } else {
+          console.log(res.data.responseMessage);
+          setSupervisors([]);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+
+  }
 
   const validatePECANForm = () => {
     let valid = true;
@@ -466,8 +489,7 @@ const FINVNewRequestForm = () => {
   const clearInputFileother = (index) =>{
     if (fileInputRefsother[index]?.current) fileInputRefsother[index].current.value = "";
    }
-  
-   console.log("files", files)
+   
   const getRoleHandle = async () => {
     await axios
       .post(APIURL + "Master/GetRoles", {
@@ -657,7 +679,7 @@ const FINVNewRequestForm = () => {
       axios
         .post(APIURL + "User/GetUsersByRoleID", {
           RoleID: value,
-          DepartmentID: "2",
+          DepartmentID: "4",
           UserID: UserID.replace(/"/g, ""),
         })
         .then((res) => {
@@ -767,6 +789,10 @@ const FINVNewRequestForm = () => {
     }
     if (checkSupervisor === true && FINForm.bankSupervisor === "") {
       newErrors.bankSupervisor = "Bank supervisor is required";
+      valid = false;
+    }
+    if (checkSupervisor == true && selectuserRole == "" && roleID == 4) {
+      newErrors.selectuserRole = "Role is required";
       valid = false;
     }
     setErrors(newErrors);
@@ -1872,13 +1898,13 @@ const FINVNewRequestForm = () => {
         </div>
         {/* end form-bx  */}
 
-        <div className="inner_form_new ">
+        <div  className={roleID == 4 ? "d-none" : "inner_form_new "}>
           <label className="controlform">Submit to Bank Supervisor</label>
           <input
             type="checkbox"
             className=""
             onChange={(e) => {
-              HandelSupervisorcheck(e);
+              HandelSupervisorcheck(e); handeSupervisor()
             }}
           />
         </div>

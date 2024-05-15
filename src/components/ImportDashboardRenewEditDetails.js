@@ -1351,7 +1351,6 @@ const ImportDashboardRenewEditDetails = ({
                             ref={PECANNumberRef}
                             type="text"
                             name="pecaNumber"
-                            placeholder="Prior Exchange Control Authority Number(PECAN)"
                             onChange={(e) => {
                               changeHandelForm(e);
                             }}

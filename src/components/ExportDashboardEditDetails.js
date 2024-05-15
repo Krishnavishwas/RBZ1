@@ -1981,7 +1981,7 @@ console.log("supervisordecision", supervisordecision)
     if (validateForm()) {
       setSubmitBtnLoader(true);
       await axios
-        .post(APIURL + "ExportApplication/UpdateExportApplicationss", {
+        .post(APIURL + "ExportApplication/UpdateExportApplications", {
           RBZReferenceNumber: applicationDetail?.rbzReferenceNumber,
           ID: applicationDetail?.id,
           DepartmentID: "2",

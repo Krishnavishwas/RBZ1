@@ -1233,7 +1233,7 @@ useEffect(() => {
         });
     }
   };
-
+console.log("applicationDetail", applicationDetail)
   const HandleDateExpiryOption = (e) => {
     const { name, value } = e.target;
     setDateExpiryOption(e.target.value);

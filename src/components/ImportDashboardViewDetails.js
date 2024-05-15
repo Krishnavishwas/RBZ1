@@ -562,7 +562,6 @@ const ImportDashboardViewDetails = ({
                                               <label className="controlform">
                                                 Action Type
                                               </label>
-                                              {console.log("items?.actionStatusName - ", items?.actionStatusName)}
                                               <div className="form-bx">
                                                 <label>
                                                   <input
@@ -584,7 +583,7 @@ const ImportDashboardViewDetails = ({
                                               </div>
                                             </div>
                                           </div>
-{console.log("items?.actionRoleName - ", items?.actionRoleName)}
+
                                           <div className="col-md-3">
                                             <div className="inner_form_new-sm ">
                                               <label className="controlform-sm">

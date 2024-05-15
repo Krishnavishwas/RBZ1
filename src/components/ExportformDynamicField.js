@@ -112,7 +112,7 @@ const ExportformDynamicField = () => {
     } catch (error) {
       console.log(error);
     }
-
+ 
     await axios
       .post(APIURL + "User/GetSupervisors", {
         BankID: BankID,

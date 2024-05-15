@@ -660,6 +660,7 @@ const ImportApprovedRequestsTable = () => {
       {tabHeader}
       {pageLoader == true ? (
         <label className="outerloader2">
+          {" "}
           <span className="loader"></span>
           <span className="loaderwait">Please Wait...</span>
         </label>

@@ -1767,7 +1767,7 @@ const ImportNewRequestForm = () => {
           </label>
           <input
             type="checkbox"
-            className="mt-4"
+            // className="mt-4"
             disabled={roleID == 4 ? true : false}
             onChange={(e) => {
               HandelSupervisorcheck(e);
