@@ -92,7 +92,7 @@ const ImportDashboardViewDetails = ({
                   <input
                     disabled
                     value={moment(applicationDetail?.applicationDate).format(
-                      "MM/DD/YYYY"
+                      "DD/MMM/yyyy"
                     )}
                     className="text-uppercase"
                   />
@@ -4015,6 +4015,9 @@ const ImportDashboardViewDetails = ({
             ""
           )}
 
+
+{roleID >= 5 ? (
+              <>  
           <h5
             className={
               sharefiletab
@@ -4063,7 +4066,11 @@ const ImportDashboardViewDetails = ({
               <label className="notfound">File Not Found</label>
             )}
           </div>
-
+          </>
+            ) : (
+              ""
+            )}
+            
           <>
               <h5 className={roleID > 3 ? "section_top_subheading mt-3 py-3 btn-collapse_active " : "d-none"}>
                 Application History

@@ -347,8 +347,8 @@ const FINDashboardTable = () => {
     setshowdataloader(true);
     setApplicationDetail({})
     await axios
-      .post(APIURL + "ImportApplication/GetImportRequestInfoByApplicationID", {
-        RBZReferenceNumber: `${rbzrefnumber}`,
+      .post(APIURL + "FINApplication/GetFINRequestInfoByApplicationID", {
+        // RBZReferenceNumber: `${rbzrefnumber}`,
         ID: id,
       })
       .then((res) => {

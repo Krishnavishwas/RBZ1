@@ -842,7 +842,7 @@ const FINVNewRequestForm = () => {
             registerusertype === "1" && bankID !== ""
               ? getCompanyName?.value
               : "",
-          ApplicantTypeID: registerusertype,
+          ApplicantType: registerusertype,
           ApplicationTypeID: FINForm.applicationType,
           ApplicationSubTypeID: FINForm.applicationSubType,
           BeneficiaryName: FINForm.BeneficiaryName,
@@ -1123,7 +1123,7 @@ const FINVNewRequestForm = () => {
 
         <div className="inner_form_new ">
           <label className="controlform">Type of Importer</label>
-          <div className="form-bx-radio mt-4">
+          <div className="form-bx-radio">
             {applicantTypes.map((item, index) => {
               return (
                 <>
@@ -1311,12 +1311,18 @@ const FINVNewRequestForm = () => {
               selected={startDate}
               onChange={(date) => setStartDate(date)}
               peekNextMonth
+              placeholderText={
+                startDate == null
+                  ? moment(new Date()).format("DD/MMM/YYYY")
+                  : startDate
+              }
               minDate="01/01/2018"
               showMonthDropdown
               maxDate={new Date()}
               showYearDropdown
               dropdownMode="select"
               keyboard={false}
+              dateFormat="dd/MMM/yyyy"
             />
             <span className="sspan"></span>
             {errors.date || startDate == null ? (
@@ -1347,11 +1353,11 @@ const FINVNewRequestForm = () => {
                     : ""
                 }
               >
-                <option value="">Select Application Type</option>
+                <option value="">Application Category</option>
                 {applicationType?.map((item, ind) => {
                   return (
                     <option key={item.id} value={item.id}>
-                      {item.name}
+                      {item.name} 
                     </option>
                   );
                 })}
