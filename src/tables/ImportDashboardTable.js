@@ -273,7 +273,6 @@ const ImportDashboardTable = () => {
 
   const EditModalClose = () => {
     setshowEditForm(false);
-    // setapplicationstaus("0");
     setnextlevelvalue("");
   };
   const handleFormClose = () => setShowUpdateModal(false);

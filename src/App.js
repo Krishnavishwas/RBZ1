@@ -28,6 +28,7 @@ import FINVNewRequest from "./pages/FINVNewRequest";
 import ApprovedUser from "./admin/pages/ApprovedUser";
 import CompanyMaster from "./admin/pages/CompanyMaster";
 import GovtAgencyMaster from "./admin/pages/GovtAgencyMaster";
+import ReferredDashboard from "./pages/ReferredDashboard";
 import ExportSubmittedRequests from "./pages/ExportSubmittedRequests";
 import ExportPendingRequests from "./pages/ExportPendingRequests";
 import ExportApprovedRequests from "./pages/ExportApprovedRequests";
@@ -125,6 +126,10 @@ function App() {
             <Route
               path="/ExportSubmittedRequests"
               element={<ExportSubmittedRequests />}
+            />
+            <Route
+              path="/ReferredDashboard"
+              element={<ReferredDashboard />}
             />
             <Route
               path="/ExportApprovedRequests"

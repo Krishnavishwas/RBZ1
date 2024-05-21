@@ -35,7 +35,7 @@ import StarterKit from "@tiptap/starter-kit";
 import ImportDashboardViewDetails from "./ImportDashboardViewDetails";
 /* Tiptp Editor Ends */
 
-const ImportDashboardEditDetails = ({
+const ImportOtherDepartmentEditDetails = ({
   applicationDetail,
   setApplicationDetail,
   EditModalClose,
@@ -203,8 +203,8 @@ const ImportDashboardEditDetails = ({
   const [otherDepartmentRoles, setOtherDepartmentRoles] = useState([]);
   const [otherDepartmentUser, setOtherDepartmentUser] = useState("");
   const [otherDepartmentUsers, setOtherDepartmentUsers] = useState([]);
-  const [OtherDepartmentPopup,setOtherDepartmentPopup]= useState(false)
-  const [OtherDepartmentLoader, setOtherDepartmentLoader]= useState(false)
+  const [OtherDepartmentPopup, setOtherDepartmentPopup] = useState(false);
+  const [OtherDepartmentLoader, setOtherDepartmentLoader] = useState(false);
   const [loader, setLoader] = useState(false);
   const [othersharefile, setOthersharefile] = useState([]);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
@@ -272,11 +272,11 @@ const ImportDashboardEditDetails = ({
 
   const heading = "Updated Successfully!";
   const para = "Import request updated successfully!";
-  
-  const heading1 = "Submit Successfully"
-  const para1= "Application Successfully Submitted to Other Department!"
-  const applicationNumber = applicationDetail.rbzReferenceNumber;
 
+  const heading1 = "Submit Successfully";
+  const para1 = "Application Successfully Submitted to Other Department!";
+
+  const applicationNumber = applicationDetail.rbzReferenceNumber;
   const ratevalue = applicationDetail?.rate;
 
   const handleViewData = (id) => setShowUpdateModal(true);
@@ -456,7 +456,7 @@ const ImportDashboardEditDetails = ({
   };
 
   const closePopupHandle = () => {
-    navigate("/ImportDashboard");
+    navigate("/ReferredDashboard");
     EditModalClose();
     handleData();
     setupdatepopup(false);
@@ -808,7 +808,6 @@ const ImportDashboardEditDetails = ({
           doc.setGState(new doc.GState({ opacity: 0.4 }));
           doc.setFont("helvetica", "normal");
           doc.setFontSize(80);
-          //doc.text("PREVIEW", 50, 150, {align: 'center', baseline: 'middle'})
           doc.text(
             doc.internal.pageSize.width / 3,
             doc.internal.pageSize.height / 2,
@@ -1244,7 +1243,7 @@ const ImportDashboardEditDetails = ({
     if (validateForm()) {
       setSubmitBtnLoader(true);
       await axios
-        .post(APIURL + "ImportApplication/UpdateImportApplication", {
+        .post(APIURL + "ReferredApplication/UpdateReferredApplication", {
           ID: applicationDetail?.id,
           AssignedTo:
             roleID >= 3 && AssignUserID == ""
@@ -1760,7 +1759,7 @@ const ImportDashboardEditDetails = ({
                 setSubmitBtnLoader(false);
                 console.log("sharefile Upload ", err);
               });
-            handleData();
+            // handleData();
           } else {
             setSubmitBtnLoader(false);
             toast.error(res.data.responseMessage);
@@ -1941,6 +1940,7 @@ const ImportDashboardEditDetails = ({
       setDescription(editorDeputy.getHTML());
     }
   }, [applicationDetail, lastComments]);
+
   const editorPrincipleAnalyst = useEditor({
     extensions: [
       Color.configure({ types: [TextStyle.name, ListItem.name] }),
@@ -2439,35 +2439,35 @@ const ImportDashboardEditDetails = ({
 
   const SubmitOtherDepartment = async () => {
     try {
-      setOtherDepartmentLoader(true)
+      setOtherDepartmentLoader(true);
       await axios
-      .post(APIURL + "ReferredApplication/CreateReferredApplication", {
-        ID: applicationDetail.id,
-        RoleID: roleID,
-        UserID: UserID.replace(/"/g, ""),
-        ReferredDepartmentID: OtherDepartment,
-        AssignedToRoleID: otherDepartmentRole,
-        AssignedTo: otherDepartmentUser,
-        Comment: asignnextLeveldata.Comment,
-        Notes: asignnextLeveldata.Notes,
-        Description: Description,
-        Status: "35",
-      })
-      .then((res) => {
-        if (res.data.responseCode == 200) {
-          console.log("vbbbbb---", res);
-          setOtherDepartmentLoader(false)
-          setOtherDepartmentPopup(true)
-        }
-      })
-      .catch((error) => {
-        setOtherDepartmentPopup(false)
-        setOtherDepartmentLoader(false)
-        console.log("User/GetUsersByRoleID - Error", error);
-      });
+        .post(APIURL + "ReferredApplication/CreateReferredApplication", {
+          ID: applicationDetail.id,
+          RoleID: roleID,
+          UserID: UserID.replace(/"/g, ""),
+          ReferredDepartmentID: OtherDepartment,
+          AssignedToRoleID: otherDepartmentRole,
+          AssignedTo: otherDepartmentUser,
+          Comment: asignnextLeveldata.Comment,
+          Notes: asignnextLeveldata.Notes,
+          Description: Description,
+          Status: "35",
+        })
+        .then((res) => {
+          if (res.data.responseCode == 200) {
+            console.log("vbbbbb---", res);
+            setOtherDepartmentLoader(false);
+            setOtherDepartmentPopup(true);
+          }
+        })
+        .catch((error) => {
+          setOtherDepartmentPopup(false);
+          setOtherDepartmentLoader(false);
+          console.log("User/GetUsersByRoleID - Error", error);
+        });
     } catch (error) {
-      setOtherDepartmentPopup(false)
-      setOtherDepartmentLoader(false)
+      setOtherDepartmentPopup(false);
+      setOtherDepartmentLoader(false);
       console.log("User/GetUsersByRoleID - catch - Error", error);
     }
   };
@@ -3104,7 +3104,6 @@ const ImportDashboardEditDetails = ({
                       </label>
                     </div>
                   </div>
-                  {/* end form-bx  */}
                 </div>
 
                 <div className="col-md-3">
@@ -3761,7 +3760,6 @@ const ImportDashboardEditDetails = ({
                                         </label>
                                         <div className="form-bx-sm">
                                           <label>
-                                            {" "}
                                             <input
                                               type="text"
                                               className=""
@@ -5719,7 +5717,6 @@ const ImportDashboardEditDetails = ({
                             className="addmore-btn mt-0"
                             onClick={(e) => handleuserAddMore(e)}
                           >
-                            {" "}
                             Add More File{" "}
                           </button>
                         </div>
@@ -5982,7 +5979,7 @@ const ImportDashboardEditDetails = ({
                                 dateFormat="dd/MMM/yyyy"
                                 onKeyDown={(e) => {
                                   const key = e.key;
-                                  const allowedKeys = /[0-9\/]/; // Allow numbers and '/'
+                                  const allowedKeys = /[0-9\/]/;
                                   if (
                                     !allowedKeys.test(key) &&
                                     key !== "Backspace" &&
@@ -6062,7 +6059,9 @@ const ImportDashboardEditDetails = ({
                         <div className="col-md-7">
                           <div
                             className={
-                              roleID == 5 && DateExpiryOption == "1" && nextlevelvalue != 35
+                              roleID == 5 &&
+                              DateExpiryOption == "1" &&
+                              nextlevelvalue != 35
                                 ? "inner_form_new align-items-center"
                                 : "d-none"
                             }
@@ -6131,7 +6130,8 @@ const ImportDashboardEditDetails = ({
                             className={
                               roleID == 5 &&
                               DateExpirydisplay == "0" &&
-                              DateExpiryOption == "1" && nextlevelvalue != 35
+                              DateExpiryOption == "1" &&
+                              nextlevelvalue != 35
                                 ? "inner_form_new-sm"
                                 : "d-none"
                             }
@@ -6153,7 +6153,7 @@ const ImportDashboardEditDetails = ({
                                 dateFormat="dd/MMM/yyyy"
                                 onKeyDown={(e) => {
                                   const key = e.key;
-                                  const allowedKeys = /[0-9\/]/; // Allow numbers and '/'
+                                  const allowedKeys = /[0-9\/]/;
                                   if (
                                     !allowedKeys.test(key) &&
                                     key !== "Backspace" &&
@@ -7140,7 +7140,11 @@ const ImportDashboardEditDetails = ({
                       </div>
 
                       <div
-                        className={checkSupervisor == true && nextlevelvalue != "35" ? "row" : "d-none"}
+                        className={
+                          checkSupervisor == true && nextlevelvalue != "35"
+                            ? "row"
+                            : "d-none"
+                        }
                       >
                         <div className="col-md-12 d-flex c-gap">
                           <div
@@ -7351,11 +7355,62 @@ const ImportDashboardEditDetails = ({
                         ""
                       )}
 
-                      {nextlevelvalue != "35" && attachmentData?.map((items, index) => {
-                        return (
+                      {nextlevelvalue != "35" &&
+                        attachmentData?.map((items, index) => {
+                          return (
+                            <div
+                              className="attachemt_form-bx  mt-2"
+                              key={items.id}
+                            >
+                              <label
+                                style={{
+                                  background: "#d9edf7",
+                                  padding: "9px 3px",
+                                  border: "0px",
+                                }}
+                              >
+                                <span style={{ fontWeight: "500" }}>
+                                  {items.filename}
+                                </span>
+                              </label>
+                              <div className="browse-btn">
+                                Browse
+                                <input
+                                  type="file"
+                                  onChange={(e) =>
+                                    handleuserFileChange(e, "analyst" + index)
+                                  }
+                                />
+                              </div>
+                              <span className="filename">
+                                {userfiles?.find(
+                                  (f) => f.id === "analyst" + index
+                                )?.file?.name || "No file chosen"}
+                              </span>
+                              {userfiles?.length &&
+                              userfiles?.find((f) => f.id === "analyst" + index)
+                                ?.file?.name ? (
+                                <button
+                                  type="button"
+                                  className="remove-file"
+                                  onClick={() =>
+                                    removeUserImage(index, "analyst" + index)
+                                  }
+                                >
+                                  Remove
+                                </button>
+                              ) : (
+                                ""
+                              )}
+                            </div>
+                          );
+                        })}
+
+                      {nextlevelvalue != "35" &&
+                        otheruserfiles?.map((file, index) => (
                           <div
-                            className="attachemt_form-bx  mt-2"
-                            key={items.id}
+                            key={"other" + (index + 1)}
+                            className="attachemt_form-bx"
                           >
                             <label
                               style={{
@@ -7364,32 +7419,31 @@ const ImportDashboardEditDetails = ({
                                 border: "0px",
                               }}
                             >
-                              <span style={{ fontWeight: "500" }}>
-                                {items.filename}
-                              </span>
+                              Other File
+                              {index + 1}
                             </label>
                             <div className="browse-btn">
-                              Browse
+                              Browse{" "}
                               <input
                                 type="file"
-                                onChange={(e) =>
-                                  handleuserFileChange(e, "analyst" + index)
-                                }
+                                onChange={(e) => {
+                                  handleuserFileChange(e, "other" + index);
+                                  handleOthrefile(e, `other ${index}`);
+                                }}
                               />
                             </div>
                             <span className="filename">
-                              {userfiles?.find(
-                                (f) => f.id === "analyst" + index
-                              )?.file?.name || "No file chosen"}
+                              {userfiles?.find((f) => f.id === "other" + index)
+                                ?.file?.name || "No file chosen"}
                             </span>
                             {userfiles?.length &&
-                            userfiles?.find((f) => f.id === "analyst" + index)
+                            userfiles?.find((f) => f.id === "other" + index)
                               ?.file?.name ? (
                               <button
                                 type="button"
                                 className="remove-file"
                                 onClick={() =>
-                                  removeUserImage(index, "analyst" + index)
+                                  removeUserImage(index, "other" + index)
                                 }
                               >
                                 Remove
@@ -7398,57 +7452,10 @@ const ImportDashboardEditDetails = ({
                               ""
                             )}
                           </div>
-                        );
-                      })}
+                        ))}
 
-                      {nextlevelvalue != "35" && otheruserfiles?.map((file, index) => (
-                        <div
-                          key={"other" + (index + 1)}
-                          className="attachemt_form-bx"
-                        >
-                          <label
-                            style={{
-                              background: "#d9edf7",
-                              padding: "9px 3px",
-                              border: "0px",
-                            }}
-                          >
-                            Other File
-                            {index + 1}
-                          </label>
-                          <div className="browse-btn">
-                            Browse{" "}
-                            <input
-                              type="file"
-                              onChange={(e) => {
-                                handleuserFileChange(e, "other" + index);
-                                handleOthrefile(e, `other ${index}`);
-                              }}
-                            />
-                          </div>
-                          <span className="filename">
-                            {userfiles?.find((f) => f.id === "other" + index)
-                              ?.file?.name || "No file chosen"}
-                          </span>
-                          {userfiles?.length &&
-                          userfiles?.find((f) => f.id === "other" + index)?.file
-                            ?.name ? (
-                            <button
-                              type="button"
-                              className="remove-file"
-                              onClick={() =>
-                                removeUserImage(index, "other" + index)
-                              }
-                            >
-                              Remove
-                            </button>
-                          ) : (
-                            ""
-                          )}
-                        </div>
-                      ))}
-
-                      {(otheruserfiles?.length || userfiles?.length) && nextlevelvalue != "35" ? (
+                      {(otheruserfiles?.length || userfiles?.length) &&
+                      nextlevelvalue != "35" ? (
                         <div className="attachemt_form-bx">
                           <label style={{ border: "0px" }}>{""}</label>
                           <button
@@ -7603,7 +7610,13 @@ const ImportDashboardEditDetails = ({
                         </div>
                       </div>
 
-                      <div className={nextlevelvalue == "35" ? "d-none" : "inner_form_new align-items-center"}>
+                      <div
+                        className={
+                          nextlevelvalue == "35"
+                            ? "d-none"
+                            : "inner_form_new align-items-center"
+                        }
+                      >
                         <label className="controlform">CC To</label>
                         <div className=" cccto">
                           <div className="flex justify-content-center multiSelect">
@@ -7621,421 +7634,425 @@ const ImportDashboardEditDetails = ({
                         </div>
                       </div>
 
-                      {nextlevelvalue != "35" && <>
-                      <div
-                        className={
-                          (roleID == 6 && nextlevelvalue == "") ||
-                          recomdAnalyst == "121"
-                            ? "inner_form_new align-items-center"
-                            : "d-none"
-                        }
-                      >
-                        <label className="controlform">Decision</label>
-                        <div className="row">
-                          <div className="col-md-12">
+                      {nextlevelvalue != "35" && (
+                        <>
+                          <div
+                            className={
+                              (roleID == 6 && nextlevelvalue == "") ||
+                              recomdAnalyst == "121"
+                                ? "inner_form_new align-items-center"
+                                : "d-none"
+                            }
+                          >
+                            <label className="controlform">Decision</label>
+                            <div className="row">
+                              <div className="col-md-12">
+                                <div className="hidden-toggles">
+                                  <input
+                                    type="radio"
+                                    id="srcoloration-Approvedvedsr"
+                                    value="10"
+                                    onChange={(e) => {
+                                      ChangeApplicationStatus(e);
+                                      GetRoleHandle(10);
+                                    }}
+                                    name="applicationstaussr"
+                                    className="hidden-toggles__input"
+                                    checked={
+                                      applicationstaus == "10" ? true : false
+                                    }
+                                  />
+                                  <label
+                                    for="srcoloration-Approvedvedsr"
+                                    className="hidden-toggles__label"
+                                  >
+                                    Approved
+                                  </label>
+
+                                  <input
+                                    type="radio"
+                                    id="srcoloration-Rejected"
+                                    value="30"
+                                    onChange={(e) => {
+                                      ChangeApplicationStatus(e);
+                                    }}
+                                    name="applicationstaussr"
+                                    className="hidden-toggles__input"
+                                    checked={
+                                      applicationstaus == "30" ? true : false
+                                    }
+                                  />
+                                  <label
+                                    for="srcoloration-Rejected"
+                                    className="hidden-toggles__label"
+                                  >
+                                    Rejected
+                                  </label>
+
+                                  <input
+                                    type="radio"
+                                    id="srcoloration-Deferred"
+                                    onChange={(e) => {
+                                      ChangeApplicationStatus(e);
+                                    }}
+                                    name="applicationstaussr"
+                                    value="40"
+                                    className="hidden-toggles__input"
+                                    checked={
+                                      applicationstaus == "40" ? true : false
+                                    }
+                                  />
+                                  <label
+                                    for="srcoloration-Deferred"
+                                    className="hidden-toggles__label"
+                                  >
+                                    Deferred
+                                  </label>
+
+                                  <input
+                                    type="radio"
+                                    id="srcoloration-Cancelled"
+                                    onChange={(e) => {
+                                      ChangeApplicationStatus(e);
+                                    }}
+                                    name="applicationstaussr"
+                                    value="25"
+                                    className="hidden-toggles__input"
+                                    checked={
+                                      applicationstaus == "25" ? true : false
+                                    }
+                                  />
+                                  <label
+                                    for="srcoloration-Cancelled"
+                                    className="hidden-toggles__label"
+                                  >
+                                    Cancelled
+                                  </label>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div
+                            className={
+                              roleID == 6
+                                ? "inner_form_new align-items-center"
+                                : "d-none"
+                            }
+                          >
+                            <label className="controlform">
+                              Is Return Needed?
+                            </label>
                             <div className="hidden-toggles">
                               <input
                                 type="radio"
-                                id="srcoloration-Approvedvedsr"
-                                value="10"
-                                onChange={(e) => {
-                                  ChangeApplicationStatus(e);
-                                  GetRoleHandle(10);
-                                }}
-                                name="applicationstaussr"
+                                id="YesIsReturnsr"
+                                name="IsReturnsr"
+                                onChange={(e) => HandleIsReturnOption(e)}
                                 className="hidden-toggles__input"
-                                checked={
-                                  applicationstaus == "10" ? true : false
-                                }
+                                checked={IsReturn == "1"}
+                                value="1"
                               />
                               <label
-                                for="srcoloration-Approvedvedsr"
+                                for={IsReturn == "1" ? "" : "YesIsReturnsr"}
                                 className="hidden-toggles__label"
+                                id={IsReturn}
                               >
-                                Approved
+                                Yes
                               </label>
-
                               <input
                                 type="radio"
-                                id="srcoloration-Rejected"
-                                value="30"
-                                onChange={(e) => {
-                                  ChangeApplicationStatus(e);
-                                }}
-                                name="applicationstaussr"
+                                name="IsReturnsr"
+                                id="NoIsReturnsr"
                                 className="hidden-toggles__input"
-                                checked={
-                                  applicationstaus == "30" ? true : false
-                                }
-                              />
-                              <label
-                                for="srcoloration-Rejected"
-                                className="hidden-toggles__label"
-                              >
-                                Rejected
-                              </label>
-
-                              <input
-                                type="radio"
-                                id="srcoloration-Deferred"
-                                onChange={(e) => {
-                                  ChangeApplicationStatus(e);
-                                }}
-                                name="applicationstaussr"
-                                value="40"
-                                className="hidden-toggles__input"
-                                checked={
-                                  applicationstaus == "40" ? true : false
-                                }
-                              />
-                              <label
-                                for="srcoloration-Deferred"
-                                className="hidden-toggles__label"
-                              >
-                                Deferred
-                              </label>
-
-                              <input
-                                type="radio"
-                                id="srcoloration-Cancelled"
-                                onChange={(e) => {
-                                  ChangeApplicationStatus(e);
-                                }}
-                                name="applicationstaussr"
-                                value="25"
-                                className="hidden-toggles__input"
-                                checked={
-                                  applicationstaus == "25" ? true : false
-                                }
-                              />
-                              <label
-                                for="srcoloration-Cancelled"
-                                className="hidden-toggles__label"
-                              >
-                                Cancelled
-                              </label>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div
-                        className={
-                          roleID == 6
-                            ? "inner_form_new align-items-center"
-                            : "d-none"
-                        }
-                      >
-                        <label className="controlform">Is Return Needed?</label>
-                        <div className="hidden-toggles">
-                          <input
-                            type="radio"
-                            id="YesIsReturnsr"
-                            name="IsReturnsr"
-                            onChange={(e) => HandleIsReturnOption(e)}
-                            className="hidden-toggles__input"
-                            checked={IsReturn == "1"}
-                            value="1"
-                          />
-                          <label
-                            for={IsReturn == "1" ? "" : "YesIsReturnsr"}
-                            className="hidden-toggles__label"
-                            id={IsReturn}
-                          >
-                            Yes
-                          </label>
-                          <input
-                            type="radio"
-                            name="IsReturnsr"
-                            id="NoIsReturnsr"
-                            className="hidden-toggles__input"
-                            onChange={(e) => HandleIsReturnOption(e)}
-                            value="0"
-                            checked={IsReturn == "0"}
-                          />
-                          <label
-                            for="NoIsReturnsr"
-                            className="hidden-toggles__label"
-                          >
-                            No
-                          </label>
-                        </div>
-                      </div>
-
-                      <div className="row">
-                        <div className="col-md-7">
-                          <div
-                            className={
-                              roleID == 6 && IsReturnOption == "1"
-                                ? "inner_form_new align-items-center"
-                                : "d-none"
-                            }
-                          >
-                            <label className="controlform">
-                              Return Frequency
-                            </label>
-                            <div className="form-bx">
-                              <label>
-                                <select
-                                  name="ReturnFrequency"
-                                  onChange={(e) => SelectReturnFrequency(e)}
-                                >
-                                  <option value="0" defaultChecked>
-                                    Select Frequency
-                                  </option>
-                                  {AllFrequency?.map((item, index) => {
-                                    return (
-                                      <option
-                                        key={index}
-                                        value={item.id}
-                                        selected={
-                                          getFrequencyID == item.id &&
-                                          getFrequencyID != ""
-                                            ? true
-                                            : false
-                                        }
-                                      >
-                                        {item.name}
-                                      </option>
-                                    );
-                                  })}
-                                </select>
-                              </label>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="col-md-5">
-                          <div
-                            className={
-                              roleID == 6 &&
-                              IsReturn == "1" &&
-                              getFrequencyID == "1"
-                                ? "inner_form_new-sm"
-                                : "d-none"
-                            }
-                          >
-                            <label className="controlform-sm">
-                              Frequency Date
-                            </label>
-                            <div className="form-bx-sm">
-                              <DatePicker
-                                ref={FrequencyDateRef}
-                                placeholderText="Select Frequency Date"
-                                closeOnScroll={(e) => e.target === document}
-                                selected={IsReturnExpiringDate}
-                                onChange={(date) =>
-                                  setIsReturnExpiringDate(date)
-                                }
-                                peekNextMonth
-                                showMonthDropdown
-                                maxDate={new Date("03-31-2027")}
-                                minDate={new Date()}
-                                showYearDropdown
-                                dropdownMode="select"
-                                dateFormat="dd/MMM/yyyy"
-                                onKeyDown={(e) => {
-                                  const key = e.key;
-                                  const allowedKeys = /[0-9\/]/;
-                                  if (
-                                    !allowedKeys.test(key) &&
-                                    key !== "Backspace" &&
-                                    key !== "Delete"
-                                  ) {
-                                    e.preventDefault();
-                                  }
-                                }}
-                              />
-                              <span className="sspan"></span>
-                              {errors.IsReturnExpiringDate &&
-                              (IsReturnExpiringDate ==
-                                "Select Frequency Date " ||
-                                IsReturnExpiringDate == null) ? (
-                                <small
-                                  className="errormsg"
-                                  style={{ marginBottom: "9px" }}
-                                >
-                                  {errors.IsReturnExpiringDate}
-                                </small>
-                              ) : (
-                                ""
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div
-                        className={
-                          roleID == 6
-                            ? "inner_form_new align-items-center"
-                            : "d-none"
-                        }
-                      >
-                        <label className="controlform">
-                          Is Expiry Required?
-                        </label>
-                        <div className="hidden-toggles">
-                          <input
-                            type="radio"
-                            id="exprqsr"
-                            name="dateexpitysr"
-                            onChange={(e) => HandleDateExpiryOption(e)}
-                            className="hidden-toggles__input"
-                            checked={defaultnoExpiry == "1"}
-                            value="1"
-                          />
-                          <label
-                            for={defaultnoExpiry == "1" ? "" : "exprqsr"}
-                            className="hidden-toggles__label"
-                          >
-                            Yes
-                          </label>
-                          <input
-                            type="radio"
-                            name="dateexpitysr"
-                            id="noexpsr"
-                            className="hidden-toggles__input"
-                            onChange={(e) => {
-                              HandleDateExpiryOption(e);
-                              setExpiringDate(null);
-                            }}
-                            value="0"
-                            checked={defaultnoExpiry == "0"}
-                          />
-                          <label
-                            for={defaultnoExpiry == "0" ? "" : "noexpsr"}
-                            className="hidden-toggles__label"
-                          >
-                            No
-                          </label>
-                        </div>
-                      </div>
-
-                      <div className="row">
-                        <div className="col-md-7">
-                          <div
-                            className={
-                              roleID == 6 && DateExpiryOption == "1"
-                                ? "inner_form_new align-items-center"
-                                : "d-none"
-                            }
-                          >
-                            <label className="controlform">
-                              Define Expiry Date
-                            </label>
-
-                            <div
-                              className={
-                                DateExpiryOption == "1"
-                                  ? "hidden-toggles"
-                                  : "d-none"
-                              }
-                            >
-                              <input
-                                type="radio"
-                                ref={dateExpirydisplayRef}
-                                id="defineddatesr"
-                                className="hidden-toggles__input"
-                                name="dateExpirydisplaysr"
-                                onChange={(e) =>
-                                  setDateExpirydisplay(e.target.value)
-                                }
+                                onChange={(e) => HandleIsReturnOption(e)}
                                 value="0"
-                                checked={
-                                  DateExpirydisplay != "" &&
-                                  DateExpirydisplay == "0" &&
-                                  DateExpiryOption == "1"
-                                }
-                              />{" "}
+                                checked={IsReturn == "0"}
+                              />
                               <label
-                                for="defineddatesr"
+                                for="NoIsReturnsr"
                                 className="hidden-toggles__label"
                               >
-                                Specific Date
+                                No
+                              </label>
+                            </div>
+                          </div>
+
+                          <div className="row">
+                            <div className="col-md-7">
+                              <div
+                                className={
+                                  roleID == 6 && IsReturnOption == "1"
+                                    ? "inner_form_new align-items-center"
+                                    : "d-none"
+                                }
+                              >
+                                <label className="controlform">
+                                  Return Frequency
+                                </label>
+                                <div className="form-bx">
+                                  <label>
+                                    <select
+                                      name="ReturnFrequency"
+                                      onChange={(e) => SelectReturnFrequency(e)}
+                                    >
+                                      <option value="0" defaultChecked>
+                                        Select Frequency
+                                      </option>
+                                      {AllFrequency?.map((item, index) => {
+                                        return (
+                                          <option
+                                            key={index}
+                                            value={item.id}
+                                            selected={
+                                              getFrequencyID == item.id &&
+                                              getFrequencyID != ""
+                                                ? true
+                                                : false
+                                            }
+                                          >
+                                            {item.name}
+                                          </option>
+                                        );
+                                      })}
+                                    </select>
+                                  </label>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="col-md-5">
+                              <div
+                                className={
+                                  roleID == 6 &&
+                                  IsReturn == "1" &&
+                                  getFrequencyID == "1"
+                                    ? "inner_form_new-sm"
+                                    : "d-none"
+                                }
+                              >
+                                <label className="controlform-sm">
+                                  Frequency Date
+                                </label>
+                                <div className="form-bx-sm">
+                                  <DatePicker
+                                    ref={FrequencyDateRef}
+                                    placeholderText="Select Frequency Date"
+                                    closeOnScroll={(e) => e.target === document}
+                                    selected={IsReturnExpiringDate}
+                                    onChange={(date) =>
+                                      setIsReturnExpiringDate(date)
+                                    }
+                                    peekNextMonth
+                                    showMonthDropdown
+                                    maxDate={new Date("03-31-2027")}
+                                    minDate={new Date()}
+                                    showYearDropdown
+                                    dropdownMode="select"
+                                    dateFormat="dd/MMM/yyyy"
+                                    onKeyDown={(e) => {
+                                      const key = e.key;
+                                      const allowedKeys = /[0-9\/]/;
+                                      if (
+                                        !allowedKeys.test(key) &&
+                                        key !== "Backspace" &&
+                                        key !== "Delete"
+                                      ) {
+                                        e.preventDefault();
+                                      }
+                                    }}
+                                  />
+                                  <span className="sspan"></span>
+                                  {errors.IsReturnExpiringDate &&
+                                  (IsReturnExpiringDate ==
+                                    "Select Frequency Date " ||
+                                    IsReturnExpiringDate == null) ? (
+                                    <small
+                                      className="errormsg"
+                                      style={{ marginBottom: "9px" }}
+                                    >
+                                      {errors.IsReturnExpiringDate}
+                                    </small>
+                                  ) : (
+                                    ""
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div
+                            className={
+                              roleID == 6
+                                ? "inner_form_new align-items-center"
+                                : "d-none"
+                            }
+                          >
+                            <label className="controlform">
+                              Is Expiry Required?
+                            </label>
+                            <div className="hidden-toggles">
+                              <input
+                                type="radio"
+                                id="exprqsr"
+                                name="dateexpitysr"
+                                onChange={(e) => HandleDateExpiryOption(e)}
+                                className="hidden-toggles__input"
+                                checked={defaultnoExpiry == "1"}
+                                value="1"
+                              />
+                              <label
+                                for={defaultnoExpiry == "1" ? "" : "exprqsr"}
+                                className="hidden-toggles__label"
+                              >
+                                Yes
                               </label>
                               <input
                                 type="radio"
-                                ref={optionExpirydisplayRef}
-                                id="rerpetualdatesr"
-                                name="dateExpirydisplaysr"
+                                name="dateexpitysr"
+                                id="noexpsr"
+                                className="hidden-toggles__input"
                                 onChange={(e) => {
-                                  setDateExpirydisplay(e.target.value);
+                                  HandleDateExpiryOption(e);
                                   setExpiringDate(null);
                                 }}
-                                className="hidden-toggles__input"
-                                value="1"
-                                checked={
-                                  DateExpirydisplay == "1" &&
-                                  DateExpiryOption == "1"
-                                }
+                                value="0"
+                                checked={defaultnoExpiry == "0"}
                               />
                               <label
-                                for="rerpetualdatesr"
+                                for={defaultnoExpiry == "0" ? "" : "noexpsr"}
                                 className="hidden-toggles__label"
                               >
-                                Perpetual
+                                No
                               </label>
                             </div>
                           </div>
-                        </div>
 
-                        <div className="col-md-5">
-                          <div
-                            className={
-                              roleID == 6 &&
-                              DateExpirydisplay == "0" &&
-                              DateExpiryOption == "1"
-                                ? "inner_form_new-sm"
-                                : "d-none"
-                            }
-                          >
-                            <label className="controlform-sm">
-                              Expiry Date
-                            </label>
-                            <div className="form-bx-sm">
-                              <DatePicker
-                                placeholderText="Select Expiry Date"
-                                closeOnScroll={(e) => e.target === document}
-                                selected={ExpiringDate}
-                                onChange={(date) => setExpiringDate(date)}
-                                peekNextMonth
-                                showMonthDropdown
-                                minDate={new Date()}
-                                showYearDropdown
-                                dropdownMode="select"
-                                dateFormat="dd/MMM/yyyy"
-                                onKeyDown={(e) => {
-                                  const key = e.key;
-                                  const allowedKeys = /[0-9\/]/;
-                                  if (
-                                    !allowedKeys.test(key) &&
-                                    key !== "Backspace" &&
-                                    key !== "Delete"
-                                  ) {
-                                    e.preventDefault();
+                          <div className="row">
+                            <div className="col-md-7">
+                              <div
+                                className={
+                                  roleID == 6 && DateExpiryOption == "1"
+                                    ? "inner_form_new align-items-center"
+                                    : "d-none"
+                                }
+                              >
+                                <label className="controlform">
+                                  Define Expiry Date
+                                </label>
+
+                                <div
+                                  className={
+                                    DateExpiryOption == "1"
+                                      ? "hidden-toggles"
+                                      : "d-none"
                                   }
-                                }}
-                              />
-
-                              <span className="sspan"></span>
-                              {errors.ExpiringDate &&
-                              (ExpiringDate == "Select Expiring Date " ||
-                                ExpiringDate == null) ? (
-                                <small
-                                  className="errormsg"
-                                  style={{ marginBottom: "9px" }}
                                 >
-                                  {errors.ExpiringDate}
-                                </small>
-                              ) : (
-                                ""
-                              )}
+                                  <input
+                                    type="radio"
+                                    ref={dateExpirydisplayRef}
+                                    id="defineddatesr"
+                                    className="hidden-toggles__input"
+                                    name="dateExpirydisplaysr"
+                                    onChange={(e) =>
+                                      setDateExpirydisplay(e.target.value)
+                                    }
+                                    value="0"
+                                    checked={
+                                      DateExpirydisplay != "" &&
+                                      DateExpirydisplay == "0" &&
+                                      DateExpiryOption == "1"
+                                    }
+                                  />{" "}
+                                  <label
+                                    for="defineddatesr"
+                                    className="hidden-toggles__label"
+                                  >
+                                    Specific Date
+                                  </label>
+                                  <input
+                                    type="radio"
+                                    ref={optionExpirydisplayRef}
+                                    id="rerpetualdatesr"
+                                    name="dateExpirydisplaysr"
+                                    onChange={(e) => {
+                                      setDateExpirydisplay(e.target.value);
+                                      setExpiringDate(null);
+                                    }}
+                                    className="hidden-toggles__input"
+                                    value="1"
+                                    checked={
+                                      DateExpirydisplay == "1" &&
+                                      DateExpiryOption == "1"
+                                    }
+                                  />
+                                  <label
+                                    for="rerpetualdatesr"
+                                    className="hidden-toggles__label"
+                                  >
+                                    Perpetual
+                                  </label>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="col-md-5">
+                              <div
+                                className={
+                                  roleID == 6 &&
+                                  DateExpirydisplay == "0" &&
+                                  DateExpiryOption == "1"
+                                    ? "inner_form_new-sm"
+                                    : "d-none"
+                                }
+                              >
+                                <label className="controlform-sm">
+                                  Expiry Date
+                                </label>
+                                <div className="form-bx-sm">
+                                  <DatePicker
+                                    placeholderText="Select Expiry Date"
+                                    closeOnScroll={(e) => e.target === document}
+                                    selected={ExpiringDate}
+                                    onChange={(date) => setExpiringDate(date)}
+                                    peekNextMonth
+                                    showMonthDropdown
+                                    minDate={new Date()}
+                                    showYearDropdown
+                                    dropdownMode="select"
+                                    dateFormat="dd/MMM/yyyy"
+                                    onKeyDown={(e) => {
+                                      const key = e.key;
+                                      const allowedKeys = /[0-9\/]/;
+                                      if (
+                                        !allowedKeys.test(key) &&
+                                        key !== "Backspace" &&
+                                        key !== "Delete"
+                                      ) {
+                                        e.preventDefault();
+                                      }
+                                    }}
+                                  />
+
+                                  <span className="sspan"></span>
+                                  {errors.ExpiringDate &&
+                                  (ExpiringDate == "Select Expiring Date " ||
+                                    ExpiringDate == null) ? (
+                                    <small
+                                      className="errormsg"
+                                      style={{ marginBottom: "9px" }}
+                                    >
+                                      {errors.ExpiringDate}
+                                    </small>
+                                  ) : (
+                                    ""
+                                  )}
+                                </div>
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      </div>
-                      </>}
+                        </>
+                      )}
                     </div>
 
                     {allcomment?.map((cur) => {
@@ -8801,7 +8818,6 @@ const ImportDashboardEditDetails = ({
                                   </label>
                                   <div className="form-bx">
                                     <label>
-                                      {" "}
                                       <textarea
                                         type="text"
                                         className=""
@@ -8987,7 +9003,11 @@ const ImportDashboardEditDetails = ({
                       </div>
 
                       <div
-                        className={checkSupervisor == true && nextlevelvalue != "35" ? "row" : "d-none"}
+                        className={
+                          checkSupervisor == true && nextlevelvalue != "35"
+                            ? "row"
+                            : "d-none"
+                        }
                       >
                         <div className="col-md-12 d-flex c-gap">
                           <div
@@ -9203,11 +9223,62 @@ const ImportDashboardEditDetails = ({
                         ""
                       )}
 
-                      {nextlevelvalue != "35" && attachmentData?.map((items, index) => {
-                        return (
+                      {nextlevelvalue != "35" &&
+                        attachmentData?.map((items, index) => {
+                          return (
+                            <div
+                              className="attachemt_form-bx  mt-2"
+                              key={items.id}
+                            >
+                              <label
+                                style={{
+                                  background: "#d9edf7",
+                                  padding: "9px 3px",
+                                  border: "0px",
+                                }}
+                              >
+                                <span style={{ fontWeight: "500" }}>
+                                  {items.filename}
+                                </span>
+                              </label>
+                              <div className="browse-btn">
+                                Browse
+                                <input
+                                  type="file"
+                                  onChange={(e) =>
+                                    handleuserFileChange(e, "analyst" + index)
+                                  }
+                                />
+                              </div>
+                              <span className="filename">
+                                {userfiles?.find(
+                                  (f) => f.id === "analyst" + index
+                                )?.file?.name || "No file chosen"}
+                              </span>
+                              {userfiles?.length &&
+                              userfiles?.find((f) => f.id === "analyst" + index)
+                                ?.file?.name ? (
+                                <button
+                                  type="button"
+                                  className="remove-file"
+                                  onClick={() =>
+                                    removeUserImage(index, "analyst" + index)
+                                  }
+                                >
+                                  Remove
+                                </button>
+                              ) : (
+                                ""
+                              )}
+                            </div>
+                          );
+                        })}
+
+                      {nextlevelvalue != "35" &&
+                        otheruserfiles?.map((file, index) => (
                           <div
-                            className="attachemt_form-bx  mt-2"
-                            key={items.id}
+                            key={"other" + (index + 1)}
+                            className="attachemt_form-bx"
                           >
                             <label
                               style={{
@@ -9216,32 +9287,32 @@ const ImportDashboardEditDetails = ({
                                 border: "0px",
                               }}
                             >
-                              <span style={{ fontWeight: "500" }}>
-                                {items.filename}
-                              </span>
+                              Other File
+                              {index + 1}
                             </label>
                             <div className="browse-btn">
-                              Browse
+                              Browse{" "}
                               <input
                                 type="file"
-                                onChange={(e) =>
-                                  handleuserFileChange(e, "analyst" + index)
-                                }
+                                onChange={(e) => {
+                                  handleuserFileChange(e, "other" + index);
+                                  handleOthrefile(e, `other ${index}`);
+                                }}
                               />
                             </div>
                             <span className="filename">
-                              {userfiles?.find(
-                                (f) => f.id === "analyst" + index
-                              )?.file?.name || "No file chosen"}
+                              {userfiles?.find((f) => f.id === "other" + index)
+                                ?.file?.name || "No file chosen"}
                             </span>
+
                             {userfiles?.length &&
-                            userfiles?.find((f) => f.id === "analyst" + index)
+                            userfiles?.find((f) => f.id === "other" + index)
                               ?.file?.name ? (
                               <button
                                 type="button"
                                 className="remove-file"
                                 onClick={() =>
-                                  removeUserImage(index, "analyst" + index)
+                                  removeUserImage(index, "other" + index)
                                 }
                               >
                                 Remove
@@ -9250,58 +9321,10 @@ const ImportDashboardEditDetails = ({
                               ""
                             )}
                           </div>
-                        );
-                      })}
+                        ))}
 
-                      {nextlevelvalue != "35" && otheruserfiles?.map((file, index) => (
-                        <div
-                          key={"other" + (index + 1)}
-                          className="attachemt_form-bx"
-                        >
-                          <label
-                            style={{
-                              background: "#d9edf7",
-                              padding: "9px 3px",
-                              border: "0px",
-                            }}
-                          >
-                            Other File
-                            {index + 1}
-                          </label>
-                          <div className="browse-btn">
-                            Browse{" "}
-                            <input
-                              type="file"
-                              onChange={(e) => {
-                                handleuserFileChange(e, "other" + index);
-                                handleOthrefile(e, `other ${index}`);
-                              }}
-                            />
-                          </div>
-                          <span className="filename">
-                            {userfiles?.find((f) => f.id === "other" + index)
-                              ?.file?.name || "No file chosen"}
-                          </span>
-
-                          {userfiles?.length &&
-                          userfiles?.find((f) => f.id === "other" + index)?.file
-                            ?.name ? (
-                            <button
-                              type="button"
-                              className="remove-file"
-                              onClick={() =>
-                                removeUserImage(index, "other" + index)
-                              }
-                            >
-                              Remove
-                            </button>
-                          ) : (
-                            ""
-                          )}
-                        </div>
-                      ))}
-
-                      {(otheruserfiles?.length || userfiles?.length) && nextlevelvalue != "35" ? (
+                      {(otheruserfiles?.length || userfiles?.length) &&
+                      nextlevelvalue != "35" ? (
                         <div className="attachemt_form-bx">
                           <label style={{ border: "0px" }}>{""}</label>
                           <button
@@ -9452,439 +9475,443 @@ const ImportDashboardEditDetails = ({
                         </div>
                       </div>
 
-                      {nextlevelvalue != "35" && <>
-                      <div className="inner_form_new align-items-center">
-                        <label className="controlform">CC To</label>
-                        <div className=" cccto">
-                          <div className="flex justify-content-center multiSelect">
-                            <MultiSelect
-                              value={selectedBanks}
-                              onChange={(e) => setSelectedBanks(e.value)}
-                              options={vOption}
-                              onShow={onShow}
-                              optionLabel="name"
-                              placeholder="Select Banks"
-                              display="chip"
-                              className="w-full md:w-20rem"
-                            />
+                      {nextlevelvalue != "35" && (
+                        <>
+                          <div className="inner_form_new align-items-center">
+                            <label className="controlform">CC To</label>
+                            <div className=" cccto">
+                              <div className="flex justify-content-center multiSelect">
+                                <MultiSelect
+                                  value={selectedBanks}
+                                  onChange={(e) => setSelectedBanks(e.value)}
+                                  options={vOption}
+                                  onShow={onShow}
+                                  optionLabel="name"
+                                  placeholder="Select Banks"
+                                  display="chip"
+                                  className="w-full md:w-20rem"
+                                />
+                              </div>
+                            </div>
                           </div>
-                        </div>
-                      </div>
 
-                      <div
-                        className={
-                          roleID == 7
-                            ? "inner_form_new align-items-center"
-                            : "d-none"
-                        }
-                      >
-                        <label className="controlform">Is Return Needed?</label>
-                        <div className="hidden-toggles">
-                          <input
-                            type="radio"
-                            id="YesIsReturnpr"
-                            name="IsReturnpr"
-                            onChange={(e) => HandleIsReturnOption(e)}
-                            className="hidden-toggles__input"
-                            checked={IsReturn == "1"}
-                            value="1"
-                          />
-                          <label
-                            for={IsReturn == "1" ? "" : "YesIsReturnpr"}
-                            className="hidden-toggles__label"
-                            id={IsReturn}
-                          >
-                            Yes
-                          </label>
-                          <input
-                            type="radio"
-                            name="IsReturnpr"
-                            id="NoIsReturnpr"
-                            className="hidden-toggles__input"
-                            onChange={(e) => HandleIsReturnOption(e)}
-                            value="0"
-                            checked={IsReturn == "0"}
-                          />
-                          <label
-                            for="NoIsReturnpr"
-                            className="hidden-toggles__label"
-                          >
-                            No
-                          </label>
-                        </div>
-                      </div>
-
-                      <div className="row">
-                        <div className="col-md-7">
                           <div
                             className={
-                              roleID == 7 && IsReturnOption == "1"
+                              roleID == 7
                                 ? "inner_form_new align-items-center"
                                 : "d-none"
                             }
                           >
                             <label className="controlform">
-                              Return Frequency
+                              Is Return Needed?
                             </label>
-                            <div className="form-bx">
-                              <label>
-                                <select
-                                  name="ReturnFrequency"
-                                  onChange={(e) => SelectReturnFrequency(e)}
-                                >
-                                  <option value="0" defaultChecked>
-                                    Select Frequency
-                                  </option>
-                                  {AllFrequency?.map((item, index) => {
-                                    return (
-                                      <option
-                                        key={index}
-                                        value={item.id}
-                                        selected={
-                                          getFrequencyID == item.id &&
-                                          getFrequencyID != ""
-                                            ? true
-                                            : false
-                                        }
-                                      >
-                                        {item.name}
-                                      </option>
-                                    );
-                                  })}
-                                </select>
-                              </label>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="col-md-5">
-                          <div
-                            className={
-                              roleID == 7 &&
-                              IsReturn == "1" &&
-                              getFrequencyID == "1"
-                                ? "inner_form_new-sm"
-                                : "d-none"
-                            }
-                          >
-                            <label className="controlform-sm">
-                              Frequency Date
-                            </label>
-                            <div className="form-bx-sm">
-                              <DatePicker
-                                ref={FrequencyDateRef}
-                                placeholderText="Select Frequency Date"
-                                closeOnScroll={(e) => e.target === document}
-                                selected={IsReturnExpiringDate}
-                                onChange={(date) =>
-                                  setIsReturnExpiringDate(date)
-                                }
-                                peekNextMonth
-                                showMonthDropdown
-                                maxDate={new Date("03-31-2027")}
-                                minDate={new Date()}
-                                showYearDropdown
-                                dropdownMode="select"
-                                dateFormat="dd/MMM/yyyy"
-                                onKeyDown={(e) => {
-                                  const key = e.key;
-                                  const allowedKeys = /[0-9\/]/;
-                                  if (
-                                    !allowedKeys.test(key) &&
-                                    key !== "Backspace" &&
-                                    key !== "Delete"
-                                  ) {
-                                    e.preventDefault();
-                                  }
-                                }}
-                              />
-                              <span className="sspan"></span>
-                              {errors.IsReturnExpiringDate &&
-                              (IsReturnExpiringDate ==
-                                "Select Frequency Date " ||
-                                IsReturnExpiringDate == null) ? (
-                                <small
-                                  className="errormsg"
-                                  style={{ marginBottom: "9px" }}
-                                >
-                                  {errors.IsReturnExpiringDate}
-                                </small>
-                              ) : (
-                                ""
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div
-                        className={
-                          roleID == 7
-                            ? "inner_form_new align-items-center"
-                            : "d-none"
-                        }
-                      >
-                        <label className="controlform">
-                          Is Expiry Required?
-                        </label>
-                        <div className="hidden-toggles">
-                          <input
-                            type="radio"
-                            id="exprqprs"
-                            name="dateexpityprs"
-                            onChange={(e) => HandleDateExpiryOption(e)}
-                            className="hidden-toggles__input"
-                            checked={defaultnoExpiry == "1"}
-                            value="1"
-                          />
-                          <label
-                            for="exprqprs"
-                            className="hidden-toggles__label"
-                          >
-                            Yes
-                          </label>
-                          <input
-                            type="radio"
-                            name="dateexpityprs"
-                            id="noexpprs"
-                            className="hidden-toggles__input"
-                            onChange={(e) => {
-                              HandleDateExpiryOption(e);
-                              setExpiringDate(null);
-                            }}
-                            value="0"
-                            checked={defaultnoExpiry == "0"}
-                          />
-                          <label
-                            for="noexpprs"
-                            className="hidden-toggles__label"
-                          >
-                            No
-                          </label>
-                        </div>
-                      </div>
-
-                      <div className="row">
-                        <div className="col-md-7">
-                          <div
-                            className={
-                              roleID == 7 && DateExpiryOption == "1"
-                                ? "inner_form_new align-items-center"
-                                : "d-none"
-                            }
-                          >
-                            <label className="controlform">
-                              Define Expiry Date
-                            </label>
-
-                            <div
-                              className={
-                                DateExpiryOption == "1"
-                                  ? "hidden-toggles"
-                                  : "d-none"
-                              }
-                            >
-                              <input
-                                type="radio"
-                                ref={dateExpirydisplayRef}
-                                id="defineddatepr"
-                                className="hidden-toggles__input"
-                                name="dateExpirydisplaypr"
-                                onChange={(e) =>
-                                  setDateExpirydisplay(e.target.value)
-                                }
-                                value="0"
-                                checked={
-                                  DateExpirydisplay != "" &&
-                                  DateExpirydisplay == "0" &&
-                                  DateExpiryOption == "1"
-                                }
-                              />{" "}
-                              <label
-                                for="defineddatepr"
-                                className="hidden-toggles__label"
-                              >
-                                Specific Date
-                              </label>
-                              <input
-                                type="radio"
-                                ref={optionExpirydisplayRef}
-                                id="rerpetualdatepr"
-                                name="dateExpirydisplaypr"
-                                onChange={(e) => {
-                                  setDateExpirydisplay(e.target.value);
-                                  setExpiringDate(null);
-                                }}
-                                className="hidden-toggles__input"
-                                value="1"
-                                checked={
-                                  DateExpirydisplay == "1" &&
-                                  DateExpiryOption == "1"
-                                }
-                              />
-                              <label
-                                for="rerpetualdatepr"
-                                className="hidden-toggles__label"
-                              >
-                                Perpetual
-                              </label>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="col-md-5">
-                          <div
-                            className={
-                              roleID == 7 &&
-                              DateExpirydisplay == "0" &&
-                              DateExpiryOption == "1"
-                                ? "inner_form_new-sm"
-                                : "d-none"
-                            }
-                          >
-                            <label className="controlform-sm">
-                              Expiry Date
-                            </label>
-
-                            <div className="form-bx-sm">
-                              <DatePicker
-                                placeholderText="Select Expiry Date"
-                                closeOnScroll={(e) => e.target === document}
-                                selected={ExpiringDate}
-                                onChange={(date) => setExpiringDate(date)}
-                                peekNextMonth
-                                showMonthDropdown
-                                minDate={new Date()}
-                                showYearDropdown
-                                dropdownMode="select"
-                                dateFormat="dd/MMM/yyyy"
-                                onKeyDown={(e) => {
-                                  const key = e.key;
-                                  const allowedKeys = /[0-9\/]/;
-                                  if (
-                                    !allowedKeys.test(key) &&
-                                    key !== "Backspace" &&
-                                    key !== "Delete"
-                                  ) {
-                                    e.preventDefault();
-                                  }
-                                }}
-                              />
-                              <span className="sspan"></span>
-                              {errors.ExpiringDate &&
-                              (ExpiringDate == "Select Expiring Date " ||
-                                ExpiringDate == null) ? (
-                                <small
-                                  className="errormsg"
-                                  style={{ marginBottom: "9px" }}
-                                >
-                                  {errors.ExpiringDate}
-                                </small>
-                              ) : (
-                                ""
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div
-                        className={
-                          (roleID == 7 && nextlevelvalue == "") ||
-                          recomdAnalyst == "121"
-                            ? "inner_form_new align-items-center"
-                            : "d-none"
-                        }
-                      >
-                        <label className="controlform">Decision</label>
-                        <div className="row">
-                          <div className="col-md-12">
                             <div className="hidden-toggles">
                               <input
                                 type="radio"
-                                id="srcoloration-Approvedved3"
-                                value="10"
-                                onChange={(e) => {
-                                  ChangeApplicationStatus(e);
-                                  GetRoleHandle(10);
-                                }}
-                                name="applicationstausprs"
+                                id="YesIsReturnpr"
+                                name="IsReturnpr"
+                                onChange={(e) => HandleIsReturnOption(e)}
                                 className="hidden-toggles__input"
-                                checked={
-                                  applicationstaus == "10" ? true : false
-                                }
+                                checked={IsReturn == "1"}
+                                value="1"
                               />
                               <label
-                                for="srcoloration-Approvedved3"
+                                for={IsReturn == "1" ? "" : "YesIsReturnpr"}
                                 className="hidden-toggles__label"
+                                id={IsReturn}
                               >
-                                Approved
+                                Yes
                               </label>
-
                               <input
                                 type="radio"
-                                id="srcoloration-Rejected"
-                                value="30"
-                                onChange={(e) => {
-                                  ChangeApplicationStatus(e);
-                                }}
-                                name="applicationstausprs"
+                                name="IsReturnpr"
+                                id="NoIsReturnpr"
                                 className="hidden-toggles__input"
-                                checked={
-                                  applicationstaus == "30" ? true : false
-                                }
+                                onChange={(e) => HandleIsReturnOption(e)}
+                                value="0"
+                                checked={IsReturn == "0"}
                               />
                               <label
-                                for="srcoloration-Rejected"
+                                for="NoIsReturnpr"
                                 className="hidden-toggles__label"
                               >
-                                Rejected
-                              </label>
-
-                              <input
-                                type="radio"
-                                id="srcoloration-Deferred"
-                                onChange={(e) => {
-                                  ChangeApplicationStatus(e);
-                                }}
-                                name="applicationstausprs"
-                                value="40"
-                                className="hidden-toggles__input"
-                                checked={
-                                  applicationstaus == "40" ? true : false
-                                }
-                              />
-                              <label
-                                for="srcoloration-Deferred"
-                                className="hidden-toggles__label"
-                              >
-                                Deferred
-                              </label>
-
-                              <input
-                                type="radio"
-                                id="srcoloration-Cancelled"
-                                onChange={(e) => {
-                                  ChangeApplicationStatus(e);
-                                }}
-                                name="applicationstausprs"
-                                value="25"
-                                className="hidden-toggles__input"
-                                checked={
-                                  applicationstaus == "25" ? true : false
-                                }
-                              />
-                              <label
-                                for="srcoloration-Cancelled"
-                                className="hidden-toggles__label"
-                              >
-                                Cancelled
+                                No
                               </label>
                             </div>
                           </div>
-                        </div>
-                      </div>
-                      </>}
+
+                          <div className="row">
+                            <div className="col-md-7">
+                              <div
+                                className={
+                                  roleID == 7 && IsReturnOption == "1"
+                                    ? "inner_form_new align-items-center"
+                                    : "d-none"
+                                }
+                              >
+                                <label className="controlform">
+                                  Return Frequency
+                                </label>
+                                <div className="form-bx">
+                                  <label>
+                                    <select
+                                      name="ReturnFrequency"
+                                      onChange={(e) => SelectReturnFrequency(e)}
+                                    >
+                                      <option value="0" defaultChecked>
+                                        Select Frequency
+                                      </option>
+                                      {AllFrequency?.map((item, index) => {
+                                        return (
+                                          <option
+                                            key={index}
+                                            value={item.id}
+                                            selected={
+                                              getFrequencyID == item.id &&
+                                              getFrequencyID != ""
+                                                ? true
+                                                : false
+                                            }
+                                          >
+                                            {item.name}
+                                          </option>
+                                        );
+                                      })}
+                                    </select>
+                                  </label>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="col-md-5">
+                              <div
+                                className={
+                                  roleID == 7 &&
+                                  IsReturn == "1" &&
+                                  getFrequencyID == "1"
+                                    ? "inner_form_new-sm"
+                                    : "d-none"
+                                }
+                              >
+                                <label className="controlform-sm">
+                                  Frequency Date
+                                </label>
+                                <div className="form-bx-sm">
+                                  <DatePicker
+                                    ref={FrequencyDateRef}
+                                    placeholderText="Select Frequency Date"
+                                    closeOnScroll={(e) => e.target === document}
+                                    selected={IsReturnExpiringDate}
+                                    onChange={(date) =>
+                                      setIsReturnExpiringDate(date)
+                                    }
+                                    peekNextMonth
+                                    showMonthDropdown
+                                    maxDate={new Date("03-31-2027")}
+                                    minDate={new Date()}
+                                    showYearDropdown
+                                    dropdownMode="select"
+                                    dateFormat="dd/MMM/yyyy"
+                                    onKeyDown={(e) => {
+                                      const key = e.key;
+                                      const allowedKeys = /[0-9\/]/;
+                                      if (
+                                        !allowedKeys.test(key) &&
+                                        key !== "Backspace" &&
+                                        key !== "Delete"
+                                      ) {
+                                        e.preventDefault();
+                                      }
+                                    }}
+                                  />
+                                  <span className="sspan"></span>
+                                  {errors.IsReturnExpiringDate &&
+                                  (IsReturnExpiringDate ==
+                                    "Select Frequency Date " ||
+                                    IsReturnExpiringDate == null) ? (
+                                    <small
+                                      className="errormsg"
+                                      style={{ marginBottom: "9px" }}
+                                    >
+                                      {errors.IsReturnExpiringDate}
+                                    </small>
+                                  ) : (
+                                    ""
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div
+                            className={
+                              roleID == 7
+                                ? "inner_form_new align-items-center"
+                                : "d-none"
+                            }
+                          >
+                            <label className="controlform">
+                              Is Expiry Required?
+                            </label>
+                            <div className="hidden-toggles">
+                              <input
+                                type="radio"
+                                id="exprqprs"
+                                name="dateexpityprs"
+                                onChange={(e) => HandleDateExpiryOption(e)}
+                                className="hidden-toggles__input"
+                                checked={defaultnoExpiry == "1"}
+                                value="1"
+                              />
+                              <label
+                                for="exprqprs"
+                                className="hidden-toggles__label"
+                              >
+                                Yes
+                              </label>
+                              <input
+                                type="radio"
+                                name="dateexpityprs"
+                                id="noexpprs"
+                                className="hidden-toggles__input"
+                                onChange={(e) => {
+                                  HandleDateExpiryOption(e);
+                                  setExpiringDate(null);
+                                }}
+                                value="0"
+                                checked={defaultnoExpiry == "0"}
+                              />
+                              <label
+                                for="noexpprs"
+                                className="hidden-toggles__label"
+                              >
+                                No
+                              </label>
+                            </div>
+                          </div>
+
+                          <div className="row">
+                            <div className="col-md-7">
+                              <div
+                                className={
+                                  roleID == 7 && DateExpiryOption == "1"
+                                    ? "inner_form_new align-items-center"
+                                    : "d-none"
+                                }
+                              >
+                                <label className="controlform">
+                                  Define Expiry Date
+                                </label>
+
+                                <div
+                                  className={
+                                    DateExpiryOption == "1"
+                                      ? "hidden-toggles"
+                                      : "d-none"
+                                  }
+                                >
+                                  <input
+                                    type="radio"
+                                    ref={dateExpirydisplayRef}
+                                    id="defineddatepr"
+                                    className="hidden-toggles__input"
+                                    name="dateExpirydisplaypr"
+                                    onChange={(e) =>
+                                      setDateExpirydisplay(e.target.value)
+                                    }
+                                    value="0"
+                                    checked={
+                                      DateExpirydisplay != "" &&
+                                      DateExpirydisplay == "0" &&
+                                      DateExpiryOption == "1"
+                                    }
+                                  />{" "}
+                                  <label
+                                    for="defineddatepr"
+                                    className="hidden-toggles__label"
+                                  >
+                                    Specific Date
+                                  </label>
+                                  <input
+                                    type="radio"
+                                    ref={optionExpirydisplayRef}
+                                    id="rerpetualdatepr"
+                                    name="dateExpirydisplaypr"
+                                    onChange={(e) => {
+                                      setDateExpirydisplay(e.target.value);
+                                      setExpiringDate(null);
+                                    }}
+                                    className="hidden-toggles__input"
+                                    value="1"
+                                    checked={
+                                      DateExpirydisplay == "1" &&
+                                      DateExpiryOption == "1"
+                                    }
+                                  />
+                                  <label
+                                    for="rerpetualdatepr"
+                                    className="hidden-toggles__label"
+                                  >
+                                    Perpetual
+                                  </label>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="col-md-5">
+                              <div
+                                className={
+                                  roleID == 7 &&
+                                  DateExpirydisplay == "0" &&
+                                  DateExpiryOption == "1"
+                                    ? "inner_form_new-sm"
+                                    : "d-none"
+                                }
+                              >
+                                <label className="controlform-sm">
+                                  Expiry Date
+                                </label>
+
+                                <div className="form-bx-sm">
+                                  <DatePicker
+                                    placeholderText="Select Expiry Date"
+                                    closeOnScroll={(e) => e.target === document}
+                                    selected={ExpiringDate}
+                                    onChange={(date) => setExpiringDate(date)}
+                                    peekNextMonth
+                                    showMonthDropdown
+                                    minDate={new Date()}
+                                    showYearDropdown
+                                    dropdownMode="select"
+                                    dateFormat="dd/MMM/yyyy"
+                                    onKeyDown={(e) => {
+                                      const key = e.key;
+                                      const allowedKeys = /[0-9\/]/;
+                                      if (
+                                        !allowedKeys.test(key) &&
+                                        key !== "Backspace" &&
+                                        key !== "Delete"
+                                      ) {
+                                        e.preventDefault();
+                                      }
+                                    }}
+                                  />
+                                  <span className="sspan"></span>
+                                  {errors.ExpiringDate &&
+                                  (ExpiringDate == "Select Expiring Date " ||
+                                    ExpiringDate == null) ? (
+                                    <small
+                                      className="errormsg"
+                                      style={{ marginBottom: "9px" }}
+                                    >
+                                      {errors.ExpiringDate}
+                                    </small>
+                                  ) : (
+                                    ""
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div
+                            className={
+                              (roleID == 7 && nextlevelvalue == "") ||
+                              recomdAnalyst == "121"
+                                ? "inner_form_new align-items-center"
+                                : "d-none"
+                            }
+                          >
+                            <label className="controlform">Decision</label>
+                            <div className="row">
+                              <div className="col-md-12">
+                                <div className="hidden-toggles">
+                                  <input
+                                    type="radio"
+                                    id="srcoloration-Approvedved3"
+                                    value="10"
+                                    onChange={(e) => {
+                                      ChangeApplicationStatus(e);
+                                      GetRoleHandle(10);
+                                    }}
+                                    name="applicationstausprs"
+                                    className="hidden-toggles__input"
+                                    checked={
+                                      applicationstaus == "10" ? true : false
+                                    }
+                                  />
+                                  <label
+                                    for="srcoloration-Approvedved3"
+                                    className="hidden-toggles__label"
+                                  >
+                                    Approved
+                                  </label>
+
+                                  <input
+                                    type="radio"
+                                    id="srcoloration-Rejected"
+                                    value="30"
+                                    onChange={(e) => {
+                                      ChangeApplicationStatus(e);
+                                    }}
+                                    name="applicationstausprs"
+                                    className="hidden-toggles__input"
+                                    checked={
+                                      applicationstaus == "30" ? true : false
+                                    }
+                                  />
+                                  <label
+                                    for="srcoloration-Rejected"
+                                    className="hidden-toggles__label"
+                                  >
+                                    Rejected
+                                  </label>
+
+                                  <input
+                                    type="radio"
+                                    id="srcoloration-Deferred"
+                                    onChange={(e) => {
+                                      ChangeApplicationStatus(e);
+                                    }}
+                                    name="applicationstausprs"
+                                    value="40"
+                                    className="hidden-toggles__input"
+                                    checked={
+                                      applicationstaus == "40" ? true : false
+                                    }
+                                  />
+                                  <label
+                                    for="srcoloration-Deferred"
+                                    className="hidden-toggles__label"
+                                  >
+                                    Deferred
+                                  </label>
+
+                                  <input
+                                    type="radio"
+                                    id="srcoloration-Cancelled"
+                                    onChange={(e) => {
+                                      ChangeApplicationStatus(e);
+                                    }}
+                                    name="applicationstausprs"
+                                    value="25"
+                                    className="hidden-toggles__input"
+                                    checked={
+                                      applicationstaus == "25" ? true : false
+                                    }
+                                  />
+                                  <label
+                                    for="srcoloration-Cancelled"
+                                    className="hidden-toggles__label"
+                                  >
+                                    Cancelled
+                                  </label>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </>
+                      )}
                     </div>
 
                     {allcomment?.map((cur) => {
@@ -10833,7 +10860,11 @@ const ImportDashboardEditDetails = ({
                       </div>
 
                       <div
-                        className={checkSupervisor == true && nextlevelvalue != "35" ? "row" : "d-none"}
+                        className={
+                          checkSupervisor == true && nextlevelvalue != "35"
+                            ? "row"
+                            : "d-none"
+                        }
                       >
                         <div className="col-md-12 d-flex c-gap">
                           <div
@@ -11045,11 +11076,62 @@ const ImportDashboardEditDetails = ({
                         ""
                       )}
 
-                      {nextlevelvalue != "35" && attachmentData?.map((items, index) => {
-                        return (
+                      {nextlevelvalue != "35" &&
+                        attachmentData?.map((items, index) => {
+                          return (
+                            <div
+                              className="attachemt_form-bx  mt-2"
+                              key={items.id}
+                            >
+                              <label
+                                style={{
+                                  background: "#d9edf7",
+                                  padding: "9px 3px",
+                                  border: "0px",
+                                }}
+                              >
+                                <span style={{ fontWeight: "500" }}>
+                                  {items.filename}
+                                </span>
+                              </label>
+                              <div className="browse-btn">
+                                Browse
+                                <input
+                                  type="file"
+                                  onChange={(e) =>
+                                    handleuserFileChange(e, "analyst" + index)
+                                  }
+                                />
+                              </div>
+                              <span className="filename">
+                                {userfiles?.find(
+                                  (f) => f.id === "analyst" + index
+                                )?.file?.name || "No file chosen"}
+                              </span>
+                              {userfiles?.length &&
+                              userfiles?.find((f) => f.id === "analyst" + index)
+                                ?.file?.name ? (
+                                <button
+                                  type="button"
+                                  className="remove-file"
+                                  onClick={() =>
+                                    removeUserImage(index, "analyst" + index)
+                                  }
+                                >
+                                  Remove
+                                </button>
+                              ) : (
+                                ""
+                              )}
+                            </div>
+                          );
+                        })}
+
+                      {nextlevelvalue != "35" &&
+                        otheruserfiles?.map((file, index) => (
                           <div
-                            className="attachemt_form-bx  mt-2"
-                            key={items.id}
+                            key={"other" + (index + 1)}
+                            className="attachemt_form-bx"
                           >
                             <label
                               style={{
@@ -11058,32 +11140,31 @@ const ImportDashboardEditDetails = ({
                                 border: "0px",
                               }}
                             >
-                              <span style={{ fontWeight: "500" }}>
-                                {items.filename}
-                              </span>
+                              Other File
+                              {index + 1}
                             </label>
                             <div className="browse-btn">
-                              Browse
+                              Browse{" "}
                               <input
                                 type="file"
-                                onChange={(e) =>
-                                  handleuserFileChange(e, "analyst" + index)
-                                }
+                                onChange={(e) => {
+                                  handleuserFileChange(e, "other" + index);
+                                }}
                               />
                             </div>
                             <span className="filename">
-                              {userfiles?.find(
-                                (f) => f.id === "analyst" + index
-                              )?.file?.name || "No file chosen"}
+                              {userfiles?.find((f) => f.id === "other" + index)
+                                ?.file?.name || "No file chosen"}
                             </span>
+
                             {userfiles?.length &&
-                            userfiles?.find((f) => f.id === "analyst" + index)
+                            userfiles?.find((f) => f.id === "other" + index)
                               ?.file?.name ? (
                               <button
                                 type="button"
                                 className="remove-file"
                                 onClick={() =>
-                                  removeUserImage(index, "analyst" + index)
+                                  removeUserImage(index, "other" + index)
                                 }
                               >
                                 Remove
@@ -11092,57 +11173,10 @@ const ImportDashboardEditDetails = ({
                               ""
                             )}
                           </div>
-                        );
-                      })}
+                        ))}
 
-                      {nextlevelvalue != "35" && otheruserfiles?.map((file, index) => (
-                        <div
-                          key={"other" + (index + 1)}
-                          className="attachemt_form-bx"
-                        >
-                          <label
-                            style={{
-                              background: "#d9edf7",
-                              padding: "9px 3px",
-                              border: "0px",
-                            }}
-                          >
-                            Other File
-                            {index + 1}
-                          </label>
-                          <div className="browse-btn">
-                            Browse{" "}
-                            <input
-                              type="file"
-                              onChange={(e) => {
-                                handleuserFileChange(e, "other" + index);
-                              }}
-                            />
-                          </div>
-                          <span className="filename">
-                            {userfiles?.find((f) => f.id === "other" + index)
-                              ?.file?.name || "No file chosen"}
-                          </span>
-
-                          {userfiles?.length &&
-                          userfiles?.find((f) => f.id === "other" + index)?.file
-                            ?.name ? (
-                            <button
-                              type="button"
-                              className="remove-file"
-                              onClick={() =>
-                                removeUserImage(index, "other" + index)
-                              }
-                            >
-                              Remove
-                            </button>
-                          ) : (
-                            ""
-                          )}
-                        </div>
-                      ))}
-
-                      {(otheruserfiles?.length || userfiles?.length) && nextlevelvalue != "35" ? (
+                      {(otheruserfiles?.length || userfiles?.length) &&
+                      nextlevelvalue != "35" ? (
                         <div className="attachemt_form-bx">
                           <label style={{ border: "0px" }}>{""}</label>
                           <button
@@ -11289,440 +11323,444 @@ const ImportDashboardEditDetails = ({
                         </div>
                       </div>
 
-                      {nextlevelvalue != "35" && <>
-                      <div className="inner_form_new align-items-center">
-                        <label className="controlform">CC To</label>
-                        <div className=" cccto">
-                          <div className="flex justify-content-center multiSelect">
-                            <MultiSelect
-                              value={selectedBanks}
-                              onChange={(e) => setSelectedBanks(e.value)}
-                              options={vOption}
-                              onShow={onShow}
-                              optionLabel="name"
-                              placeholder="Select Banks"
-                              display="chip"
-                              className="w-full md:w-20rem"
-                            />
+                      {nextlevelvalue != "35" && (
+                        <>
+                          <div className="inner_form_new align-items-center">
+                            <label className="controlform">CC To</label>
+                            <div className=" cccto">
+                              <div className="flex justify-content-center multiSelect">
+                                <MultiSelect
+                                  value={selectedBanks}
+                                  onChange={(e) => setSelectedBanks(e.value)}
+                                  options={vOption}
+                                  onShow={onShow}
+                                  optionLabel="name"
+                                  placeholder="Select Banks"
+                                  display="chip"
+                                  className="w-full md:w-20rem"
+                                />
+                              </div>
+                            </div>
                           </div>
-                        </div>
-                      </div>
 
-                      <div
-                        className={
-                          roleID == 8
-                            ? "inner_form_new align-items-center"
-                            : "d-none"
-                        }
-                      >
-                        <label className="controlform">Is Return Needed?</label>
-                        <div className="hidden-toggles">
-                          <input
-                            type="radio"
-                            id="YesIsReturndpd"
-                            name="IsReturnpd"
-                            onChange={(e) => HandleIsReturnOption(e)}
-                            className="hidden-toggles__input"
-                            checked={IsReturn == "1"}
-                            value="1"
-                          />
-                          <label
-                            for="YesIsReturndpd"
-                            className="hidden-toggles__label"
-                            id={IsReturn}
-                          >
-                            Yes
-                          </label>
-                          <input
-                            type="radio"
-                            name="IsReturnpd"
-                            id="NoIsReturndpd"
-                            className="hidden-toggles__input"
-                            onChange={(e) => HandleIsReturnOption(e)}
-                            value="0"
-                            checked={IsReturn == "0"}
-                          />
-                          <label
-                            for={IsReturn == "0" ? "" : "NoIsReturndpd"}
-                            className="hidden-toggles__label"
-                          >
-                            No
-                          </label>
-                        </div>
-                      </div>
-
-                      <div className="row">
-                        <div className="col-md-7">
                           <div
                             className={
-                              roleID == 8 && IsReturnOption == "1"
+                              roleID == 8
                                 ? "inner_form_new align-items-center"
                                 : "d-none"
                             }
                           >
                             <label className="controlform">
-                              Return Frequency
+                              Is Return Needed?
                             </label>
-                            <div className="form-bx">
-                              <label>
-                                <select
-                                  name="ReturnFrequency"
-                                  onChange={(e) => SelectReturnFrequency(e)}
-                                >
-                                  <option value="0" defaultChecked>
-                                    Select Frequency
-                                  </option>
-                                  {AllFrequency?.map((item, index) => {
-                                    return (
-                                      <option
-                                        key={index}
-                                        value={item.id}
-                                        selected={
-                                          getFrequencyID == item.id &&
-                                          getFrequencyID != ""
-                                            ? true
-                                            : false
-                                        }
-                                      >
-                                        {item.name}
-                                      </option>
-                                    );
-                                  })}
-                                </select>
-                              </label>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="col-md-5">
-                          <div
-                            className={
-                              roleID == 8 &&
-                              IsReturn == "1" &&
-                              getFrequencyID == "1"
-                                ? "inner_form_new-sm"
-                                : "d-none"
-                            }
-                          >
-                            <label className="controlform-sm">
-                              Frequency Date
-                            </label>
-                            <div className="form-bx-sm">
-                              <DatePicker
-                                ref={FrequencyDateRef}
-                                placeholderText="Select Frequency Date"
-                                closeOnScroll={(e) => e.target === document}
-                                selected={IsReturnExpiringDate}
-                                onChange={(date) =>
-                                  setIsReturnExpiringDate(date)
-                                }
-                                peekNextMonth
-                                showMonthDropdown
-                                maxDate={new Date("03-31-2027")}
-                                minDate={new Date()}
-                                showYearDropdown
-                                dropdownMode="select"
-                                dateFormat="dd/MMM/yyyy"
-                                onKeyDown={(e) => {
-                                  const key = e.key;
-                                  const allowedKeys = /[0-9\/]/;
-                                  if (
-                                    !allowedKeys.test(key) &&
-                                    key !== "Backspace" &&
-                                    key !== "Delete"
-                                  ) {
-                                    e.preventDefault();
-                                  }
-                                }}
-                              />
-                              <span className="sspan"></span>
-                              {errors.IsReturnExpiringDate &&
-                              (IsReturnExpiringDate ==
-                                "Select Frequency Date " ||
-                                IsReturnExpiringDate == null) ? (
-                                <small
-                                  className="errormsg"
-                                  style={{ marginBottom: "9px" }}
-                                >
-                                  {errors.IsReturnExpiringDate}
-                                </small>
-                              ) : (
-                                ""
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div
-                        className={
-                          roleID == 8
-                            ? "inner_form_new align-items-center"
-                            : "d-none"
-                        }
-                      >
-                        <label className="controlform">
-                          Is Expiry Required?
-                        </label>
-                        <div className="hidden-toggles">
-                          <input
-                            type="radio"
-                            id="exprqdp"
-                            name="dateexpitydp"
-                            onChange={(e) => HandleDateExpiryOption(e)}
-                            className="hidden-toggles__input"
-                            checked={defaultnoExpiry == "1"}
-                            value="1"
-                          />
-                          <label
-                            for={defaultnoExpiry == "1" ? "" : "exprqdp"}
-                            className="hidden-toggles__label"
-                          >
-                            Yes
-                          </label>
-                          <input
-                            type="radio"
-                            name="dateexpitydp"
-                            id="noexpdp"
-                            className="hidden-toggles__input"
-                            onChange={(e) => {
-                              HandleDateExpiryOption(e);
-                              setExpiringDate(null);
-                            }}
-                            value="0"
-                            checked={defaultnoExpiry == "0"}
-                          />
-                          <label
-                            for={defaultnoExpiry == "0" ? "" : "noexpdp"}
-                            className="hidden-toggles__label"
-                          >
-                            No
-                          </label>
-                        </div>
-                      </div>
-
-                      <div className="row">
-                        <div className="col-md-7">
-                          <div
-                            className={
-                              roleID == 8 && DateExpiryOption == "1"
-                                ? "inner_form_new align-items-center"
-                                : "d-none"
-                            }
-                          >
-                            <label className="controlform">
-                              Define Expiry Date
-                            </label>
-
-                            <div
-                              className={
-                                DateExpiryOption == "1"
-                                  ? "hidden-toggles"
-                                  : "d-none"
-                              }
-                            >
-                              <input
-                                type="radio"
-                                ref={dateExpirydisplayRef}
-                                id="defineddatedp"
-                                className="hidden-toggles__input"
-                                name="dateExpirydisplaydp"
-                                onChange={(e) =>
-                                  setDateExpirydisplay(e.target.value)
-                                }
-                                value="0"
-                                checked={
-                                  DateExpirydisplay != "" &&
-                                  DateExpirydisplay == "0" &&
-                                  DateExpiryOption == "1"
-                                }
-                              />{" "}
-                              <label
-                                for="defineddatedp"
-                                className="hidden-toggles__label"
-                              >
-                                Specific Date
-                              </label>
-                              <input
-                                type="radio"
-                                ref={optionExpirydisplayRef}
-                                id="rerpetualdatedp"
-                                name="dateExpirydisplaydp"
-                                onChange={(e) => {
-                                  setDateExpirydisplay(e.target.value);
-                                  setExpiringDate(null);
-                                }}
-                                className="hidden-toggles__input"
-                                value="1"
-                                checked={
-                                  DateExpirydisplay == "1" &&
-                                  DateExpiryOption == "1"
-                                }
-                              />
-                              <label
-                                for="rerpetualdatedp"
-                                className="hidden-toggles__label"
-                              >
-                                Perpetual
-                              </label>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="col-md-5">
-                          <div
-                            className={
-                              roleID == 8 &&
-                              DateExpirydisplay == "0" &&
-                              DateExpiryOption == "1"
-                                ? "inner_form_new-sm"
-                                : "d-none"
-                            }
-                          >
-                            <label className="controlform-sm">
-                              Expiry Date
-                            </label>
-
-                            <div className="form-bx-sm">
-                              <DatePicker
-                                placeholderText="Select Expiry Date"
-                                closeOnScroll={(e) => e.target === document}
-                                selected={ExpiringDate}
-                                onChange={(date) => setExpiringDate(date)}
-                                peekNextMonth
-                                showMonthDropdown
-                                minDate={new Date()}
-                                showYearDropdown
-                                dropdownMode="select"
-                                dateFormat="dd/MMM/yyyy"
-                                onKeyDown={(e) => {
-                                  const key = e.key;
-                                  const allowedKeys = /[0-9\/]/;
-                                  if (
-                                    !allowedKeys.test(key) &&
-                                    key !== "Backspace" &&
-                                    key !== "Delete"
-                                  ) {
-                                    e.preventDefault();
-                                  }
-                                }}
-                              />
-
-                              <span className="sspan"></span>
-                              {errors.ExpiringDate &&
-                              (ExpiringDate == "Select Expiring Date " ||
-                                ExpiringDate == null) ? (
-                                <small
-                                  className="errormsg"
-                                  style={{ marginBottom: "9px" }}
-                                >
-                                  {errors.ExpiringDate}
-                                </small>
-                              ) : (
-                                ""
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div
-                        className={
-                          (roleID == 8 && nextlevelvalue == "") ||
-                          recomdAnalyst == "121"
-                            ? "inner_form_new align-items-center"
-                            : "d-none"
-                        }
-                      >
-                        <label className="controlform">Decision</label>
-                        <div className="row">
-                          <div className="col-md-12">
                             <div className="hidden-toggles">
                               <input
                                 type="radio"
-                                id="srcoloration-Approvedved4"
-                                value="10"
-                                onChange={(e) => {
-                                  ChangeApplicationStatus(e);
-                                  GetRoleHandle(10);
-                                }}
-                                name="applicationstausdp"
+                                id="YesIsReturndpd"
+                                name="IsReturnpd"
+                                onChange={(e) => HandleIsReturnOption(e)}
                                 className="hidden-toggles__input"
-                                checked={
-                                  applicationstaus == "10" ? true : false
-                                }
+                                checked={IsReturn == "1"}
+                                value="1"
                               />
                               <label
-                                for="srcoloration-Approvedved4"
+                                for="YesIsReturndpd"
                                 className="hidden-toggles__label"
+                                id={IsReturn}
                               >
-                                Approved
+                                Yes
                               </label>
-
                               <input
                                 type="radio"
-                                id="srcoloration-Rejected"
-                                value="30"
-                                onChange={(e) => {
-                                  ChangeApplicationStatus(e);
-                                }}
-                                name="applicationstausdp"
+                                name="IsReturnpd"
+                                id="NoIsReturndpd"
                                 className="hidden-toggles__input"
-                                checked={
-                                  applicationstaus == "30" ? true : false
-                                }
+                                onChange={(e) => HandleIsReturnOption(e)}
+                                value="0"
+                                checked={IsReturn == "0"}
                               />
                               <label
-                                for="srcoloration-Rejected"
+                                for={IsReturn == "0" ? "" : "NoIsReturndpd"}
                                 className="hidden-toggles__label"
                               >
-                                Rejected
-                              </label>
-
-                              <input
-                                type="radio"
-                                id="srcoloration-Deferred"
-                                onChange={(e) => {
-                                  ChangeApplicationStatus(e);
-                                }}
-                                name="applicationstausdp"
-                                value="40"
-                                className="hidden-toggles__input"
-                                checked={
-                                  applicationstaus == "40" ? true : false
-                                }
-                              />
-                              <label
-                                for="srcoloration-Deferred"
-                                className="hidden-toggles__label"
-                              >
-                                Deferred
-                              </label>
-
-                              <input
-                                type="radio"
-                                id="srcoloration-Cancelled"
-                                onChange={(e) => {
-                                  ChangeApplicationStatus(e);
-                                }}
-                                name="applicationstausdp"
-                                value="25"
-                                className="hidden-toggles__input"
-                                checked={
-                                  applicationstaus == "25" ? true : false
-                                }
-                              />
-                              <label
-                                for="srcoloration-Cancelled"
-                                className="hidden-toggles__label"
-                              >
-                                Cancelled
+                                No
                               </label>
                             </div>
                           </div>
-                        </div>
-                      </div>
-                      </>}
+
+                          <div className="row">
+                            <div className="col-md-7">
+                              <div
+                                className={
+                                  roleID == 8 && IsReturnOption == "1"
+                                    ? "inner_form_new align-items-center"
+                                    : "d-none"
+                                }
+                              >
+                                <label className="controlform">
+                                  Return Frequency
+                                </label>
+                                <div className="form-bx">
+                                  <label>
+                                    <select
+                                      name="ReturnFrequency"
+                                      onChange={(e) => SelectReturnFrequency(e)}
+                                    >
+                                      <option value="0" defaultChecked>
+                                        Select Frequency
+                                      </option>
+                                      {AllFrequency?.map((item, index) => {
+                                        return (
+                                          <option
+                                            key={index}
+                                            value={item.id}
+                                            selected={
+                                              getFrequencyID == item.id &&
+                                              getFrequencyID != ""
+                                                ? true
+                                                : false
+                                            }
+                                          >
+                                            {item.name}
+                                          </option>
+                                        );
+                                      })}
+                                    </select>
+                                  </label>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="col-md-5">
+                              <div
+                                className={
+                                  roleID == 8 &&
+                                  IsReturn == "1" &&
+                                  getFrequencyID == "1"
+                                    ? "inner_form_new-sm"
+                                    : "d-none"
+                                }
+                              >
+                                <label className="controlform-sm">
+                                  Frequency Date
+                                </label>
+                                <div className="form-bx-sm">
+                                  <DatePicker
+                                    ref={FrequencyDateRef}
+                                    placeholderText="Select Frequency Date"
+                                    closeOnScroll={(e) => e.target === document}
+                                    selected={IsReturnExpiringDate}
+                                    onChange={(date) =>
+                                      setIsReturnExpiringDate(date)
+                                    }
+                                    peekNextMonth
+                                    showMonthDropdown
+                                    maxDate={new Date("03-31-2027")}
+                                    minDate={new Date()}
+                                    showYearDropdown
+                                    dropdownMode="select"
+                                    dateFormat="dd/MMM/yyyy"
+                                    onKeyDown={(e) => {
+                                      const key = e.key;
+                                      const allowedKeys = /[0-9\/]/;
+                                      if (
+                                        !allowedKeys.test(key) &&
+                                        key !== "Backspace" &&
+                                        key !== "Delete"
+                                      ) {
+                                        e.preventDefault();
+                                      }
+                                    }}
+                                  />
+                                  <span className="sspan"></span>
+                                  {errors.IsReturnExpiringDate &&
+                                  (IsReturnExpiringDate ==
+                                    "Select Frequency Date " ||
+                                    IsReturnExpiringDate == null) ? (
+                                    <small
+                                      className="errormsg"
+                                      style={{ marginBottom: "9px" }}
+                                    >
+                                      {errors.IsReturnExpiringDate}
+                                    </small>
+                                  ) : (
+                                    ""
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div
+                            className={
+                              roleID == 8
+                                ? "inner_form_new align-items-center"
+                                : "d-none"
+                            }
+                          >
+                            <label className="controlform">
+                              Is Expiry Required?
+                            </label>
+                            <div className="hidden-toggles">
+                              <input
+                                type="radio"
+                                id="exprqdp"
+                                name="dateexpitydp"
+                                onChange={(e) => HandleDateExpiryOption(e)}
+                                className="hidden-toggles__input"
+                                checked={defaultnoExpiry == "1"}
+                                value="1"
+                              />
+                              <label
+                                for={defaultnoExpiry == "1" ? "" : "exprqdp"}
+                                className="hidden-toggles__label"
+                              >
+                                Yes
+                              </label>
+                              <input
+                                type="radio"
+                                name="dateexpitydp"
+                                id="noexpdp"
+                                className="hidden-toggles__input"
+                                onChange={(e) => {
+                                  HandleDateExpiryOption(e);
+                                  setExpiringDate(null);
+                                }}
+                                value="0"
+                                checked={defaultnoExpiry == "0"}
+                              />
+                              <label
+                                for={defaultnoExpiry == "0" ? "" : "noexpdp"}
+                                className="hidden-toggles__label"
+                              >
+                                No
+                              </label>
+                            </div>
+                          </div>
+
+                          <div className="row">
+                            <div className="col-md-7">
+                              <div
+                                className={
+                                  roleID == 8 && DateExpiryOption == "1"
+                                    ? "inner_form_new align-items-center"
+                                    : "d-none"
+                                }
+                              >
+                                <label className="controlform">
+                                  Define Expiry Date
+                                </label>
+
+                                <div
+                                  className={
+                                    DateExpiryOption == "1"
+                                      ? "hidden-toggles"
+                                      : "d-none"
+                                  }
+                                >
+                                  <input
+                                    type="radio"
+                                    ref={dateExpirydisplayRef}
+                                    id="defineddatedp"
+                                    className="hidden-toggles__input"
+                                    name="dateExpirydisplaydp"
+                                    onChange={(e) =>
+                                      setDateExpirydisplay(e.target.value)
+                                    }
+                                    value="0"
+                                    checked={
+                                      DateExpirydisplay != "" &&
+                                      DateExpirydisplay == "0" &&
+                                      DateExpiryOption == "1"
+                                    }
+                                  />{" "}
+                                  <label
+                                    for="defineddatedp"
+                                    className="hidden-toggles__label"
+                                  >
+                                    Specific Date
+                                  </label>
+                                  <input
+                                    type="radio"
+                                    ref={optionExpirydisplayRef}
+                                    id="rerpetualdatedp"
+                                    name="dateExpirydisplaydp"
+                                    onChange={(e) => {
+                                      setDateExpirydisplay(e.target.value);
+                                      setExpiringDate(null);
+                                    }}
+                                    className="hidden-toggles__input"
+                                    value="1"
+                                    checked={
+                                      DateExpirydisplay == "1" &&
+                                      DateExpiryOption == "1"
+                                    }
+                                  />
+                                  <label
+                                    for="rerpetualdatedp"
+                                    className="hidden-toggles__label"
+                                  >
+                                    Perpetual
+                                  </label>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="col-md-5">
+                              <div
+                                className={
+                                  roleID == 8 &&
+                                  DateExpirydisplay == "0" &&
+                                  DateExpiryOption == "1"
+                                    ? "inner_form_new-sm"
+                                    : "d-none"
+                                }
+                              >
+                                <label className="controlform-sm">
+                                  Expiry Date
+                                </label>
+
+                                <div className="form-bx-sm">
+                                  <DatePicker
+                                    placeholderText="Select Expiry Date"
+                                    closeOnScroll={(e) => e.target === document}
+                                    selected={ExpiringDate}
+                                    onChange={(date) => setExpiringDate(date)}
+                                    peekNextMonth
+                                    showMonthDropdown
+                                    minDate={new Date()}
+                                    showYearDropdown
+                                    dropdownMode="select"
+                                    dateFormat="dd/MMM/yyyy"
+                                    onKeyDown={(e) => {
+                                      const key = e.key;
+                                      const allowedKeys = /[0-9\/]/;
+                                      if (
+                                        !allowedKeys.test(key) &&
+                                        key !== "Backspace" &&
+                                        key !== "Delete"
+                                      ) {
+                                        e.preventDefault();
+                                      }
+                                    }}
+                                  />
+
+                                  <span className="sspan"></span>
+                                  {errors.ExpiringDate &&
+                                  (ExpiringDate == "Select Expiring Date " ||
+                                    ExpiringDate == null) ? (
+                                    <small
+                                      className="errormsg"
+                                      style={{ marginBottom: "9px" }}
+                                    >
+                                      {errors.ExpiringDate}
+                                    </small>
+                                  ) : (
+                                    ""
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div
+                            className={
+                              (roleID == 8 && nextlevelvalue == "") ||
+                              recomdAnalyst == "121"
+                                ? "inner_form_new align-items-center"
+                                : "d-none"
+                            }
+                          >
+                            <label className="controlform">Decision</label>
+                            <div className="row">
+                              <div className="col-md-12">
+                                <div className="hidden-toggles">
+                                  <input
+                                    type="radio"
+                                    id="srcoloration-Approvedved4"
+                                    value="10"
+                                    onChange={(e) => {
+                                      ChangeApplicationStatus(e);
+                                      GetRoleHandle(10);
+                                    }}
+                                    name="applicationstausdp"
+                                    className="hidden-toggles__input"
+                                    checked={
+                                      applicationstaus == "10" ? true : false
+                                    }
+                                  />
+                                  <label
+                                    for="srcoloration-Approvedved4"
+                                    className="hidden-toggles__label"
+                                  >
+                                    Approved
+                                  </label>
+
+                                  <input
+                                    type="radio"
+                                    id="srcoloration-Rejected"
+                                    value="30"
+                                    onChange={(e) => {
+                                      ChangeApplicationStatus(e);
+                                    }}
+                                    name="applicationstausdp"
+                                    className="hidden-toggles__input"
+                                    checked={
+                                      applicationstaus == "30" ? true : false
+                                    }
+                                  />
+                                  <label
+                                    for="srcoloration-Rejected"
+                                    className="hidden-toggles__label"
+                                  >
+                                    Rejected
+                                  </label>
+
+                                  <input
+                                    type="radio"
+                                    id="srcoloration-Deferred"
+                                    onChange={(e) => {
+                                      ChangeApplicationStatus(e);
+                                    }}
+                                    name="applicationstausdp"
+                                    value="40"
+                                    className="hidden-toggles__input"
+                                    checked={
+                                      applicationstaus == "40" ? true : false
+                                    }
+                                  />
+                                  <label
+                                    for="srcoloration-Deferred"
+                                    className="hidden-toggles__label"
+                                  >
+                                    Deferred
+                                  </label>
+
+                                  <input
+                                    type="radio"
+                                    id="srcoloration-Cancelled"
+                                    onChange={(e) => {
+                                      ChangeApplicationStatus(e);
+                                    }}
+                                    name="applicationstausdp"
+                                    value="25"
+                                    className="hidden-toggles__input"
+                                    checked={
+                                      applicationstaus == "25" ? true : false
+                                    }
+                                  />
+                                  <label
+                                    for="srcoloration-Cancelled"
+                                    className="hidden-toggles__label"
+                                  >
+                                    Cancelled
+                                  </label>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </>
+                      )}
                     </div>
 
                     {allcomment?.map((cur) => {
@@ -14014,17 +14052,18 @@ const ImportDashboardEditDetails = ({
                       !otherDepartmentRole ||
                       !otherDepartmentUser ||
                       !asignnextLeveldata.Comment ||
-                      !asignnextLeveldata.Notes || OtherDepartmentLoader
+                      !asignnextLeveldata.Notes ||
+                      OtherDepartmentLoader
                         ? true
                         : false
                     }
                     onClick={() => SubmitOtherDepartment()}
                   >
                     {OtherDepartmentLoader ? (
-                        <span className="loaderwait">Please Wait...</span>
-                      ) : (
-                        <span>Refer to Other Department</span>
-                      )}
+                      <span className="loaderwait">Please Wait...</span>
+                    ) : (
+                      <span>Refer to Other Department</span>
+                    )}
                   </button>
                 ) : (
                   <button
@@ -14946,7 +14985,6 @@ const ImportDashboardEditDetails = ({
                                   : applicationstaus == "25"
                                   ? "Cancelled"
                                   : ""}
-                                {/* {applicationDetail?.statusName} */}
                               </td>
                             </tr>
                           </table>
@@ -14984,7 +15022,7 @@ const ImportDashboardEditDetails = ({
                                         className="tableEditorData"
                                         dangerouslySetInnerHTML={{
                                           __html: asignnextLeveldata
-                                            ? // ? asignnextLeveldata.Notes
+                                            ?
                                               Description
                                             : "",
                                         }}
@@ -16038,7 +16076,7 @@ const ImportDashboardEditDetails = ({
                 ""
               )}
 
-{OtherDepartmentPopup == true ? (
+              {OtherDepartmentPopup == true ? (
                 <UpdatePopupMessage
                   heading={heading1}
                   para={para1}
@@ -16050,44 +16088,10 @@ const ImportDashboardEditDetails = ({
               )}
             </div>
           </form>
-          {/* <Modal
-        show={showUpdateModal}
-        onHide={handleFormClose}
-        backdrop="static"
-        className="max-width-600"
-      >
-        <div className="application-box">
-          <div className="login_inner">
-            <div class="login_form ">
-              <h5>
-                <Modal.Header closeButton className="p-0">
-                  <Modal.Title>
-                    View Import Request --{" "}
-                    <big>{applicationDetail?.rbzReferenceNumber}</big>
-                  </Modal.Title>
-                </Modal.Header>
-              </h5>
-            </div>
-            <div className="login_form_panel">
-              <Modal.Body className="p-0">
-                <ImportDashboardViewDetails
-                  applicationDetail={applicationDetail}
-                  handleFormClose={handleFormClose}
-                  allcomment={allcommentRenew}
-                  noDataComment={noDataCommentRenew}
-                  tatHistory={tatHistoryRenew}
-                  Actiondata={Actiondata}
-                  responceCount={responceCountRenew}
-                />
-              </Modal.Body>
-            </div>
-          </div>
-        </div>
-      </Modal> */}
         </>
       )}
     </>
   );
 };
 
-export default ImportDashboardEditDetails;
+export default ImportOtherDepartmentEditDetails;

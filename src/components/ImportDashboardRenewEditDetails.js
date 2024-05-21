@@ -123,20 +123,11 @@ const ImportDashboardRenewEditDetails = ({
   const [sharefile, setsharefile] = useState([]);
   const [registerusertype, setregisterusertype] = useState(bankidcheck);
   const [subsectorData, setsubsectorData] = useState([]);
-  const [checkSupervisor, setcheckSupervisor] = useState(false);
+  const [checkSupervisor, setcheckSupervisor] = useState(roleID == 4 ? true : false);
   const [curRate, setCurrate] = useState();
-  const [DateExpirydisplay, setDateExpirydisplay] = useState("");
-  const [banksuperTab, setbanksuperTab] = useState(roleID == 3 ? true : false);
-  const [recordTab, setrecordTab] = useState(roleID == 4 ? true : false);
-  const [updatepopup, setupdatepopup] = useState(false);
-  const [analystTab, setanalystTab] = useState(roleID == 5 ? true : false);
-  const [btnLoader, setBtnLoader] = useState(false);
-  const [sranalystTab, setsranalystTab] = useState(roleID == 6 ? true : false);
-  const [principalanalystTab, setprincipalanalystTab] = useState(
-    roleID == 7 ? true : false
-  );
-  const [deputyTab, setdeputyTab] = useState(roleID == 8 ? true : false);
-  const [director, setdirector] = useState(roleID == 9 ? true : false);
+  const [DateExpirydisplay, setDateExpirydisplay] = useState("");  
+  const [updatepopup, setupdatepopup] = useState(false); 
+  const [btnLoader, setBtnLoader] = useState(false);   
   const [inputValue, setInputValue] = useState("");
   const [viewShareFile, setviewShareFile] = useState([]);
   const [applicationType, setapplicationType] = useState([]);
@@ -145,7 +136,7 @@ const ImportDashboardRenewEditDetails = ({
     Comment: "",
   });
   const [getCompanyName, setgetCompanyName] = useState();
-  const [geninfoTab, setgeninfoTab] = useState(roleID == 2 ? true : false);
+  const [geninfoTab, setgeninfoTab] = useState( true );
   const [options, setOptions] = useState([]);
   const [startDate, setStartDate] = useState(new Date());
   const [newData, setnewData] = useState([]);
@@ -648,7 +639,8 @@ const ImportDashboardRenewEditDetails = ({
     setErrors({});
     setselectuserRoleRecordofficer(value);
     setAssignUserID("");
-    setSupervisorRoleId("");
+    setSupervisorRoleId(""); 
+    if (bankSupervisorRef.current) bankSupervisorRef.current.value = "";
     if (value == "") {
       setGetalluser([]);
     } else {
@@ -1967,8 +1959,8 @@ const ImportDashboardRenewEditDetails = ({
                 </div>
               </div>
 
-              {roleID < 3 ? (
-                <div className="inner_form_new ">
+              
+                <div className={roleID == 4 ? "d-none" : "inner_form_new "}>
                   <label className="controlform">Submit To Next Level </label>
                   <input
                     type="checkbox"
@@ -1976,12 +1968,9 @@ const ImportDashboardRenewEditDetails = ({
                     checked={checkSupervisor}
                     disabled={roleID == 2 ? false : true}
                   />
-                </div>
-              ) : (
-                ""
-              )}
+                </div> 
 
-              {checkSupervisor === true ? (
+              {checkSupervisor === true && roleID == 2  ? (
                 <div className="inner_form_new ">
                   <label className="controlform">Bank Supervisor</label>
                   <div className="form-bx">
@@ -2024,6 +2013,88 @@ const ImportDashboardRenewEditDetails = ({
               ) : (
                 ""
               )}
+
+{checkSupervisor == true && roleID == 4 ? (
+          <div className="inner_form_new ">
+            <label className="controlform">RBZ Record Officer Submit to</label>
+            <div className="form-bx">
+              <label>
+                <select
+                  name="SupervisorRoleId"
+                  onChange={(e) => {
+                    supervisorHangechangeRoleRecordofficer(e);
+                  }}
+                  // className={
+                  //   errors.assignedTo && !SupervisorRoleId
+                  //     ? "error"
+                  //     : ""
+                  // }
+                >
+                  <option value="">Select Role</option>
+                  {userRole?.map((item, index) => {
+                    return (
+                      <option key={index} value={item.id}>
+                        {item.designation}
+                      </option>
+                    );
+                  })}
+                </select>
+                <span className="sspan"></span>
+                {errors.selectuserRoleRecordofficer && selectuserRoleRecordofficer === "" ? (
+                  <small className="errormsg">Role is required</small>
+                ) : (
+                  ""
+                )}
+              </label>
+            </div>
+          </div>
+        ) : (
+          ""
+        )}
+
+{checkSupervisor == true && roleID == 4 && getalluser?.length ? (
+          <div className="w-100">
+            <div className="inner_form_new">
+              <label className="controlform">User</label>
+
+              <div className="form-bx">
+                <label>
+                  <select
+                    ref={bankSupervisorRef}
+                    name="bankSupervisor"
+                    onChange={(e) => {
+                      handleuserByrecordOfficer(e);
+                    }}
+                    className={
+                      errors.bankSupervisor && applicationDetail.bankSupervisor === ""
+                        ? "error"
+                        : ""
+                    }
+                  >
+                    <option value="" selected>
+                      Select User
+                    </option>
+                    {getalluser?.map((item, index) => {
+                      return (
+                        <option key={item.id} value={item.userID}>
+                          {item.name}
+                        </option>
+                      );
+                    })}
+                  </select>
+                  <span className="sspan"></span>
+                  {errors.bankSupervisor && applicationDetail.bankSupervisor === "" ? (
+                    <small className="errormsg">User is required</small>
+                  ) : (
+                    ""
+                  )}
+                </label>
+              </div>
+            </div>
+          </div>
+        ) : (
+          ""
+        )}
 
               <h5 className="section_top_subheading">Attachments</h5>
               {applicationDetail?.fileName || applicationDetail?.filePath ? (

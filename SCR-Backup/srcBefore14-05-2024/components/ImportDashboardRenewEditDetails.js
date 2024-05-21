@@ -1981,7 +1981,7 @@ const ImportDashboardRenewEditDetails = ({
                 ""
               )}
 
-              {checkSupervisor === true ? (
+              {checkSupervisor === true && roleID < 3 ? (
                 <div className="inner_form_new ">
                   <label className="controlform">Bank Supervisor</label>
                   <div className="form-bx">
