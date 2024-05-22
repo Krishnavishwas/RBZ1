@@ -1355,12 +1355,13 @@ const ImportDashboardViewDetails = ({
                                         <label className="controlform">
                                           Attachments
                                         </label>
-                                        {items?.filesData?.length ? (
+                                        <div>{items?.filesData?.length ? (
                                           items?.filesData?.map(
                                             (items, index) => {
                                               return (
+                                               
                                                 <div
-                                                  className="attachemt_form-bx mt-3"
+                                                  className="attachemt_form-bx mt-1"
                                                   key={items.id}
                                                 >
                                                   <label>
@@ -1378,6 +1379,7 @@ const ImportDashboardViewDetails = ({
                                                     </Link>
                                                   </span>
                                                 </div>
+                                                
                                               );
                                             }
                                           )
@@ -1386,6 +1388,7 @@ const ImportDashboardViewDetails = ({
                                             File Not Found
                                           </label>
                                         )}
+                                        </div>
                                       </div>
                                       <div className="inner_form_new ">
                                         <label className="controlform">
@@ -1942,12 +1945,12 @@ const ImportDashboardViewDetails = ({
                                         <label className="controlform">
                                           Attachments
                                         </label>
-                                        {items?.filesData?.length ? (
+                                        <div>{items?.filesData?.length ? (
                                           items?.filesData?.map(
                                             (items, index) => {
                                               return (
                                                 <div
-                                                  className="attachemt_form-bx mt-3"
+                                                  className="attachemt_form-bx mt-1"
                                                   key={items.id}
                                                 >
                                                   <label>
@@ -1973,7 +1976,7 @@ const ImportDashboardViewDetails = ({
                                           <label className="notfound">
                                             File Not Found
                                           </label>
-                                        )}
+                                        )}</div>
                                       </div>
                                       <div className="inner_form_new ">
                                         <label className="controlform">
@@ -2542,12 +2545,12 @@ const ImportDashboardViewDetails = ({
                                         <label className="controlform">
                                           Attachments
                                         </label>
-                                        {items?.filesData?.length ? (
+                                        <div>{items?.filesData?.length ? (
                                           items?.filesData?.map(
                                             (items, index) => {
                                               return (
                                                 <div
-                                                  className="attachemt_form-bx mt-3"
+                                                  className="attachemt_form-bx mt-1"
                                                   key={items.id}
                                                 >
                                                   <label>
@@ -2573,7 +2576,7 @@ const ImportDashboardViewDetails = ({
                                           <label className="notfound">
                                             File Not Found
                                           </label>
-                                        )}
+                                        )}</div>
                                       </div>
                                       <div className="inner_form_new ">
                                         <label className="controlform">
@@ -3139,12 +3142,12 @@ const ImportDashboardViewDetails = ({
                                         <label className="controlform">
                                           Attachments
                                         </label>
-                                        {items?.filesData?.length ? (
+                                        <div>{items?.filesData?.length ? (
                                           items?.filesData?.map(
                                             (items, index) => {
                                               return (
                                                 <div
-                                                  className="attachemt_form-bx mt-3"
+                                                  className="attachemt_form-bx mt-1"
                                                   key={items.id}
                                                 >
                                                   <label>
@@ -3171,6 +3174,7 @@ const ImportDashboardViewDetails = ({
                                             File Not Found
                                           </label>
                                         )}
+                                        </div>
                                       </div>
                                       <div className="inner_form_new ">
                                         <label className="controlform">
@@ -3734,12 +3738,12 @@ const ImportDashboardViewDetails = ({
                                         <label className="controlform">
                                           Attachments
                                         </label>
-                                        {items?.filesData?.length ? (
+                                        <div>{items?.filesData?.length ? (
                                           items?.filesData?.map(
                                             (items, index) => {
                                               return (
                                                 <div
-                                                  className="attachemt_form-bx mt-3"
+                                                  className="attachemt_form-bx mt-1"
                                                   key={items.id}
                                                 >
                                                   <label>
@@ -3766,6 +3770,7 @@ const ImportDashboardViewDetails = ({
                                             File Not Found
                                           </label>
                                         )}
+                                        </div>
                                       </div>
                                       <div className="inner_form_new ">
                                         <label className="controlform">

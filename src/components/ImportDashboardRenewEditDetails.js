@@ -1777,6 +1777,12 @@ const ImportDashboardRenewEditDetails = ({
                           onChange={(e) => {
                             changeHandelForm(e);
                           }}
+                          onKeyDown={(event) => {
+                            const blockedKeys = ['e', 'E', '-', '+'];
+                            if (blockedKeys.includes(event.key)) {
+                                event.preventDefault();
+                            }
+                        }}
                           placeholder={applicationDetail?.amount}
                           className={
                             errors.amount && applicationDetail.amount === ""

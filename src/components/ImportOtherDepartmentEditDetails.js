@@ -165,7 +165,6 @@ const ImportOtherDepartmentEditDetails = ({
   const [inputValue, setInputValue] = useState("");
   const [viewShareFile, setviewShareFile] = useState([]);
   const [applicationType, setapplicationType] = useState([]);
-  const [lastComments, setLastComments] = useState({});
   const [asignnextLeveldata, setasignnextLeveldata] = useState({
     Notes: "",
     Comment: "",
@@ -206,6 +205,7 @@ const ImportOtherDepartmentEditDetails = ({
   const [OtherDepartmentPopup, setOtherDepartmentPopup] = useState(false);
   const [OtherDepartmentLoader, setOtherDepartmentLoader] = useState(false);
   const [loader, setLoader] = useState(false);
+  const [sharefiletab, setsharefiletab] = useState(false);
   const [othersharefile, setOthersharefile] = useState([]);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [SubmitBtnLoader, setSubmitBtnLoader] = useState(false);
@@ -456,9 +456,9 @@ const ImportOtherDepartmentEditDetails = ({
   };
 
   const closePopupHandle = () => {
+    handleData();
     navigate("/ReferredDashboard");
     EditModalClose();
-    handleData();
     setupdatepopup(false);
     setApplicationDetail({});
     setSupervisorRoleId("");
@@ -503,7 +503,7 @@ const ImportOtherDepartmentEditDetails = ({
 
   const handleFIleview = () => {
     axios
-      .post(APIURL + "ImportApplication/GetSharedFileDataImport", {
+      .post(APIURL + "ReferredApplication/GetSharedFileDataReferred", {
         ID: applicationDetail.id,
       })
       .then((res) => {
@@ -518,7 +518,7 @@ const ImportOtherDepartmentEditDetails = ({
       });
 
     axios
-      .post(APIURL + "ImportApplication/GetImportFilesByApplicationID", {
+      .post(APIURL + "ReferredApplication/GetReferredFilesByApplicationID", {
         ID: applicationDetail.id,
       })
       .then((res) => {
@@ -916,22 +916,13 @@ const ImportOtherDepartmentEditDetails = ({
       };
     });
 
-    const lastResponseCCTodata = lastComments?.copiedResponseData?.map(
-      (items, i) => {
-        return {
-          name: items.bankName,
-          code: items.bankID,
-        };
-      }
-    );
-
     setExpiringDate(
       applicationDetail?.expiringDate
         ? applicationDetail?.expiringDate
         : new Date()
     );
 
-    setSelectedBanks(lastResponseCCTodata ? lastResponseCCTodata : bankdtata);
+    setSelectedBanks(bankdtata);
 
     if (applicationDetail?.isReturnNeeded == 1) {
       axios
@@ -947,7 +938,7 @@ const ImportOtherDepartmentEditDetails = ({
           console.log(err);
         });
     }
-  }, [applicationDetail, lastComments]);
+  }, [applicationDetail]);
 
   const onShow = () => {
     setTimeout(() => {
@@ -1423,6 +1414,7 @@ const ImportOtherDepartmentEditDetails = ({
                           }
                         }
                       };
+
                       const addHeader = (doc) => {
                         if (roleID != 3) {
                           const pageCount = doc.internal.getNumberOfPages();
@@ -1731,7 +1723,10 @@ const ImportOtherDepartmentEditDetails = ({
                 console.log("file Upload ", err);
               });
             axios
-              .post(APIURL + "ExportApplication/CopyingResponses", copyresponse)
+              .post(
+                APIURL + "ReferredApplication/CopyingResponsesReferred",
+                copyresponse
+              )
               .then((resposnse) => {
                 console.log("CopyingResponses");
               })
@@ -1809,25 +1804,17 @@ const ImportOtherDepartmentEditDetails = ({
 
   useEffect(() => {
     if (editor) {
-      editor.commands.setContent(
-        applicationDetail.parentApplicationID !== 0 && lastComments
-          ? lastComments?.description
-          : ""
-      );
+      editor.commands.setContent("");
       setDescription(editor.getHTML());
     }
   }, [applicationDetail]);
 
   useEffect(() => {
     if (editorAnalyst) {
-      editorAnalyst.commands.setContent(
-        applicationDetail.parentApplicationID !== 0 && lastComments
-          ? lastComments?.description
-          : applicationDetail?.analystDescription
-      );
+      editorAnalyst.commands.setContent(applicationDetail?.analystDescription);
       setDescription(editorAnalyst.getHTML());
     }
-  }, [applicationDetail, lastComments]);
+  }, [applicationDetail]);
 
   const editorAnalyst = useEditor({
     extensions: [
@@ -1862,13 +1849,11 @@ const ImportOtherDepartmentEditDetails = ({
   useEffect(() => {
     if (editorSrAnalyst) {
       editorSrAnalyst.commands.setContent(
-        applicationDetail.parentApplicationID !== 0 && lastComments
-          ? lastComments?.description
-          : applicationDetail?.analystDescription
+        applicationDetail?.analystDescription
       );
       setDescription(editorSrAnalyst.getHTML());
     }
-  }, [applicationDetail, lastComments]);
+  }, [applicationDetail]);
 
   const editorSrAnalyst = useEditor({
     extensions: [
@@ -1932,14 +1917,10 @@ const ImportOtherDepartmentEditDetails = ({
 
   useEffect(() => {
     if (editorDeputy) {
-      editorDeputy.commands.setContent(
-        applicationDetail.parentApplicationID !== 0 && lastComments
-          ? lastComments?.description
-          : applicationDetail?.analystDescription
-      );
+      editorDeputy.commands.setContent(applicationDetail?.analystDescription);
       setDescription(editorDeputy.getHTML());
     }
-  }, [applicationDetail, lastComments]);
+  }, [applicationDetail]);
 
   const editorPrincipleAnalyst = useEditor({
     extensions: [
@@ -1974,13 +1955,11 @@ const ImportOtherDepartmentEditDetails = ({
   useEffect(() => {
     if (editorPrincipleAnalyst) {
       editorPrincipleAnalyst.commands.setContent(
-        applicationDetail.parentApplicationID !== 0 && lastComments
-          ? lastComments?.description
-          : applicationDetail?.analystDescription
+        applicationDetail?.analystDescription
       );
       setDescription(editorPrincipleAnalyst.getHTML());
     }
-  }, [applicationDetail, lastComments]);
+  }, [applicationDetail]);
 
   const editorDirector = useEditor({
     extensions: [
@@ -2014,14 +1993,10 @@ const ImportOtherDepartmentEditDetails = ({
 
   useEffect(() => {
     if (editorDirector) {
-      editorDirector.commands.setContent(
-        applicationDetail.parentApplicationID !== 0 && lastComments
-          ? lastComments?.description
-          : applicationDetail?.analystDescription
-      );
+      editorDirector.commands.setContent(applicationDetail?.analystDescription);
       setDescription(editorDirector.getHTML());
     }
-  }, [applicationDetail, lastComments]);
+  }, [applicationDetail]);
 
   const MenuBar = ({ editor }) => {
     if (!editor) {
@@ -2376,32 +2351,6 @@ const ImportOtherDepartmentEditDetails = ({
         </span>
       </>
     );
-  };
-
-  useEffect(() => {
-    setasignnextLeveldata({
-      Notes: lastComments?.notes,
-      Comment: lastComments?.comment,
-    });
-  }, [lastComments]);
-
-  const getLastComment = async (id) => {
-    await axios
-      .post(APIURL + "ImportApplication/GetLastApplicationDataByIDImport", {
-        ApplicationID: id,
-        RoleID: roleID,
-      })
-      .then((res) => {
-        if (res.data.responseCode == 200) {
-          setLastComments(res.data.responseData);
-          setDescription(res.data.responseData.description);
-        } else {
-          toast.warning(res.data.responseMessage);
-        }
-      })
-      .catch((error) => {
-        console.log("GetLastApplicationDataByIDImport Error", error);
-      });
   };
 
   const OtherDepartmentRole = async () => {
@@ -3603,20 +3552,6 @@ const ImportOtherDepartmentEditDetails = ({
                   >
                     <i className="bi bi-caret-down-fill"></i>
                   </span>
-                  {applicationDetail?.parentApplicationID !== 0 &&
-                  roleID == 3 ? (
-                    <button
-                      type="button"
-                      className="btn btn-light mx-auto copybtn"
-                      onClick={() =>
-                        getLastComment(applicationDetail?.parentApplicationID)
-                      }
-                    >
-                      Copy Last Response
-                    </button>
-                  ) : (
-                    ""
-                  )}
                 </h5>
                 <div className={banksuperTab ? "customtab" : "d-none"}>
                   {allcomment?.map((cur, i) => {
@@ -3655,7 +3590,7 @@ const ImportOtherDepartmentEditDetails = ({
                           {cur?.applicationActivityData
                             ?.slice()
                             ?.reverse()
-                            .map((items, index) => {
+                            ?.map((items, index) => {
                               return (
                                 <li className="nav-item" role="presentation">
                                   <button
@@ -4202,7 +4137,7 @@ const ImportOtherDepartmentEditDetails = ({
                       return cur?.applicationActivityData
                         ?.slice()
                         ?.reverse()
-                        .map((item, index) => {
+                        ?.map((item, index) => {
                           if (cur?.assignedToRoleID == 3) {
                             return (
                               <>
@@ -4509,20 +4444,6 @@ const ImportOtherDepartmentEditDetails = ({
                   >
                     <i className="bi bi-caret-down-fill"></i>
                   </span>
-                  {applicationDetail?.parentApplicationID !== 0 &&
-                  roleID == 4 ? (
-                    <button
-                      type="button"
-                      className="btn btn-light mx-auto copybtn"
-                      onClick={() =>
-                        getLastComment(applicationDetail?.parentApplicationID)
-                      }
-                    >
-                      Copy Last Response
-                    </button>
-                  ) : (
-                    ""
-                  )}
                 </h5>
 
                 <div className={recordTab ? "customtab" : "d-none"}>
@@ -4928,20 +4849,6 @@ const ImportOtherDepartmentEditDetails = ({
                   >
                     <i className="bi bi-caret-down-fill"></i>
                   </span>
-                  {applicationDetail?.parentApplicationID !== 0 &&
-                  roleID == 5 ? (
-                    <button
-                      type="button"
-                      className="btn btn-light mx-auto copybtn"
-                      onClick={() =>
-                        getLastComment(applicationDetail?.parentApplicationID)
-                      }
-                    >
-                      Copy Last Response
-                    </button>
-                  ) : (
-                    ""
-                  )}
                 </h5>
 
                 <div className={analystTab ? "customtab" : "d-none"}>
@@ -4981,7 +4888,7 @@ const ImportOtherDepartmentEditDetails = ({
                           {cur?.applicationActivityData
                             ?.slice()
                             ?.reverse()
-                            .map((items, index) => {
+                            ?.map((items, index) => {
                               return (
                                 <li className="nav-item" role="presentation">
                                   <button
@@ -6187,7 +6094,7 @@ const ImportOtherDepartmentEditDetails = ({
                       return cur?.applicationActivityData
                         ?.slice()
                         ?.reverse()
-                        .map((item, index) => {
+                        ?.map((item, index) => {
                           if (cur?.assignedToRoleID == 5) {
                             return (
                               <>
@@ -6725,20 +6632,6 @@ const ImportOtherDepartmentEditDetails = ({
                   >
                     <i className="bi bi-caret-down-fill"></i>
                   </span>
-                  {applicationDetail?.parentApplicationID !== 0 &&
-                  roleID == 6 ? (
-                    <button
-                      type="button"
-                      className="btn btn-light mx-auto copybtn"
-                      onClick={() =>
-                        getLastComment(applicationDetail?.parentApplicationID)
-                      }
-                    >
-                      Copy Last Response
-                    </button>
-                  ) : (
-                    ""
-                  )}
                 </h5>
 
                 <div className={sranalystTab ? "customtab" : "d-none"}>
@@ -6778,7 +6671,7 @@ const ImportOtherDepartmentEditDetails = ({
                           {cur?.applicationActivityData
                             ?.slice()
                             ?.reverse()
-                            .map((items, index) => {
+                            ?.map((items, index) => {
                               return (
                                 <li className="nav-item" role="presentation">
                                   <button
@@ -8059,7 +7952,7 @@ const ImportOtherDepartmentEditDetails = ({
                       return cur?.applicationActivityData
                         ?.slice()
                         ?.reverse()
-                        .map((item, index) => {
+                        ?.map((item, index) => {
                           if (cur?.assignedToRoleID == 6) {
                             return (
                               <>
@@ -8587,20 +8480,6 @@ const ImportOtherDepartmentEditDetails = ({
                   >
                     <i className="bi bi-caret-down-fill"></i>
                   </span>
-                  {applicationDetail?.parentApplicationID !== 0 &&
-                  roleID == 7 ? (
-                    <button
-                      type="button"
-                      className="btn btn-light mx-auto copybtn"
-                      onClick={() =>
-                        getLastComment(applicationDetail?.parentApplicationID)
-                      }
-                    >
-                      Copy Last Response
-                    </button>
-                  ) : (
-                    ""
-                  )}
                 </h5>
 
                 <div className={principalanalystTab ? "customtab" : "d-none"}>
@@ -8640,7 +8519,7 @@ const ImportOtherDepartmentEditDetails = ({
                           {cur?.applicationActivityData
                             ?.slice()
                             ?.reverse()
-                            .map((items, index) => {
+                            ?.map((items, index) => {
                               return (
                                 <li className="nav-item" role="presentation">
                                   <button
@@ -8686,7 +8565,6 @@ const ImportOtherDepartmentEditDetails = ({
                       );
                     }
                   })}
-
                   <div className="tab-content pt-2">
                     <div
                       className={
@@ -9918,7 +9796,7 @@ const ImportOtherDepartmentEditDetails = ({
                       return cur?.applicationActivityData
                         ?.slice()
                         ?.reverse()
-                        .map((item, index) => {
+                        ?.map((item, index) => {
                           if (cur?.assignedToRoleID == 7) {
                             return (
                               <>
@@ -10448,20 +10326,6 @@ const ImportOtherDepartmentEditDetails = ({
                   >
                     <i className="bi bi-caret-down-fill"></i>
                   </span>
-                  {applicationDetail?.parentApplicationID !== 0 &&
-                  roleID == 8 ? (
-                    <button
-                      type="button"
-                      className="btn btn-light mx-auto copybtn"
-                      onClick={() =>
-                        getLastComment(applicationDetail?.parentApplicationID)
-                      }
-                    >
-                      Copy Last Response
-                    </button>
-                  ) : (
-                    ""
-                  )}
                 </h5>
 
                 <div className={deputyTab ? "customtab" : "d-none"}>
@@ -10501,7 +10365,7 @@ const ImportOtherDepartmentEditDetails = ({
                           {cur?.applicationActivityData
                             ?.slice()
                             ?.reverse()
-                            .map((items, index) => {
+                            ?.map((items, index) => {
                               return (
                                 <li className="nav-item" role="presentation">
                                   <button
@@ -11767,7 +11631,7 @@ const ImportOtherDepartmentEditDetails = ({
                       return cur?.applicationActivityData
                         ?.slice()
                         ?.reverse()
-                        .map((item, index) => {
+                        ?.map((item, index) => {
                           if (cur?.assignedToRoleID == 8) {
                             return (
                               <>
@@ -12292,20 +12156,6 @@ const ImportOtherDepartmentEditDetails = ({
                   >
                     <i className="bi bi-caret-down-fill"></i>
                   </span>
-                  {applicationDetail?.parentApplicationID !== 0 &&
-                  roleID == 9 ? (
-                    <button
-                      type="button"
-                      className="btn btn-light mx-auto copybtn"
-                      onClick={() =>
-                        getLastComment(applicationDetail?.parentApplicationID)
-                      }
-                    >
-                      Copy Last Response
-                    </button>
-                  ) : (
-                    ""
-                  )}
                 </h5>
 
                 <div className={director ? "customtab mb-3" : "d-none"}>
@@ -12345,7 +12195,7 @@ const ImportOtherDepartmentEditDetails = ({
                           {cur?.applicationActivityData
                             ?.slice()
                             ?.reverse()
-                            .map((items, index) => {
+                            ?.map((items, index) => {
                               return (
                                 <li className="nav-item" role="presentation">
                                   <button
@@ -13946,6 +13796,189 @@ const ImportOtherDepartmentEditDetails = ({
               ""
             )}
 
+            {roleID >= 5 ? (
+              <>
+                <h5
+                  className={
+                    sharefiletab
+                      ? "section_top_subheading mt-1 py-3 btn-collapse_active cursorpointer"
+                      : "section_top_subheading mt-1 py-3 cursorpointer"
+                  }
+                  onClick={() => setsharefiletab(!sharefiletab)}
+                >
+                  Shared File{" "}
+                  <span className="counter-tab">{viewShareFile?.length}</span>
+                  <span className="btn-collapse">
+                    <i className="bi bi-caret-down-fill"></i>
+                  </span>
+                </h5>
+
+                <div className={sharefiletab ? "customtab  mt-2" : "d-none"}>
+                  {viewShareFile?.map((items, index) => {
+                    return (
+                      <div className="attachemt_form-bx" key={items.id}>
+                        <label>
+                          {/* {items.filename} */}
+                          {items?.fileName
+                            ? items?.fileName
+                            : `FileUpload ${index}`}
+                        </label>
+                        <div
+                          className={
+                            roleID == 2 || roleID == 3 ? "browse-btn" : "d-none"
+                          }
+                        >
+                          Browse{" "}
+                          <input
+                            type="file"
+                            onChange={(e) => handleFileChange(e, items.id)}
+                          />
+                        </div>
+                        <span className="filename">
+                          <Link
+                            to={items?.filePath}
+                            target="_blank"
+                            className="viewbtn"
+                          >
+                            View File
+                          </Link>
+                        </span>
+                        <button
+                          type="button"
+                          onClick={(e) => handleRemovfile(items.id)}
+                          className="remove-file"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    );
+                  })}
+
+                  {attachmentData?.map((items, index) => {
+                    return (
+                      <div className="attachemt_form-bx  mt-2" key={items.id}>
+                        <label
+                          style={{
+                            background: "#d9edf7",
+                            padding: "9px 3px",
+                            border: "0px",
+                          }}
+                        >
+                          <span style={{ fontWeight: "500" }}>
+                            {items.filename}
+                          </span>
+                        </label>
+                        <div className="browse-btn">
+                          Browse
+                          <input
+                            type="file"
+                            onChange={(e) =>
+                              handleshareFileChange(e, `sharefile ${index}`)
+                            }
+                          />
+                        </div>
+                        <span className="filename">
+                          {sharefile?.find((f) => f.id === `sharefile ${index}`)
+                            ?.file?.name || "No file chosen"}
+                        </span>
+
+                        {sharefile?.length &&
+                        sharefile?.find((f) => f.id === `sharefile ${index}`)
+                          ?.file?.name ? (
+                          <button
+                            type="button"
+                            className="remove-file"
+                            onClick={() =>
+                              removeshareImage(index, `sharefile ${index}`)
+                            }
+                          >
+                            Remove
+                          </button>
+                        ) : (
+                          ""
+                        )}
+                      </div>
+                    );
+                  })}
+
+                  {othersharefile.map((file, index) => (
+                    <div
+                      key={"other" + (index + 1)}
+                      className="attachemt_form-bx"
+                    >
+                      <label
+                        style={{
+                          background: "#d9edf7",
+                          padding: "9px 3px",
+                          border: "0px",
+                        }}
+                      >
+                        <b>
+                          Other File
+                          {index + 1}
+                        </b>
+                      </label>
+                      <div className="browse-btn">
+                        Browse{" "}
+                        <input
+                          type="file"
+                          onChange={(e) => {
+                            handleshareFileChange(
+                              e,
+                              "sharefileother" + (index + 1)
+                            );
+                            handleOthrefile(e, "sharefileother" + (index + 1));
+                          }}
+                        />
+                      </div>
+                      <span className="filename">
+                        {sharefile?.find(
+                          (f) => f.id === "sharefileother" + (index + 1)
+                        )?.file?.name || "No file chosen"}
+                      </span>
+                      {sharefile?.length &&
+                      sharefile?.find(
+                        (f) => f.id === "sharefileother" + (index + 1)
+                      )?.file?.name ? (
+                        <button
+                          type="button"
+                          className="remove-file"
+                          onClick={() =>
+                            removeshareImage(
+                              index,
+                              "sharefileother" + (index + 1)
+                            )
+                          }
+                        >
+                          Remove
+                        </button>
+                      ) : (
+                        ""
+                      )}
+                    </div>
+                  ))}
+
+                  {sharefile?.length ? (
+                    <div className="attachemt_form-bx">
+                      <label style={{ border: "0px" }}>{""}</label>
+                      <button
+                        type="button"
+                        className="addmore-btn mt-0"
+                        onClick={(e) => handlesharefileAddMore(e)}
+                      >
+                        {" "}
+                        Add More File{" "}
+                      </button>
+                    </div>
+                  ) : (
+                    ""
+                  )}
+                </div>
+              </>
+            ) : (
+              ""
+            )}
+
             <>
               <h5
                 className={
@@ -14660,7 +14693,7 @@ const ImportOtherDepartmentEditDetails = ({
                                         CC:
                                       </p>
                                       <div>
-                                        {selectedBanks.map((item) => {
+                                        {selectedBanks?.map((item) => {
                                           return (
                                             <p
                                               style={{
@@ -15022,8 +15055,7 @@ const ImportOtherDepartmentEditDetails = ({
                                         className="tableEditorData"
                                         dangerouslySetInnerHTML={{
                                           __html: asignnextLeveldata
-                                            ?
-                                              Description
+                                            ? Description
                                             : "",
                                         }}
                                         style={{
@@ -15685,7 +15717,7 @@ const ImportOtherDepartmentEditDetails = ({
                                         CC:
                                       </p>
                                       <div>
-                                        {selectedBanks.map((item) => {
+                                        {selectedBanks?.map((item) => {
                                           return (
                                             <p
                                               style={{
@@ -16035,7 +16067,7 @@ const ImportOtherDepartmentEditDetails = ({
                                         CC:
                                       </p>
                                       <div>
-                                        {selectedBanks.map((item) => {
+                                        {selectedBanks?.map((item) => {
                                           return (
                                             <p
                                               style={{

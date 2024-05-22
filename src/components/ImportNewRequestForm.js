@@ -63,7 +63,6 @@ const ImportNewRequestForm = () => {
   const [toastDisplayed, setToastDisplayed] = useState(false);
   const [getCompanyName, setgetCompanyName] = useState(null);
   const [submitbuttonhide, setsubmitbuttonhide] = useState(false);
-  const [getCompanyId, setgetCompanyId] = useState("");
   const [updatepopup, setupdatepopup] = useState(false);
 
   const [registerusertype, setregisterusertype] = useState(bankidcheck);
@@ -483,10 +482,6 @@ const ImportNewRequestForm = () => {
     }
     setErrors(newErrors);
     return valid;
-  };
-
-  const generateRandomNumber = () => {
-    return Math.floor(10000 + Math.random() * 90000);
   };
 
   const HandleSubmit = async (e) => {
@@ -1108,7 +1103,6 @@ const ImportNewRequestForm = () => {
             <span className="sspan"></span>
           </div>
         </div>
-        {/* end form-bx  */}
 
         <div className="inner_form_new ">
           <label className="controlform">
@@ -1588,7 +1582,6 @@ const ImportNewRequestForm = () => {
                 </label>
               </div>
             </div>
-            {/* end form-bx  */}
           </div>
 
           <div className="col-md-3">
@@ -1606,6 +1599,12 @@ const ImportNewRequestForm = () => {
                     }}
                     placeholder="Amount"
                     value={ImportForm.amount}
+                    onKeyDown={(event) => {
+                      const blockedKeys = ["e", "E", "-", "+"];
+                      if (blockedKeys.includes(event.key)) {
+                        event.preventDefault();
+                      }
+                    }}
                     className={
                       errors.amount && ImportForm.amount === "" ? "error" : ""
                     }
@@ -1619,7 +1618,6 @@ const ImportNewRequestForm = () => {
                 </label>
               </div>
             </div>
-            {/* end form-bx  */}
           </div>
 
           <div className="col-md-3">

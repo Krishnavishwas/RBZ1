@@ -240,6 +240,7 @@ const ReferredDashboardTable = () => {
       })
       .then((res) => {
         if (res.data.responseCode === "200") {
+          setpaginationModalShow(false);
           setTabCount(res.data.responseData);
         }
       });
@@ -258,7 +259,8 @@ const ReferredDashboardTable = () => {
         if (res.data.responseCode === "200") {
           setPageLoader(false);
           setExportsapproveRequests(res.data.responseData);
-        } else if (res.data.responseMessage === "No data") {
+        } else if (res.data.responseCode === "401") {
+          setpaginationModalShow(false);
           setPageLoader(false);
         }
       });
@@ -298,7 +300,7 @@ const ReferredDashboardTable = () => {
       });
 
     await axios
-      .post(APIURL + "ImportApplication/GetNewCommentsImport", {
+      .post(APIURL + "ReferredApplication/GetNewCommentsReferred", {
         ID: id,
       })
       .then((res) => {
@@ -329,7 +331,7 @@ const ReferredDashboardTable = () => {
 
     // --------------------------vishwas start----------------------------
     await axios
-      .post(APIURL + "ImportApplication/GetImportCommentsInfoByRoleID", {
+      .post(APIURL + "ReferredApplication/GetReferredCommentsInfoByRoleID", {
         ApplicationID: id,
       })
       .then((res) => {
@@ -347,7 +349,7 @@ const ReferredDashboardTable = () => {
 
   const GetApplicationCount = async (id) => {
     await axios
-      .post(APIURL + "ImportApplication/CountByApplicationIDImport", {
+      .post(APIURL + "ReferredApplication/CountByApplicationIDReferred", {
         ApplicationID: id,
       })
       .then((res) => {
@@ -422,6 +424,9 @@ const ReferredDashboardTable = () => {
         if (res.data.responseCode === "200") {
           setpaginationModalShow(false);
           setExportsapproveRequests(res.data.responseData);
+        } else if (res.data.responseCode === "401") {
+          setpaginationModalShow(false);
+          setPageLoader(false);
         }
       });
   };
@@ -438,7 +443,7 @@ const ReferredDashboardTable = () => {
           />
         </span>
         <div>
-          {tabDepId == "All" && tabCount?.allDataCount >= 9 ? (
+          {tabDepId == "3" && tabCount?.allDataCount >= 9 ? (
             <Paginator
               className="custom-pagination"
               first={first}
@@ -450,7 +455,7 @@ const ReferredDashboardTable = () => {
           ) : (
             " "
           )}
-          {tabDepId == "My" && tabCount?.myDataCount >= 9 ? (
+          {tabDepId == "4" && tabCount?.myDataCount >= 9 ? (
             <Paginator
               className="custom-pagination"
               first={first}
@@ -677,7 +682,7 @@ const ReferredDashboardTable = () => {
                 ></Column>
               </DataTable>
 
-              {tabDepId == "All" && tabCount?.allDataCount >= 9 ? (
+              {tabDepId == "3" && tabCount?.allDataCount >= 9 ? (
                 <Paginator
                   className="custom-pagination"
                   first={first}
@@ -689,7 +694,7 @@ const ReferredDashboardTable = () => {
               ) : (
                 " "
               )}
-              {tabDepId == "My" && tabCount?.myDataCount >= 9 ? (
+              {tabDepId == "4" && tabCount?.myDataCount >= 9 ? (
                 <Paginator
                   className="custom-pagination"
                   first={first}

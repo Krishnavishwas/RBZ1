@@ -151,7 +151,7 @@ const ImportPendingRequestsTable = () => {
         if (res.data.responseCode === "200") {
           setPageLoader(false);
           setExportsPendingRequests(res.data.responseData);
-        } else if (res.data.responseMessage === "No data") {
+        } else if (res.data.responseCode === "401") {
           setPageLoader(false);
         }
       });
@@ -427,6 +427,9 @@ const ImportPendingRequestsTable = () => {
         if (res.data.responseCode === "200") {
           setpaginationModalShow(false);
           setExportsPendingRequests(res.data.responseData);
+        }else if (res.data.responseCode === "401") {
+          setPageLoader(false);
+          setpaginationModalShow(false);
         }
       });
   };
