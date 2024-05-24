@@ -22,6 +22,19 @@ const ReferredDashboardTable = () => {
   const useId = Storage.getItem("userID");
   const rollId = Storage.getItem("roleIDs");
   const bankID = Storage.getItem("bankID");
+  const menuname = Storage.getItem("menuname");
+
+  const DeptID =
+    menuname === "Exports"
+      ? "2"
+      : menuname === "Imports"
+      ? "3"
+      : menuname === "Foreign Investments"
+      ? "4"
+      : menuname === "Inspectorate"
+      ? "5"
+      : "";
+
   const [ExportsapproveRequests, setExportsapproveRequests] = useState([]);
   const [ExportsapproveAllRequests, setExportsapproveAllRequests] = useState(
     []
@@ -50,6 +63,8 @@ const ReferredDashboardTable = () => {
   const [SupervisorRoleId, setSupervisorRoleId] = useState("");
   const [loader, setLoader] = useState("");
   const [pageLoader, setPageLoader] = useState("");
+  const [tabDepId, setTabDepId] = useState("");
+
   const csvLinkRef = useRef();
   FilterService.register("custom_activity", (value, filters) => {
     const [from, to] = filters ?? [null, null];
@@ -228,24 +243,6 @@ const ReferredDashboardTable = () => {
     );
   };
 
-  // ----- Start Code For Geting Table List Data
-  const [tabCount, setTabCount] = useState("");
-  const handleTabCount = async () => {
-    await axios
-      .post(APIURL + "ExportApplication/CountData", {
-        UserID: useId?.replace(/"/g, ""),
-        RoleID: rollId,
-        MenuName: "AllRequest",
-        BankID: bankID,
-      })
-      .then((res) => {
-        if (res.data.responseCode === "200") {
-          setpaginationModalShow(false);
-          setTabCount(res.data.responseData);
-        }
-      });
-  };
-
   const handleData = async () => {
     setPageLoader(true);
     await axios
@@ -253,18 +250,23 @@ const ReferredDashboardTable = () => {
         UserID: useId.replace(/"/g, ""),
         RoleID: rollId,
         DepartmentID: tabDepId,
-        ReferredDepartmentID: "2",
+        ReferredDepartmentID: DeptID,
       })
       .then((res) => {
         if (res.data.responseCode === "200") {
           setPageLoader(false);
           setExportsapproveRequests(res.data.responseData);
         } else if (res.data.responseCode === "401") {
-          setpaginationModalShow(false);
+          setExportsapproveRequests([]);
           setPageLoader(false);
         }
       });
   };
+
+  useEffect(() => {
+    setTabDepId(DeptID == "2" ? "3" : "2");
+    handleData();
+  }, [DeptID]);
 
   const handleViewData = (id) => {
     setShowUpdateModal(true);
@@ -365,55 +367,54 @@ const ReferredDashboardTable = () => {
   };
 
   //------tabs state start
-  const [tabDepId, setTabDepId] = useState("3");
-
   const tabHeader = (
     <div className="application-tab w-100 mt-4">
       <ul className="nav nav-pills mb-3">
-        <li className="nav-item">
-          <a
-            className={tabDepId == "3" ? "nav-link active" : "nav-link"}
-            onClick={() => setTabDepId("3")}
-          >
-            {/* All Request ({tabCount?.allDataCount}) */}
-            Import
-          </a>
-        </li>
-        <li className="nav-item">
-          <a
-            className={tabDepId == "4" ? "nav-link active" : "nav-link"}
-            onClick={() => setTabDepId("4")}
-          >
-            {/* My Request ({tabCount?.myDataCount}) */}
-            Foreign Investments
-          </a>
-        </li>
-        <li className="nav-item">
-          <a
-            className={tabDepId == "5" ? "nav-link active" : "nav-link"}
-            onClick={() => setTabDepId("5")}
-          >
-            {/* My Request ({tabCount?.myDataCount}) */}
-            Inspectorate
-          </a>
-        </li>
+        {DeptID !== "2" && (
+          <li className="nav-item">
+            <a
+              className={tabDepId == "2" ? "nav-link active" : "nav-link"}
+              onClick={() => setTabDepId("2")}
+            >
+              Exports
+            </a>
+          </li>
+        )}
+        {DeptID !== "3" && (
+          <li className="nav-item">
+            <a
+              className={tabDepId == "3" ? "nav-link active" : "nav-link"}
+              onClick={() => setTabDepId("3")}
+            >
+              Imports
+            </a>
+          </li>
+        )}
+        {DeptID !== "4" && (
+          <li className="nav-item">
+            <a
+              className={tabDepId == "4" ? "nav-link active" : "nav-link"}
+              onClick={() => setTabDepId("4")}
+            >
+              Foreign Investments
+            </a>
+          </li>
+        )}
+        {DeptID !== "5" && (
+          <li className="nav-item">
+            <a
+              className={tabDepId == "5" ? "nav-link active" : "nav-link"}
+              onClick={() => setTabDepId("5")}
+            >
+              Inspectorate
+            </a>
+          </li>
+        )}
       </ul>
     </div>
   );
 
-  // pagination click loader start
-  const [paginationModalShow, setpaginationModalShow] = useState(false);
-  const handlePaginationModalClose = () => setpaginationModalShow(false);
-
-  // pagination click loader end
-  ///--------pagination start
-  const [first, setFirst] = useState("");
-  const [rows, setRows] = useState(10);
-
   const onPageChange = (event) => {
-    setpaginationModalShow(true);
-    setFirst(event.first);
-    setRows(event.rows);
     axios
       .post(APIURL + "ReferredApplication/GetReferredApplications", {
         UserID: useId.replace(/"/g, ""),
@@ -422,10 +423,8 @@ const ReferredDashboardTable = () => {
       })
       .then((res) => {
         if (res.data.responseCode === "200") {
-          setpaginationModalShow(false);
           setExportsapproveRequests(res.data.responseData);
         } else if (res.data.responseCode === "401") {
-          setpaginationModalShow(false);
           setPageLoader(false);
         }
       });
@@ -442,32 +441,6 @@ const ReferredDashboardTable = () => {
             placeholder="Search"
           />
         </span>
-        <div>
-          {tabDepId == "3" && tabCount?.allDataCount >= 9 ? (
-            <Paginator
-              className="custom-pagination"
-              first={first}
-              rows={rows}
-              totalRecords={tabCount?.allDataCount}
-              rowsPerPageOptions={[10, 50, 100, 500, 1000]}
-              onPageChange={onPageChange}
-            />
-          ) : (
-            " "
-          )}
-          {tabDepId == "4" && tabCount?.myDataCount >= 9 ? (
-            <Paginator
-              className="custom-pagination"
-              first={first}
-              rows={rows}
-              totalRecords={tabCount?.myDataCount}
-              rowsPerPageOptions={[10, 50, 100, 500, 1000]}
-              onPageChange={onPageChange}
-            />
-          ) : (
-            " "
-          )}
-        </div>
       </div>
     );
   };
@@ -476,7 +449,6 @@ const ReferredDashboardTable = () => {
 
   useEffect(() => {
     handleData();
-    handleTabCount();
     setExportsapproveRequests([]);
   }, [tabDepId]);
 
@@ -615,13 +587,17 @@ const ReferredDashboardTable = () => {
               <div className="pagination-top pagination-top-right"></div>
               <div className="clear"></div>
               <DataTable
-                className="primeDatatTable"
                 value={ExportsapproveRequests}
                 scrollable
                 scrollHeight="600px"
                 rowHover
                 filters={filters}
+                paginator={ExportsapproveRequests.length > 10 ? true : false}
+                paginatorPosition={"both"}
+                paginatorLeft
+                rows={10}
                 dataKey="id"
+                rowsPerPageOptions={[10, 50, 100]}
                 globalFilterFields={[
                   "rbzReferenceNumber",
                   "name",
@@ -681,31 +657,6 @@ const ReferredDashboardTable = () => {
                   body={action}
                 ></Column>
               </DataTable>
-
-              {tabDepId == "3" && tabCount?.allDataCount >= 9 ? (
-                <Paginator
-                  className="custom-pagination"
-                  first={first}
-                  rows={rows}
-                  totalRecords={tabCount?.allDataCount}
-                  rowsPerPageOptions={[10, 50, 100, 500, 1000]}
-                  onPageChange={onPageChange}
-                />
-              ) : (
-                " "
-              )}
-              {tabDepId == "4" && tabCount?.myDataCount >= 9 ? (
-                <Paginator
-                  className="custom-pagination"
-                  first={first}
-                  rows={rows}
-                  totalRecords={tabCount?.myDataCount}
-                  rowsPerPageOptions={[10, 50, 100, 500, 1000]}
-                  onPageChange={onPageChange}
-                />
-              ) : (
-                " "
-              )}
             </>
           )}
 
@@ -770,35 +721,6 @@ const ReferredDashboardTable = () => {
                                 ? applicationDetail.rbzReferenceNumber
                                 : ""}
                             </big>
-                          </div>
-                          <div
-                            className={
-                              applicationDetail &&
-                              applicationDetail?.parentApplicationID == 0
-                                ? "d-none"
-                                : "col-md-6 text-center"
-                            }
-                          >
-                            <button
-                              className={
-                                applicationDetail?.parentApplicationID
-                                  ? "btn btn-light viewcopybtn"
-                                  : "d-none"
-                              }
-                              onClick={() => {
-                                handleOldViewData(
-                                  applicationDetail?.parentApplicationID
-                                );
-                                GetOldHandelDetail(
-                                  applicationDetail?.parentApplicationID
-                                );
-                                GetOldApplicationCount(
-                                  applicationDetail?.parentApplicationID
-                                );
-                              }}
-                            >
-                              View Old Application
-                            </button>
                           </div>
                         </div>
                       </Modal.Title>
@@ -877,22 +799,6 @@ const ReferredDashboardTable = () => {
                 </div>
               </div>
             </div>
-          </Modal>
-
-          <Modal
-            size="sm"
-            show={paginationModalShow}
-            onHide={handlePaginationModalClose}
-            backdrop="static"
-            keyboard={false}
-            centered
-            className="paginationLoader"
-          >
-            <Modal.Body>
-              <Spinner animation="border" size="md" />
-
-              <p>Please wait loading data.</p>
-            </Modal.Body>
           </Modal>
         </>
       )}

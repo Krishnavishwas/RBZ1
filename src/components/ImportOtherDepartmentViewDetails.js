@@ -418,7 +418,7 @@ const ImportOtherDepartmentViewDetails = ({
             )}
 
             {applicationDetail?.attachedFiles?.length ? (
-              geninfoFile?.map((items, index) => {
+              applicationDetail?.attachedFiles?.map((items, index) => {
                 return (
                   <div className="attachemt_form-bx" key={items.id}>
                     <label
@@ -429,7 +429,6 @@ const ImportOtherDepartmentViewDetails = ({
                       }}
                     >
                       <span style={{ fontWeight: "500" }}>
-                        {" "}
                         {items?.label ? items?.label : items?.fileName}
                       </span>
                     </label>
@@ -453,7 +452,7 @@ const ImportOtherDepartmentViewDetails = ({
             )}
           </div>
 
-          {applicationDetail?.roleID !== 4 ? (
+          {/* {applicationDetail?.roleID !== 4 ? (
             <>
               <h5
                 className={
@@ -846,9 +845,9 @@ const ImportOtherDepartmentViewDetails = ({
             </>
           ) : (
             ""
-          )}
+          )} */}
 
-          {roleID >= 4 && applicationDetail?.roleID != 4 ? (
+          {/* {roleID >= 4 && applicationDetail?.roleID != 4 ? (
             <>
               <h5
                 className={
@@ -1002,9 +1001,6 @@ const ImportOtherDepartmentViewDetails = ({
                                               </div>
                                             </div>
                                           </div>
-                                          {/* ) : (
-                                           ""
-                                         )} */}
                                         </>
                                       );
                                     }
@@ -1041,7 +1037,7 @@ const ImportOtherDepartmentViewDetails = ({
             </>
           ) : (
             ""
-          )}
+          )} */}
 
           {roleID >= 4 ? (
             <>
@@ -1355,12 +1351,12 @@ const ImportOtherDepartmentViewDetails = ({
                                         <label className="controlform">
                                           Attachments
                                         </label>
-                                        {items?.filesData?.length ? (
+                                       <div> {items?.filesData?.length ? (
                                           items?.filesData?.map(
                                             (items, index) => {
                                               return (
                                                 <div
-                                                  className="attachemt_form-bx mt-3"
+                                                  className="attachemt_form-bx mt-1"
                                                   key={items.id}
                                                 >
                                                   <label>
@@ -1385,7 +1381,7 @@ const ImportOtherDepartmentViewDetails = ({
                                           <label className="notfound">
                                             File Not Found
                                           </label>
-                                        )}
+                                        )}</div>
                                       </div>
                                       <div className="inner_form_new ">
                                         <label className="controlform">
@@ -1942,12 +1938,12 @@ const ImportOtherDepartmentViewDetails = ({
                                         <label className="controlform">
                                           Attachments
                                         </label>
-                                        {items?.filesData?.length ? (
+                                        <div>{items?.filesData?.length ? (
                                           items?.filesData?.map(
                                             (items, index) => {
                                               return (
                                                 <div
-                                                  className="attachemt_form-bx mt-3"
+                                                  className="attachemt_form-bx mt-1"
                                                   key={items.id}
                                                 >
                                                   <label>
@@ -1973,7 +1969,7 @@ const ImportOtherDepartmentViewDetails = ({
                                           <label className="notfound">
                                             File Not Found
                                           </label>
-                                        )}
+                                        )}</div>
                                       </div>
                                       <div className="inner_form_new ">
                                         <label className="controlform">
@@ -2542,12 +2538,12 @@ const ImportOtherDepartmentViewDetails = ({
                                         <label className="controlform">
                                           Attachments
                                         </label>
-                                        {items?.filesData?.length ? (
+                                        <div>{items?.filesData?.length ? (
                                           items?.filesData?.map(
                                             (items, index) => {
                                               return (
                                                 <div
-                                                  className="attachemt_form-bx mt-3"
+                                                  className="attachemt_form-bx mt-1"
                                                   key={items.id}
                                                 >
                                                   <label>
@@ -2573,7 +2569,7 @@ const ImportOtherDepartmentViewDetails = ({
                                           <label className="notfound">
                                             File Not Found
                                           </label>
-                                        )}
+                                        )}</div>
                                       </div>
                                       <div className="inner_form_new ">
                                         <label className="controlform">
@@ -3139,12 +3135,12 @@ const ImportOtherDepartmentViewDetails = ({
                                         <label className="controlform">
                                           Attachments
                                         </label>
-                                        {items?.filesData?.length ? (
+                                        <div>{items?.filesData?.length ? (
                                           items?.filesData?.map(
                                             (items, index) => {
                                               return (
                                                 <div
-                                                  className="attachemt_form-bx mt-3"
+                                                  className="attachemt_form-bx mt-1"
                                                   key={items.id}
                                                 >
                                                   <label>
@@ -3170,7 +3166,7 @@ const ImportOtherDepartmentViewDetails = ({
                                           <label className="notfound">
                                             File Not Found
                                           </label>
-                                        )}
+                                        )}</div>
                                       </div>
                                       <div className="inner_form_new ">
                                         <label className="controlform">
@@ -3734,12 +3730,12 @@ const ImportOtherDepartmentViewDetails = ({
                                         <label className="controlform">
                                           Attachments
                                         </label>
-                                        {items?.filesData?.length ? (
+                                        <div>{items?.filesData?.length ? (
                                           items?.filesData?.map(
                                             (items, index) => {
                                               return (
                                                 <div
-                                                  className="attachemt_form-bx mt-3"
+                                                  className="attachemt_form-bx mt-1"
                                                   key={items.id}
                                                 >
                                                   <label>
@@ -3765,7 +3761,7 @@ const ImportOtherDepartmentViewDetails = ({
                                           <label className="notfound">
                                             File Not Found
                                           </label>
-                                        )}
+                                        )}</div>
                                       </div>
                                       <div className="inner_form_new ">
                                         <label className="controlform">

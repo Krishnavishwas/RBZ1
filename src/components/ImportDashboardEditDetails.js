@@ -11,15 +11,11 @@ import Modal from "react-bootstrap/Modal";
 import UpdatePopupMessage from "./UpdatePopupMessage";
 import "suneditor/dist/css/suneditor.min.css";
 import { toast } from "react-toastify";
-import logo from "../rbz_LOGO.png";
-import { DataTable } from "primereact/datatable";
-import { Column } from "primereact/column";
-import { TailSpin } from "react-loader-spinner";
+import logo from "../rbz_LOGO.png";  
 import NoSign from "../NoSign.png";
 import "react-datepicker/dist/react-datepicker.css";
-import jsPDF from "jspdf";
-import { MultiSelect } from "primereact/multiselect";
-
+import jsPDF from "jspdf"; 
+import CustomMultiSelect from "./SearchUI/CustomMultiSelect";
 /* Tiptp Editor Starts */
 import Table from "@tiptap/extension-table";
 import TableCell from "@tiptap/extension-table-cell";
@@ -141,7 +137,7 @@ const ImportDashboardEditDetails = ({
   const [files, setFiles] = useState([]);
   const [toastDisplayed, setToastDisplayed] = useState(false);
   const [errors, setErrors] = useState({});
-  const [selectedBanks, setSelectedBanks] = useState(null);
+  const [selectedBanks, setSelectedBanks] = useState([]);
   const [userRoleRecordofficer, setuserRoleRecordofficer] = useState([]);
   const [sharefile, setsharefile] = useState([]);
   const [registerusertype, setregisterusertype] = useState(bankidcheck);
@@ -272,11 +268,15 @@ const ImportDashboardEditDetails = ({
   ];
 
   const heading = "Updated Successfully!";
-  const para = "Import request updated successfully!";
+  const para = "Import request updated successfully!"; 
 
-  const heading1 = "Submit Successfully";
-  const para1 = "Application Successfully Submitted to Other Department!";
+  const heading1 = "Submitted  Successfully";
+  const para1 = "Application successfully submitted to other department!";
   const applicationNumber = applicationDetail.rbzReferenceNumber;
+
+  const menuname = Storage.getItem("menuname")
+
+const DeptID = menuname === "Exports" ? "2" : menuname === "Imports" ? "3": menuname === "Foreign Investments" ? "4" : menuname === "Inspectorate" ? "5" : ""
 
   const ratevalue = applicationDetail?.rate;
 
@@ -774,82 +774,162 @@ const ImportDashboardEditDetails = ({
     setOtherfilesupload([...otherfilesupload, { otherfile, id }]);
   };
 
-  const GetHandelDetailPDF = async () => {
+   /* PDF Preview code starts */
+   const GetHandelDetailPDF = async () => {
     setBtnLoader(true);
     setTimeout(() => {
       const doc = new jsPDF({
         format: "a4",
         unit: "pt",
       });
-      const addHeader = (doc) => {
-        const pageCount = doc.internal.getNumberOfPages();
-        const headerpositionfromleft = (doc.internal.pageSize.width - 10) / 4;
-        for (var i = 1; i <= pageCount; i++) {
-          doc.setPage(i);
-          doc.addImage(logo, "png", 70, 10, 80, 80, "DMS-RBZ", "NONE", 0);
-          doc.setFontSize(8);
-          doc.text(
-            "Reserve Bank of Zimbabwe. 80 Samora Machel Avenue, P.O. Box 1283, Harare, Zimbabwe.",
-            headerpositionfromleft + 50,
-            40
-          );
-          doc.text(
-            "Tel: 263 242 703000, 263 8677000477 | Website:www.rbz.co.zw",
-            headerpositionfromleft + 100,
-            50
-          );
-        }
-      };
-      const addWaterMark = (doc) => {
-        const pageCount = doc.internal.getNumberOfPages();
-        for (var i = 1; i <= pageCount; i++) {
-          doc.setPage(i);
-          doc.setTextColor("#cccaca");
-          doc.saveGraphicsState();
-          doc.setGState(new doc.GState({ opacity: 0.4 }));
-          doc.setFont("helvetica", "normal");
-          doc.setFontSize(80);
-          //doc.text("PREVIEW", 50, 150, {align: 'center', baseline: 'middle'})
-          doc.text(
-            doc.internal.pageSize.width / 3,
-            doc.internal.pageSize.height / 2,
-            "Preview",
-            { angle: 45 }
-          );
-          doc.restoreGraphicsState();
-        }
-      };
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(3);
-      let docWidth = doc.internal.pageSize.getWidth();
-      const refpdfview =
-        roleID == 3 && nextlevelvalue == 10
-          ? PdfPrivewsupervisorRef
-          : roleID == 3 && nextlevelvalue == ""
-          ? CoverigLetterRef
-          : PdfPrivewRef;
-      doc.html(refpdfview.current, {
-        x: 12,
-        y: 12,
-        width: 513,
-        height: doc.internal.pageSize.getHeight(),
-        margin: [110, 80, 60, 35],
-        windowWidth: 1000,
-        pagebreak: true,
-        async callback(doc) {
-          addHeader(doc);
-          addWaterMark(doc);
-          doc.setProperties({
-            title: `${applicationDetail?.rbzReferenceNumber}`,
-          });
-          var blob = doc.output("blob");
-          window.open(URL.createObjectURL(blob), "_blank");
-        },
-      });
-      setBtnLoader(false);
+
+      axios
+        .post(APIURL + "Admin/GetBankByID", {
+          id: applicationDetail?.bankID,
+        })
+        .then((response) => {
+          if (response.data.responseCode === "200") {
+            if (
+              response.data.responseData?.headerFooterData["0"]?.fileType ==
+              "HeaderFile"
+            ) {
+              var headerImage =
+                response.data.responseData.headerFooterData["0"].filePath;
+              var headerImagewidth =
+                response.data.responseData.headerFooterData["0"].imageWidth;
+            } else {
+              var headerImage = "";
+            }
+            if (
+              response.data.responseData?.headerFooterData["1"]?.fileType ==
+              "FooterFile"
+            ) {
+              var footerImage =
+                response.data.responseData.headerFooterData["1"].filePath;
+              var footerImagewidth =
+                response.data.responseData.headerFooterData["1"].imageWidth;
+            } else {
+              var footerImage = "";
+            }
+
+            const addHeader = (doc) => {
+              if (roleID != 3) {
+                const pageCount = doc.internal.getNumberOfPages();
+                const headerpositionfromleft =
+                  (doc.internal.pageSize.width - 10) / 4;
+                for (var i = 1; i <= pageCount; i++) {
+                  doc.setPage(i);
+                  doc.addImage(
+                    logo,
+                    "png",
+                    70,
+                    10,
+                    80,
+                    80,
+                    "DMS-RBZ",
+                    "NONE",
+                    0
+                  );
+                  doc.setFontSize(8);
+                  doc.text(
+                    "Reserve Bank of Zimbabwe. 80 Samora Machel Avenue, P.O. Box 1283, Harare, Zimbabwe.",
+                    headerpositionfromleft + 50,
+                    40
+                  );
+                  doc.text(
+                    "Tel: 263 242 703000, 263 8677000477 | Website:www.rbz.co.zw",
+                    headerpositionfromleft + 100,
+                    50
+                  );
+                }
+              } else {
+                if (headerImage != "") {
+                  const pageCount = doc.internal.getNumberOfPages();
+                  var pagewidth = doc.internal.pageSize.width;
+                  if (pagewidth > headerImagewidth) {
+                    var diff = parseInt(pagewidth) - parseInt(headerImagewidth);
+                    var positionLeft = parseInt(diff / 2);
+                  } else {
+                    var positionLeft = 250;
+                  }
+
+                  for (var i = 1; i <= pageCount; i++) {
+                    doc.setPage(i);
+                    doc.addImage(
+                      headerImage,
+                      "png",
+                      positionLeft,
+                      10,
+                      80,
+                      80,
+                      "Header",
+                      "NONE",
+                      0
+                    );
+                  }
+                } else {
+                  doc.setFont("helvetica", "bold");
+                  doc.setFontSize(20);
+                  doc.text("Final Letter", 250, 40);
+                }
+              }
+            };
+
+            const addWaterMark = (doc) => {
+              const pageCount = doc.internal.getNumberOfPages();
+              for (var i = 1; i <= pageCount; i++) {
+                doc.setPage(i);
+                doc.setTextColor("#cccaca");
+                doc.saveGraphicsState();
+                doc.setGState(new doc.GState({ opacity: 0.4 }));
+                doc.setFont("helvetica", "normal");
+                doc.setFontSize(80);
+                //doc.text("PREVIEW", 50, 150, {align: 'center', baseline: 'middle'})
+                doc.text(
+                  doc.internal.pageSize.width / 3,
+                  doc.internal.pageSize.height / 2,
+                  "Preview",
+                  { angle: 45 }
+                );
+                doc.restoreGraphicsState();
+              }
+            };
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(3);
+            let docWidth = doc.internal.pageSize.getWidth();
+            const refpdfview =
+              roleID == 3 && nextlevelvalue == 10
+                ? PdfPrivewsupervisorRef
+                : roleID == 3 && nextlevelvalue == ""
+                ? CoverigLetterRef
+                : PdfPrivewRef;
+            doc.html(refpdfview.current, {
+              x: 12,
+              y: 12,
+              width: 513,
+              height: doc.internal.pageSize.getHeight(),
+              margin: [110, 80, 60, 35],
+              windowWidth: 1000,
+              pagebreak: true,
+              async callback(doc) {
+                addHeader(doc);
+                addWaterMark(doc);
+                doc.setProperties({
+                  title: `${applicationDetail?.rbzReferenceNumber}`,
+                });
+                var string = doc.output('dataurlnewwindow');
+                // var blob = doc.output("blob");
+                // window.open(URL.createObjectURL(blob), "_blank");
+              },
+            });
+            setBtnLoader(false);
+          } else {
+            var headerImage = "";
+            var footerImage = "";
+          }
+        });
     }, 1500);
   };
-
   const GetApplicationTypes = async () => {
     await axios
       .post(APIURL + "Master/GetApplicationTypesByDepartmentID", {
@@ -913,19 +993,25 @@ const ImportDashboardEditDetails = ({
 
     const bankdtata = applicationDetail?.copiedResponses?.map((items, i) => {
       return {
-        name: items.bankName,
-        code: items.bankID,
+        value: items.bankID,
+        label: items.bankName,
       };
     });
 
     const lastResponseCCTodata = lastComments?.copiedResponseData?.map(
       (items, i) => {
         return {
-          name: items.bankName,
-          code: items.bankID,
+          value: items.bankID,
+          label: items.bankName,
         };
       }
     );
+
+    
+
+  
+
+
 
     setExpiringDate(
       applicationDetail?.expiringDate
@@ -975,10 +1061,16 @@ const ImportDashboardEditDetails = ({
   });
 
   const vOption = masterBank?.map((res) => ({
-    name: res.bankName,
-    code: res.id,
+    value: res.id,
+    label: res.bankName,
   }));
 
+  const handleChangeBank = (e) => {    
+    const values = e;
+    setSelectedBanks(values); 
+  };
+
+  console.log("selectedBanks", selectedBanks)
   const HandleIsReturnOption = (e) => {
     const { name, value } = e.target;
     setIsReturnOption(e.target.value);
@@ -1029,12 +1121,12 @@ const ImportDashboardEditDetails = ({
   };
 
   const formatecopyresponse = selectedBanks?.map((item) => {
-    return item.code;
+    return item.value;
   });
 
   const copyresponse = selectedBanks?.map((res) => ({
     ApplicationID: applicationDetail?.id,
-    BankID: res?.code,
+    BankID: res?.value,
     CopyingResponse: 1,
     CopiedResponse: formatecopyresponse?.join(),
   }));
@@ -2452,7 +2544,18 @@ const ImportDashboardEditDetails = ({
           Comment: asignnextLeveldata.Comment,
           Notes: asignnextLeveldata.Notes,
           Description: Description,
-          Status: "35",
+          DepartmentID: DeptID ,
+          Status:
+            OtherDepartment == "2"
+              ? "275"
+              : OtherDepartment == "3"
+              ? "280"
+              : OtherDepartment == "4"
+              ? "285"
+              : OtherDepartment == "5"
+              ? "290"
+              : "",
+          // Status: "35",
         })
         .then((res) => {
           if (res.data.responseCode == 200) {
@@ -3085,12 +3188,6 @@ const ImportDashboardEditDetails = ({
                           onChange={(e) => {
                             changeHandelForm(e);
                           }}
-                          onKeyDown={(event) => {
-                            const blockedKeys = ['e', 'E', '-', '+'];
-                            if (blockedKeys.includes(event.key)) {
-                                event.preventDefault();
-                            }
-                        }}
                           placeholder={
                             applicationDetail?.amount
                               ? applicationDetail?.amount
@@ -3101,6 +3198,12 @@ const ImportDashboardEditDetails = ({
                               ? "error"
                               : ""
                           }
+                          onKeyDown={(event) => {
+                            const blockedKeys = ['e', 'E', '-', '+'];
+                            if (blockedKeys.includes(event.key)) {
+                                event.preventDefault();
+                            }
+                        }}
                         />
                         <span className="sspan"></span>
                         {errors.amount && applicationDetail.amount === "" ? (
@@ -5516,7 +5619,7 @@ const ImportDashboardEditDetails = ({
                           <div className="col-md-6">
                             <div className="inner_form_new align-items-center">
                               <label className="controlform">
-                                Other Department
+                                Department
                               </label>
                               <div className="form-bx">
                                 <label>
@@ -5538,7 +5641,7 @@ const ImportDashboardEditDetails = ({
                                     }
                                   >
                                     <option value="">
-                                      Select Other Department
+                                      Select Department
                                     </option>
                                     <option value="2">Export</option>
                                     <option value="4">
@@ -5855,7 +5958,7 @@ const ImportDashboardEditDetails = ({
                         <label className="controlform">CC To</label>
                         <div className=" cccto">
                           <div className="flex justify-content-center multiSelect">
-                            <MultiSelect
+                            {/* <MultiSelect
                               value={selectedBanks}
                               onChange={(e) => setSelectedBanks(e.value)}
                               options={vOption}
@@ -5864,6 +5967,14 @@ const ImportDashboardEditDetails = ({
                               placeholder="Select Banks"
                               className="w-full md:w-20rem"
                               display="chip"
+                            /> */}
+                            <CustomMultiSelect
+                              key="multyselectprinciple"
+                              options={vOption}
+                              onChange={(e) => handleChangeBank(e)}
+                              value={selectedBanks}
+                              isSelectAll={true}
+                              menuPlacement={"bottom"}
                             />
                           </div>
                         </div>
@@ -7262,7 +7373,7 @@ const ImportDashboardEditDetails = ({
                           <div className="col-md-6">
                             <div className="inner_form_new align-items-center">
                               <label className="controlform">
-                                Other Department
+                               Department
                               </label>
                               <div className="form-bx">
                                 <label>
@@ -7284,7 +7395,7 @@ const ImportDashboardEditDetails = ({
                                     }
                                   >
                                     <option value="">
-                                      Select Other Department
+                                      Select Department
                                     </option>
                                     <option value="2">Export</option>
                                     <option value="4">
@@ -7630,7 +7741,7 @@ const ImportDashboardEditDetails = ({
                         <label className="controlform">CC To</label>
                         <div className=" cccto">
                           <div className="flex justify-content-center multiSelect">
-                            <MultiSelect
+                            {/* <MultiSelect
                               value={selectedBanks}
                               onChange={(e) => setSelectedBanks(e.value)}
                               options={vOption}
@@ -7639,6 +7750,14 @@ const ImportDashboardEditDetails = ({
                               placeholder="Select Banks"
                               display="chip"
                               className="w-full md:w-20rem"
+                            /> */}
+                            <CustomMultiSelect
+                              key="multyselectprinciple"
+                              options={vOption}
+                              onChange={(e) => handleChangeBank(e)}
+                              value={selectedBanks}
+                              isSelectAll={true}
+                              menuPlacement={"bottom"}
                             />
                           </div>
                         </div>
@@ -9131,7 +9250,7 @@ const ImportDashboardEditDetails = ({
                           <div className="col-md-6">
                             <div className="inner_form_new align-items-center">
                               <label className="controlform">
-                                Other Department
+                                 Department
                               </label>
                               <div className="form-bx">
                                 <label>
@@ -9153,7 +9272,7 @@ const ImportDashboardEditDetails = ({
                                     }
                                   >
                                     <option value="">
-                                      Select Other Department
+                                      Select Department
                                     </option>
                                     <option value="2">Export</option>
                                     <option value="4">
@@ -9492,7 +9611,7 @@ const ImportDashboardEditDetails = ({
                             <label className="controlform">CC To</label>
                             <div className=" cccto">
                               <div className="flex justify-content-center multiSelect">
-                                <MultiSelect
+                                {/* <MultiSelect
                                   value={selectedBanks}
                                   onChange={(e) => setSelectedBanks(e.value)}
                                   options={vOption}
@@ -9501,7 +9620,15 @@ const ImportDashboardEditDetails = ({
                                   placeholder="Select Banks"
                                   display="chip"
                                   className="w-full md:w-20rem"
-                                />
+                                /> */}
+                                <CustomMultiSelect
+                              key="multyselectprinciple"
+                              options={vOption}
+                              onChange={(e) => handleChangeBank(e)}
+                              value={selectedBanks}
+                              isSelectAll={true}
+                              menuPlacement={"bottom"}
+                            />
                               </div>
                             </div>
                           </div>
@@ -10984,7 +11111,7 @@ const ImportDashboardEditDetails = ({
                           <div className="col-md-6">
                             <div className="inner_form_new align-items-center">
                               <label className="controlform">
-                                Other Department
+                                 Department
                               </label>
                               <div className="form-bx">
                                 <label>
@@ -11006,7 +11133,7 @@ const ImportDashboardEditDetails = ({
                                     }
                                   >
                                     <option value="">
-                                      Select Other Department
+                                      Select Department
                                     </option>
                                     <option value="2">Export</option>
                                     <option value="4">
@@ -11340,7 +11467,7 @@ const ImportDashboardEditDetails = ({
                             <label className="controlform">CC To</label>
                             <div className=" cccto">
                               <div className="flex justify-content-center multiSelect">
-                                <MultiSelect
+                                {/* <MultiSelect
                                   value={selectedBanks}
                                   onChange={(e) => setSelectedBanks(e.value)}
                                   options={vOption}
@@ -11349,7 +11476,15 @@ const ImportDashboardEditDetails = ({
                                   placeholder="Select Banks"
                                   display="chip"
                                   className="w-full md:w-20rem"
-                                />
+                                /> */}
+                                <CustomMultiSelect
+                              key="multyselectprinciple"
+                              options={vOption}
+                              onChange={(e) => handleChangeBank(e)}
+                              value={selectedBanks}
+                              isSelectAll={true}
+                              menuPlacement={"bottom"}
+                            />
                               </div>
                             </div>
                           </div>
@@ -13037,7 +13172,7 @@ const ImportDashboardEditDetails = ({
                         <label className="controlform">CC To</label>
                         <div className=" cccto">
                           <div className="flex justify-content-center multiSelect">
-                            <MultiSelect
+                            {/* <MultiSelect
                               value={selectedBanks}
                               onChange={(e) => setSelectedBanks(e.value)}
                               options={vOption}
@@ -13046,6 +13181,14 @@ const ImportDashboardEditDetails = ({
                               placeholder="Select Banks"
                               display="chip"
                               className="w-full md:w-20rem"
+                            /> */}
+                            <CustomMultiSelect
+                              key="multyselectprinciple"
+                              options={vOption}
+                              onChange={(e) => handleChangeBank(e)}
+                              value={selectedBanks}
+                              isSelectAll={true}
+                              menuPlacement={"bottom"}
                             />
                           </div>
                         </div>
@@ -13957,67 +14100,119 @@ const ImportDashboardEditDetails = ({
               ""
             )}
 
-            {roleID >= 5 ? (
-              <>
-                <h5
-                  className={
-                    sharefiletab
-                      ? "section_top_subheading mt-1 py-3 btn-collapse_active cursorpointer"
-                      : "section_top_subheading mt-1 py-3 cursorpointer"
-                  }
-                  onClick={() => setsharefiletab(!sharefiletab)}
-                >
-                  Shared File{" "}
-                  <span className="counter-tab">{viewShareFile?.length}</span>
-                  <span className="btn-collapse">
-                    <i className="bi bi-caret-down-fill"></i>
-                  </span>
-                </h5>
+{roleID >= 5 ? (
+                <>
+                  <h5
+                    className={
+                      sharefiletab
+                        ? "section_top_subheading mt-1 py-3 btn-collapse_active cursorpointer"
+                        : "section_top_subheading mt-1 py-3 cursorpointer"
+                    }
+                    onClick={() => setsharefiletab(!sharefiletab)}
+                  >
+                    Shared File{" "}
+                    <span className="counter-tab">{viewShareFile?.length}</span>
+                    <span className="btn-collapse">
+                      <i className="bi bi-caret-down-fill"></i>
+                    </span>
+                  </h5>
 
-                <div className={sharefiletab ? "customtab  mt-2" : "d-none"}>
-                  {viewShareFile?.map((items, index) => {
-                    return (
-                      <div className="attachemt_form-bx" key={items.id}>
-                        <label>
-                          {/* {items.filename} */}
-                          {items?.fileName
-                            ? items?.fileName
-                            : `FileUpload ${index}`}
-                        </label>
-                        <div
-                          className={
-                            roleID == 2 || roleID == 3 ? "browse-btn" : "d-none"
-                          }
-                        >
-                          Browse{" "}
-                          <input
-                            type="file"
-                            onChange={(e) => handleFileChange(e, items.id)}
-                          />
-                        </div>
-                        <span className="filename">
-                          <Link
-                            to={items?.filePath}
-                            target="_blank"
-                            className="viewbtn"
+                  <div className={sharefiletab ? "customtab  mt-2" : "d-none"}>
+                    {viewShareFile?.map((items, index) => {
+                      return (
+                        <div className="attachemt_form-bx" key={items.id}>
+                          <label>
+                            {/* {items.filename} */}
+                            {items?.fileName
+                              ? items?.fileName
+                              : `FileUpload ${index}`}
+                          </label>
+                          <div
+                            className={
+                              roleID == 2 || roleID == 3
+                                ? "browse-btn"
+                                : "d-none"
+                            }
                           >
-                            View File
-                          </Link>
-                        </span>
-                        <button
-                          type="button"
-                          onClick={(e) => handleRemovfile(items.id)}
-                          className="remove-file"
-                        >
-                          Remove
-                        </button>
-                      </div>
-                    );
-                  })}
+                            Browse{" "}
+                            <input
+                              type="file"
+                              onChange={(e) => handleFileChange(e, items.id)}
+                            />
+                          </div>
+                          <span className="filename">
+                            <Link
+                              to={items?.filePath}
+                              target="_blank"
+                              className="viewbtn"
+                            >
+                              View File
+                            </Link>
+                          </span>
+                          <button
+                            type="button"
+                            onClick={(e) => handleRemovfile(items.id)}
+                            className="remove-file"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      );
+                    })}
 
-                  {attachmentData?.map((items, index) => {
-                    return (
-                      <div className="attachemt_form-bx  mt-2" key={items.id}>
+                    {attachmentData?.map((items, index) => {
+                      return (
+                        <div className="attachemt_form-bx  mt-2" key={items.id}>
+                          <label
+                            style={{
+                              background: "#d9edf7",
+                              padding: "9px 3px",
+                              border: "0px",
+                            }}
+                          >
+                            <span style={{ fontWeight: "500" }}>
+                              {items.filename}
+                            </span>
+                          </label>
+                          <div className="browse-btn">
+                            Browse
+                            <input
+                              type="file"
+                              onChange={(e) =>
+                                handleshareFileChange(e, `sharefile ${index}`)
+                              }
+                            />
+                          </div>
+                          <span className="filename">
+                            {sharefile?.find(
+                              (f) => f.id === `sharefile ${index}`
+                            )?.file?.name || "No file chosen"}
+                          </span>
+
+                          {sharefile?.length &&
+                          sharefile?.find((f) => f.id === `sharefile ${index}`)
+                            ?.file?.name ? (
+                            <button
+                              type="button"
+                              className="remove-file"
+                              onClick={() =>
+                                removeshareImage(index, `sharefile ${index}`)
+                              }
+                            >
+                              Remove
+                            </button>
+                          ) : (
+                            ""
+                          )}
+                        </div>
+                      );
+                    })}
+
+                    {othersharefile.map((file, index) => (
+                      <div
+                        key={"other" + (index + 1)}
+                        className="attachemt_form-bx"
+                      >
                         <label
                           style={{
                             background: "#d9edf7",
@@ -14025,32 +14220,44 @@ const ImportDashboardEditDetails = ({
                             border: "0px",
                           }}
                         >
-                          <span style={{ fontWeight: "500" }}>
-                            {items.filename}
-                          </span>
+                          <b>
+                            Other File
+                            {index + 1}
+                          </b>
                         </label>
                         <div className="browse-btn">
-                          Browse
+                          Browse{" "}
                           <input
                             type="file"
-                            onChange={(e) =>
-                              handleshareFileChange(e, `sharefile ${index}`)
-                            }
+                            onChange={(e) => {
+                              handleshareFileChange(
+                                e,
+                                "sharefileother" + (index + 1)
+                              );
+                              handleOthrefile(
+                                e,
+                                "sharefileother" + (index + 1)
+                              );
+                            }}
                           />
                         </div>
                         <span className="filename">
-                          {sharefile?.find((f) => f.id === `sharefile ${index}`)
-                            ?.file?.name || "No file chosen"}
+                          {sharefile?.find(
+                            (f) => f.id === "sharefileother" + (index + 1)
+                          )?.file?.name || "No file chosen"}
                         </span>
-
                         {sharefile?.length &&
-                        sharefile?.find((f) => f.id === `sharefile ${index}`)
-                          ?.file?.name ? (
+                        sharefile?.find(
+                          (f) => f.id === "sharefileother" + (index + 1)
+                        )?.file?.name ? (
                           <button
                             type="button"
                             className="remove-file"
                             onClick={() =>
-                              removeshareImage(index, `sharefile ${index}`)
+                              removeshareImage(
+                                index,
+                                "sharefileother" + (index + 1)
+                              )
                             }
                           >
                             Remove
@@ -14059,86 +14266,29 @@ const ImportDashboardEditDetails = ({
                           ""
                         )}
                       </div>
-                    );
-                  })}
+                    ))}
 
-                  {othersharefile.map((file, index) => (
-                    <div
-                      key={"other" + (index + 1)}
-                      className="attachemt_form-bx"
-                    >
-                      <label
-                        style={{
-                          background: "#d9edf7",
-                          padding: "9px 3px",
-                          border: "0px",
-                        }}
-                      >
-                        <b>
-                          Other File
-                          {index + 1}
-                        </b>
-                      </label>
-                      <div className="browse-btn">
-                        Browse{" "}
-                        <input
-                          type="file"
-                          onChange={(e) => {
-                            handleshareFileChange(
-                              e,
-                              "sharefileother" + (index + 1)
-                            );
-                            handleOthrefile(e, "sharefileother" + (index + 1));
-                          }}
-                        />
-                      </div>
-                      <span className="filename">
-                        {sharefile?.find(
-                          (f) => f.id === "sharefileother" + (index + 1)
-                        )?.file?.name || "No file chosen"}
-                      </span>
-                      {sharefile?.length &&
-                      sharefile?.find(
-                        (f) => f.id === "sharefileother" + (index + 1)
-                      )?.file?.name ? (
+                    {sharefile?.length ? (
+                      <div className="attachemt_form-bx">
+                        <label style={{ border: "0px" }}>{""}</label>
                         <button
                           type="button"
-                          className="remove-file"
-                          onClick={() =>
-                            removeshareImage(
-                              index,
-                              "sharefileother" + (index + 1)
-                            )
-                          }
+                          className="addmore-btn mt-0"
+                          onClick={(e) => handlesharefileAddMore(e)}
                         >
-                          Remove
+                          {" "}
+                          Add More File{" "}
                         </button>
-                      ) : (
-                        ""
-                      )}
-                    </div>
-                  ))}
+                      </div>
+                    ) : (
+                      ""
+                    )}
+                  </div>
+                </>
+              ) : (
+                ""
+              )}
 
-                  {sharefile?.length ? (
-                    <div className="attachemt_form-bx">
-                      <label style={{ border: "0px" }}>{""}</label>
-                      <button
-                        type="button"
-                        className="addmore-btn mt-0"
-                        onClick={(e) => handlesharefileAddMore(e)}
-                      >
-                        {" "}
-                        Add More File{" "}
-                      </button>
-                    </div>
-                  ) : (
-                    ""
-                  )}
-                </div>
-              </>
-            ) : (
-              ""
-            )}
 
             <>
               <h5
@@ -14256,7 +14406,7 @@ const ImportDashboardEditDetails = ({
                     {OtherDepartmentLoader ? (
                       <span className="loaderwait">Please Wait...</span>
                     ) : (
-                      <span>Refer to Other Department</span>
+                      <span>Submit</span>
                     )}
                   </button>
                 ) : (
@@ -14448,7 +14598,7 @@ const ImportDashboardEditDetails = ({
                                   fontWeight: "400",
                                 }}
                               >
-                                Exporter
+                                Importer
                               </td>
                               <td
                                 style={{
@@ -14474,7 +14624,7 @@ const ImportDashboardEditDetails = ({
                                   letterSpacing: "0.01px",
                                 }}
                               >
-                                Date Submitted
+                                Date Submitted -1
                               </td>
                               <td
                                 style={{
@@ -14864,7 +15014,7 @@ const ImportDashboardEditDetails = ({
                                                 fontWeight: "400",
                                               }}
                                             >
-                                              {item.name}
+                                              {item.label}
                                             </p>
                                           );
                                         })}
@@ -15022,7 +15172,7 @@ const ImportDashboardEditDetails = ({
                             <tr>
                               <td colSpan="2">&nbsp;</td>
                             </tr>
-                            <tr>
+                            {/* <tr>
                               <td
                                 style={{
                                   color: "#000",
@@ -15030,7 +15180,7 @@ const ImportDashboardEditDetails = ({
                                   fontWeight: "400",
                                 }}
                               >
-                                Exporter
+                                Importer
                               </td>
                               <td
                                 style={{
@@ -15046,7 +15196,7 @@ const ImportDashboardEditDetails = ({
                                   ? applicationDetail?.name
                                   : applicationDetail?.companyName}
                               </td>
-                            </tr>
+                            </tr> */}
                             <tr>
                               <td
                                 style={{
@@ -15072,7 +15222,7 @@ const ImportDashboardEditDetails = ({
                                 ).format("DD MMMM YYYY")}
                               </td>
                             </tr>
-                            <tr>
+                            {/* <tr>
                               <td
                                 style={{
                                   color: "#000",
@@ -15110,8 +15260,8 @@ const ImportDashboardEditDetails = ({
                                   {applicationDetail?.amount}
                                 </span>
                               </td>
-                            </tr>
-                            <tr>
+                            </tr> */}
+                            {/* <tr>
                               <td
                                 style={{
                                   color: "#000",
@@ -15149,8 +15299,8 @@ const ImportDashboardEditDetails = ({
                                   {applicationDetail?.usdEquivalent}
                                 </span>
                               </td>
-                            </tr>
-                            <tr>
+                            </tr> */}
+                            {/* <tr>
                               <td
                                 style={{
                                   color: "#000",
@@ -15179,9 +15329,9 @@ const ImportDashboardEditDetails = ({
                                   : applicationstaus == "25"
                                   ? "Cancelled"
                                   : ""}
-                                {/* {applicationDetail?.statusName} */}
+                                
                               </td>
-                            </tr>
+                            </tr> */}
                           </table>
                         </td>
                       </tr>
@@ -15321,328 +15471,389 @@ const ImportDashboardEditDetails = ({
               {/* coveri letter data end Arun Verma */}
 
               <div className="login_inner" style={{ display: "none" }}>
-                <div className="login_form_panel" style={{ display: "none" }}>
-                  <div
-                    ref={PdfPrivewRef}
-                    className="p-5"
-                    style={{ position: "relative" }}
-                  >
-                    <table width="100%">
-                      <tr>
-                        <td
+              <div className="login_form_panel" style={{ display: "none" }}>
+                <div
+                  ref={PdfPrivewRef}
+                  className="p-5"
+                  style={{ position: "relative" }}
+                >
+                  <table width="100%">
+                    <tr>
+                      <td
+                        style={{
+                          marginBottom: "0px",
+                          color: "#000",
+                          fontSize: "18px",
+                          fontWeight: "800",
+                        }}
+                      >
+                        Exchange &nbsp; Control &nbsp; Ref
+                        <br />
+                        Previous &nbsp; Exchange &nbsp; Control &nbsp; Ref
+                      </td>
+                      <td>
+                        <p
                           style={{
                             marginBottom: "0px",
                             color: "#000",
                             fontSize: "18px",
+                            textAlign: "left",
                             fontWeight: "800",
-                          }}
-                        >
-                          Exchange &nbsp; Control &nbsp; Ref
-                          <br />
-                          Previous &nbsp; Exchange &nbsp; Control &nbsp; Ref
-                        </td>
-                        <td>
-                          <p
-                            style={{
-                              marginBottom: "0px",
-                              color: "#000",
-                              fontSize: "18px",
-                              textAlign: "left",
-                              fontWeight: "800",
-                              letterSpacing: "0.01px",
-                            }}
-                          >
-                            : {applicationDetail?.rbzReferenceNumber}
-                            <br />: N/A
-                          </p>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td colSpan="2">&nbsp;</td>
-                      </tr>
-                      <tr>
-                        <td
-                          colSpan="2"
-                          style={{
-                            color: "#000",
-                            fontSize: "18px",
-                            fontWeight: "600",
                             letterSpacing: "0.01px",
                           }}
                         >
-                          {moment(
-                            applicationDetail?.applicationSubmittedDate
-                          ).format("DD MMMM YYYY")}
-                        </td>
-                      </tr>
-                      <tr>
-                        <td colSpan="2">&nbsp;</td>
-                      </tr>
-                      <tr>
-                        <td
-                          colSpan="2"
-                          style={{
-                            color: "#000",
-                            fontSize: "18px",
-                            fontWeight: "600",
-                            letterSpacing: "0.01px",
-                          }}
-                        >
-                          The Head - Exchange Control
-                          <br />
-                          {applicationDetail?.bankName
-                            ? applicationDetail?.bankName
-                            : ""}
-                          {applicationDetail?.bankName == null ? (
-                            <span>
-                              Reserve Bank of Zimbabwe. 80 Samora Machel Avenue,{" "}
-                              <br /> P.O. Box 1283, Harare, Zimbabwe.
-                            </span>
-                          ) : (
-                            <>
-                              <br />
-                              {applicationDetail?.bankAddress1 != null ||
-                              applicationDetail?.bankAddress1 != ""
-                                ? applicationDetail?.bankAddress1 + "," + " "
-                                : ""}
-                              <br></br>
-                              {applicationDetail?.bankAddress2 != null ||
-                              applicationDetail?.bankAddress2 != ""
-                                ? applicationDetail?.bankAddress2 + "," + " "
-                                : ""}
-                              <br></br>
-                              {applicationDetail?.bankAddress3 != null ||
-                              applicationDetail?.bankAddress3 != ""
-                                ? applicationDetail?.bankAddress3
-                                : ""}
-                              <br />
-                            </>
-                          )}
-                        </td>
-                      </tr>
-                      <tr>
-                        <td colSpan="2">&nbsp;</td>
-                      </tr>
-                      <tr>
-                        <td
-                          colSpan="2"
-                          style={{
-                            color: "#000",
-                            fontSize: "18px",
-                            fontWeight: "600",
-                            letterSpacing: "0.01px",
-                          }}
-                        >
-                          Dear{" "}
-                          {applicationDetail?.companyName == null ||
-                          applicationDetail?.companyName == ""
-                            ? applicationDetail?.name
-                            : applicationDetail?.companyName}
-                          {console.log(applicationDetail)},
-                        </td>
-                      </tr>
-                      <tr>
-                        <td colSpan="2">&nbsp;</td>
-                      </tr>
-                      <tr>
-                        <td colSpan="2">
-                          <table width="100%">
-                            <tr>
-                              <td colSpan="2">
-                                <p
-                                  style={{
-                                    color: "#000",
-                                    fontSize: "18px",
-                                    fontWeight: "800",
-                                    borderBottom: "1px solid #000",
-                                    marginBottom: "0px",
-                                    letterSpacing: "0.01px",
-                                  }}
-                                >
-                                  RE &nbsp;:&nbsp;{" "}
-                                  {applicationDetail?.applicationType}
-                                </p>
-                              </td>
-                            </tr>
-                            <tr>
-                              <td colSpan="2">&nbsp;</td>
-                            </tr>
-                            <tr>
-                              <td
-                                style={{
-                                  color: "#000",
-                                  fontSize: "18px",
-                                  fontWeight: "400",
-                                }}
-                              >
-                                Exporter
-                              </td>
-                              <td
+                          : {applicationDetail?.rbzReferenceNumber}
+                          <br />: N/A
+                        </p>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td colSpan="2">&nbsp;</td>
+                    </tr>
+                    <tr>
+                      <td
+                        colSpan="2"
+                        style={{
+                          color: "#000",
+                          fontSize: "18px",
+                          fontWeight: "600",
+                          letterSpacing: "0.01px",
+                        }}
+                      >
+                        {moment(
+                          applicationDetail?.applicationSubmittedDate
+                        ).format("DD MMMM YYYY")}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td colSpan="2">&nbsp;</td>
+                    </tr>
+                    <tr>
+                      <td
+                        colSpan="2"
+                        style={{
+                          color: "#000",
+                          fontSize: "18px",
+                          fontWeight: "600",
+                          letterSpacing: "0.01px",
+                        }}
+                      >
+                        The Head - Exchange Control
+                        <br />
+                        {applicationDetail?.bankName
+                          ? applicationDetail?.bankName
+                          : ""}
+                        {applicationDetail?.bankName == null ? (
+                          <span>
+                            Reserve Bank of Zimbabwe. 80 Samora Machel Avenue,{" "}
+                            <br /> P.O. Box 1283, Harare, Zimbabwe.
+                          </span>
+                        ) : (
+                          <>
+                            <br />
+                            {applicationDetail?.bankAddress1 == null ||
+                            applicationDetail?.bankAddress1 == ""
+                              ? ""
+                              : applicationDetail?.bankAddress1 + "," + " "}
+                            <br></br>
+                            {applicationDetail?.bankAddress2 == null ||
+                            applicationDetail?.bankAddress2 == ""
+                              ? ""
+                              : applicationDetail?.bankAddress2 + "," + " "}
+                            <br></br>
+                            {applicationDetail?.bankAddress3 == null ||
+                            applicationDetail?.bankAddress3 == ""
+                              ? ""
+                              : applicationDetail?.bankAddress3}
+                            <br />
+                          </>
+                        )}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td colSpan="2">&nbsp;</td>
+                    </tr>
+                    <tr>
+                      <td
+                        colSpan="2"
+                        style={{
+                          color: "#000",
+                          fontSize: "18px",
+                          fontWeight: "600",
+                          letterSpacing: "0.01px",
+                        }}
+                      >
+                        Dear{" "}
+                        {applicationDetail?.companyName == null ||
+                        applicationDetail?.companyName == ""
+                          ? applicationDetail?.name
+                          : applicationDetail?.companyName} 
+                      </td>
+                    </tr>
+                    <tr>
+                      <td colSpan="2">&nbsp;</td>
+                    </tr>
+                    <tr>
+                      <td colSpan="2">
+                        <table width="100%">
+                          <tr>
+                            <td colSpan="2">
+                              <p
                                 style={{
                                   color: "#000",
                                   fontSize: "18px",
                                   fontWeight: "800",
+                                  borderBottom: "1px solid #000",
+                                  marginBottom: "0px",
                                   letterSpacing: "0.01px",
                                 }}
                               >
-                                :{" "}
-                                {applicationDetail?.companyName == null ||
-                                applicationDetail?.companyName == ""
-                                  ? applicationDetail?.name
-                                  : applicationDetail?.companyName}
-                                {console.log(applicationDetail)}
-                              </td>
-                            </tr>
-                            <tr>
-                              <td
-                                style={{
-                                  color: "#000",
-                                  fontSize: "18px",
-                                  fontWeight: "400",
-                                }}
-                              >
-                                Date Submitted
-                              </td>
-                              <td
-                                style={{
-                                  color: "#000",
-                                  fontSize: "18px",
-                                  fontWeight: "800",
-                                  letterSpacing: "0.01px",
-                                }}
-                              >
-                                :{" "}
-                                {moment(
-                                  applicationDetail?.applicationSubmittedDate
-                                ).format("DD MMMM  YYYY")}
-                              </td>
-                            </tr>
-                            <tr>
-                              <td
-                                style={{
-                                  color: "#000",
-                                  fontSize: "18px",
-                                  fontWeight: "400",
-                                  letterSpacing: "0.01px",
-                                }}
-                              >
-                                Currency and Amount
-                              </td>
-                              <td
-                                style={{
-                                  color: "#000",
-                                  fontSize: "18px",
-                                  fontWeight: "800",
-                                }}
-                              >
-                                :{" "}
-                                <span
-                                  style={{
-                                    minWidth: "45px",
-                                    display: "inline-block",
-                                    paddingRight: "5px",
-                                    fontWeight: "800",
-                                  }}
-                                >
-                                  {applicationDetail?.currencyCode}
-                                </span>
-                                <span
-                                  style={{
-                                    fontSize: "18px",
-                                    fontWeight: "800",
-                                  }}
-                                >
-                                  {applicationDetail?.amount}
-                                </span>
-                              </td>
-                            </tr>
-                            <tr>
-                              <td
-                                style={{
-                                  color: "#000",
-                                  fontSize: "18px",
-                                  fontWeight: "400",
-                                }}
-                              >
-                                USD &nbsp; Equivalent
-                              </td>
-                              <td
-                                style={{
-                                  color: "#000",
-                                  fontSize: "18px",
-                                  fontWeight: "800",
-                                }}
-                              >
-                                :{" "}
-                                <span
-                                  style={{
-                                    minWidth: "45px",
-                                    display: "inline-block",
-                                    paddingRight: "5px",
-                                    fontWeight: "800",
-                                  }}
-                                >
-                                  USD
-                                </span>
-                                <span
-                                  style={{
-                                    fontSize: "18px",
-                                    fontWeight: "800",
-                                  }}
-                                >
-                                  {applicationDetail?.usdEquivalent}
-                                </span>
-                              </td>
-                            </tr>
-                            <tr>
-                              <td
-                                style={{
-                                  color: "#000",
-                                  fontSize: "18px",
-                                  fontWeight: "400",
-                                  letterSpacing: "0.01px",
-                                }}
-                              >
-                                Status/Decision
-                              </td>
-                              <td
-                                style={{
-                                  color: "#000",
-                                  fontSize: "18px",
-                                  fontWeight: "800",
-                                  letterSpacing: "0.01px",
-                                }}
-                              >
-                                :{" "}
-                                {applicationstaus == "10"
-                                  ? "Approved"
-                                  : applicationstaus == "30"
-                                  ? "Rejected"
-                                  : applicationstaus == "40"
-                                  ? "Deferred"
-                                  : applicationstaus == "25"
-                                  ? "Cancelled"
-                                  : ""}
-                                {/* {applicationDetail?.statusName} */}
-                              </td>
-                            </tr>
-                            <tr
-                              className={
-                                applicationDetail?.expiringDate == null ||
-                                applicationDetail?.expiringDate == ""
-                                  ? "d-none"
-                                  : ""
-                              }
+                                RE &nbsp;:&nbsp;{" "}
+                                {applicationDetail?.applicationType}
+                              </p>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td colSpan="2">&nbsp;</td>
+                          </tr>
+                          <tr>
+                            <td
+                              style={{
+                                color: "#000",
+                                fontSize: "18px",
+                                fontWeight: "400",
+                              }}
                             >
-                              <td
+                              Importer
+                            </td>
+                            <td
+                              style={{
+                                color: "#000",
+                                fontSize: "18px",
+                                fontWeight: "800",
+                                letterSpacing: "0.01px",
+                              }}
+                            >
+                              :{" "}
+                              {applicationDetail?.companyName == null ||
+                              applicationDetail?.companyName == ""
+                                ? applicationDetail?.name
+                                : applicationDetail?.companyName}
+                               
+                            </td>
+                          </tr>
+                          <tr>
+                            <td
+                              style={{
+                                color: "#000",
+                                fontSize: "18px",
+                                fontWeight: "400",
+                              }}
+                            >
+                              Date Submitted -3
+                            </td>
+                            <td
+                              style={{
+                                color: "#000",
+                                fontSize: "18px",
+                                fontWeight: "800",
+                                letterSpacing: "0.01px",
+                              }}
+                            >
+                              :{" "}
+                              {moment(
+                                applicationDetail?.applicationSubmittedDate
+                              ).format("DD MMMM  YYYY")}
+                            </td>
+                          </tr>
+                          <tr>
+                            <td
+                              style={{
+                                color: "#000",
+                                fontSize: "18px",
+                                fontWeight: "400",
+                                letterSpacing: "0.01px",
+                              }}
+                            >
+                              Currency and Amount
+                            </td>
+                            <td
+                              style={{
+                                color: "#000",
+                                fontSize: "18px",
+                                fontWeight: "800",
+                              }}
+                            >
+                              :{" "}
+                              <span
                                 style={{
-                                  color: "#000",
-                                  fontSize: "18px",
-                                  fontWeight: "400",
-                                  letterSpacing: "0.01px",
+                                  minWidth: "45px",
+                                  display: "inline-block",
+                                  paddingRight: "5px",
+                                  fontWeight: "800",
                                 }}
                               >
-                                Expiry Date
+                                {applicationDetail?.currencyCode}
+                              </span>
+                              <span
+                                style={{
+                                  fontSize: "18px",
+                                  fontWeight: "800",
+                                }}
+                              >
+                                {applicationDetail?.amount}
+                              </span>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td
+                              style={{
+                                color: "#000",
+                                fontSize: "18px",
+                                fontWeight: "400",
+                              }}
+                            >
+                              USD &nbsp; Equivalent
+                            </td>
+                            <td
+                              style={{
+                                color: "#000",
+                                fontSize: "18px",
+                                fontWeight: "800",
+                              }}
+                            >
+                              :{" "}
+                              <span
+                                style={{
+                                  minWidth: "45px",
+                                  display: "inline-block",
+                                  paddingRight: "5px",
+                                  fontWeight: "800",
+                                }}
+                              >
+                                USD
+                              </span>
+                              <span
+                                style={{
+                                  fontSize: "18px",
+                                  fontWeight: "800",
+                                }}
+                              >
+                                {applicationDetail?.usdEquivalent}
+                              </span>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td
+                              style={{
+                                color: "#000",
+                                fontSize: "18px",
+                                fontWeight: "400",
+                                letterSpacing: "0.01px",
+                              }}
+                            >
+                              Status/Decision
+                            </td>
+                            <td
+                              style={{
+                                color: "#000",
+                                fontSize: "18px",
+                                fontWeight: "800",
+                                letterSpacing: "0.01px",
+                              }}
+                            >
+                              :{" "}
+                              {applicationstaus == "10"
+                                ? "Approved"
+                                : applicationstaus == "30"
+                                ? "Rejected"
+                                : applicationstaus == "40"
+                                ? "Deferred"
+                                : applicationstaus == "25"
+                                ? "Cancelled"
+                                : ""}
+                              {/* {applicationDetail?.statusName} */}
+                            </td>
+                          </tr>
+                          <tr
+                            className={
+                              applicationDetail?.expiringDate == null ||
+                              applicationDetail?.expiringDate == ""
+                                ? "d-none"
+                                : ""
+                            }
+                          >
+                            <td
+                              style={{
+                                color: "#000",
+                                fontSize: "18px",
+                                fontWeight: "400",
+                                letterSpacing: "0.01px",
+                              }}
+                            >
+                              Expiry Date
+                            </td>
+                            <td
+                              style={{
+                                color: "#000",
+                                fontSize: "18px",
+                                fontWeight: "800",
+                                letterSpacing: "0.01px",
+                              }}
+                            >
+                              :{" "}
+                              {applicationDetail?.expiringDate == null ||
+                              applicationDetail?.expiringDate == "" ||
+                              applicationDetail?.expiringDate ==
+                                "0001-01-01T00:00:00"
+                                ? "N/A"
+                                : moment(
+                                    applicationDetail?.expiringDate
+                                  ).format("DD MMMM YYYY")}
+                            </td>
+                          </tr>
+                          <tr
+                            className={
+                              applicationDetail?.returnFrequencyName == null ||
+                              applicationDetail?.returnFrequencyName == ""
+                                ? "d-none"
+                                : ""
+                            }
+                          >
+                            <td
+                              style={{
+                                fontSize: "18px",
+                                fontWeight: "400",
+                                color: "#000",
+                                letterSpacing: "0.01px",
+                              }}
+                            >
+                              Returns Frequency
+                            </td>
+                            <td
+                              style={{
+                                color: "#000",
+                                fontSize: "18px",
+                                fontWeight: "800",
+                              }}
+                            >
+                              :{" "}
+                              {applicationDetail?.returnFrequencyName == null ||
+                              applicationDetail?.returnFrequencyName == ""
+                                ? "N/A"
+                                : applicationDetail?.returnFrequencyName}
+                            </td>
+                          </tr>
+                          {applicationDetail?.returnFrequencyName == "Once" ? (
+                            <tr>
+                              <td
+                                style={{
+                                  fontSize: "18px",
+                                  fontWeight: "400",
+                                  color: "#000",
+                                }}
+                              >
+                                Returns Date
                               </td>
                               <td
                                 style={{
@@ -15653,411 +15864,368 @@ const ImportDashboardEditDetails = ({
                                 }}
                               >
                                 :{" "}
-                                {applicationDetail?.expiringDate == null ||
-                                applicationDetail?.expiringDate == "" ||
-                                applicationDetail?.expiringDate ==
+                                {applicationDetail?.returnDate == null ||
+                                applicationDetail?.returnDate == "" ||
+                                applicationDetail?.returnDate ==
                                   "0001-01-01T00:00:00"
                                   ? "N/A"
                                   : moment(
-                                      applicationDetail?.expiringDate
-                                    ).format("DD MMMM YYYY")}
+                                      applicationDetail?.returnDate
+                                    ).format("DD MMMM  YYYY")}
                               </td>
                             </tr>
-                            <tr
-                              className={
-                                applicationDetail?.returnFrequencyName ==
-                                  null ||
-                                applicationDetail?.returnFrequencyName == ""
-                                  ? "d-none"
-                                  : ""
-                              }
+                          ) : (
+                            ""
+                          )}
+                        </table>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td colSpan="2">&nbsp;</td>
+                    </tr>
+                    <tr>
+                      <td colSpan="2">
+                        <table>
+                          <tr>
+                            <td colSpan="2">
+                              <table width="100%">
+                                <tr>
+                                  <td
+                                    style={{
+                                      color: "#000",
+                                      fontSize: "18px",
+                                      fontWeight: "400",
+                                    }}
+                                  >
+                                    <div>
+                                      <span
+                                        style={{
+                                          fontWeight: "800",
+                                          padding: "15px 0px 15px",
+                                        }}
+                                      >
+                                        Response &nbsp;/&nbsp; Conditions
+                                      </span>
+                                    </div>
+                                    <div
+                                      className="tableEditorData"
+                                      dangerouslySetInnerHTML={{
+                                        __html: Description
+                                          ? Description
+                                          : applicationDetail?.analystDescription,
+                                      }}
+                                      style={{
+                                        paddingBottom: "60px",
+                                        letterSpacing: "0.01px",
+                                      }}
+                                    />
+                                  </td>
+                                </tr>
+                              </table>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td colSpan="2">&nbsp;</td>
+                          </tr>
+                          <tr>
+                            <td
+                              colSpan="2"
+                              style={{
+                                color: "#000",
+                                fontSize: "18px",
+                                fontWeight: "400",
+                              }}
                             >
-                              <td
+                              <span
                                 style={{
+                                  color: "#000",
                                   fontSize: "18px",
                                   fontWeight: "400",
+                                  display: "inline-block",
+                                }}
+                              >
+                                {" "}
+                                Yours Sincerely,
+                              </span>
+                              <img
+                                src={
+                                  applicationDetail?.getUserData?.filePath
+                                    ? applicationDetail?.getUserData.filePath
+                                    : NoSign
+                                }
+                                alt="Signature"
+                                style={{
+                                  width: "120px",
+                                  height: "50px",
+                                  display: "block",
+                                  objectFit: "contain",
+                                }}
+                              />
+                              <p
+                                style={{
+                                  marginBottom: "0px",
                                   color: "#000",
+                                  fontSize: "14px",
+                                  fontWeight: "400",
+                                  padding: "15px 0px 3px",
+                                  lineHeight: "13px",
                                   letterSpacing: "0.01px",
                                 }}
                               >
-                                Returns Frequency
-                              </td>
-                              <td
+                                {PdfUsername
+                                  ? PdfUsername?.replace(/"/g, "")
+                                  : "N/A"}
+                              </p>
+                              <p
+                                style={{
+                                  marginBottom: "0px",
+                                  color: "#000",
+                                  fontSize: "14px",
+                                  fontWeight: "400",
+                                  padding: "5px 0px",
+                                  lineHeight: "13px",
+                                  letterSpacing: "0.01px",
+                                }}
+                              >
+                                {PdfRolename
+                                  ? PdfRolename?.replace(/"/g, "")
+                                  : "N/A"}
+                              </p>
+                              <h3
                                 style={{
                                   color: "#000",
                                   fontSize: "18px",
                                   fontWeight: "800",
                                 }}
                               >
-                                :{" "}
-                                {applicationDetail?.returnFrequencyName ==
-                                  null ||
-                                applicationDetail?.returnFrequencyName == ""
-                                  ? "N/A"
-                                  : applicationDetail?.returnFrequencyName}
-                              </td>
-                            </tr>
-                            {applicationDetail?.returnFrequencyName ==
-                            "Once" ? (
-                              <tr>
-                                <td
-                                  style={{
-                                    fontSize: "18px",
-                                    fontWeight: "400",
-                                    color: "#000",
-                                  }}
-                                >
-                                  Returns Date
-                                </td>
-                                <td
-                                  style={{
-                                    color: "#000",
-                                    fontSize: "18px",
-                                    fontWeight: "800",
-                                    letterSpacing: "0.01px",
-                                  }}
-                                >
-                                  :{" "}
-                                  {applicationDetail?.returnDate == null ||
-                                  applicationDetail?.returnDate == "" ||
-                                  applicationDetail?.returnDate ==
-                                    "0001-01-01T00:00:00"
-                                    ? "N/A"
-                                    : moment(
-                                        applicationDetail?.returnDate
-                                      ).format("DD MMMM  YYYY")}
-                                </td>
-                              </tr>
-                            ) : (
-                              ""
-                            )}
-                          </table>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td colSpan="2">&nbsp;</td>
-                      </tr>
-                      <tr>
-                        <td colSpan="2">
-                          <table>
-                            <tr>
-                              <td colSpan="2">
-                                <table width="100%">
-                                  <tr>
-                                    <td
-                                      style={{
-                                        color: "#000",
-                                        fontSize: "18px",
-                                        fontWeight: "400",
-                                      }}
-                                    >
-                                      <div>
-                                        <span
-                                          style={{
-                                            fontWeight: "800",
-                                            padding: "15px 0px 15px",
-                                          }}
-                                        >
-                                          Response &nbsp;/&nbsp; Conditions
-                                        </span>
-                                      </div>
-                                      <div
-                                        className="tableEditorData"
-                                        dangerouslySetInnerHTML={{
-                                          __html: Description
-                                            ? Description
-                                            : applicationDetail?.analystDescription,
-                                        }}
-                                        style={{
-                                          paddingBottom: "60px",
-                                          letterSpacing: "0.01px",
-                                        }}
-                                      />
-                                    </td>
-                                  </tr>
-                                </table>
-                              </td>
-                            </tr>
-                            <tr>
-                              <td colSpan="2">&nbsp;</td>
-                            </tr>
-                            <tr>
-                              <td
-                                colSpan="2"
+                                EXCHANGE &nbsp; CONTROL
+                              </h3>
+                              <div
                                 style={{
+                                  marginBottom: "0px",
                                   color: "#000",
                                   fontSize: "18px",
                                   fontWeight: "400",
+                                  padding: "25px 0px 5px",
+                                  lineHeight: "13px",
+                                  display: "flex",
                                 }}
                               >
-                                <span
-                                  style={{
-                                    color: "#000",
-                                    fontSize: "18px",
-                                    fontWeight: "400",
-                                    display: "inline-block",
-                                  }}
-                                >
-                                  {" "}
-                                  Yours Sincerely,
-                                </span>
-                                <img
-                                  src={
-                                    applicationDetail?.getUserData?.filePath
-                                      ? applicationDetail?.getUserData.filePath
-                                      : NoSign
-                                  }
-                                  alt="Signature"
-                                  style={{
-                                    width: "120px",
-                                    height: "50px",
-                                    display: "block",
-                                    objectFit: "contain",
-                                  }}
-                                />
-                                <p
-                                  style={{
-                                    marginBottom: "0px",
-                                    color: "#000",
-                                    fontSize: "14px",
-                                    fontWeight: "400",
-                                    padding: "15px 0px 3px",
-                                    lineHeight: "13px",
-                                    letterSpacing: "0.01px",
-                                  }}
-                                >
-                                  {PdfUsername
-                                    ? PdfUsername?.replace(/"/g, "")
-                                    : "N/A"}
-                                </p>
-                                <p
-                                  style={{
-                                    marginBottom: "0px",
-                                    color: "#000",
-                                    fontSize: "14px",
-                                    fontWeight: "400",
-                                    padding: "5px 0px",
-                                    lineHeight: "13px",
-                                    letterSpacing: "0.01px",
-                                  }}
-                                >
-                                  {PdfRolename
-                                    ? PdfRolename?.replace(/"/g, "")
-                                    : "N/A"}
-                                </p>
-                                <h3
-                                  style={{
-                                    color: "#000",
-                                    fontSize: "18px",
-                                    fontWeight: "800",
-                                  }}
-                                >
-                                  EXCHANGE &nbsp; CONTROL
-                                </h3>
-                                <div
-                                  style={{
-                                    marginBottom: "0px",
-                                    color: "#000",
-                                    fontSize: "18px",
-                                    fontWeight: "400",
-                                    padding: "25px 0px 5px",
-                                    lineHeight: "13px",
-                                    display: "flex",
-                                  }}
-                                >
-                                  {applicationDetail?.copiedResponses?.length ||
-                                  selectedBanks?.length > 0 ? (
-                                    <>
-                                      <p
-                                        style={{
-                                          marginBottom: "0px",
-                                          fontSize: "18px",
-                                          fontWeight: "400",
-                                          paddingRight: "10px",
-                                          letterSpacing: "0.01px",
-                                        }}
-                                      >
-                                        CC:
-                                      </p>
-                                      <div>
-                                        {selectedBanks.map((item) => {
-                                          return (
-                                            <p
-                                              style={{
-                                                marginBottom: "3px",
-                                                letterSpacing: "0.01px",
-                                                fontSize: "18px",
-                                                fontWeight: "400",
-                                              }}
-                                            >
-                                              {item.name}
-                                            </p>
-                                          );
-                                        })}
-                                      </div>
-                                    </>
-                                  ) : (
-                                    ""
-                                  )}
-                                </div>
-                              </td>
-                            </tr>
-                          </table>
-                        </td>
-                      </tr>
-                    </table>
-                  </div>
+                                {applicationDetail?.copiedResponses?.length ||
+                                selectedBanks?.length > 0 ? (
+                                  <>
+                                    <p
+                                      style={{
+                                        marginBottom: "0px",
+                                        fontSize: "18px",
+                                        fontWeight: "400",
+                                        paddingRight: "10px",
+                                        letterSpacing: "0.01px",
+                                      }}
+                                    >
+                                      CC:
+                                    </p>
+                                    <div>
+                                      {selectedBanks.map((item) => {
+                                        return (
+                                          <p
+                                            style={{
+                                              marginBottom: "3px",
+                                              letterSpacing: "0.01px",
+                                              fontSize: "18px",
+                                              fontWeight: "400",
+                                            }}
+                                          >
+                                            {item.label}
+                                          </p>
+                                        );
+                                      })}
+                                    </div>
+                                  </>
+                                ) : (
+                                  ""
+                                )}
+                              </div>
+                            </td>
+                          </tr>
+                        </table>
+                      </td>
+                    </tr>
+                  </table>
                 </div>
               </div>
+            </div>
 
-              <div className="login_inner" style={{ display: "none" }}>
-                <div className="login_form_panel" style={{ display: "none" }}>
-                  <div
-                    ref={PdfPrivewsupervisorRef}
-                    className="p-5"
-                    style={{ position: "relative" }}
-                  >
-                    <table width="100%">
-                      <tr>
-                        <td
+
+            <div className="login_inner" style={{ display: "none" }}>
+              <div className="login_form_panel" style={{ display: "none" }}>
+                <div
+                  ref={PdfPrivewsupervisorRef}
+                  className="p-5"
+                  style={{ position: "relative" }}
+                >
+                  <table width="100%">
+                    <tr>
+                      <td
+                        style={{
+                          marginBottom: "0px",
+                          color: "#000",
+                          fontSize: "18px",
+                          fontWeight: "800",
+                        }}
+                      >
+                        Exchange &nbsp; Control &nbsp; Ref
+                        <br />
+                        Previous &nbsp; Exchange &nbsp; Control &nbsp; Ref
+                      </td>
+                      <td>
+                        <p
                           style={{
                             marginBottom: "0px",
                             color: "#000",
                             fontSize: "18px",
+                            textAlign: "left",
                             fontWeight: "800",
+                            letterSpacing: "0.01px",
                           }}
                         >
-                          Exchange &nbsp; Control &nbsp; Ref
-                          <br />
-                          Previous &nbsp; Exchange &nbsp; Control &nbsp; Ref
-                        </td>
-                        <td>
-                          <p
+                          : {applicationDetail?.rbzReferenceNumber}
+                          <br />: N/A
+                        </p>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td colSpan="2">&nbsp;</td>
+                    </tr>
+                    <tr>
+                      <td
+                        colSpan="2"
+                        style={{
+                          color: "#000",
+                          fontSize: "18px",
+                          fontWeight: "600",
+                          letterSpacing: "0.01px",
+                        }}
+                      >
+                        {moment(
+                          applicationDetail?.applicationSubmittedDate
+                        ).format("DD MMMM YYYY")}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td colSpan="2">&nbsp;</td>
+                    </tr>
+                    <tr>
+                      <td
+                        colSpan="2"
+                        style={{
+                          color: "#000",
+                          fontSize: "18px",
+                          fontWeight: "600",
+                          letterSpacing: "0.01px",
+                        }}
+                      >
+                        The Head - Exchange Control
+                        <br />
+                        {applicationDetail?.bankName
+                          ? applicationDetail?.bankName
+                          : ""}
+                        {applicationDetail?.bankName == null ? (
+                          <span>
+                            Reserve Bank of Zimbabwe. 80 Samora Machel Avenue,{" "}
+                            <br /> P.O. Box 1283, Harare, Zimbabwe.
+                          </span>
+                        ) : (
+                          <>
+                            <br />
+                            {applicationDetail?.bankAddress1 != null ||
+                            applicationDetail?.bankAddress1 != ""
+                              ? applicationDetail?.bankAddress1 + "," + " "
+                              : ""}
+                            <br></br>
+                            {applicationDetail?.bankAddress2 != null ||
+                            applicationDetail?.bankAddress2 != ""
+                              ? applicationDetail?.bankAddress2 + "," + " "
+                              : ""}
+                            <br></br>
+                            {applicationDetail?.bankAddress3 != null ||
+                            applicationDetail?.bankAddress3 != ""
+                              ? applicationDetail?.bankAddress3
+                              : ""}
+                            <br />
+                          </>
+                        )}
+                        {/* <span
                             style={{
-                              marginBottom: "0px",
-                              color: "#000",
-                              fontSize: "18px",
-                              textAlign: "left",
+                              borderBottom: "1px solid #000",
                               fontWeight: "800",
-                              letterSpacing: "0.01px",
+                              fontSize: "18px",
+                              letterSpacing: "0.01px"
                             }}
+                            className="text-uppercase"
                           >
-                            : {applicationDetail?.rbzReferenceNumber}
-                            <br />: N/A
-                          </p>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td colSpan="2">&nbsp;</td>
-                      </tr>
-                      <tr>
-                        <td
-                          colSpan="2"
-                          style={{
-                            color: "#000",
-                            fontSize: "18px",
-                            fontWeight: "600",
-                            letterSpacing: "0.01px",
-                          }}
-                        >
-                          {moment(
-                            applicationDetail?.applicationSubmittedDate
-                          ).format("DD MMMM YYYY")}
-                        </td>
-                      </tr>
-                      <tr>
-                        <td colSpan="2">&nbsp;</td>
-                      </tr>
-                      <tr>
-                        <td
-                          colSpan="2"
-                          style={{
-                            color: "#000",
-                            fontSize: "18px",
-                            fontWeight: "600",
-                            letterSpacing: "0.01px",
-                          }}
-                        >
-                          The Head - Exchange Control
-                          <br />
-                          {applicationDetail?.bankName
-                            ? applicationDetail?.bankName
-                            : ""}
-                          {applicationDetail?.bankName == null ? (
-                            <span>
-                              Reserve Bank of Zimbabwe. 80 Samora Machel Avenue,{" "}
-                              <br /> P.O. Box 1283, Harare, Zimbabwe.
-                            </span>
-                          ) : (
-                            <>
-                              <br />
-                              {applicationDetail?.bankAddress1 == null ||
-                              applicationDetail?.bankAddress1 == ""
-                                ? ""
-                                : applicationDetail?.bankAddress1 + "," + " "}
-                              <br></br>
-                              {applicationDetail?.bankAddress2 == null ||
-                              applicationDetail?.bankAddress2 == ""
-                                ? ""
-                                : applicationDetail?.bankAddress2 + "," + " "}
-                              <br></br>
-                              {applicationDetail?.bankAddress3 != null ||
-                              applicationDetail?.bankAddress3 != ""
-                                ? applicationDetail?.bankAddress3
-                                : ""}
-                              <br />
-                            </>
-                          )}
-                        </td>
-                      </tr>
-                      <tr>
-                        <td colSpan="2">&nbsp;</td>
-                      </tr>
-                      <tr>
-                        <td
-                          colSpan="2"
-                          style={{
-                            color: "#000",
-                            fontSize: "18px",
-                            fontWeight: "600",
-                            letterSpacing: "0.01px",
-                          }}
-                        >
-                          Dear{" "}
-                          {applicationDetail?.companyName == null ||
-                          applicationDetail?.companyName == ""
+                            {applicationDetail?.bankCity != null ||
+                            applicationDetail?.bankCity != ""
+                              ? applicationDetail?.bankCity
+                              : ""}
+                          </span> */}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td colSpan="2">&nbsp;</td>
+                    </tr>
+                    <tr>
+                      <td
+                        colSpan="2"
+                        style={{
+                          color: "#000",
+                          fontSize: "18px",
+                          fontWeight: "600",
+                          letterSpacing: "0.01px",
+                        }}
+                      >
+                        Dear{" "}
+                        {/* {applicationDetail?.applicantType == 1
+                            ? applicationDetail?.companyName
+                            : applicationDetail?.applicantType == 2
                             ? applicationDetail?.name
-                            : applicationDetail?.companyName}
-                          {console.log(applicationDetail)},
-                        </td>
-                      </tr>
-                      <tr>
-                        <td colSpan="2">&nbsp;</td>
-                      </tr>
-                      <tr>
-                        <td colSpan="2">
-                          <table width="100%">
-                            <tr>
-                              <td colSpan="2">
-                                <p
-                                  style={{
-                                    color: "#000",
-                                    fontSize: "18px",
-                                    fontWeight: "800",
-                                    borderBottom: "1px solid #000",
-                                    marginBottom: "0px",
-                                    letterSpacing: "0.01px",
-                                  }}
-                                >
-                                  RE &nbsp;:&nbsp;{" "}
-                                  {applicationDetail?.applicationType}
-                                </p>
-                              </td>
-                            </tr>
-                            <tr>
-                              <td colSpan="2">&nbsp;</td>
-                            </tr>
-                            <tr>
+                            : applicationDetail?.applicantType == 3
+                            ? applicationDetail?.agencyName
+                            : " "} */}
+                        {applicationDetail?.companyName == null ||
+                        applicationDetail?.companyName == ""
+                          ? applicationDetail?.name
+                          : applicationDetail?.companyName}
+                         
+                      </td>
+                    </tr>
+                    <tr>
+                      <td colSpan="2">&nbsp;</td>
+                    </tr>
+                    <tr>
+                      <td colSpan="2">
+                        <table width="100%">
+                          <tr>
+                            <td colSpan="2">
+                              <p
+                                style={{
+                                  color: "#000",
+                                  fontSize: "18px",
+                                  fontWeight: "800",
+                                  borderBottom: "1px solid #000",
+                                  marginBottom: "0px",
+                                  letterSpacing: "0.01px",
+                                }}
+                              >
+                                RE &nbsp;:&nbsp;{" "}
+                                {applicationDetail?.applicationType}
+                              </p>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td colSpan="2">&nbsp;</td>
+                          </tr>
+                          {/* <tr>
                               <td
                                 style={{
                                   color: "#000",
@@ -16065,200 +16233,225 @@ const ImportDashboardEditDetails = ({
                                   fontWeight: "400",
                                 }}
                               >
-                                Date Submitted
+                                Importer
                               </td>
                               <td
                                 style={{
                                   color: "#000",
                                   fontSize: "18px",
                                   fontWeight: "800",
-                                  letterSpacing: "0.01px",
+                                  letterSpacing: "0.01px"
                                 }}
                               >
                                 :{" "}
-                                {moment(
-                                  applicationDetail?.applicationSubmittedDate
-                                ).format("DD MMMM  YYYY")}
+                                {applicationDetail?.companyName == null || applicationDetail?.companyName == ""
+                                  ? applicationDetail?.name
+                                  : applicationDetail?.companyName} 
+                                  {console.log(applicationDetail)}
                               </td>
-                            </tr>
-                          </table>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td colSpan="2">&nbsp;</td>
-                      </tr>
-                      <tr>
-                        <td colSpan="2">
-                          <table>
-                            <tr>
-                              <td colSpan="2">
-                                <table width="100%">
-                                  <tr>
-                                    <td
-                                      style={{
-                                        color: "#000",
-                                        fontSize: "18px",
-                                        fontWeight: "400",
-                                      }}
-                                    >
-                                      <div>
-                                        <span
-                                          style={{
-                                            fontWeight: "800",
-                                            padding: "15px 0px 15px",
-                                          }}
-                                        >
-                                          Description
-                                        </span>
-                                      </div>
-                                      <div
-                                        className="tableEditorData"
-                                        dangerouslySetInnerHTML={{
-                                          __html: Description
-                                            ? Description
-                                            : applicationDetail?.analystDescription,
-                                        }}
+                            </tr> */}
+                          <tr>
+                            <td
+                              style={{
+                                color: "#000",
+                                fontSize: "18px",
+                                fontWeight: "400",
+                              }}
+                            >
+                              Date Submitted -4
+                            </td>
+                            <td
+                              style={{
+                                color: "#000",
+                                fontSize: "18px",
+                                fontWeight: "800",
+                                letterSpacing: "0.01px",
+                              }}
+                            >
+                              :{" "}
+                              {moment(
+                                applicationDetail?.applicationSubmittedDate
+                              ).format("DD MMMM  YYYY")}
+                            </td>
+                          </tr>
+                        </table>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td colSpan="2">&nbsp;</td>
+                    </tr>
+                    <tr>
+                      <td colSpan="2">
+                        <table>
+                          <tr>
+                            <td colSpan="2">
+                              <table width="100%">
+                                <tr>
+                                  <td
+                                    style={{
+                                      color: "#000",
+                                      fontSize: "18px",
+                                      fontWeight: "400",
+                                    }}
+                                  >
+                                    <div>
+                                      <span
                                         style={{
-                                          paddingBottom: "60px",
-                                          letterSpacing: "0.01px",
+                                          fontWeight: "800",
+                                          padding: "15px 0px 15px",
                                         }}
-                                      />
-                                    </td>
-                                  </tr>
-                                </table>
-                              </td>
-                            </tr>
-                            <tr>
-                              <td colSpan="2">&nbsp;</td>
-                            </tr>
-                            <tr>
-                              <td
-                                colSpan="2"
+                                      >
+                                        Description
+                                      </span>
+                                    </div>
+                                    <div
+                                      className="tableEditorData"
+                                      dangerouslySetInnerHTML={{
+                                        __html: Description
+                                          ? Description
+                                          : applicationDetail?.analystDescription,
+                                      }}
+                                      style={{
+                                        paddingBottom: "60px",
+                                        letterSpacing: "0.01px",
+                                      }}
+                                    />
+                                  </td>
+                                </tr>
+                              </table>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td colSpan="2">&nbsp;</td>
+                          </tr>
+                          <tr>
+                            <td
+                              colSpan="2"
+                              style={{
+                                color: "#000",
+                                fontSize: "18px",
+                                fontWeight: "400",
+                              }}
+                            >
+                              <span
                                 style={{
                                   color: "#000",
                                   fontSize: "18px",
                                   fontWeight: "400",
+                                  display: "inline-block",
                                 }}
                               >
-                                <span
-                                  style={{
-                                    color: "#000",
-                                    fontSize: "18px",
-                                    fontWeight: "400",
-                                    display: "inline-block",
-                                  }}
-                                >
-                                  {" "}
-                                  Yours Sincerely,
-                                </span>
-                                <img
-                                  src={
-                                    applicationDetail?.getUserData?.filePath
-                                      ? applicationDetail?.getUserData.filePath
-                                      : NoSign
-                                  }
-                                  alt="Signature"
-                                  style={{
-                                    width: "120px",
-                                    height: "50px",
-                                    display: "block",
-                                    objectFit: "contain",
-                                  }}
-                                />
-                                <p
-                                  style={{
-                                    marginBottom: "0px",
-                                    color: "#000",
-                                    fontSize: "14px",
-                                    fontWeight: "400",
-                                    padding: "15px 0px 3px",
-                                    lineHeight: "13px",
-                                    letterSpacing: "0.01px",
-                                  }}
-                                >
-                                  {PdfUsername
-                                    ? PdfUsername?.replace(/"/g, "")
-                                    : "N/A"}
-                                </p>
-                                <p
-                                  style={{
-                                    marginBottom: "0px",
-                                    color: "#000",
-                                    fontSize: "14px",
-                                    fontWeight: "400",
-                                    padding: "5px 0px",
-                                    lineHeight: "13px",
-                                    letterSpacing: "0.01px",
-                                  }}
-                                >
-                                  {PdfRolename
-                                    ? PdfRolename?.replace(/"/g, "")
-                                    : "N/A"}
-                                </p>
-                                <h3
-                                  style={{
-                                    color: "#000",
-                                    fontSize: "18px",
-                                    fontWeight: "800",
-                                  }}
-                                >
-                                  EXCHANGE &nbsp; CONTROL
-                                </h3>
-                                <div
-                                  style={{
-                                    marginBottom: "0px",
-                                    color: "#000",
-                                    fontSize: "18px",
-                                    fontWeight: "400",
-                                    padding: "25px 0px 5px",
-                                    lineHeight: "13px",
-                                    display: "flex",
-                                  }}
-                                >
-                                  {applicationDetail?.copiedResponses?.length ||
-                                  selectedBanks?.length > 0 ? (
-                                    <>
-                                      <p
-                                        style={{
-                                          marginBottom: "0px",
-                                          fontSize: "18px",
-                                          fontWeight: "400",
-                                          paddingRight: "10px",
-                                          letterSpacing: "0.01px",
-                                        }}
-                                      >
-                                        CC:
-                                      </p>
-                                      <div>
-                                        {selectedBanks.map((item) => {
-                                          return (
-                                            <p
-                                              style={{
-                                                marginBottom: "3px",
-                                                letterSpacing: "0.01px",
-                                                fontSize: "18px",
-                                                fontWeight: "400",
-                                              }}
-                                            >
-                                              {item.name}
-                                            </p>
-                                          );
-                                        })}
-                                      </div>
-                                    </>
-                                  ) : (
-                                    ""
-                                  )}
-                                </div>
-                              </td>
-                            </tr>
-                          </table>
-                        </td>
-                      </tr>
-                    </table>
-                  </div>
+                                {" "}
+                                Yours Sincerely,
+                              </span>
+                              <img
+                                src={
+                                  applicationDetail?.getUserData?.filePath
+                                    ? applicationDetail?.getUserData.filePath
+                                    : NoSign
+                                }
+                                alt="Signature"
+                                style={{
+                                  width: "120px",
+                                  height: "50px",
+                                  display: "block",
+                                  objectFit: "contain",
+                                }}
+                              />
+                              <p
+                                style={{
+                                  marginBottom: "0px",
+                                  color: "#000",
+                                  fontSize: "14px",
+                                  fontWeight: "400",
+                                  padding: "15px 0px 3px",
+                                  lineHeight: "13px",
+                                  letterSpacing: "0.01px",
+                                }}
+                              >
+                                {PdfUsername
+                                  ? PdfUsername?.replace(/"/g, "")
+                                  : "N/A"}
+                              </p>
+                              <p
+                                style={{
+                                  marginBottom: "0px",
+                                  color: "#000",
+                                  fontSize: "14px",
+                                  fontWeight: "400",
+                                  padding: "5px 0px",
+                                  lineHeight: "13px",
+                                  letterSpacing: "0.01px",
+                                }}
+                              >
+                                {PdfRolename
+                                  ? PdfRolename?.replace(/"/g, "")
+                                  : "N/A"}
+                              </p>
+                              <h3
+                                style={{
+                                  color: "#000",
+                                  fontSize: "18px",
+                                  fontWeight: "800",
+                                }}
+                              >
+                                EXCHANGE &nbsp; CONTROL
+                              </h3>
+                              <div
+                                style={{
+                                  marginBottom: "0px",
+                                  color: "#000",
+                                  fontSize: "18px",
+                                  fontWeight: "400",
+                                  padding: "25px 0px 5px",
+                                  lineHeight: "13px",
+                                  display: "flex",
+                                }}
+                              >
+                                {applicationDetail?.copiedResponses?.length ||
+                                selectedBanks?.length > 0 ? (
+                                  <>
+                                    <p
+                                      style={{
+                                        marginBottom: "0px",
+                                        fontSize: "18px",
+                                        fontWeight: "400",
+                                        paddingRight: "10px",
+                                        letterSpacing: "0.01px",
+                                      }}
+                                    >
+                                      CC:
+                                    </p>
+                                    <div>
+                                      {selectedBanks.map((item) => {
+                                        return (
+                                          <p
+                                            style={{
+                                              marginBottom: "3px",
+                                              letterSpacing: "0.01px",
+                                              fontSize: "18px",
+                                              fontWeight: "400",
+                                            }}
+                                          >
+                                           {item.label}
+                                          </p>
+                                        );
+                                      })}
+                                    </div>
+                                  </>
+                                ) : (
+                                  ""
+                                )}
+                              </div>
+                            </td>
+                          </tr>
+                        </table>
+                      </td>
+                    </tr>
+                  </table>
                 </div>
               </div>
+            </div>
 
               {updatepopup == true ? (
                 <UpdatePopupMessage

@@ -35,6 +35,7 @@ const ImportDashboardViewDetails = ({
   const [tabstatus6, settabstatus6] = useState(true);
   const [sharefiletab, setsharefiletab] = useState(false);
 
+  console.log("applicationDetail",applicationDetail)
   return (
     <>
       {showdataLoader == true || !noDataComment?.length ? (
@@ -418,7 +419,7 @@ const ImportDashboardViewDetails = ({
             )}
 
             {applicationDetail?.attachedFiles?.length ? (
-              geninfoFile?.map((items, index) => {
+              applicationDetail?.attachedFiles?.map((items, index) => {
                 return (
                   <div className="attachemt_form-bx" key={items.id}>
                     <label

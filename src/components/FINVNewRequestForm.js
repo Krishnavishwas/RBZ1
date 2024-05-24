@@ -24,6 +24,7 @@ const FINVNewRequestForm = () => {
     GovernmentAgencies,
     applicantTypes,
     sectorData, 
+    masterBank,
     countries,
   } = ExportformDynamicField();
 
@@ -107,7 +108,7 @@ const FINVNewRequestForm = () => {
   const [inputValue, setInputValue] = useState("");
   const [options, setOptions] = useState([]);
   const [value, setValue] = useState("");
-
+  const [applicationSubTypeValue, setapplicationSubTypeValue]= useState('');
   const [ValidateRBZ, setValidateRBZ] = useState([]);
   const [loader, setLoader] = useState(false);
   const [ValidateShow, setValidateShow] = useState(false);
@@ -219,6 +220,10 @@ const [Supervisors, setSupervisors] = useState([])
     }
     setErrors(newErrors);
   };
+
+  const changeHandelFormSubtype = (e)=>{
+    setapplicationSubTypeValue(e.target.value)
+  }
 
   const changeHandelForm = (e) => {
     let newErrors = {};
@@ -382,11 +387,7 @@ const [Supervisors, setSupervisors] = useState([])
         .post(APIURL + "Admin/GetSubApplicationTypeByApplicationTypeID", {
           ID: value,
         })
-        .then((res) => {
-          console.log(
-            "res--Nature of Application(Consultancy Service Agreements)",
-            res
-          );
+        .then((res) => { 
           if (res.data.responseCode === "200") {
             setapplicationSubType(res.data.responseData);
           } else {
@@ -743,7 +744,7 @@ const [Supervisors, setSupervisors] = useState([])
       valid = false;
     }
     if (FINForm.applicationType === "") {
-      newErrors.applicationType = "Application type is required";
+      newErrors.applicationType = "Application category is required";
       valid = false;
     }
     if (
@@ -765,6 +766,10 @@ const [Supervisors, setSupervisors] = useState([])
     // }
     if (FINForm.currency === "") {
       newErrors.currency = "Currency is required";
+      valid = false;
+    }
+    if(applicationSubTypeValue == ""){
+      newErrors.applicationSubTypeValue = "Nature of application is required";
       valid = false;
     }
     if (FINForm.amount === "") {
@@ -801,6 +806,11 @@ const [Supervisors, setSupervisors] = useState([])
 
   const handleChangecompany = (selectedOption) => {
     setgetCompanyName(selectedOption);
+  };
+
+  const SelectBankRecordOfficer = (e) => {
+    const { name, value } = e.target;
+    setGetBankID(value);
   };
 
   const handleInputChangecompany = (input) => {
@@ -856,7 +866,7 @@ const [Supervisors, setSupervisors] = useState([])
       await axios
         .post(APIURL + "FINApplication/CreateFINApplication", {
           UserID: UserID.replace(/"/g, ""),
-          BankID: bankID,
+          BankID: roleID == 4 ? getBankID : bankID,
           DepartmentID: "2",
           ApplicationDate: moment(startDate).format("YYYY-MM-DD"),
           RBZReferenceNumber: generatedNumber,
@@ -870,7 +880,7 @@ const [Supervisors, setSupervisors] = useState([])
               : "",
           ApplicantType: registerusertype,
           ApplicationTypeID: FINForm.applicationType,
-          ApplicationSubTypeID: FINForm.applicationSubType,
+          ApplicationSubTypeID: applicationSubTypeValue,
           BeneficiaryName: FINForm.BeneficiaryName,
           BeneficiaryCountry: FINForm.baneficiaryCountry,
           BPNCode:
@@ -1131,7 +1141,7 @@ const [Supervisors, setSupervisors] = useState([])
             </label>
           </div>
         </div>
-        <div className="inner_form_new ">
+        {/* <div className="inner_form_new ">
           <label className="controlform">Name of Bank</label>
           <div className="form-bx">
             <label>
@@ -1144,7 +1154,57 @@ const [Supervisors, setSupervisors] = useState([])
               <span className="sspan"></span>
             </label>
           </div>
-        </div>
+        </div> */}
+
+<div className="inner_form_new ">
+            <label className="controlform">Name of Bank</label>
+            {roleID == 4 ? (
+              <div className="form-bx">
+                <label>
+                  <select
+                    ref={banknameRef}
+                    className={
+                      errors?.getBankID && getBankID == "" ? "error" : ""
+                    }
+                    name="BankID"
+                    onChange={(e) => {
+                      SelectBankRecordOfficer(e);
+                    }}
+                  >
+                    <option value="">Select Bank/ADLA Name</option>
+                    {masterBank?.map((item, index) => {
+                      return (
+                        <>
+                          <option value={item?.id} key={index}>
+                            {item?.bankName}
+                          </option>
+                        </>
+                      );
+                    })}
+                  </select>
+                  <span className="sspan"></span>
+                  {errors?.getBankID && getBankID == "" ? (
+                    <small className="errormsg">{errors.getBankID}</small>
+                  ) : (
+                    ""
+                  )}
+                </label>
+              </div>
+            ) : (
+              <div className="form-bx">
+                <label>
+                  <input
+                    type="text"
+                    value={bankName.replace(/"/g, "")}
+                    disabled
+                  />
+                  <span className="sspan"></span>
+                </label>
+              </div>
+            )}
+          </div>
+        {/* end form-bx  */}
+
         {/* end form-bx  */}
 
         <div className="inner_form_new ">
@@ -1371,7 +1431,7 @@ const [Supervisors, setSupervisors] = useState([])
                 ref={applicationTypeRef}
                 name="applicationType"
                 onChange={(e) => {
-                  changeHandelForm(e);
+                  changeHandelForm(e); setapplicationSubTypeValue('')
                 }}
                 className={
                   errors.applicationType && FINForm.applicationType === ""
@@ -1410,13 +1470,17 @@ const [Supervisors, setSupervisors] = useState([])
               <label>
                 <select
                   ref={applicationSubTypeRef}
-                  name="applicationSubType"
+                  // name="applicationSubType"
+                  // onChange={(e) => {
+                  //   changeHandelForm(e);
+                  // }}
+                  name="applicationSubTypeValue"
                   onChange={(e) => {
-                    changeHandelForm(e);
+                    changeHandelFormSubtype(e);
                   }}
                   className={
-                    errors.applicationSubType &&
-                    FINForm.applicationSubType === ""
+                    errors.applicationSubTypeValue &&
+                    applicationSubTypeValue === ""
                       ? "error"
                       : ""
                   }
@@ -1431,10 +1495,10 @@ const [Supervisors, setSupervisors] = useState([])
                   })}
                 </select>
                 <span className="sspan"></span>
-                {errors.applicationSubType &&
-                FINForm.applicationSubType === "" ? (
+                {errors.applicationSubTypeValue &&
+                applicationSubTypeValue === "" ? (
                   <small className="errormsg">
-                    {errors.applicationSubType}
+                    {errors.applicationSubTypeValue}
                   </small>
                 ) : (
                   ""
