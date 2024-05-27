@@ -260,6 +260,7 @@ const ImportOtherDepartmentEditDetails = ({
     useRef(null),
     useRef(null),
   ];
+
   const fileInputRefsother = [
     useRef(null),
     useRef(null),
@@ -1372,7 +1373,6 @@ const ImportOtherDepartmentEditDetails = ({
                       } else {
                         var footerImage = "";
                       }
-
                       const addFooters = (doc) => {
                         if (roleID != 3) {
                           const pageCount = doc.internal.getNumberOfPages();
@@ -1398,7 +1398,6 @@ const ImportOtherDepartmentEditDetails = ({
                             const footerpositionfromTop =
                               doc.internal.pageSize.height - 90;
                             const pageCount = doc.internal.getNumberOfPages();
-
                             var pagewidth = doc.internal.pageSize.width;
                             if (pagewidth > footerImagewidth) {
                               var diff =
@@ -1425,7 +1424,6 @@ const ImportOtherDepartmentEditDetails = ({
                           }
                         }
                       };
-
                       const addHeader = (doc) => {
                         if (roleID != 3) {
                           const pageCount = doc.internal.getNumberOfPages();
@@ -1589,7 +1587,6 @@ const ImportOtherDepartmentEditDetails = ({
                             const footerpositionfromTop =
                               doc.internal.pageSize.height - 90;
                             const pageCount = doc.internal.getNumberOfPages();
-
                             var pagewidth = doc.internal.pageSize.width;
                             if (pagewidth > footerImagewidth) {
                               var diff =
@@ -9090,7 +9087,6 @@ const ImportOtherDepartmentEditDetails = ({
                     return (
                       <div className="attachemt_form-bx" key={items.id}>
                         <label>
-                          {/* {items.filename} */}
                           {items?.fileName
                             ? items?.fileName
                             : `FileUpload ${index}`}
@@ -9320,35 +9316,7 @@ const ImportOtherDepartmentEditDetails = ({
                 Close
               </button>
 
-              <div>
-                {/* {(roleID > 5 &&
-                  recomdAnalyst == "121" &&
-                  applicationstaus != "25") ||
-                (roleID == 3 &&
-                  applicationstaus &&
-                  applicationstaus != 0 &&
-                  applicationstaus != "25") ||
-                (roleID == 3 &&
-                  nextlevelvalue == "10" &&
-                  applicationstaus != "25") ? (
-                  <>
-                    <button
-                      type="button"
-                      className="login m-end-4"
-                      onClick={() => GetHandelDetailPDF()}
-                      disabled={btnLoader}
-                    >
-                      {btnLoader ? (
-                        <span className="loaderwait">Please Wait...</span>
-                      ) : (
-                        <span>Preview PDF</span>
-                      )}
-                    </button>
-                  </>
-                ) : (
-                  ""
-                )} */}
-
+              <div>                
                 {nextlevelvalue == 35 ? (
                   <button
                     className="btn btn-primary"
@@ -10595,12 +10563,11 @@ const ImportOtherDepartmentEditDetails = ({
                                   letterSpacing: "0.01px",
                                 }}
                               >
-                                :{" "}
+                                :
                                 {applicationDetail?.companyName == null ||
                                 applicationDetail?.companyName == ""
                                   ? applicationDetail?.name
                                   : applicationDetail?.companyName}
-                                {console.log(applicationDetail)}
                               </td>
                             </tr>
                             <tr>
@@ -10683,7 +10650,7 @@ const ImportOtherDepartmentEditDetails = ({
                                   fontWeight: "800",
                                 }}
                               >
-                                :{" "}
+                                :
                                 <span
                                   style={{
                                     minWidth: "45px",
@@ -10723,7 +10690,7 @@ const ImportOtherDepartmentEditDetails = ({
                                   letterSpacing: "0.01px",
                                 }}
                               >
-                                :{" "}
+                                :
                                 {applicationstaus == "10"
                                   ? "Approved"
                                   : applicationstaus == "30"
@@ -10733,7 +10700,6 @@ const ImportOtherDepartmentEditDetails = ({
                                   : applicationstaus == "25"
                                   ? "Cancelled"
                                   : ""}
-                                {/* {applicationDetail?.statusName} */}
                               </td>
                             </tr>
                             <tr

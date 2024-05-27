@@ -118,7 +118,6 @@ const ReferredDashboardTable = () => {
             handleClickEditModal(rowData.title);
             GetHandelDetail(rowData?.rbzReferenceNumber, rowData.id);
             GetRoleHandle(applicationstaus);
-            // handleData();
             GetApplicationCount(rowData.id);
           }}
           onMouseEnter={(e) => {
@@ -331,6 +330,21 @@ const ReferredDashboardTable = () => {
         console.log(err);
       });
 
+      await axios
+      .post(APIURL + "ReferredApplication/GetReferredActionsByApplicationID", {
+        ID: id,
+      })
+      .then((res) => {
+        if (res.data.responseCode == 200) {
+          setActiondata(res.data.responseData);
+        } else {
+          setActiondata([]);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+
     // --------------------------vishwas start----------------------------
     await axios
       .post(APIURL + "ReferredApplication/GetReferredCommentsInfoByRoleID", {
@@ -451,118 +465,6 @@ const ReferredDashboardTable = () => {
     handleData();
     setExportsapproveRequests([]);
   }, [tabDepId]);
-
-  // OLD
-  const [showOldModal, setShowOldModal] = useState(false);
-  const [oldApplicationDetail, setOldApplicationDetail] = useState({});
-  const [oldNoDataComment, setOldNoDataComment] = useState([]);
-  const [oldAllcomment, setOldAllcomment] = useState([]);
-  const [oldTatHistory, setOldTatHistory] = useState([]);
-  const [oldActiondata, setOldActiondata] = useState([]);
-  const [oldResponceCount, setOldResponceCount] = useState([]);
-  const [showOldDataLoader, setShowOldDataLoader] = useState(false);
-
-  const handleOldClose = () => setShowOldModal(false);
-
-  const handleOldViewData = (id) => {
-    setShowOldModal(true);
-  };
-
-  const GetOldHandelDetail = async (id) => {
-    setShowOldDataLoader(true);
-    await axios
-      .post(APIURL + "ImportApplication/GetImportRequestInfoByApplicationID", {
-        ID: id,
-      })
-      .then((res) => {
-        if (res.data.responseCode === "200") {
-          setOldApplicationDetail(res.data.responseData);
-          setTimeout(() => {
-            setShowOldDataLoader(false);
-          }, 2000);
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-
-    await axios
-      .post(APIURL + "ImportApplication/GetImportCommentsInfoByRoleID", {
-        ApplicationID: id,
-      })
-      .then((res) => {
-        if (res.data.responseCode == 200) {
-          setOldNoDataComment(res.data.responseData);
-        } else {
-          setOldNoDataComment([]);
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-
-    await axios
-      .post(APIURL + "ImportApplication/GetNewCommentsImport", {
-        ID: id,
-      })
-      .then((res) => {
-        if (res.data.responseCode == 200) {
-          setOldAllcomment(res.data.responseData);
-        } else {
-          setOldAllcomment([]);
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-
-    await axios
-      .post(APIURL + "ReferredApplication/GetReferredApplicationHistory", {
-        ID: id,
-      })
-      .then((res) => {
-        if (res.data.responseCode == 200) {
-          setOldTatHistory(res.data.responseData);
-        } else {
-          setOldTatHistory([]);
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-
-    await axios
-      .post(APIURL + "ImportApplication/GetActionsByApplicationID", {
-        ID: id,
-      })
-      .then((res) => {
-        if (res.data.responseCode == 200) {
-          setOldActiondata(res.data.responseData);
-        } else {
-          setOldActiondata([]);
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
-
-  const GetOldApplicationCount = async (id) => {
-    await axios
-      .post(APIURL + "ImportApplication/CountByApplicationIDImport", {
-        ApplicationID: id,
-      })
-      .then((res) => {
-        if (res.data.responseCode == 200) {
-          setOldResponceCount(res.data.responseData);
-        } else {
-          setOldResponceCount({});
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
 
   return (
     <>
@@ -758,42 +660,6 @@ const ReferredDashboardTable = () => {
                       supervisorHangechangeRole={supervisorHangechangeRole}
                       setSupervisorRoleId={setSupervisorRoleId}
                       noDataComment={noDataComment}
-                    />
-                  </Modal.Body>
-                </div>
-              </div>
-            </div>
-          </Modal>
-
-          <Modal
-            show={showOldModal}
-            onHide={handleOldClose}
-            backdrop="static"
-            className="max-width-600 oldModal-full"
-          >
-            <div className="application-box">
-              <div className="login_inner">
-                <div className="login_form ">
-                  <h5>
-                    <Modal.Header closeButton className="p-0">
-                      <Modal.Title>
-                        View Old Export Request --{" "}
-                        <big>{oldApplicationDetail?.rbzReferenceNumber}</big>
-                      </Modal.Title>
-                    </Modal.Header>
-                  </h5>
-                </div>
-                <div className="login_form_panel">
-                  <Modal.Body className="p-0">
-                    <ImportDashboardViewDetails
-                      applicationDetail={oldApplicationDetail}
-                      handleFormClose={handleOldClose}
-                      allcomment={oldAllcomment}
-                      tatHistory={oldTatHistory}
-                      Actiondata={oldActiondata}
-                      noDataComment={oldNoDataComment}
-                      showdataLoader={showOldDataLoader}
-                      responceCount={oldResponceCount}
                     />
                   </Modal.Body>
                 </div>

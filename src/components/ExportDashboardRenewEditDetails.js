@@ -138,7 +138,9 @@ const ExportDashboardRenewEditDetails = ({
   const [ValidateShow, setValidateShow] = useState(false);
   const [applicationType, setapplicationType] = useState([]);
   const [subsectorData, setsubsectorData] = useState([]);
-  const [checkSupervisor, setcheckSupervisor] = useState(roleID == 4 ? true : false);
+  const [checkSupervisor, setcheckSupervisor] = useState(
+    roleID == 4 ? true : false
+  );
   const [attachmentData, setAttachmentData] = useState([
     { filename: "File Upload", upload: "" },
   ]);
@@ -507,7 +509,7 @@ const ExportDashboardRenewEditDetails = ({
     }
   };
 
-  const HandleDateCurrRate = (e) => { 
+  const HandleDateCurrRate = (e) => {
     axios
       .post(APIURL + "Master/GetRateByCurrencyID", {
         Id: applicationDetail.currency,
@@ -522,12 +524,11 @@ const ExportDashboardRenewEditDetails = ({
       })
       .catch((err) => {
         console.log(err);
-      }); 
-};
-useEffect(()=>{
-  HandleDateCurrRate()
-},[curRate])
- 
+      });
+  };
+  useEffect(() => {
+    HandleDateCurrRate();
+  }, [curRate]);
 
   // const HandleDateExpiryOption = (e) => {
   //   const { name, value } = e.target;
@@ -946,7 +947,7 @@ useEffect(()=>{
     setErrors({});
     setselectuserRoleRecordofficer(value);
     setAssignUserID("");
-    setSupervisorRoleId(""); 
+    setSupervisorRoleId("");
     if (bankSupervisorRef.current) bankSupervisorRef.current.value = "";
     if (value == "") {
       setGetalluser([]);
@@ -2359,16 +2360,16 @@ useEffect(()=>{
               </div>
 
               <div className={roleID == 4 ? "d-none" : "inner_form_new "}>
-                  <label className="controlform">Submit To Next Level </label>
-                  <input
-                    type="checkbox"
-                    onChange={HandelSupervisorcheck}
-                    checked={checkSupervisor}
-                    disabled={roleID == 2 ? false : true}
-                  />
-                </div> 
+                <label className="controlform">Submit To Next Level </label>
+                <input
+                  type="checkbox"
+                  onChange={HandelSupervisorcheck}
+                  checked={checkSupervisor}
+                  disabled={roleID == 2 ? false : true}
+                />
+              </div>
 
-              {checkSupervisor === true && roleID == 2  ? (
+              {checkSupervisor === true && roleID == 2 ? (
                 <div className="inner_form_new ">
                   <label className="controlform">Bank Supervisor</label>
                   <div className="form-bx">
@@ -2412,87 +2413,87 @@ useEffect(()=>{
                 ""
               )}
 
-{checkSupervisor == true && roleID == 4 ? (
-          <div className="inner_form_new ">
-            <label className="controlform">RBZ Record Officer Submit to</label>
-            <div className="form-bx">
-              <label>
-                <select
-                  name="SupervisorRoleId"
-                  onChange={(e) => {
-                    supervisorHangechangeRoleRecordofficer(e);
-                  }}
-                  // className={
-                  //   errors.assignedTo && !SupervisorRoleId
-                  //     ? "error"
-                  //     : ""
-                  // }
-                >
-                  <option value="">Select Role</option>
-                  {userRole?.map((item, index) => {
-                    return (
-                      <option key={index} value={item.id}>
-                        {item.designation}
-                      </option>
-                    );
-                  })}
-                </select>
-                <span className="sspan"></span>
-                {errors.selectuserRoleRecordofficer && selectuserRoleRecordofficer === "" ? (
-                  <small className="errormsg">Role is required</small>
-                ) : (
-                  ""
-                )}
-              </label>
-            </div>
-          </div>
-        ) : (
-          ""
-        )}
+              {checkSupervisor == true && roleID == 4 ? (
+                <div className="inner_form_new ">
+                  <label className="controlform">
+                    RBZ Record Officer Submit to
+                  </label>
+                  <div className="form-bx">
+                    <label>
+                      <select
+                        name="SupervisorRoleId"
+                        onChange={(e) => {
+                          supervisorHangechangeRoleRecordofficer(e);
+                        }}
+                      >
+                        <option value="">Select Role</option>
+                        {userRole?.map((item, index) => {
+                          return (
+                            <option key={index} value={item.id}>
+                              {item.designation}
+                            </option>
+                          );
+                        })}
+                      </select>
+                      <span className="sspan"></span>
+                      {errors.selectuserRoleRecordofficer &&
+                      selectuserRoleRecordofficer === "" ? (
+                        <small className="errormsg">Role is required</small>
+                      ) : (
+                        ""
+                      )}
+                    </label>
+                  </div>
+                </div>
+              ) : (
+                ""
+              )}
 
-{checkSupervisor == true && roleID == 4 && getalluser?.length ? (
-          <div className="w-100">
-            <div className="inner_form_new">
-              <label className="controlform">User</label>
+              {checkSupervisor == true && roleID == 4 && getalluser?.length ? (
+                <div className="w-100">
+                  <div className="inner_form_new">
+                    <label className="controlform">User</label>
 
-              <div className="form-bx">
-                <label>
-                  <select
-                    ref={bankSupervisorRef}
-                    name="bankSupervisor"
-                    onChange={(e) => {
-                      handleuserByrecordOfficer(e);
-                    }}
-                    className={
-                      errors.bankSupervisor && applicationDetail.bankSupervisor === ""
-                        ? "error"
-                        : ""
-                    }
-                  >
-                    <option value="" selected>
-                      Select User
-                    </option>
-                    {getalluser?.map((item, index) => {
-                      return (
-                        <option key={item.id} value={item.userID}>
-                          {item.name}
-                        </option>
-                      );
-                    })}
-                  </select>
-                  <span className="sspan"></span>
-                  {errors.bankSupervisor && applicationDetail.bankSupervisor === "" ? (
-                    <small className="errormsg">User is required</small>
-                  ) : (
-                    ""
-                  )}
-                </label>
-              </div>
-            </div>
-          </div>
-        ) : (
-          ""
-        )}
+                    <div className="form-bx">
+                      <label>
+                        <select
+                          ref={bankSupervisorRef}
+                          name="bankSupervisor"
+                          onChange={(e) => {
+                            handleuserByrecordOfficer(e);
+                          }}
+                          className={
+                            errors.bankSupervisor &&
+                            applicationDetail.bankSupervisor === ""
+                              ? "error"
+                              : ""
+                          }
+                        >
+                          <option value="" selected>
+                            Select User
+                          </option>
+                          {getalluser?.map((item, index) => {
+                            return (
+                              <option key={item.id} value={item.userID}>
+                                {item.name}
+                              </option>
+                            );
+                          })}
+                        </select>
+                        <span className="sspan"></span>
+                        {errors.bankSupervisor &&
+                        applicationDetail.bankSupervisor === "" ? (
+                          <small className="errormsg">User is required</small>
+                        ) : (
+                          ""
+                        )}
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                ""
+              )}
 
               <h5 className="section_top_subheading mt-2">Attachments</h5>
 
@@ -2671,6 +2672,7 @@ useEffect(()=>{
                   )}
                 </div>
               ))}
+              
               {files?.length ? (
                 <button
                   type="button"
@@ -2729,7 +2731,6 @@ useEffect(()=>{
                   }
                   className="login"
                 >
-                  {" "}
                   Submit{" "}
                 </button>
               </div>
