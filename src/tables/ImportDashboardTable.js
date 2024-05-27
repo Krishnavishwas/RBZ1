@@ -273,7 +273,6 @@ const ImportDashboardTable = () => {
 
   const EditModalClose = () => {
     setshowEditForm(false);
-    // setapplicationstaus("0");
     setnextlevelvalue("");
   };
   const handleFormClose = () => setShowUpdateModal(false);
@@ -351,7 +350,7 @@ const ImportDashboardTable = () => {
         console.log(err);
       });
 
-      await axios
+    await axios
       .post(APIURL + "ImportApplication/GetActionsByApplicationID", {
         ID: id,
       })
@@ -636,6 +635,37 @@ const ImportDashboardTable = () => {
       });
   };
 
+  //Fetch Referred to Other Department data
+  const [referredDataTrue, setreferredDataTrue] = useState(false);
+  const [RODLoader, setRODLoader] = useState(false);
+  const [referredData, setReferredData] = useState({});
+
+  const GetReferredData = async (id) => {
+    try {
+      setRODLoader(true);
+      await axios
+        .post(APIURL + "ImportApplication/GetReferredImportApplicationByID", {
+          ID: id,
+        })
+        .then((res) => {
+          if (res.data.responseCode == 200) {
+            setReferredData(res.data.responseData);
+            setRODLoader(false);
+          } else {
+            setReferredData({});
+            setRODLoader(false);
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+          setRODLoader(false);
+          setreferredDataTrue(false);
+        });
+    } catch (error) {
+      console.log("GetReferredImportApplicationByID error - ", error);
+    }
+  };
+
   return (
     <>
       {loading === true ? (
@@ -782,7 +812,8 @@ const ImportDashboardTable = () => {
                         <div className="row">
                           <div
                             className={
-                              applicationDetail?.parentApplicationID == 0
+                              applicationDetail?.parentApplicationID == 0 &&
+                              applicationDetail?.referredApplicationID == 0
                                 ? "col-md-12"
                                 : "col-md-6"
                             }
@@ -797,8 +828,8 @@ const ImportDashboardTable = () => {
                           </div>
                           <div
                             className={
-                              (applicationDetail &&
-                              applicationDetail?.parentApplicationID == 0)
+                              applicationDetail &&
+                              applicationDetail?.parentApplicationID == 0
                                 ? "d-none"
                                 : "col-md-6 text-center"
                             }
@@ -823,6 +854,72 @@ const ImportDashboardTable = () => {
                             >
                               View Old Application
                             </button>
+                          </div>
+                          <div
+                            className={
+                              applicationDetail &&
+                              applicationDetail?.referredApplicationID == 0
+                                ? "d-none"
+                                : "col-md-6 text-center"
+                            }
+                          >
+                            <button
+                              className={
+                                applicationDetail?.referredApplicationID
+                                  ? "btn btn-light viewcopybtn"
+                                  : "d-none"
+                              }
+                              onClick={() => {
+                                referredDataTrue == false &&
+                                  GetReferredData(
+                                    applicationDetail?.referredApplicationID
+                                  );
+                                setreferredDataTrue(!referredDataTrue);
+                              }}
+                            >
+                              View Other Department Response
+                            </button>
+                            <div
+                              className={
+                                referredDataTrue == true
+                                  ? "tooltip-bx"
+                                  : "d-none"
+                              }
+                            >
+                              {RODLoader === true ? (
+                                <label className="outerloader2">
+                                  <span className="loader"></span>
+                                  <span className="loaderwait">
+                                    Please Wait...
+                                  </span>
+                                </label>
+                              ) : (
+                                <>
+                                  <div className="toolinner">
+                                    <label>Decision</label>{" "}
+                                    <p>{referredData.statusName}</p>
+                                  </div>
+                                  <div className="toolinner">
+                                    <label>Recommendation</label>{" "}
+                                    <p
+                                      dangerouslySetInnerHTML={{
+                                        __html: referredData.description
+                                          ? referredData.description
+                                          : "N/A",
+                                      }}
+                                    />
+                                  </div>
+                                  <div className="toolinner">
+                                    <label>Note</label>{" "}
+                                    <p>{referredData.notes}</p>
+                                  </div>
+                                  <div className="toolinner">
+                                    <label>Comment</label>{" "}
+                                    <p>{referredData.comment}</p>
+                                  </div>
+                                </>
+                              )}
+                            </div>
                           </div>
                         </div>
                       </Modal.Title>
