@@ -23,8 +23,8 @@ const FINVNewRequestForm = () => {
     companies,
     GovernmentAgencies,
     applicantTypes,
-    sectorData,
-    Supervisors,
+    sectorData, 
+    masterBank,
     countries,
   } = ExportformDynamicField();
 
@@ -102,13 +102,13 @@ const FINVNewRequestForm = () => {
   const [applicationSubType, setapplicationSubType] = useState([]);
   const [subsectorData, setsubsectorData] = useState([]);
   const [curRate, setCurrate] = useState();
-  const [checkSupervisor, setcheckSupervisor] = useState(false);
+  const [checkSupervisor, setcheckSupervisor] = useState(roleID == 4 ? true : false);
   const [attachmentData, setAttachmentData] = useState([]);
   const [otherfilesupload, setOtherfilesupload] = useState([]);
   const [inputValue, setInputValue] = useState("");
   const [options, setOptions] = useState([]);
   const [value, setValue] = useState("");
-
+  const [applicationSubTypeValue, setapplicationSubTypeValue]= useState('');
   const [ValidateRBZ, setValidateRBZ] = useState([]);
   const [loader, setLoader] = useState(false);
   const [ValidateShow, setValidateShow] = useState(false);
@@ -117,7 +117,7 @@ const FINVNewRequestForm = () => {
   });
 
   const [getBankID, setGetBankID] = useState("");
-
+const [Supervisors, setSupervisors] = useState([])
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [loading, setLoading] = useState(false);
   const [applicationDetail, setApplicationDetail] = useState({});
@@ -163,6 +163,30 @@ const FINVNewRequestForm = () => {
   ];
   const relatedexchangeControlNumberRef = useRef(null);
 
+
+  const handeSupervisor = async ()=>{
+
+    await axios
+      .post(APIURL + "User/GetSupervisors", {
+        BankID: bankID,
+        UserID: UserID,
+        DepartmentID:"4",
+        RoleID: roleID,
+      })
+      .then((res) => {
+        if (res.data.responseCode === "200") {
+          setSupervisors(res.data.responseData);
+        } else {
+          console.log(res.data.responseMessage);
+          setSupervisors([]);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+
+  }
+
   const validatePECANForm = () => {
     let valid = true;
     const newErrors = {};
@@ -196,6 +220,10 @@ const FINVNewRequestForm = () => {
     }
     setErrors(newErrors);
   };
+
+  const changeHandelFormSubtype = (e)=>{
+    setapplicationSubTypeValue(e.target.value)
+  }
 
   const changeHandelForm = (e) => {
     let newErrors = {};
@@ -359,11 +387,7 @@ const FINVNewRequestForm = () => {
         .post(APIURL + "Admin/GetSubApplicationTypeByApplicationTypeID", {
           ID: value,
         })
-        .then((res) => {
-          console.log(
-            "res--Nature of Application(Consultancy Service Agreements)",
-            res
-          );
+        .then((res) => { 
           if (res.data.responseCode === "200") {
             setapplicationSubType(res.data.responseData);
           } else {
@@ -466,8 +490,7 @@ const FINVNewRequestForm = () => {
   const clearInputFileother = (index) =>{
     if (fileInputRefsother[index]?.current) fileInputRefsother[index].current.value = "";
    }
-  
-   console.log("files", files)
+   
   const getRoleHandle = async () => {
     await axios
       .post(APIURL + "Master/GetRoles", {
@@ -657,7 +680,7 @@ const FINVNewRequestForm = () => {
       axios
         .post(APIURL + "User/GetUsersByRoleID", {
           RoleID: value,
-          DepartmentID: "2",
+          DepartmentID: "4",
           UserID: UserID.replace(/"/g, ""),
         })
         .then((res) => {
@@ -721,7 +744,7 @@ const FINVNewRequestForm = () => {
       valid = false;
     }
     if (FINForm.applicationType === "") {
-      newErrors.applicationType = "Application type is required";
+      newErrors.applicationType = "Application category is required";
       valid = false;
     }
     if (
@@ -743,6 +766,10 @@ const FINVNewRequestForm = () => {
     // }
     if (FINForm.currency === "") {
       newErrors.currency = "Currency is required";
+      valid = false;
+    }
+    if(applicationSubTypeValue == ""){
+      newErrors.applicationSubTypeValue = "Nature of application is required";
       valid = false;
     }
     if (FINForm.amount === "") {
@@ -769,12 +796,21 @@ const FINVNewRequestForm = () => {
       newErrors.bankSupervisor = "Bank supervisor is required";
       valid = false;
     }
+    if (checkSupervisor == true && selectuserRole == "" && roleID == 4) {
+      newErrors.selectuserRole = "Role is required";
+      valid = false;
+    }
     setErrors(newErrors);
     return valid;
   };
 
   const handleChangecompany = (selectedOption) => {
     setgetCompanyName(selectedOption);
+  };
+
+  const SelectBankRecordOfficer = (e) => {
+    const { name, value } = e.target;
+    setGetBankID(value);
   };
 
   const handleInputChangecompany = (input) => {
@@ -830,7 +866,7 @@ const FINVNewRequestForm = () => {
       await axios
         .post(APIURL + "FINApplication/CreateFINApplication", {
           UserID: UserID.replace(/"/g, ""),
-          BankID: bankID,
+          BankID: roleID == 4 ? getBankID : bankID,
           DepartmentID: "2",
           ApplicationDate: moment(startDate).format("YYYY-MM-DD"),
           RBZReferenceNumber: generatedNumber,
@@ -844,7 +880,7 @@ const FINVNewRequestForm = () => {
               : "",
           ApplicantType: registerusertype,
           ApplicationTypeID: FINForm.applicationType,
-          ApplicationSubTypeID: FINForm.applicationSubType,
+          ApplicationSubTypeID: applicationSubTypeValue,
           BeneficiaryName: FINForm.BeneficiaryName,
           BeneficiaryCountry: FINForm.baneficiaryCountry,
           BPNCode:
@@ -1105,7 +1141,7 @@ const FINVNewRequestForm = () => {
             </label>
           </div>
         </div>
-        <div className="inner_form_new ">
+        {/* <div className="inner_form_new ">
           <label className="controlform">Name of Bank</label>
           <div className="form-bx">
             <label>
@@ -1118,7 +1154,57 @@ const FINVNewRequestForm = () => {
               <span className="sspan"></span>
             </label>
           </div>
-        </div>
+        </div> */}
+
+<div className="inner_form_new ">
+            <label className="controlform">Name of Bank</label>
+            {roleID == 4 ? (
+              <div className="form-bx">
+                <label>
+                  <select
+                    ref={banknameRef}
+                    className={
+                      errors?.getBankID && getBankID == "" ? "error" : ""
+                    }
+                    name="BankID"
+                    onChange={(e) => {
+                      SelectBankRecordOfficer(e);
+                    }}
+                  >
+                    <option value="">Select Bank/ADLA Name</option>
+                    {masterBank?.map((item, index) => {
+                      return (
+                        <>
+                          <option value={item?.id} key={index}>
+                            {item?.bankName}
+                          </option>
+                        </>
+                      );
+                    })}
+                  </select>
+                  <span className="sspan"></span>
+                  {errors?.getBankID && getBankID == "" ? (
+                    <small className="errormsg">{errors.getBankID}</small>
+                  ) : (
+                    ""
+                  )}
+                </label>
+              </div>
+            ) : (
+              <div className="form-bx">
+                <label>
+                  <input
+                    type="text"
+                    value={bankName.replace(/"/g, "")}
+                    disabled
+                  />
+                  <span className="sspan"></span>
+                </label>
+              </div>
+            )}
+          </div>
+        {/* end form-bx  */}
+
         {/* end form-bx  */}
 
         <div className="inner_form_new ">
@@ -1345,7 +1431,7 @@ const FINVNewRequestForm = () => {
                 ref={applicationTypeRef}
                 name="applicationType"
                 onChange={(e) => {
-                  changeHandelForm(e);
+                  changeHandelForm(e); setapplicationSubTypeValue('')
                 }}
                 className={
                   errors.applicationType && FINForm.applicationType === ""
@@ -1384,13 +1470,17 @@ const FINVNewRequestForm = () => {
               <label>
                 <select
                   ref={applicationSubTypeRef}
-                  name="applicationSubType"
+                  // name="applicationSubType"
+                  // onChange={(e) => {
+                  //   changeHandelForm(e);
+                  // }}
+                  name="applicationSubTypeValue"
                   onChange={(e) => {
-                    changeHandelForm(e);
+                    changeHandelFormSubtype(e);
                   }}
                   className={
-                    errors.applicationSubType &&
-                    FINForm.applicationSubType === ""
+                    errors.applicationSubTypeValue &&
+                    applicationSubTypeValue === ""
                       ? "error"
                       : ""
                   }
@@ -1405,10 +1495,10 @@ const FINVNewRequestForm = () => {
                   })}
                 </select>
                 <span className="sspan"></span>
-                {errors.applicationSubType &&
-                FINForm.applicationSubType === "" ? (
+                {errors.applicationSubTypeValue &&
+                applicationSubTypeValue === "" ? (
                   <small className="errormsg">
-                    {errors.applicationSubType}
+                    {errors.applicationSubTypeValue}
                   </small>
                 ) : (
                   ""
@@ -1872,13 +1962,13 @@ const FINVNewRequestForm = () => {
         </div>
         {/* end form-bx  */}
 
-        <div className="inner_form_new ">
+        <div  className={roleID == 4 ? "d-none" : "inner_form_new "}>
           <label className="controlform">Submit to Bank Supervisor</label>
           <input
             type="checkbox"
             className=""
             onChange={(e) => {
-              HandelSupervisorcheck(e);
+              HandelSupervisorcheck(e); handeSupervisor()
             }}
           />
         </div>

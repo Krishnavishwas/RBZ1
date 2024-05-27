@@ -7,17 +7,15 @@ import { APIURL, ImageAPI } from "../constant";
 import Select from "react-select";
 import moment from "moment";
 import { Link, useNavigate } from "react-router-dom";
-import SunEditor from "suneditor-react";
+import Modal from "react-bootstrap/Modal";
 import UpdatePopupMessage from "./UpdatePopupMessage";
 import "suneditor/dist/css/suneditor.min.css";
 import { toast } from "react-toastify";
 import logo from "../rbz_LOGO.png";
-import ReactQuill from "react-quill";
 import NoSign from "../NoSign.png";
 import "react-datepicker/dist/react-datepicker.css";
 import jsPDF from "jspdf";
-import { MultiSelect } from "primereact/multiselect";
-
+import CustomMultiSelect from "./SearchUI/CustomMultiSelect";
 /* Tiptp Editor Starts */
 import Table from "@tiptap/extension-table";
 import TableCell from "@tiptap/extension-table-cell";
@@ -30,6 +28,7 @@ import Text from "@tiptap/extension-text";
 import TextAlign from "@tiptap/extension-text-align";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
+import ImportDashboardViewDetails from "./ImportDashboardViewDetails";
 /* Tiptp Editor Ends */
 
 const ImportDashboardEditDetails = ({
@@ -118,6 +117,7 @@ const ImportDashboardEditDetails = ({
   const FrequencyDateRef = useRef(null);
   const dateExpirydisplayRef = useRef(null);
   const optionExpirydisplayRef = useRef(null);
+  const optionOtherDepartmentRef = useRef(null);
 
   const UserID = Storage.getItem("userID");
   const bankID = Storage.getItem("bankID");
@@ -137,11 +137,12 @@ const ImportDashboardEditDetails = ({
   const [files, setFiles] = useState([]);
   const [toastDisplayed, setToastDisplayed] = useState(false);
   const [errors, setErrors] = useState({});
-  const [selectedBanks, setSelectedBanks] = useState(null);
+  const [selectedBanks, setSelectedBanks] = useState([]);
   const [userRoleRecordofficer, setuserRoleRecordofficer] = useState([]);
   const [sharefile, setsharefile] = useState([]);
   const [registerusertype, setregisterusertype] = useState(bankidcheck);
   const [subsectorData, setsubsectorData] = useState([]);
+  const [ValidateRBZ, setValidateRBZ] = useState([]);
   const [checkSupervisor, setcheckSupervisor] = useState(false);
   const [curRate, setCurrate] = useState();
   const [DateExpirydisplay, setDateExpirydisplay] = useState("");
@@ -151,11 +152,13 @@ const ImportDashboardEditDetails = ({
   const [analystTab, setanalystTab] = useState(roleID == 5 ? true : false);
   const [btnLoader, setBtnLoader] = useState(false);
   const [sranalystTab, setsranalystTab] = useState(roleID == 6 ? true : false);
+  const [ValidateShow, setValidateShow] = useState(false);
   const [principalanalystTab, setprincipalanalystTab] = useState(
     roleID == 7 ? true : false
   );
   const [deputyTab, setdeputyTab] = useState(roleID == 8 ? true : false);
   const [director, setdirector] = useState(roleID == 9 ? true : false);
+  const [sharefiletab, setsharefiletab] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const [viewShareFile, setviewShareFile] = useState([]);
   const [applicationType, setapplicationType] = useState([]);
@@ -189,9 +192,19 @@ const ImportDashboardEditDetails = ({
   const [IsReturn, setIsReturn] = useState("0");
   const [checksectorchange, setchecksectorchange] = useState(false);
   const [getFrequencyID, setGetFrequencyID] = useState("0");
+  const [loading, setLoading] = useState(false);
   const [AllFrequency, setAllFrequency] = useState([]);
   const [getalluser, setGetalluser] = useState([]);
+  const [OtherDepartment, setOtherDepartment] = useState("");
+  const [otherDepartmentRole, setOtherDepartmentRole] = useState("");
+  const [otherDepartmentRoles, setOtherDepartmentRoles] = useState([]);
+  const [otherDepartmentUser, setOtherDepartmentUser] = useState("");
+  const [otherDepartmentUsers, setOtherDepartmentUsers] = useState([]);
+  const [OtherDepartmentPopup, setOtherDepartmentPopup] = useState(false);
+  const [OtherDepartmentLoader, setOtherDepartmentLoader] = useState(false);
+  const [loader, setLoader] = useState(false);
   const [othersharefile, setOthersharefile] = useState([]);
+  const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [SubmitBtnLoader, setSubmitBtnLoader] = useState(false);
   const [ImportForm, setImporttForm] = useState({
     user: "",
@@ -218,6 +231,7 @@ const ImportDashboardEditDetails = ({
     applicantComments: "",
     bankSupervisor: "",
   });
+
   const fileInputRefs = [
     useRef(null),
     useRef(null),
@@ -255,10 +269,28 @@ const ImportDashboardEditDetails = ({
 
   const heading = "Updated Successfully!";
   const para = "Import request updated successfully!";
+
+  const heading1 = "Submitted  Successfully";
+  const para1 = "Application successfully submitted to other department!";
   const applicationNumber = applicationDetail.rbzReferenceNumber;
-  console.log("applicationstaus - ", applicationstaus);
-  // const convertedRate = curRate * parseFloat(applicationDetail.amount);
+
+  const menuname = Storage.getItem("menuname");
+
+  const DeptID =
+    menuname === "Exports"
+      ? "2"
+      : menuname === "Imports"
+      ? "3"
+      : menuname === "Foreign Investments"
+      ? "4"
+      : menuname === "Inspectorate"
+      ? "5"
+      : "";
+
   const ratevalue = applicationDetail?.rate;
+
+  const handleViewData = (id) => setShowUpdateModal(true);
+  const handleFormClose = () => setShowUpdateModal(false);
 
   const convertedRate =
     parseFloat(curRate ? curRate : ratevalue) *
@@ -281,11 +313,6 @@ const ImportDashboardEditDetails = ({
       };
     },
   });
-
-  console.log(
-    "applicationDetail.beneficiaryCountry - ",
-    applicationDetail.beneficiaryCountry
-  );
 
   const changeHandelForm = (e) => {
     const name = e.target.name;
@@ -756,6 +783,7 @@ const ImportDashboardEditDetails = ({
     setOtherfilesupload([...otherfilesupload, { otherfile, id }]);
   };
 
+  /* PDF Preview code starts */
   const GetHandelDetailPDF = async () => {
     setBtnLoader(true);
     setTimeout(() => {
@@ -763,75 +791,154 @@ const ImportDashboardEditDetails = ({
         format: "a4",
         unit: "pt",
       });
-      const addHeader = (doc) => {
-        const pageCount = doc.internal.getNumberOfPages();
-        const headerpositionfromleft = (doc.internal.pageSize.width - 10) / 4;
-        for (var i = 1; i <= pageCount; i++) {
-          doc.setPage(i);
-          doc.addImage(logo, "png", 70, 10, 80, 80, "DMS-RBZ", "NONE", 0);
-          doc.setFontSize(8);
-          doc.text(
-            "Reserve Bank of Zimbabwe. 80 Samora Machel Avenue, P.O. Box 1283, Harare, Zimbabwe.",
-            headerpositionfromleft + 50,
-            40
-          );
-          doc.text(
-            "Tel: 263 242 703000, 263 8677000477 | Website:www.rbz.co.zw",
-            headerpositionfromleft + 100,
-            50
-          );
-        }
-      };
-      const addWaterMark = (doc) => {
-        const pageCount = doc.internal.getNumberOfPages();
-        for (var i = 1; i <= pageCount; i++) {
-          doc.setPage(i);
-          doc.setTextColor("#cccaca");
-          doc.saveGraphicsState();
-          doc.setGState(new doc.GState({ opacity: 0.4 }));
-          doc.setFont("helvetica", "normal");
-          doc.setFontSize(80);
-          //doc.text("PREVIEW", 50, 150, {align: 'center', baseline: 'middle'})
-          doc.text(
-            doc.internal.pageSize.width / 3,
-            doc.internal.pageSize.height / 2,
-            "Preview",
-            { angle: 45 }
-          );
-          doc.restoreGraphicsState();
-        }
-      };
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(3);
-      let docWidth = doc.internal.pageSize.getWidth();
-      const refpdfview =
-        roleID == 3 && nextlevelvalue == 10
-          ? PdfPrivewsupervisorRef
-          : roleID == 3 && nextlevelvalue == ""
-          ? CoverigLetterRef
-          : PdfPrivewRef;
-      doc.html(refpdfview.current, {
-        x: 12,
-        y: 12,
-        width: 513,
-        height: doc.internal.pageSize.getHeight(),
-        margin: [110, 80, 60, 35],
-        windowWidth: 1000,
-        pagebreak: true,
-        async callback(doc) {
-          addHeader(doc);
-          addWaterMark(doc);
-          doc.setProperties({
-            title: `${applicationDetail?.rbzReferenceNumber}`,
-          });
-          var blob = doc.output("blob");
-          window.open(URL.createObjectURL(blob), "_blank");
-        },
-      });
-      setBtnLoader(false);
+
+      axios
+        .post(APIURL + "Admin/GetBankByID", {
+          id: applicationDetail?.bankID,
+        })
+        .then((response) => {
+          if (response.data.responseCode === "200") {
+            if (
+              response.data.responseData?.headerFooterData["0"]?.fileType ==
+              "HeaderFile"
+            ) {
+              var headerImage =
+                response.data.responseData.headerFooterData["0"].filePath;
+              var headerImagewidth =
+                response.data.responseData.headerFooterData["0"].imageWidth;
+            } else {
+              var headerImage = "";
+            }
+            if (
+              response.data.responseData?.headerFooterData["1"]?.fileType ==
+              "FooterFile"
+            ) {
+              var footerImage =
+                response.data.responseData.headerFooterData["1"].filePath;
+              var footerImagewidth =
+                response.data.responseData.headerFooterData["1"].imageWidth;
+            } else {
+              var footerImage = "";
+            }
+
+            const addHeader = (doc) => {
+              if (roleID != 3) {
+                const pageCount = doc.internal.getNumberOfPages();
+                const headerpositionfromleft =
+                  (doc.internal.pageSize.width - 10) / 4;
+                for (var i = 1; i <= pageCount; i++) {
+                  doc.setPage(i);
+                  doc.addImage(
+                    logo,
+                    "png",
+                    70,
+                    10,
+                    80,
+                    80,
+                    "DMS-RBZ",
+                    "NONE",
+                    0
+                  );
+                  doc.setFontSize(8);
+                  doc.text(
+                    "Reserve Bank of Zimbabwe. 80 Samora Machel Avenue, P.O. Box 1283, Harare, Zimbabwe.",
+                    headerpositionfromleft + 50,
+                    40
+                  );
+                  doc.text(
+                    "Tel: 263 242 703000, 263 8677000477 | Website:www.rbz.co.zw",
+                    headerpositionfromleft + 100,
+                    50
+                  );
+                }
+              } else {
+                if (headerImage != "") {
+                  const pageCount = doc.internal.getNumberOfPages();
+                  var pagewidth = doc.internal.pageSize.width;
+                  if (pagewidth > headerImagewidth) {
+                    var diff = parseInt(pagewidth) - parseInt(headerImagewidth);
+                    var positionLeft = parseInt(diff / 2);
+                  } else {
+                    var positionLeft = 250;
+                  }
+
+                  for (var i = 1; i <= pageCount; i++) {
+                    doc.setPage(i);
+                    doc.addImage(
+                      headerImage,
+                      "png",
+                      positionLeft,
+                      10,
+                      80,
+                      80,
+                      "Header",
+                      "NONE",
+                      0
+                    );
+                  }
+                } else {
+                  doc.setFont("helvetica", "bold");
+                  doc.setFontSize(20);
+                  doc.text("Final Letter", 250, 40);
+                }
+              }
+            };
+
+            const addWaterMark = (doc) => {
+              const pageCount = doc.internal.getNumberOfPages();
+              for (var i = 1; i <= pageCount; i++) {
+                doc.setPage(i);
+                doc.setTextColor("#cccaca");
+                doc.saveGraphicsState();
+                doc.setGState(new doc.GState({ opacity: 0.4 }));
+                doc.setFont("helvetica", "normal");
+                doc.setFontSize(80);
+                //doc.text("PREVIEW", 50, 150, {align: 'center', baseline: 'middle'})
+                doc.text(
+                  doc.internal.pageSize.width / 3,
+                  doc.internal.pageSize.height / 2,
+                  "Preview",
+                  { angle: 45 }
+                );
+                doc.restoreGraphicsState();
+              }
+            };
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(3);
+            let docWidth = doc.internal.pageSize.getWidth();
+            const refpdfview =
+              roleID == 3 && nextlevelvalue == 10
+                ? PdfPrivewsupervisorRef
+                : roleID == 3 && nextlevelvalue == ""
+                ? CoverigLetterRef
+                : PdfPrivewRef;
+            doc.html(refpdfview.current, {
+              x: 12,
+              y: 12,
+              width: 513,
+              height: doc.internal.pageSize.getHeight(),
+              margin: [110, 80, 60, 35],
+              windowWidth: 1000,
+              pagebreak: true,
+              async callback(doc) {
+                addHeader(doc);
+                addWaterMark(doc);
+                doc.setProperties({
+                  title: `${applicationDetail?.rbzReferenceNumber}`,
+                });
+                var string = doc.output("dataurlnewwindow");
+                // var blob = doc.output("blob");
+                // window.open(URL.createObjectURL(blob), "_blank");
+              },
+            });
+            setBtnLoader(false);
+          } else {
+            var headerImage = "";
+            var footerImage = "";
+          }
+        });
     }, 1500);
   };
-
   const GetApplicationTypes = async () => {
     await axios
       .post(APIURL + "Master/GetApplicationTypesByDepartmentID", {
@@ -895,16 +1002,16 @@ const ImportDashboardEditDetails = ({
 
     const bankdtata = applicationDetail?.copiedResponses?.map((items, i) => {
       return {
-        name: items.bankName,
-        code: items.bankID,
+        value: items.bankID,
+        label: items.bankName,
       };
     });
 
     const lastResponseCCTodata = lastComments?.copiedResponseData?.map(
       (items, i) => {
         return {
-          name: items.bankName,
-          code: items.bankID,
+          value: items.bankID,
+          label: items.bankName,
         };
       }
     );
@@ -957,9 +1064,15 @@ const ImportDashboardEditDetails = ({
   });
 
   const vOption = masterBank?.map((res) => ({
-    name: res.bankName,
-    code: res.id,
+    value: res.id,
+    label: res.bankName,
   }));
+
+  const handleChangeBank = (e) => {
+    const values = e;
+    setSelectedBanks(values);
+  };
+
 
   const HandleIsReturnOption = (e) => {
     const { name, value } = e.target;
@@ -1011,12 +1124,12 @@ const ImportDashboardEditDetails = ({
   };
 
   const formatecopyresponse = selectedBanks?.map((item) => {
-    return item.code;
+    return item.value;
   });
 
   const copyresponse = selectedBanks?.map((res) => ({
     ApplicationID: applicationDetail?.id,
-    BankID: res?.code,
+    BankID: res?.value,
     CopyingResponse: 1,
     CopiedResponse: formatecopyresponse?.join(),
   }));
@@ -1090,7 +1203,6 @@ const ImportDashboardEditDetails = ({
     }
 
     if (
-      //  (checkSupervisor == false && nextlevelvalue == "" &&  roleID == 3 && Description == "<p></p>") ||
       Description == null ||
       (Description == "<p></p>" &&
         roleID == 3 &&
@@ -1225,7 +1337,6 @@ const ImportDashboardEditDetails = ({
     e.preventDefault();
     let formData = new FormData();
     let shareformData = new FormData();
-
     if (validateForm()) {
       setSubmitBtnLoader(true);
       await axios
@@ -1926,7 +2037,6 @@ const ImportDashboardEditDetails = ({
       setDescription(editorDeputy.getHTML());
     }
   }, [applicationDetail, lastComments]);
-
   const editorPrincipleAnalyst = useEditor({
     extensions: [
       Color.configure({ types: [TextStyle.name, ListItem.name] }),
@@ -1967,11 +2077,6 @@ const ImportDashboardEditDetails = ({
       setDescription(editorPrincipleAnalyst.getHTML());
     }
   }, [applicationDetail, lastComments]);
-
-  console.log(
-    "applicationDetail?.analystDescription - ",
-    applicationDetail?.analystDescription
-  );
 
   const editorDirector = useEditor({
     extensions: [
@@ -2395,7 +2500,84 @@ const ImportDashboardEditDetails = ({
       });
   };
 
-  console.log("lastComments - ", lastComments);
+  const OtherDepartmentRole = async () => {
+    await axios
+      .post(APIURL + "Master/GetRoles", {
+        RoleID: roleID,
+        Status: "40",
+      })
+      .then((res) => {
+        if (res.data.responseCode == 200) {
+          setOtherDepartmentRoles(res.data.responseData);
+        }
+      })
+      .catch((error) => {
+        console.log("Master/GetRoles - Error", error);
+      });
+  };
+
+  const OtherDepartmentUserByRole = async (role) => {
+    await axios
+      .post(APIURL + "User/GetUsersByRoleID", {
+        DepartmentID: OtherDepartment,
+        RoleID: role,
+        UserID: UserID.replace(/"/g, ""),
+      })
+      .then((res) => {
+        if (res.data.responseCode == 200) {
+          setOtherDepartmentUsers(res.data.responseData);
+        }
+      })
+      .catch((error) => {
+        console.log("User/GetUsersByRoleID - Error", error);
+      });
+  };
+
+  const SubmitOtherDepartment = async () => {
+    try {
+      setOtherDepartmentLoader(true);
+      await axios
+        .post(APIURL + "ReferredApplication/CreateReferredApplication", {
+          ID: applicationDetail.id,
+          RoleID: roleID,
+          UserID: UserID.replace(/"/g, ""),
+          ReferredDepartmentID: OtherDepartment,
+          AssignedToRoleID: otherDepartmentRole,
+          AssignedTo: otherDepartmentUser,
+          Comment: asignnextLeveldata.Comment,
+          Notes: asignnextLeveldata.Notes,
+          Description: Description,
+          DepartmentID: DeptID,
+          Status:
+            OtherDepartment == "2"
+              ? "275"
+              : OtherDepartment == "3"
+              ? "280"
+              : OtherDepartment == "4"
+              ? "285"
+              : OtherDepartment == "5"
+              ? "290"
+              : "",
+          // Status: "35",
+        })
+        .then((res) => {
+          if (res.data.responseCode == 200) {
+            console.log("vbbbbb---", res);
+            setOtherDepartmentLoader(false);
+            setOtherDepartmentPopup(true);
+          }
+        })
+        .catch((error) => {
+          setOtherDepartmentPopup(false);
+          setOtherDepartmentLoader(false);
+          console.log("User/GetUsersByRoleID - Error", error);
+        });
+    } catch (error) {
+      setOtherDepartmentPopup(false);
+      setOtherDepartmentLoader(false);
+      console.log("User/GetUsersByRoleID - catch - Error", error);
+    }
+  };
 
   return (
     <>
@@ -2501,6 +2683,7 @@ const ImportDashboardEditDetails = ({
                             onChange={(e) => {
                               changeHandelForm(e);
                             }}
+                            placeholder="Prior Exchange Control Authority Number(PECAN)"
                             value={
                               applicationDetail?.pecaNumber
                                 ? applicationDetail?.pecaNumber
@@ -2522,6 +2705,95 @@ const ImportDashboardEditDetails = ({
                             ""
                           )}
                         </label>
+                        {/* {loader == true ? (
+                    <TailSpin
+                      visible={true}
+                      height="20"
+                      width="20"
+                      color="#5e62a1"
+                      ariaLabel="tail-spin-loading"
+                      radius="1"
+                      wrapperStyle={{}}
+                      wrapperClass=""
+                    />
+                  ) : ValidateShow == true ? (
+                    <div className="card validatepecanfield">
+                      {ValidateRBZ.length > 0 ? (
+                        <DataTable
+                          value={ValidateRBZ}
+                          scrollable
+                          scrollHeight="500px"
+                          paginator={ValidateRBZ?.length > 10 ? true : false}
+                          rowHover
+                          paginatorRight
+                          rows={10}
+                          dataKey="id"
+                          rowsPerPageOptions={[10, 50, 100]}
+                          emptyMessage="No Data found."
+                          footer={footer}
+                        >
+                          <Column
+                            field="rbzReferenceNumber"
+                            header="RBZ Reference Number"
+                            style={{ minWidth: "200px" }}
+                          ></Column>
+                          <Column
+                            field="name"
+                            header="Applicant Name"
+                            style={{ minWidth: "180px" }}
+                            body={applicantNAME}
+                          ></Column>
+                          <Column
+                            field="bankName"
+                            header="Bank Name"
+                            style={{ minWidth: "150px" }}
+                          ></Column>
+                          <Column
+                            field="applicationType"
+                            header="Nature of Application"
+                            style={{ minWidth: "250px" }}
+                          ></Column>
+                          <Column
+                            field="amount"
+                            header="Amount"
+                            style={{ minWidth: "150px" }}
+                            body={amountData}
+                          ></Column>
+                          <Column
+                            field="statusName"
+                            header="Status"
+                            style={{ minWidth: "200px" }}
+                          ></Column>
+                          <Column
+                            field="createdDate"
+                            header="Submitted Date"
+                            style={{ minWidth: "150px" }}
+                            body={createdDate}
+                          ></Column>
+                          <Column
+                            field=""
+                            header="Action"
+                            style={{ minWidth: "100px" }}
+                            frozen
+                            alignFrozen="right"
+                            body={action}
+                          ></Column>
+                        </DataTable>
+                      ) : (
+                        <div className="d-flex justify-content-between align-items-center p-2">
+                          <p className="mb-0">No Data</p>
+                          <button
+                            className="validateCrossIcon"
+                            onClick={() => setValidateShow(false)}
+                          >
+                            <i class="bi bi-x-circle"></i>
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    " "
+                  )} */}
                       </div>
                       <button type="button" className="primrybtn  v-button">
                         Validate
@@ -2929,6 +3201,12 @@ const ImportDashboardEditDetails = ({
                               ? "error"
                               : ""
                           }
+                          onKeyDown={(event) => {
+                            const blockedKeys = ["e", "E", "-", "+"];
+                            if (blockedKeys.includes(event.key)) {
+                              event.preventDefault();
+                            }
+                          }}
                         />
                         <span className="sspan"></span>
                         {errors.amount && applicationDetail.amount === "" ? (
@@ -3039,8 +3317,12 @@ const ImportDashboardEditDetails = ({
                       ref={subsectorRef}
                       disabled={roleID == 2 || roleID == 3 ? false : true}
                       name="subSector"
-                      onChange={(e) => changeHandelForm(e)} 
-                      className={errors.subSector && ImportForm.subSector == "" ? "error" : "" }
+                      onChange={(e) => changeHandelForm(e)}
+                      className={
+                        errors.subSector && ImportForm.subSector == ""
+                          ? "error"
+                          : ""
+                      }
                     >
                       <option value="">Select Subsector</option>
                       {subsectorData?.map((item, index) => {
@@ -3163,15 +3445,6 @@ const ImportDashboardEditDetails = ({
                         className={
                           errors.assignedTo && !AssignUserID ? "error" : ""
                         }
-                        // onChange={(e) => {
-                        //   changeHandelForm(e);
-                        // }}
-                        // className={
-                        //   errors.bankSupervisor &&
-                        //   ImportForm.bankSupervisor === ""
-                        //     ? "error"
-                        //     : ""
-                        // }
                       >
                         <option value="">Select Bank Supervisor</option>
                         {ImpSupervisors?.map((item, index) => {
@@ -3967,20 +4240,19 @@ const ImportDashboardEditDetails = ({
                               <MenuBar editor={editor} />
                               <EditorContent editor={editor} />
                               <span className="sspan"></span>
-                                {(errors.Description && Description == " ") ||
-                                Description == null ||
-                                Description == "<p></p>" ||
-                                !Description ? (
-                                  <small
-                                    className="errormsg"
-                                    style={{ bottom: "-18px" }}
-                                  >
-                                    {errors.Description}
-                                  </small>
-                                ) : (
-                                  ""
-                                )}
-                                
+                              {(errors.Description && Description == " ") ||
+                              Description == null ||
+                              Description == "<p></p>" ||
+                              !Description ? (
+                                <small
+                                  className="errormsg"
+                                  style={{ bottom: "-18px" }}
+                                >
+                                  {errors.Description}
+                                </small>
+                              ) : (
+                                ""
+                              )}
                             </div>
                           </div>
                         </div>
@@ -5002,7 +5274,7 @@ const ImportDashboardEditDetails = ({
 
                       <div
                         className={
-                          roleID == 5
+                          roleID == 5 && nextlevelvalue != 35
                             ? "inner_form_new align-items-center"
                             : "d-none"
                         }
@@ -5140,6 +5412,11 @@ const ImportDashboardEditDetails = ({
                                   supervisorHangechangeRole(e);
                                   ChangeNextlevelHandle(e);
                                   GetRoleHandle(10);
+                                  setOtherDepartment("");
+                                  setOtherDepartmentRole("");
+                                  setOtherDepartmentRoles([]);
+                                  setOtherDepartmentUser("");
+                                  setOtherDepartmentUsers([]);
                                 }}
                                 name="nextactionana"
                                 className="hidden-toggles__input"
@@ -5164,6 +5441,11 @@ const ImportDashboardEditDetails = ({
                                       setcheckSupervisor(true);
                                       supervisorHangechangeRole(e);
                                       GetRoleHandle(15);
+                                      setOtherDepartment("");
+                                      setOtherDepartmentRole("");
+                                      setOtherDepartmentRoles([]);
+                                      setOtherDepartmentUser("");
+                                      setOtherDepartmentUsers([]);
                                     }}
                                     name="nextactionana"
                                     value="15"
@@ -5185,6 +5467,11 @@ const ImportDashboardEditDetails = ({
                                   supervisorHangechangeRole(e);
                                   setcheckSupervisor(true);
                                   GetRoleHandle(20);
+                                  setOtherDepartment("");
+                                  setOtherDepartmentRole("");
+                                  setOtherDepartmentRoles([]);
+                                  setOtherDepartmentUser("");
+                                  setOtherDepartmentUsers([]);
                                 }}
                                 name="nextactionana"
                                 value="20"
@@ -5221,81 +5508,199 @@ const ImportDashboardEditDetails = ({
                         </div>
                       </div>
 
-                      <div className="row mt-2">
-                        <div className="col-md-7 d-none">
-                          {checkSupervisor == true && roleID == 5 ? (
-                            <>
-                              <div className="inner_form_new">
-                                <label className="controlform">Role</label>
-                                <div className="form-bx">
-                                  <label>
-                                    <select
-                                      ref={assignedToRef}
-                                      name="SupervisorRoleId"
-                                      onChange={(e) => {
-                                        supervisorHangechangeRole(e);
-                                        handleUserRole(e);
-                                      }}
-                                      className={
-                                        errors.assignedTo && !SupervisorRoleId
-                                          ? "error"
-                                          : ""
-                                      }
-                                    >
-                                      <option value="90A">Select Role</option>
-                                      {userRole?.map((item, index) => {
+                      {nextlevelvalue != 35 ? (
+                        <div className="row mt-2">
+                          <div className="col-md-7 d-none">
+                            {checkSupervisor == true && roleID == 5 ? (
+                              <>
+                                <div className="inner_form_new">
+                                  <label className="controlform">Role</label>
+                                  <div className="form-bx">
+                                    <label>
+                                      <select
+                                        ref={assignedToRef}
+                                        name="SupervisorRoleId"
+                                        onChange={(e) => {
+                                          supervisorHangechangeRole(e);
+                                          handleUserRole(e);
+                                        }}
+                                        className={
+                                          errors.assignedTo && !SupervisorRoleId
+                                            ? "error"
+                                            : ""
+                                        }
+                                      >
+                                        <option value="90A">Select Role</option>
+                                        {userRole?.map((item, index) => {
+                                          return (
+                                            <option key={index} value={item.id}>
+                                              {item.designation}
+                                            </option>
+                                          );
+                                        })}
+                                      </select>
+                                      <span className="sspan"></span>
+                                      {errors.assignedTo &&
+                                      !SupervisorRoleId ? (
+                                        <small className="errormsg">
+                                          Senior Analyst is required{" "}
+                                        </small>
+                                      ) : (
+                                        ""
+                                      )}
+                                    </label>
+                                  </div>
+                                </div>
+                              </>
+                            ) : (
+                              ""
+                            )}
+                          </div>
+                          <div className="col-md-12">
+                            {checkSupervisor == true && roleID == 5 ? (
+                              <>
+                                <div className="inner_form_new">
+                                  <label className="controlform">
+                                    {nextlevelvalue == "20"
+                                      ? "User"
+                                      : "Submit To Senior Analyst"}
+                                  </label>
+
+                                  <div className="form-bx">
+                                    <label>
+                                      <select
+                                        ref={assignedToRef}
+                                        name="AssignUserID"
+                                        onChange={(e) =>
+                                          supervisorHangechange(e)
+                                        }
+                                        className={
+                                          errors.assignUserID && !AssignUserID
+                                            ? "error"
+                                            : ""
+                                        }
+                                      >
+                                        <option value="">
+                                          {nextlevelvalue == "20"
+                                            ? "Select User"
+                                            : "Select Senior Analyst"}
+                                        </option>
+                                        {asignUser?.map((item, index) => {
+                                          return (
+                                            <option
+                                              key={index}
+                                              value={item.userID}
+                                            >
+                                              {item.name}
+                                            </option>
+                                          );
+                                        })}
+                                      </select>
+                                      <span className="sspan"></span>
+                                      {errors.assignUserID && !AssignUserID ? (
+                                        <small className="errormsg">
+                                          {errors.assignUserID}
+                                        </small>
+                                      ) : (
+                                        ""
+                                      )}
+                                    </label>
+                                  </div>
+                                </div>
+                              </>
+                            ) : (
+                              ""
+                            )}
+                          </div>
+                        </div>
+                      ) : (
+                        ""
+                      )}
+
+                      {nextlevelvalue == 35 ? (
+                        <div className="row mt-2">
+                          <div className="col-md-6">
+                            <div className="inner_form_new align-items-center">
+                              <label className="controlform">Department</label>
+                              <div className="form-bx">
+                                <label>
+                                  <select
+                                    ref={optionOtherDepartmentRef}
+                                    name="OtherDepartment"
+                                    onChange={(e) => {
+                                      setOtherDepartment(e.target.value);
+                                      OtherDepartmentRole();
+                                      setOtherDepartmentRole("");
+                                      setOtherDepartmentRoles([]);
+                                      setOtherDepartmentUser("");
+                                      setOtherDepartmentUsers([]);
+                                    }}
+                                    className={
+                                      errors.assignedTo && !SupervisorRoleId
+                                        ? "error"
+                                        : ""
+                                    }
+                                  >
+                                    <option value="">Select Department</option>
+                                    <option value="2">Export</option>
+                                    <option value="4">
+                                      Foreign Investments
+                                    </option>
+                                    <option value="5">Inspectorate</option>
+                                  </select>
+                                  <span className="sspan"></span>
+                                  {errors.assignedTo && !SupervisorRoleId ? (
+                                    <small className="errormsg">
+                                      Senior Analyst is required{" "}
+                                    </small>
+                                  ) : (
+                                    ""
+                                  )}
+                                </label>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="col-md-3">
+                            <div className="inner_form_new-sm align-items-center">
+                              <label className="controlform-sm">Role</label>
+                              <div className="form-bx-sm">
+                                <label>
+                                  <select
+                                    onChange={(e) => {
+                                      setOtherDepartmentRole(e.target.value);
+                                      OtherDepartmentUserByRole(e.target.value);
+                                      setOtherDepartmentUser("");
+                                      setOtherDepartmentUsers([]);
+                                    }}
+                                  >
+                                    <option value="">Select Role</option>
+                                    {otherDepartmentRoles?.map(
+                                      (item, index) => {
                                         return (
                                           <option key={index} value={item.id}>
-                                            {item.designation}
+                                            {item.name}
                                           </option>
                                         );
-                                      })}
-                                    </select>
-                                    <span className="sspan"></span>
-                                    {errors.assignedTo && !SupervisorRoleId ? (
-                                      <small className="errormsg">
-                                        Senior Analyst is required{" "}
-                                      </small>
-                                    ) : (
-                                      ""
-                                    )}
-                                  </label>
-                                </div>
-                              </div>
-                            </>
-                          ) : (
-                            ""
-                          )}
-                        </div>
-
-                        <div className="col-md-12">
-                          {checkSupervisor == true && roleID == 5 ? (
-                            <>
-                              <div className="inner_form_new">
-                                <label className="controlform">
-                                  {nextlevelvalue == "20"
-                                    ? "User"
-                                    : "Submit To Senior Analyst"}
-                                </label>
-
-                                <div className="form-bx">
-                                  <label>
-                                    <select
-                                      ref={assignedToRef}
-                                      name="AssignUserID"
-                                      onChange={(e) => supervisorHangechange(e)}
-                                      className={
-                                        errors.assignUserID && !AssignUserID
-                                          ? "error"
-                                          : ""
                                       }
-                                    >
-                                      <option value="">
-                                        {nextlevelvalue == "20"
-                                          ? "Select User"
-                                          : "Select Senior Analyst"}
-                                      </option>
-                                      {asignUser?.map((item, index) => {
+                                    )}
+                                  </select>
+                                </label>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="col-md-3">
+                            <div className="inner_form_new-sm align-items-center">
+                              <label className="controlform-sm">User</label>
+                              <div className="form-bx-sm">
+                                <label>
+                                  <select
+                                    onChange={(e) =>
+                                      setOtherDepartmentUser(e.target.value)
+                                    }
+                                  >
+                                    <option value="">Select User</option>
+                                    {otherDepartmentUsers?.map(
+                                      (item, index) => {
                                         return (
                                           <option
                                             key={index}
@@ -5304,31 +5709,74 @@ const ImportDashboardEditDetails = ({
                                             {item.name}
                                           </option>
                                         );
-                                      })}
-                                    </select>
-                                    <span className="sspan"></span>
-                                    {errors.assignUserID && !AssignUserID ? (
-                                      <small className="errormsg">
-                                        {errors.assignUserID}
-                                      </small>
-                                    ) : (
-                                      ""
+                                      }
                                     )}
-                                  </label>
-                                </div>
+                                  </select>
+                                </label>
                               </div>
-                            </>
-                          ) : (
-                            ""
-                          )}
+                            </div>
+                          </div>
                         </div>
-                      </div>
+                      ) : (
+                        ""
+                      )}
 
-                      {attachmentData?.map((items, index) => {
-                        return (
+                      {nextlevelvalue != 35 &&
+                        attachmentData?.map((items, index) => {
+                          return (
+                            <div
+                              className="attachemt_form-bx  mt-2"
+                              key={items.id}
+                            >
+                              <label
+                                style={{
+                                  background: "#d9edf7",
+                                  padding: "9px 3px",
+                                  border: "0px",
+                                }}
+                              >
+                                <span style={{ fontWeight: "500" }}>
+                                  {items.filename}
+                                </span>
+                              </label>
+                              <div className="browse-btn">
+                                Browse
+                                <input
+                                  type="file"
+                                  onChange={(e) =>
+                                    handleuserFileChange(e, "analyst" + index)
+                                  }
+                                />
+                              </div>
+                              <span className="filename">
+                                {userfiles?.find(
+                                  (f) => f.id === "analyst" + index
+                                )?.file?.name || "No file chosen"}
+                              </span>
+                              {userfiles?.length &&
+                              userfiles?.find((f) => f.id === "analyst" + index)
+                                ?.file?.name ? (
+                                <button
+                                  type="button"
+                                  className="remove-file"
+                                  onClick={() =>
+                                    removeUserImage(index, "analyst" + index)
+                                  }
+                                >
+                                  Remove
+                                </button>
+                              ) : (
+                                ""
+                              )}
+                            </div>
+                          );
+                        })}
+
+                      {nextlevelvalue != 35 &&
+                        otheruserfiles?.map((file, index) => (
                           <div
-                            className="attachemt_form-bx  mt-2"
-                            key={items.id}
+                            key={"other" + (index + 1)}
+                            className="attachemt_form-bx"
                           >
                             <label
                               style={{
@@ -5337,32 +5785,30 @@ const ImportDashboardEditDetails = ({
                                 border: "0px",
                               }}
                             >
-                              <span style={{ fontWeight: "500" }}>
-                                {items.filename}
-                              </span>
+                              Other File {index + 1}
                             </label>
                             <div className="browse-btn">
-                              Browse
+                              Browse{" "}
                               <input
                                 type="file"
-                                onChange={(e) =>
-                                  handleuserFileChange(e, "analyst" + index)
-                                }
+                                onChange={(e) => {
+                                  handleuserFileChange(e, "other" + index);
+                                  handleOthrefile(e, `other ${index}`);
+                                }}
                               />
                             </div>
                             <span className="filename">
-                              {userfiles?.find(
-                                (f) => f.id === "analyst" + index
-                              )?.file?.name || "No file chosen"}
+                              {userfiles?.find((f) => f.id === "other" + index)
+                                ?.file?.name || "No file chosen"}
                             </span>
                             {userfiles?.length &&
-                            userfiles?.find((f) => f.id === "analyst" + index)
+                            userfiles?.find((f) => f.id === "other" + index)
                               ?.file?.name ? (
                               <button
                                 type="button"
                                 className="remove-file"
                                 onClick={() =>
-                                  removeUserImage(index, "analyst" + index)
+                                  removeUserImage(index, "other" + index)
                                 }
                               >
                                 Remove
@@ -5371,56 +5817,10 @@ const ImportDashboardEditDetails = ({
                               ""
                             )}
                           </div>
-                        );
-                      })}
+                        ))}
 
-                      {otheruserfiles?.map((file, index) => (
-                        <div
-                          key={"other" + (index + 1)}
-                          className="attachemt_form-bx"
-                        >
-                          <label
-                            style={{
-                              background: "#d9edf7",
-                              padding: "9px 3px",
-                              border: "0px",
-                            }}
-                          >
-                            Other File {index + 1}
-                          </label>
-                          <div className="browse-btn">
-                            Browse{" "}
-                            <input
-                              type="file"
-                              onChange={(e) => {
-                                handleuserFileChange(e, "other" + index);
-                                handleOthrefile(e, `other ${index}`);
-                              }}
-                            />
-                          </div>
-                          <span className="filename">
-                            {userfiles?.find((f) => f.id === "other" + index)
-                              ?.file?.name || "No file chosen"}
-                          </span>
-                          {userfiles?.length &&
-                          userfiles?.find((f) => f.id === "other" + index)?.file
-                            ?.name ? (
-                            <button
-                              type="button"
-                              className="remove-file"
-                              onClick={() =>
-                                removeUserImage(index, "other" + index)
-                              }
-                            >
-                              Remove
-                            </button>
-                          ) : (
-                            ""
-                          )}
-                        </div>
-                      ))}
-
-                      {otheruserfiles?.length || userfiles?.length ? (
+                      {(otheruserfiles?.length || userfiles?.length) &&
+                      nextlevelvalue != 35 ? (
                         <div className="attachemt_form-bx">
                           <label style={{ border: "0px" }}>{""}</label>
                           <button
@@ -5547,20 +5947,33 @@ const ImportDashboardEditDetails = ({
                         </div>
                       </div>
 
-                      <div className="inner_form_new align-items-center">
+                      <div
+                        className={
+                          nextlevelvalue != 35
+                            ? "inner_form_new align-items-center"
+                            : "d-none"
+                        }
+                      >
                         <label className="controlform">CC To</label>
                         <div className=" cccto">
                           <div className="flex justify-content-center multiSelect">
-                            <MultiSelect
+                            {/* <MultiSelect
                               value={selectedBanks}
                               onChange={(e) => setSelectedBanks(e.value)}
                               options={vOption}
                               optionLabel="name"
                               onShow={onShow}
                               placeholder="Select Banks"
-                              // maxSelectedLabels={3}
                               className="w-full md:w-20rem"
                               display="chip"
+                            /> */}
+                            <CustomMultiSelect
+                              key="multyselectprinciple"
+                              options={vOption}
+                              onChange={(e) => handleChangeBank(e)}
+                              value={selectedBanks}
+                              isSelectAll={true}
+                              menuPlacement={"bottom"}
                             />
                           </div>
                         </div>
@@ -5568,7 +5981,7 @@ const ImportDashboardEditDetails = ({
 
                       <div
                         className={
-                          roleID == 5
+                          roleID == 5 && nextlevelvalue != 35
                             ? "inner_form_new align-items-center"
                             : "d-none"
                         }
@@ -5608,7 +6021,7 @@ const ImportDashboardEditDetails = ({
                         </div>
                       </div>
 
-                      <div className="row">
+                      <div className={nextlevelvalue != 35 ? "row" : "d-none"}>
                         <div className="col-md-7">
                           <div
                             className={
@@ -5717,7 +6130,7 @@ const ImportDashboardEditDetails = ({
 
                       <div
                         className={
-                          roleID == 5
+                          roleID == 5 && nextlevelvalue != 35
                             ? "inner_form_new align-items-center"
                             : "d-none"
                         }
@@ -5766,7 +6179,9 @@ const ImportDashboardEditDetails = ({
                         <div className="col-md-7">
                           <div
                             className={
-                              roleID == 5 && DateExpiryOption == "1"
+                              roleID == 5 &&
+                              DateExpiryOption == "1" &&
+                              nextlevelvalue != 35
                                 ? "inner_form_new align-items-center"
                                 : "d-none"
                             }
@@ -5835,7 +6250,8 @@ const ImportDashboardEditDetails = ({
                             className={
                               roleID == 5 &&
                               DateExpirydisplay == "0" &&
-                              DateExpiryOption == "1"
+                              DateExpiryOption == "1" &&
+                              nextlevelvalue != 35
                                 ? "inner_form_new-sm"
                                 : "d-none"
                             }
@@ -6697,6 +7113,11 @@ const ImportDashboardEditDetails = ({
                                   setapplicationstaus(
                                     applicationDetail?.analystRecommendation
                                   );
+                                  setOtherDepartment("");
+                                  setOtherDepartmentRole("");
+                                  setOtherDepartmentRoles([]);
+                                  setOtherDepartmentUser("");
+                                  setOtherDepartmentUsers([]);
                                 }}
                                 name="nextaction"
                                 className={
@@ -6735,6 +7156,11 @@ const ImportDashboardEditDetails = ({
                                   setapplicationstaus(
                                     applicationDetail?.analystRecommendation
                                   );
+                                  setOtherDepartment("");
+                                  setOtherDepartmentRole("");
+                                  setOtherDepartmentRoles([]);
+                                  setOtherDepartmentUser("");
+                                  setOtherDepartmentUsers([]);
                                 }}
                                 onClick={() => setRecomdAnalyst("")}
                                 name="nextaction"
@@ -6758,6 +7184,11 @@ const ImportDashboardEditDetails = ({
                                   setapplicationstaus(
                                     applicationDetail?.analystRecommendation
                                   );
+                                  setOtherDepartment("");
+                                  setOtherDepartmentRole("");
+                                  setOtherDepartmentRoles([]);
+                                  setOtherDepartmentUser("");
+                                  setOtherDepartmentUsers([]);
                                 }}
                                 onClick={() => setRecomdAnalyst("")}
                                 name="nextaction"
@@ -6782,6 +7213,11 @@ const ImportDashboardEditDetails = ({
                                   setapplicationstaus(
                                     applicationDetail?.analystRecommendation
                                   );
+                                  setOtherDepartment("");
+                                  setOtherDepartmentRole("");
+                                  setOtherDepartmentRoles([]);
+                                  setOtherDepartmentUser("");
+                                  setOtherDepartmentUsers([]);
                                 }}
                                 onClick={() => setRecomdAnalyst("")}
                                 name="nextaction"
@@ -6824,7 +7260,11 @@ const ImportDashboardEditDetails = ({
                       </div>
 
                       <div
-                        className={checkSupervisor == true ? "row" : "d-none"}
+                        className={
+                          checkSupervisor == true && nextlevelvalue != "35"
+                            ? "row"
+                            : "d-none"
+                        }
                       >
                         <div className="col-md-12 d-flex c-gap">
                           <div
@@ -6927,11 +7367,166 @@ const ImportDashboardEditDetails = ({
                         </div>
                       </div>
 
-                      {attachmentData?.map((items, index) => {
-                        return (
+                      {nextlevelvalue == 35 ? (
+                        <div className="row mt-2">
+                          <div className="col-md-6">
+                            <div className="inner_form_new align-items-center">
+                              <label className="controlform">Department</label>
+                              <div className="form-bx">
+                                <label>
+                                  <select
+                                    ref={optionOtherDepartmentRef}
+                                    name="OtherDepartment"
+                                    onChange={(e) => {
+                                      setOtherDepartment(e.target.value);
+                                      OtherDepartmentRole();
+                                      setOtherDepartmentRole("");
+                                      setOtherDepartmentRoles([]);
+                                      setOtherDepartmentUser("");
+                                      setOtherDepartmentUsers([]);
+                                    }}
+                                    className={
+                                      errors.assignedTo && !SupervisorRoleId
+                                        ? "error"
+                                        : ""
+                                    }
+                                  >
+                                    <option value="">Select Department</option>
+                                    <option value="2">Export</option>
+                                    <option value="4">
+                                      Foreign Investments
+                                    </option>
+                                    <option value="5">Inspectorate</option>
+                                  </select>
+                                  <span className="sspan"></span>
+                                  {errors.assignedTo && !SupervisorRoleId ? (
+                                    <small className="errormsg">
+                                      Senior Analyst is required{" "}
+                                    </small>
+                                  ) : (
+                                    ""
+                                  )}
+                                </label>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="col-md-3">
+                            <div className="inner_form_new-sm align-items-center">
+                              <label className="controlform-sm">Role</label>
+                              <div className="form-bx-sm">
+                                <label>
+                                  <select
+                                    onChange={(e) => {
+                                      setOtherDepartmentRole(e.target.value);
+                                      OtherDepartmentUserByRole(e.target.value);
+                                      setOtherDepartmentUser("");
+                                      setOtherDepartmentUsers([]);
+                                    }}
+                                  >
+                                    <option value="">Select Role</option>
+                                    {otherDepartmentRoles?.map(
+                                      (item, index) => {
+                                        return (
+                                          <option key={index} value={item.id}>
+                                            {item.name}
+                                          </option>
+                                        );
+                                      }
+                                    )}
+                                  </select>
+                                </label>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="col-md-3">
+                            <div className="inner_form_new-sm align-items-center">
+                              <label className="controlform-sm">User</label>
+                              <div className="form-bx-sm">
+                                <label>
+                                  <select
+                                    onChange={(e) =>
+                                      setOtherDepartmentUser(e.target.value)
+                                    }
+                                  >
+                                    <option value="">Select User</option>
+                                    {otherDepartmentUsers?.map(
+                                      (item, index) => {
+                                        return (
+                                          <option
+                                            key={index}
+                                            value={item.userID}
+                                          >
+                                            {item.name}
+                                          </option>
+                                        );
+                                      }
+                                    )}
+                                  </select>
+                                </label>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        ""
+                      )}
+
+                      {nextlevelvalue != "35" &&
+                        attachmentData?.map((items, index) => {
+                          return (
+                            <div
+                              className="attachemt_form-bx  mt-2"
+                              key={items.id}
+                            >
+                              <label
+                                style={{
+                                  background: "#d9edf7",
+                                  padding: "9px 3px",
+                                  border: "0px",
+                                }}
+                              >
+                                <span style={{ fontWeight: "500" }}>
+                                  {items.filename}
+                                </span>
+                              </label>
+                              <div className="browse-btn">
+                                Browse
+                                <input
+                                  type="file"
+                                  onChange={(e) =>
+                                    handleuserFileChange(e, "analyst" + index)
+                                  }
+                                />
+                              </div>
+                              <span className="filename">
+                                {userfiles?.find(
+                                  (f) => f.id === "analyst" + index
+                                )?.file?.name || "No file chosen"}
+                              </span>
+                              {userfiles?.length &&
+                              userfiles?.find((f) => f.id === "analyst" + index)
+                                ?.file?.name ? (
+                                <button
+                                  type="button"
+                                  className="remove-file"
+                                  onClick={() =>
+                                    removeUserImage(index, "analyst" + index)
+                                  }
+                                >
+                                  Remove
+                                </button>
+                              ) : (
+                                ""
+                              )}
+                            </div>
+                          );
+                        })}
+
+                      {nextlevelvalue != "35" &&
+                        otheruserfiles?.map((file, index) => (
                           <div
-                            className="attachemt_form-bx  mt-2"
-                            key={items.id}
+                            key={"other" + (index + 1)}
+                            className="attachemt_form-bx"
                           >
                             <label
                               style={{
@@ -6940,32 +7535,31 @@ const ImportDashboardEditDetails = ({
                                 border: "0px",
                               }}
                             >
-                              <span style={{ fontWeight: "500" }}>
-                                {items.filename}
-                              </span>
+                              Other File
+                              {index + 1}
                             </label>
                             <div className="browse-btn">
-                              Browse
+                              Browse{" "}
                               <input
                                 type="file"
-                                onChange={(e) =>
-                                  handleuserFileChange(e, "analyst" + index)
-                                }
+                                onChange={(e) => {
+                                  handleuserFileChange(e, "other" + index);
+                                  handleOthrefile(e, `other ${index}`);
+                                }}
                               />
                             </div>
                             <span className="filename">
-                              {userfiles?.find(
-                                (f) => f.id === "analyst" + index
-                              )?.file?.name || "No file chosen"}
+                              {userfiles?.find((f) => f.id === "other" + index)
+                                ?.file?.name || "No file chosen"}
                             </span>
                             {userfiles?.length &&
-                            userfiles?.find((f) => f.id === "analyst" + index)
+                            userfiles?.find((f) => f.id === "other" + index)
                               ?.file?.name ? (
                               <button
                                 type="button"
                                 className="remove-file"
                                 onClick={() =>
-                                  removeUserImage(index, "analyst" + index)
+                                  removeUserImage(index, "other" + index)
                                 }
                               >
                                 Remove
@@ -6974,57 +7568,10 @@ const ImportDashboardEditDetails = ({
                               ""
                             )}
                           </div>
-                        );
-                      })}
+                        ))}
 
-                      {otheruserfiles?.map((file, index) => (
-                        <div
-                          key={"other" + (index + 1)}
-                          className="attachemt_form-bx"
-                        >
-                          <label
-                            style={{
-                              background: "#d9edf7",
-                              padding: "9px 3px",
-                              border: "0px",
-                            }}
-                          >
-                            Other File
-                            {index + 1}
-                          </label>
-                          <div className="browse-btn">
-                            Browse{" "}
-                            <input
-                              type="file"
-                              onChange={(e) => {
-                                handleuserFileChange(e, "other" + index);
-                                handleOthrefile(e, `other ${index}`);
-                              }}
-                            />
-                          </div>
-                          <span className="filename">
-                            {userfiles?.find((f) => f.id === "other" + index)
-                              ?.file?.name || "No file chosen"}
-                          </span>
-                          {userfiles?.length &&
-                          userfiles?.find((f) => f.id === "other" + index)?.file
-                            ?.name ? (
-                            <button
-                              type="button"
-                              className="remove-file"
-                              onClick={() =>
-                                removeUserImage(index, "other" + index)
-                              }
-                            >
-                              Remove
-                            </button>
-                          ) : (
-                            ""
-                          )}
-                        </div>
-                      ))}
-
-                      {otheruserfiles?.length || userfiles?.length ? (
+                      {(otheruserfiles?.length || userfiles?.length) &&
+                      nextlevelvalue != "35" ? (
                         <div className="attachemt_form-bx">
                           <label style={{ border: "0px" }}>{""}</label>
                           <button
@@ -7179,11 +7726,17 @@ const ImportDashboardEditDetails = ({
                         </div>
                       </div>
 
-                      <div className="inner_form_new align-items-center">
+                      <div
+                        className={
+                          nextlevelvalue == "35"
+                            ? "d-none"
+                            : "inner_form_new align-items-center"
+                        }
+                      >
                         <label className="controlform">CC To</label>
                         <div className=" cccto">
                           <div className="flex justify-content-center multiSelect">
-                            <MultiSelect
+                            {/* <MultiSelect
                               value={selectedBanks}
                               onChange={(e) => setSelectedBanks(e.value)}
                               options={vOption}
@@ -7192,424 +7745,438 @@ const ImportDashboardEditDetails = ({
                               placeholder="Select Banks"
                               display="chip"
                               className="w-full md:w-20rem"
+                            /> */}
+                            <CustomMultiSelect
+                              key="multyselectprinciple"
+                              options={vOption}
+                              onChange={(e) => handleChangeBank(e)}
+                              value={selectedBanks}
+                              isSelectAll={true}
+                              menuPlacement={"bottom"}
                             />
                           </div>
                         </div>
                       </div>
 
-                      <div
-                        className={
-                          (roleID == 6 && nextlevelvalue == "") ||
-                          recomdAnalyst == "121"
-                            ? "inner_form_new align-items-center"
-                            : "d-none"
-                        }
-                      >
-                        <label className="controlform">Decision</label>
-                        <div className="row">
-                          <div className="col-md-12">
+                      {nextlevelvalue != "35" && (
+                        <>
+                          <div
+                            className={
+                              (roleID == 6 && nextlevelvalue == "") ||
+                              recomdAnalyst == "121"
+                                ? "inner_form_new align-items-center"
+                                : "d-none"
+                            }
+                          >
+                            <label className="controlform">Decision</label>
+                            <div className="row">
+                              <div className="col-md-12">
+                                <div className="hidden-toggles">
+                                  <input
+                                    type="radio"
+                                    id="srcoloration-Approvedvedsr"
+                                    value="10"
+                                    onChange={(e) => {
+                                      ChangeApplicationStatus(e);
+                                      GetRoleHandle(10);
+                                    }}
+                                    name="applicationstaussr"
+                                    className="hidden-toggles__input"
+                                    checked={
+                                      applicationstaus == "10" ? true : false
+                                    }
+                                  />
+                                  <label
+                                    for="srcoloration-Approvedvedsr"
+                                    className="hidden-toggles__label"
+                                  >
+                                    Approved
+                                  </label>
+
+                                  <input
+                                    type="radio"
+                                    id="srcoloration-Rejected"
+                                    value="30"
+                                    onChange={(e) => {
+                                      ChangeApplicationStatus(e);
+                                    }}
+                                    name="applicationstaussr"
+                                    className="hidden-toggles__input"
+                                    checked={
+                                      applicationstaus == "30" ? true : false
+                                    }
+                                  />
+                                  <label
+                                    for="srcoloration-Rejected"
+                                    className="hidden-toggles__label"
+                                  >
+                                    Rejected
+                                  </label>
+
+                                  <input
+                                    type="radio"
+                                    id="srcoloration-Deferred"
+                                    onChange={(e) => {
+                                      ChangeApplicationStatus(e);
+                                    }}
+                                    name="applicationstaussr"
+                                    value="40"
+                                    className="hidden-toggles__input"
+                                    checked={
+                                      applicationstaus == "40" ? true : false
+                                    }
+                                  />
+                                  <label
+                                    for="srcoloration-Deferred"
+                                    className="hidden-toggles__label"
+                                  >
+                                    Deferred
+                                  </label>
+
+                                  <input
+                                    type="radio"
+                                    id="srcoloration-Cancelled"
+                                    onChange={(e) => {
+                                      ChangeApplicationStatus(e);
+                                    }}
+                                    name="applicationstaussr"
+                                    value="25"
+                                    className="hidden-toggles__input"
+                                    checked={
+                                      applicationstaus == "25" ? true : false
+                                    }
+                                  />
+                                  <label
+                                    for="srcoloration-Cancelled"
+                                    className="hidden-toggles__label"
+                                  >
+                                    Cancelled
+                                  </label>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div
+                            className={
+                              roleID == 6
+                                ? "inner_form_new align-items-center"
+                                : "d-none"
+                            }
+                          >
+                            <label className="controlform">
+                              Is Return Needed?
+                            </label>
                             <div className="hidden-toggles">
                               <input
                                 type="radio"
-                                id="srcoloration-Approvedvedsr"
-                                value="10"
-                                onChange={(e) => {
-                                  ChangeApplicationStatus(e);
-                                  GetRoleHandle(10);
-                                }}
-                                name="applicationstaussr"
+                                id="YesIsReturnsr"
+                                name="IsReturnsr"
+                                onChange={(e) => HandleIsReturnOption(e)}
                                 className="hidden-toggles__input"
-                                checked={
-                                  applicationstaus == "10" ? true : false
-                                }
+                                checked={IsReturn == "1"}
+                                value="1"
                               />
                               <label
-                                for="srcoloration-Approvedvedsr"
+                                for={IsReturn == "1" ? "" : "YesIsReturnsr"}
                                 className="hidden-toggles__label"
+                                id={IsReturn}
                               >
-                                Approved
+                                Yes
                               </label>
-
                               <input
                                 type="radio"
-                                id="srcoloration-Rejected"
-                                value="30"
-                                onChange={(e) => {
-                                  ChangeApplicationStatus(e);
-                                }}
-                                name="applicationstaussr"
+                                name="IsReturnsr"
+                                id="NoIsReturnsr"
                                 className="hidden-toggles__input"
-                                checked={
-                                  applicationstaus == "30" ? true : false
-                                }
-                              />
-                              <label
-                                for="srcoloration-Rejected"
-                                className="hidden-toggles__label"
-                              >
-                                Rejected
-                              </label>
-
-                              <input
-                                type="radio"
-                                id="srcoloration-Deferred"
-                                onChange={(e) => {
-                                  ChangeApplicationStatus(e);
-                                }}
-                                name="applicationstaussr"
-                                value="40"
-                                className="hidden-toggles__input"
-                                checked={
-                                  applicationstaus == "40" ? true : false
-                                }
-                              />
-                              <label
-                                for="srcoloration-Deferred"
-                                className="hidden-toggles__label"
-                              >
-                                Deferred
-                              </label>
-
-                              <input
-                                type="radio"
-                                id="srcoloration-Cancelled"
-                                onChange={(e) => {
-                                  ChangeApplicationStatus(e);
-                                }}
-                                name="applicationstaussr"
-                                value="25"
-                                className="hidden-toggles__input"
-                                checked={
-                                  applicationstaus == "25" ? true : false
-                                }
-                              />
-                              <label
-                                for="srcoloration-Cancelled"
-                                className="hidden-toggles__label"
-                              >
-                                Cancelled
-                              </label>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div
-                        className={
-                          roleID == 6
-                            ? "inner_form_new align-items-center"
-                            : "d-none"
-                        }
-                      >
-                        <label className="controlform">Is Return Needed?</label>
-                        <div className="hidden-toggles">
-                          <input
-                            type="radio"
-                            id="YesIsReturnsr"
-                            name="IsReturnsr"
-                            onChange={(e) => HandleIsReturnOption(e)}
-                            className="hidden-toggles__input"
-                            checked={IsReturn == "1"}
-                            value="1"
-                          />
-                          <label
-                            for={IsReturn == "1" ? "" : "YesIsReturnsr"}
-                            className="hidden-toggles__label"
-                            id={IsReturn}
-                          >
-                            Yes
-                          </label>
-                          <input
-                            type="radio"
-                            name="IsReturnsr"
-                            id="NoIsReturnsr"
-                            className="hidden-toggles__input"
-                            onChange={(e) => HandleIsReturnOption(e)}
-                            value="0"
-                            checked={IsReturn == "0"}
-                          />
-                          <label
-                            for="NoIsReturnsr"
-                            className="hidden-toggles__label"
-                          >
-                            No
-                          </label>
-                        </div>
-                      </div>
-
-                      <div className="row">
-                        <div className="col-md-7">
-                          <div
-                            className={
-                              roleID == 6 && IsReturnOption == "1"
-                                ? "inner_form_new align-items-center"
-                                : "d-none"
-                            }
-                          >
-                            <label className="controlform">
-                              Return Frequency
-                            </label>
-                            <div className="form-bx">
-                              <label>
-                                <select
-                                  name="ReturnFrequency"
-                                  onChange={(e) => SelectReturnFrequency(e)}
-                                >
-                                  <option value="0" defaultChecked>
-                                    Select Frequency
-                                  </option>
-                                  {AllFrequency?.map((item, index) => {
-                                    return (
-                                      <option
-                                        key={index}
-                                        value={item.id}
-                                        selected={
-                                          getFrequencyID == item.id &&
-                                          getFrequencyID != ""
-                                            ? true
-                                            : false
-                                        }
-                                      >
-                                        {item.name}
-                                      </option>
-                                    );
-                                  })}
-                                </select>
-                              </label>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="col-md-5">
-                          <div
-                            className={
-                              roleID == 6 &&
-                              IsReturn == "1" &&
-                              getFrequencyID == "1"
-                                ? "inner_form_new-sm"
-                                : "d-none"
-                            }
-                          >
-                            <label className="controlform-sm">
-                              Frequency Date
-                            </label>
-                            <div className="form-bx-sm">
-                              <DatePicker
-                                ref={FrequencyDateRef}
-                                placeholderText="Select Frequency Date"
-                                closeOnScroll={(e) => e.target === document}
-                                selected={IsReturnExpiringDate}
-                                onChange={(date) =>
-                                  setIsReturnExpiringDate(date)
-                                }
-                                peekNextMonth
-                                showMonthDropdown
-                                maxDate={new Date("03-31-2027")}
-                                minDate={new Date()}
-                                showYearDropdown
-                                dropdownMode="select"
-                                dateFormat="dd/MMM/yyyy"
-                                onKeyDown={(e) => {
-                                  const key = e.key;
-                                  const allowedKeys = /[0-9\/]/;
-                                  if (
-                                    !allowedKeys.test(key) &&
-                                    key !== "Backspace" &&
-                                    key !== "Delete"
-                                  ) {
-                                    e.preventDefault();
-                                  }
-                                }}
-                              />
-                              <span className="sspan"></span>
-                              {errors.IsReturnExpiringDate &&
-                              (IsReturnExpiringDate ==
-                                "Select Frequency Date " ||
-                                IsReturnExpiringDate == null) ? (
-                                <small
-                                  className="errormsg"
-                                  style={{ marginBottom: "9px" }}
-                                >
-                                  {errors.IsReturnExpiringDate}
-                                </small>
-                              ) : (
-                                ""
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div
-                        className={
-                          roleID == 6
-                            ? "inner_form_new align-items-center"
-                            : "d-none"
-                        }
-                      >
-                        <label className="controlform">
-                          Is Expiry Required?
-                        </label>
-                        <div className="hidden-toggles">
-                          <input
-                            type="radio"
-                            id="exprqsr"
-                            name="dateexpitysr"
-                            onChange={(e) => HandleDateExpiryOption(e)}
-                            className="hidden-toggles__input"
-                            checked={defaultnoExpiry == "1"}
-                            value="1"
-                          />
-                          <label
-                            for={defaultnoExpiry == "1" ? "" : "exprqsr"}
-                            className="hidden-toggles__label"
-                          >
-                            Yes
-                          </label>
-                          <input
-                            type="radio"
-                            name="dateexpitysr"
-                            id="noexpsr"
-                            className="hidden-toggles__input"
-                            onChange={(e) => {
-                              HandleDateExpiryOption(e);
-                              setExpiringDate(null);
-                            }}
-                            value="0"
-                            checked={defaultnoExpiry == "0"}
-                          />
-                          <label
-                            for={defaultnoExpiry == "0" ? "" : "noexpsr"}
-                            className="hidden-toggles__label"
-                          >
-                            No
-                          </label>
-                        </div>
-                      </div>
-
-                      <div className="row">
-                        <div className="col-md-7">
-                          <div
-                            className={
-                              roleID == 6 && DateExpiryOption == "1"
-                                ? "inner_form_new align-items-center"
-                                : "d-none"
-                            }
-                          >
-                            <label className="controlform">
-                              Define Expiry Date
-                            </label>
-
-                            <div
-                              className={
-                                DateExpiryOption == "1"
-                                  ? "hidden-toggles"
-                                  : "d-none"
-                              }
-                            >
-                              <input
-                                type="radio"
-                                ref={dateExpirydisplayRef}
-                                id="defineddatesr"
-                                className="hidden-toggles__input"
-                                name="dateExpirydisplaysr"
-                                onChange={(e) =>
-                                  setDateExpirydisplay(e.target.value)
-                                }
+                                onChange={(e) => HandleIsReturnOption(e)}
                                 value="0"
-                                checked={
-                                  DateExpirydisplay != "" &&
-                                  DateExpirydisplay == "0" &&
-                                  DateExpiryOption == "1"
-                                }
-                              />{" "}
+                                checked={IsReturn == "0"}
+                              />
                               <label
-                                for="defineddatesr"
+                                for="NoIsReturnsr"
                                 className="hidden-toggles__label"
                               >
-                                Specific Date
+                                No
+                              </label>
+                            </div>
+                          </div>
+
+                          <div className="row">
+                            <div className="col-md-7">
+                              <div
+                                className={
+                                  roleID == 6 && IsReturnOption == "1"
+                                    ? "inner_form_new align-items-center"
+                                    : "d-none"
+                                }
+                              >
+                                <label className="controlform">
+                                  Return Frequency
+                                </label>
+                                <div className="form-bx">
+                                  <label>
+                                    <select
+                                      name="ReturnFrequency"
+                                      onChange={(e) => SelectReturnFrequency(e)}
+                                    >
+                                      <option value="0" defaultChecked>
+                                        Select Frequency
+                                      </option>
+                                      {AllFrequency?.map((item, index) => {
+                                        return (
+                                          <option
+                                            key={index}
+                                            value={item.id}
+                                            selected={
+                                              getFrequencyID == item.id &&
+                                              getFrequencyID != ""
+                                                ? true
+                                                : false
+                                            }
+                                          >
+                                            {item.name}
+                                          </option>
+                                        );
+                                      })}
+                                    </select>
+                                  </label>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="col-md-5">
+                              <div
+                                className={
+                                  roleID == 6 &&
+                                  IsReturn == "1" &&
+                                  getFrequencyID == "1"
+                                    ? "inner_form_new-sm"
+                                    : "d-none"
+                                }
+                              >
+                                <label className="controlform-sm">
+                                  Frequency Date
+                                </label>
+                                <div className="form-bx-sm">
+                                  <DatePicker
+                                    ref={FrequencyDateRef}
+                                    placeholderText="Select Frequency Date"
+                                    closeOnScroll={(e) => e.target === document}
+                                    selected={IsReturnExpiringDate}
+                                    onChange={(date) =>
+                                      setIsReturnExpiringDate(date)
+                                    }
+                                    peekNextMonth
+                                    showMonthDropdown
+                                    maxDate={new Date("03-31-2027")}
+                                    minDate={new Date()}
+                                    showYearDropdown
+                                    dropdownMode="select"
+                                    dateFormat="dd/MMM/yyyy"
+                                    onKeyDown={(e) => {
+                                      const key = e.key;
+                                      const allowedKeys = /[0-9\/]/;
+                                      if (
+                                        !allowedKeys.test(key) &&
+                                        key !== "Backspace" &&
+                                        key !== "Delete"
+                                      ) {
+                                        e.preventDefault();
+                                      }
+                                    }}
+                                  />
+                                  <span className="sspan"></span>
+                                  {errors.IsReturnExpiringDate &&
+                                  (IsReturnExpiringDate ==
+                                    "Select Frequency Date " ||
+                                    IsReturnExpiringDate == null) ? (
+                                    <small
+                                      className="errormsg"
+                                      style={{ marginBottom: "9px" }}
+                                    >
+                                      {errors.IsReturnExpiringDate}
+                                    </small>
+                                  ) : (
+                                    ""
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div
+                            className={
+                              roleID == 6
+                                ? "inner_form_new align-items-center"
+                                : "d-none"
+                            }
+                          >
+                            <label className="controlform">
+                              Is Expiry Required?
+                            </label>
+                            <div className="hidden-toggles">
+                              <input
+                                type="radio"
+                                id="exprqsr"
+                                name="dateexpitysr"
+                                onChange={(e) => HandleDateExpiryOption(e)}
+                                className="hidden-toggles__input"
+                                checked={defaultnoExpiry == "1"}
+                                value="1"
+                              />
+                              <label
+                                for={defaultnoExpiry == "1" ? "" : "exprqsr"}
+                                className="hidden-toggles__label"
+                              >
+                                Yes
                               </label>
                               <input
                                 type="radio"
-                                ref={optionExpirydisplayRef}
-                                id="rerpetualdatesr"
-                                name="dateExpirydisplaysr"
+                                name="dateexpitysr"
+                                id="noexpsr"
+                                className="hidden-toggles__input"
                                 onChange={(e) => {
-                                  setDateExpirydisplay(e.target.value);
+                                  HandleDateExpiryOption(e);
                                   setExpiringDate(null);
                                 }}
-                                className="hidden-toggles__input"
-                                value="1"
-                                checked={
-                                  DateExpirydisplay == "1" &&
-                                  DateExpiryOption == "1"
-                                }
+                                value="0"
+                                checked={defaultnoExpiry == "0"}
                               />
                               <label
-                                for="rerpetualdatesr"
+                                for={defaultnoExpiry == "0" ? "" : "noexpsr"}
                                 className="hidden-toggles__label"
                               >
-                                Perpetual
+                                No
                               </label>
                             </div>
                           </div>
-                        </div>
 
-                        <div className="col-md-5">
-                          <div
-                            className={
-                              roleID == 6 &&
-                              DateExpirydisplay == "0" &&
-                              DateExpiryOption == "1"
-                                ? "inner_form_new-sm"
-                                : "d-none"
-                            }
-                          >
-                            <label className="controlform-sm">
-                              Expiry Date
-                            </label>
-                            <div className="form-bx-sm">
-                              <DatePicker
-                                placeholderText="Select Expiry Date"
-                                closeOnScroll={(e) => e.target === document}
-                                selected={ExpiringDate}
-                                onChange={(date) => setExpiringDate(date)}
-                                peekNextMonth
-                                showMonthDropdown
-                                minDate={new Date()}
-                                showYearDropdown
-                                dropdownMode="select"
-                                dateFormat="dd/MMM/yyyy"
-                                onKeyDown={(e) => {
-                                  const key = e.key;
-                                  const allowedKeys = /[0-9\/]/;
-                                  if (
-                                    !allowedKeys.test(key) &&
-                                    key !== "Backspace" &&
-                                    key !== "Delete"
-                                  ) {
-                                    e.preventDefault();
+                          <div className="row">
+                            <div className="col-md-7">
+                              <div
+                                className={
+                                  roleID == 6 && DateExpiryOption == "1"
+                                    ? "inner_form_new align-items-center"
+                                    : "d-none"
+                                }
+                              >
+                                <label className="controlform">
+                                  Define Expiry Date
+                                </label>
+
+                                <div
+                                  className={
+                                    DateExpiryOption == "1"
+                                      ? "hidden-toggles"
+                                      : "d-none"
                                   }
-                                }}
-                              />
-
-                              <span className="sspan"></span>
-                              {errors.ExpiringDate &&
-                              (ExpiringDate == "Select Expiring Date " ||
-                                ExpiringDate == null) ? (
-                                <small
-                                  className="errormsg"
-                                  style={{ marginBottom: "9px" }}
                                 >
-                                  {errors.ExpiringDate}
-                                </small>
-                              ) : (
-                                ""
-                              )}
+                                  <input
+                                    type="radio"
+                                    ref={dateExpirydisplayRef}
+                                    id="defineddatesr"
+                                    className="hidden-toggles__input"
+                                    name="dateExpirydisplaysr"
+                                    onChange={(e) =>
+                                      setDateExpirydisplay(e.target.value)
+                                    }
+                                    value="0"
+                                    checked={
+                                      DateExpirydisplay != "" &&
+                                      DateExpirydisplay == "0" &&
+                                      DateExpiryOption == "1"
+                                    }
+                                  />{" "}
+                                  <label
+                                    for="defineddatesr"
+                                    className="hidden-toggles__label"
+                                  >
+                                    Specific Date
+                                  </label>
+                                  <input
+                                    type="radio"
+                                    ref={optionExpirydisplayRef}
+                                    id="rerpetualdatesr"
+                                    name="dateExpirydisplaysr"
+                                    onChange={(e) => {
+                                      setDateExpirydisplay(e.target.value);
+                                      setExpiringDate(null);
+                                    }}
+                                    className="hidden-toggles__input"
+                                    value="1"
+                                    checked={
+                                      DateExpirydisplay == "1" &&
+                                      DateExpiryOption == "1"
+                                    }
+                                  />
+                                  <label
+                                    for="rerpetualdatesr"
+                                    className="hidden-toggles__label"
+                                  >
+                                    Perpetual
+                                  </label>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="col-md-5">
+                              <div
+                                className={
+                                  roleID == 6 &&
+                                  DateExpirydisplay == "0" &&
+                                  DateExpiryOption == "1"
+                                    ? "inner_form_new-sm"
+                                    : "d-none"
+                                }
+                              >
+                                <label className="controlform-sm">
+                                  Expiry Date
+                                </label>
+                                <div className="form-bx-sm">
+                                  <DatePicker
+                                    placeholderText="Select Expiry Date"
+                                    closeOnScroll={(e) => e.target === document}
+                                    selected={ExpiringDate}
+                                    onChange={(date) => setExpiringDate(date)}
+                                    peekNextMonth
+                                    showMonthDropdown
+                                    minDate={new Date()}
+                                    showYearDropdown
+                                    dropdownMode="select"
+                                    dateFormat="dd/MMM/yyyy"
+                                    onKeyDown={(e) => {
+                                      const key = e.key;
+                                      const allowedKeys = /[0-9\/]/;
+                                      if (
+                                        !allowedKeys.test(key) &&
+                                        key !== "Backspace" &&
+                                        key !== "Delete"
+                                      ) {
+                                        e.preventDefault();
+                                      }
+                                    }}
+                                  />
+
+                                  <span className="sspan"></span>
+                                  {errors.ExpiringDate &&
+                                  (ExpiringDate == "Select Expiring Date " ||
+                                    ExpiringDate == null) ? (
+                                    <small
+                                      className="errormsg"
+                                      style={{ marginBottom: "9px" }}
+                                    >
+                                      {errors.ExpiringDate}
+                                    </small>
+                                  ) : (
+                                    ""
+                                  )}
+                                </div>
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      </div>
+                        </>
+                      )}
                     </div>
 
                     {allcomment?.map((cur) => {
@@ -8414,6 +8981,11 @@ const ImportDashboardEditDetails = ({
                                   setapplicationstaus(
                                     applicationDetail?.analystRecommendation
                                   );
+                                  setOtherDepartment("");
+                                  setOtherDepartmentRole("");
+                                  setOtherDepartmentRoles([]);
+                                  setOtherDepartmentUser("");
+                                  setOtherDepartmentUsers([]);
                                 }}
                                 name="nextactionprincipal"
                                 className={
@@ -8452,6 +9024,11 @@ const ImportDashboardEditDetails = ({
                                   setapplicationstaus(
                                     applicationDetail?.analystRecommendation
                                   );
+                                  setOtherDepartment("");
+                                  setOtherDepartmentRole("");
+                                  setOtherDepartmentRoles([]);
+                                  setOtherDepartmentUser("");
+                                  setOtherDepartmentUsers([]);
                                 }}
                                 onClick={() => setRecomdAnalyst("")}
                                 name="nextactionprincipal"
@@ -8475,6 +9052,11 @@ const ImportDashboardEditDetails = ({
                                   setapplicationstaus(
                                     applicationDetail?.analystRecommendation
                                   );
+                                  setOtherDepartment("");
+                                  setOtherDepartmentRole("");
+                                  setOtherDepartmentRoles([]);
+                                  setOtherDepartmentUser("");
+                                  setOtherDepartmentUsers([]);
                                 }}
                                 onClick={() => setRecomdAnalyst("")}
                                 name="nextactionprincipal"
@@ -8500,6 +9082,11 @@ const ImportDashboardEditDetails = ({
                                   setapplicationstaus(
                                     applicationDetail?.analystRecommendation
                                   );
+                                  setOtherDepartment("");
+                                  setOtherDepartmentRole("");
+                                  setOtherDepartmentRoles([]);
+                                  setOtherDepartmentUser("");
+                                  setOtherDepartmentUsers([]);
                                 }}
                                 name="nextactionprincipal"
                                 value="20"
@@ -8530,7 +9117,7 @@ const ImportDashboardEditDetails = ({
                                 className="hidden-toggles__input"
                               />
                               <label
-                                for="srcoloration-Department"
+                                for="prcoloration-Department"
                                 className="hidden-toggles__label"
                               >
                                 Referred to Other Department
@@ -8541,7 +9128,11 @@ const ImportDashboardEditDetails = ({
                       </div>
 
                       <div
-                        className={checkSupervisor == true ? "row" : "d-none"}
+                        className={
+                          checkSupervisor == true && nextlevelvalue != "35"
+                            ? "row"
+                            : "d-none"
+                        }
                       >
                         <div className="col-md-12 d-flex c-gap">
                           <div
@@ -8649,11 +9240,166 @@ const ImportDashboardEditDetails = ({
                         </div>
                       </div>
 
-                      {attachmentData?.map((items, index) => {
-                        return (
+                      {nextlevelvalue == 35 ? (
+                        <div className="row mt-2">
+                          <div className="col-md-6">
+                            <div className="inner_form_new align-items-center">
+                              <label className="controlform">Department</label>
+                              <div className="form-bx">
+                                <label>
+                                  <select
+                                    ref={optionOtherDepartmentRef}
+                                    name="OtherDepartment"
+                                    onChange={(e) => {
+                                      setOtherDepartment(e.target.value);
+                                      OtherDepartmentRole();
+                                      setOtherDepartmentRole("");
+                                      setOtherDepartmentRoles([]);
+                                      setOtherDepartmentUser("");
+                                      setOtherDepartmentUsers([]);
+                                    }}
+                                    className={
+                                      errors.assignedTo && !SupervisorRoleId
+                                        ? "error"
+                                        : ""
+                                    }
+                                  >
+                                    <option value="">Select Department</option>
+                                    <option value="2">Export</option>
+                                    <option value="4">
+                                      Foreign Investments
+                                    </option>
+                                    <option value="5">Inspectorate</option>
+                                  </select>
+                                  <span className="sspan"></span>
+                                  {errors.assignedTo && !SupervisorRoleId ? (
+                                    <small className="errormsg">
+                                      Senior Analyst is required{" "}
+                                    </small>
+                                  ) : (
+                                    ""
+                                  )}
+                                </label>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="col-md-3">
+                            <div className="inner_form_new-sm align-items-center">
+                              <label className="controlform-sm">Role</label>
+                              <div className="form-bx-sm">
+                                <label>
+                                  <select
+                                    onChange={(e) => {
+                                      setOtherDepartmentRole(e.target.value);
+                                      OtherDepartmentUserByRole(e.target.value);
+                                      setOtherDepartmentUser("");
+                                      setOtherDepartmentUsers([]);
+                                    }}
+                                  >
+                                    <option value="">Select Role</option>
+                                    {otherDepartmentRoles?.map(
+                                      (item, index) => {
+                                        return (
+                                          <option key={index} value={item.id}>
+                                            {item.name}
+                                          </option>
+                                        );
+                                      }
+                                    )}
+                                  </select>
+                                </label>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="col-md-3">
+                            <div className="inner_form_new-sm align-items-center">
+                              <label className="controlform-sm">User</label>
+                              <div className="form-bx-sm">
+                                <label>
+                                  <select
+                                    onChange={(e) =>
+                                      setOtherDepartmentUser(e.target.value)
+                                    }
+                                  >
+                                    <option value="">Select User</option>
+                                    {otherDepartmentUsers?.map(
+                                      (item, index) => {
+                                        return (
+                                          <option
+                                            key={index}
+                                            value={item.userID}
+                                          >
+                                            {item.name}
+                                          </option>
+                                        );
+                                      }
+                                    )}
+                                  </select>
+                                </label>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        ""
+                      )}
+
+                      {nextlevelvalue != "35" &&
+                        attachmentData?.map((items, index) => {
+                          return (
+                            <div
+                              className="attachemt_form-bx  mt-2"
+                              key={items.id}
+                            >
+                              <label
+                                style={{
+                                  background: "#d9edf7",
+                                  padding: "9px 3px",
+                                  border: "0px",
+                                }}
+                              >
+                                <span style={{ fontWeight: "500" }}>
+                                  {items.filename}
+                                </span>
+                              </label>
+                              <div className="browse-btn">
+                                Browse
+                                <input
+                                  type="file"
+                                  onChange={(e) =>
+                                    handleuserFileChange(e, "analyst" + index)
+                                  }
+                                />
+                              </div>
+                              <span className="filename">
+                                {userfiles?.find(
+                                  (f) => f.id === "analyst" + index
+                                )?.file?.name || "No file chosen"}
+                              </span>
+                              {userfiles?.length &&
+                              userfiles?.find((f) => f.id === "analyst" + index)
+                                ?.file?.name ? (
+                                <button
+                                  type="button"
+                                  className="remove-file"
+                                  onClick={() =>
+                                    removeUserImage(index, "analyst" + index)
+                                  }
+                                >
+                                  Remove
+                                </button>
+                              ) : (
+                                ""
+                              )}
+                            </div>
+                          );
+                        })}
+
+                      {nextlevelvalue != "35" &&
+                        otheruserfiles?.map((file, index) => (
                           <div
-                            className="attachemt_form-bx  mt-2"
-                            key={items.id}
+                            key={"other" + (index + 1)}
+                            className="attachemt_form-bx"
                           >
                             <label
                               style={{
@@ -8662,32 +9408,32 @@ const ImportDashboardEditDetails = ({
                                 border: "0px",
                               }}
                             >
-                              <span style={{ fontWeight: "500" }}>
-                                {items.filename}
-                              </span>
+                              Other File
+                              {index + 1}
                             </label>
                             <div className="browse-btn">
-                              Browse
+                              Browse{" "}
                               <input
                                 type="file"
-                                onChange={(e) =>
-                                  handleuserFileChange(e, "analyst" + index)
-                                }
+                                onChange={(e) => {
+                                  handleuserFileChange(e, "other" + index);
+                                  handleOthrefile(e, `other ${index}`);
+                                }}
                               />
                             </div>
                             <span className="filename">
-                              {userfiles?.find(
-                                (f) => f.id === "analyst" + index
-                              )?.file?.name || "No file chosen"}
+                              {userfiles?.find((f) => f.id === "other" + index)
+                                ?.file?.name || "No file chosen"}
                             </span>
+
                             {userfiles?.length &&
-                            userfiles?.find((f) => f.id === "analyst" + index)
+                            userfiles?.find((f) => f.id === "other" + index)
                               ?.file?.name ? (
                               <button
                                 type="button"
                                 className="remove-file"
                                 onClick={() =>
-                                  removeUserImage(index, "analyst" + index)
+                                  removeUserImage(index, "other" + index)
                                 }
                               >
                                 Remove
@@ -8696,58 +9442,10 @@ const ImportDashboardEditDetails = ({
                               ""
                             )}
                           </div>
-                        );
-                      })}
+                        ))}
 
-                      {otheruserfiles?.map((file, index) => (
-                        <div
-                          key={"other" + (index + 1)}
-                          className="attachemt_form-bx"
-                        >
-                          <label
-                            style={{
-                              background: "#d9edf7",
-                              padding: "9px 3px",
-                              border: "0px",
-                            }}
-                          >
-                            Other File
-                            {index + 1}
-                          </label>
-                          <div className="browse-btn">
-                            Browse{" "}
-                            <input
-                              type="file"
-                              onChange={(e) => {
-                                handleuserFileChange(e, "other" + index);
-                                handleOthrefile(e, `other ${index}`);
-                              }}
-                            />
-                          </div>
-                          <span className="filename">
-                            {userfiles?.find((f) => f.id === "other" + index)
-                              ?.file?.name || "No file chosen"}
-                          </span>
-
-                          {userfiles?.length &&
-                          userfiles?.find((f) => f.id === "other" + index)?.file
-                            ?.name ? (
-                            <button
-                              type="button"
-                              className="remove-file"
-                              onClick={() =>
-                                removeUserImage(index, "other" + index)
-                              }
-                            >
-                              Remove
-                            </button>
-                          ) : (
-                            ""
-                          )}
-                        </div>
-                      ))}
-
-                      {otheruserfiles?.length || userfiles?.length ? (
+                      {(otheruserfiles?.length || userfiles?.length) &&
+                      nextlevelvalue != "35" ? (
                         <div className="attachemt_form-bx">
                           <label style={{ border: "0px" }}>{""}</label>
                           <button
@@ -8841,7 +9539,6 @@ const ImportDashboardEditDetails = ({
                           </label>
                         </div>
                       </div>
-                      {/* end form-bx  */}
 
                       <div
                         className={roleID == 7 ? "inner_form_new " : "d-none"}
@@ -8899,437 +9596,451 @@ const ImportDashboardEditDetails = ({
                         </div>
                       </div>
 
-                      <div className="inner_form_new align-items-center">
-                        <label className="controlform">CC To</label>
-                        <div className=" cccto">
-                          <div className="flex justify-content-center multiSelect">
-                            <MultiSelect
-                              value={selectedBanks}
-                              onChange={(e) => setSelectedBanks(e.value)}
-                              options={vOption}
-                              onShow={onShow}
-                              optionLabel="name"
-                              placeholder="Select Banks"
-                              display="chip"
-                              className="w-full md:w-20rem"
-                            />
+                      {nextlevelvalue != "35" && (
+                        <>
+                          <div className="inner_form_new align-items-center">
+                            <label className="controlform">CC To</label>
+                            <div className=" cccto">
+                              <div className="flex justify-content-center multiSelect">
+                                {/* <MultiSelect
+                                  value={selectedBanks}
+                                  onChange={(e) => setSelectedBanks(e.value)}
+                                  options={vOption}
+                                  onShow={onShow}
+                                  optionLabel="name"
+                                  placeholder="Select Banks"
+                                  display="chip"
+                                  className="w-full md:w-20rem"
+                                /> */}
+                                <CustomMultiSelect
+                                  key="multyselectprinciple"
+                                  options={vOption}
+                                  onChange={(e) => handleChangeBank(e)}
+                                  value={selectedBanks}
+                                  isSelectAll={true}
+                                  menuPlacement={"bottom"}
+                                />
+                              </div>
+                            </div>
                           </div>
-                        </div>
-                      </div>
 
-                      <div
-                        className={
-                          roleID == 7
-                            ? "inner_form_new align-items-center"
-                            : "d-none"
-                        }
-                      >
-                        <label className="controlform">Is Return Needed?</label>
-                        <div className="hidden-toggles">
-                          <input
-                            type="radio"
-                            id="YesIsReturnpr"
-                            name="IsReturnpr"
-                            onChange={(e) => HandleIsReturnOption(e)}
-                            className="hidden-toggles__input"
-                            checked={IsReturn == "1"}
-                            value="1"
-                          />
-                          <label
-                            for={IsReturn == "1" ? "" : "YesIsReturnpr"}
-                            className="hidden-toggles__label"
-                            id={IsReturn}
-                          >
-                            Yes
-                          </label>
-                          <input
-                            type="radio"
-                            name="IsReturnpr"
-                            id="NoIsReturnpr"
-                            className="hidden-toggles__input"
-                            onChange={(e) => HandleIsReturnOption(e)}
-                            value="0"
-                            checked={IsReturn == "0"}
-                          />
-                          <label
-                            for="NoIsReturnpr"
-                            className="hidden-toggles__label"
-                          >
-                            No
-                          </label>
-                        </div>
-                      </div>
-
-                      <div className="row">
-                        <div className="col-md-7">
                           <div
                             className={
-                              roleID == 7 && IsReturnOption == "1"
+                              roleID == 7
                                 ? "inner_form_new align-items-center"
                                 : "d-none"
                             }
                           >
                             <label className="controlform">
-                              Return Frequency
+                              Is Return Needed?
                             </label>
-                            <div className="form-bx">
-                              <label>
-                                <select
-                                  name="ReturnFrequency"
-                                  onChange={(e) => SelectReturnFrequency(e)}
-                                >
-                                  <option value="0" defaultChecked>
-                                    Select Frequency
-                                  </option>
-                                  {AllFrequency?.map((item, index) => {
-                                    return (
-                                      <option
-                                        key={index}
-                                        value={item.id}
-                                        selected={
-                                          getFrequencyID == item.id &&
-                                          getFrequencyID != ""
-                                            ? true
-                                            : false
-                                        }
-                                      >
-                                        {item.name}
-                                      </option>
-                                    );
-                                  })}
-                                </select>
-                              </label>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="col-md-5">
-                          <div
-                            className={
-                              roleID == 7 &&
-                              IsReturn == "1" &&
-                              getFrequencyID == "1"
-                                ? "inner_form_new-sm"
-                                : "d-none"
-                            }
-                          >
-                            <label className="controlform-sm">
-                              Frequency Date
-                            </label>
-                            <div className="form-bx-sm">
-                              <DatePicker
-                                ref={FrequencyDateRef}
-                                placeholderText="Select Frequency Date"
-                                closeOnScroll={(e) => e.target === document}
-                                selected={IsReturnExpiringDate}
-                                onChange={(date) =>
-                                  setIsReturnExpiringDate(date)
-                                }
-                                peekNextMonth
-                                showMonthDropdown
-                                maxDate={new Date("03-31-2027")}
-                                minDate={new Date()}
-                                showYearDropdown
-                                dropdownMode="select"
-                                dateFormat="dd/MMM/yyyy"
-                                onKeyDown={(e) => {
-                                  const key = e.key;
-                                  const allowedKeys = /[0-9\/]/;
-                                  if (
-                                    !allowedKeys.test(key) &&
-                                    key !== "Backspace" &&
-                                    key !== "Delete"
-                                  ) {
-                                    e.preventDefault();
-                                  }
-                                }}
-                              />
-                              <span className="sspan"></span>
-                              {errors.IsReturnExpiringDate &&
-                              (IsReturnExpiringDate ==
-                                "Select Frequency Date " ||
-                                IsReturnExpiringDate == null) ? (
-                                <small
-                                  className="errormsg"
-                                  style={{ marginBottom: "9px" }}
-                                >
-                                  {errors.IsReturnExpiringDate}
-                                </small>
-                              ) : (
-                                ""
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div
-                        className={
-                          roleID == 7
-                            ? "inner_form_new align-items-center"
-                            : "d-none"
-                        }
-                      >
-                        <label className="controlform">
-                          Is Expiry Required?
-                        </label>
-                        <div className="hidden-toggles">
-                          <input
-                            type="radio"
-                            id="exprqprs"
-                            name="dateexpityprs"
-                            onChange={(e) => HandleDateExpiryOption(e)}
-                            className="hidden-toggles__input"
-                            checked={defaultnoExpiry == "1"}
-                            value="1"
-                          />
-                          <label
-                            for="exprqprs"
-                            className="hidden-toggles__label"
-                          >
-                            Yes
-                          </label>
-                          <input
-                            type="radio"
-                            name="dateexpityprs"
-                            id="noexpprs"
-                            className="hidden-toggles__input"
-                            onChange={(e) => {
-                              HandleDateExpiryOption(e);
-                              setExpiringDate(null);
-                            }}
-                            value="0"
-                            checked={defaultnoExpiry == "0"}
-                          />
-                          <label
-                            for="noexpprs"
-                            className="hidden-toggles__label"
-                          >
-                            No
-                          </label>
-                        </div>
-                      </div>
-
-                      <div className="row">
-                        <div className="col-md-7">
-                          <div
-                            className={
-                              roleID == 7 && DateExpiryOption == "1"
-                                ? "inner_form_new align-items-center"
-                                : "d-none"
-                            }
-                          >
-                            <label className="controlform">
-                              Define Expiry Date
-                            </label>
-
-                            <div
-                              className={
-                                DateExpiryOption == "1"
-                                  ? "hidden-toggles"
-                                  : "d-none"
-                              }
-                            >
-                              <input
-                                type="radio"
-                                ref={dateExpirydisplayRef}
-                                id="defineddatepr"
-                                className="hidden-toggles__input"
-                                name="dateExpirydisplaypr"
-                                onChange={(e) =>
-                                  setDateExpirydisplay(e.target.value)
-                                }
-                                value="0"
-                                checked={
-                                  DateExpirydisplay != "" &&
-                                  DateExpirydisplay == "0" &&
-                                  DateExpiryOption == "1"
-                                }
-                              />{" "}
-                              <label
-                                for="defineddatepr"
-                                className="hidden-toggles__label"
-                              >
-                                Specific Date
-                              </label>
-                              <input
-                                type="radio"
-                                ref={optionExpirydisplayRef}
-                                id="rerpetualdatepr"
-                                name="dateExpirydisplaypr"
-                                onChange={(e) => {
-                                  setDateExpirydisplay(e.target.value);
-                                  setExpiringDate(null);
-                                }}
-                                className="hidden-toggles__input"
-                                value="1"
-                                checked={
-                                  DateExpirydisplay == "1" &&
-                                  DateExpiryOption == "1"
-                                }
-                              />
-                              <label
-                                for="rerpetualdatepr"
-                                className="hidden-toggles__label"
-                              >
-                                Perpetual
-                              </label>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="col-md-5">
-                          <div
-                            className={
-                              roleID == 7 &&
-                              DateExpirydisplay == "0" &&
-                              DateExpiryOption == "1"
-                                ? "inner_form_new-sm"
-                                : "d-none"
-                            }
-                          >
-                            <label className="controlform-sm">
-                              Expiry Date
-                            </label>
-
-                            <div className="form-bx-sm">
-                              <DatePicker
-                                placeholderText="Select Expiry Date"
-                                closeOnScroll={(e) => e.target === document}
-                                selected={ExpiringDate}
-                                onChange={(date) => setExpiringDate(date)}
-                                peekNextMonth
-                                showMonthDropdown
-                                minDate={new Date()}
-                                showYearDropdown
-                                dropdownMode="select"
-                                dateFormat="dd/MMM/yyyy"
-                                onKeyDown={(e) => {
-                                  const key = e.key;
-                                  const allowedKeys = /[0-9\/]/;
-                                  if (
-                                    !allowedKeys.test(key) &&
-                                    key !== "Backspace" &&
-                                    key !== "Delete"
-                                  ) {
-                                    e.preventDefault();
-                                  }
-                                }}
-                              />
-                              <span className="sspan"></span>
-                              {errors.ExpiringDate &&
-                              (ExpiringDate == "Select Expiring Date " ||
-                                ExpiringDate == null) ? (
-                                <small
-                                  className="errormsg"
-                                  style={{ marginBottom: "9px" }}
-                                >
-                                  {errors.ExpiringDate}
-                                </small>
-                              ) : (
-                                ""
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div
-                        className={
-                          (roleID == 7 && nextlevelvalue == "") ||
-                          recomdAnalyst == "121"
-                            ? "inner_form_new align-items-center"
-                            : "d-none"
-                        }
-                      >
-                        <label className="controlform">Decision</label>
-                        <div className="row">
-                          <div className="col-md-12">
                             <div className="hidden-toggles">
                               <input
                                 type="radio"
-                                id="srcoloration-Approvedved3"
-                                value="10"
-                                onChange={(e) => {
-                                  ChangeApplicationStatus(e);
-                                  GetRoleHandle(10);
-                                }}
-                                name="applicationstausprs"
+                                id="YesIsReturnpr"
+                                name="IsReturnpr"
+                                onChange={(e) => HandleIsReturnOption(e)}
                                 className="hidden-toggles__input"
-                                checked={
-                                  applicationstaus == "10" ? true : false
-                                }
+                                checked={IsReturn == "1"}
+                                value="1"
                               />
                               <label
-                                for="srcoloration-Approvedved3"
+                                for={IsReturn == "1" ? "" : "YesIsReturnpr"}
                                 className="hidden-toggles__label"
+                                id={IsReturn}
                               >
-                                Approved
+                                Yes
                               </label>
-
                               <input
                                 type="radio"
-                                id="srcoloration-Rejected"
-                                value="30"
-                                onChange={(e) => {
-                                  ChangeApplicationStatus(e);
-                                }}
-                                name="applicationstausprs"
+                                name="IsReturnpr"
+                                id="NoIsReturnpr"
                                 className="hidden-toggles__input"
-                                checked={
-                                  applicationstaus == "30" ? true : false
-                                }
+                                onChange={(e) => HandleIsReturnOption(e)}
+                                value="0"
+                                checked={IsReturn == "0"}
                               />
                               <label
-                                for="srcoloration-Rejected"
+                                for="NoIsReturnpr"
                                 className="hidden-toggles__label"
                               >
-                                Rejected
-                              </label>
-
-                              <input
-                                type="radio"
-                                id="srcoloration-Deferred"
-                                onChange={(e) => {
-                                  ChangeApplicationStatus(e);
-                                }}
-                                name="applicationstausprs"
-                                value="40"
-                                className="hidden-toggles__input"
-                                checked={
-                                  applicationstaus == "40" ? true : false
-                                }
-                              />
-                              <label
-                                for="srcoloration-Deferred"
-                                className="hidden-toggles__label"
-                              >
-                                Deferred
-                              </label>
-
-                              <input
-                                type="radio"
-                                id="srcoloration-Cancelled"
-                                onChange={(e) => {
-                                  ChangeApplicationStatus(e);
-                                }}
-                                name="applicationstausprs"
-                                value="25"
-                                className="hidden-toggles__input"
-                                checked={
-                                  applicationstaus == "25" ? true : false
-                                }
-                              />
-                              <label
-                                for="srcoloration-Cancelled"
-                                className="hidden-toggles__label"
-                              >
-                                Cancelled
+                                No
                               </label>
                             </div>
                           </div>
-                        </div>
-                      </div>
+
+                          <div className="row">
+                            <div className="col-md-7">
+                              <div
+                                className={
+                                  roleID == 7 && IsReturnOption == "1"
+                                    ? "inner_form_new align-items-center"
+                                    : "d-none"
+                                }
+                              >
+                                <label className="controlform">
+                                  Return Frequency
+                                </label>
+                                <div className="form-bx">
+                                  <label>
+                                    <select
+                                      name="ReturnFrequency"
+                                      onChange={(e) => SelectReturnFrequency(e)}
+                                    >
+                                      <option value="0" defaultChecked>
+                                        Select Frequency
+                                      </option>
+                                      {AllFrequency?.map((item, index) => {
+                                        return (
+                                          <option
+                                            key={index}
+                                            value={item.id}
+                                            selected={
+                                              getFrequencyID == item.id &&
+                                              getFrequencyID != ""
+                                                ? true
+                                                : false
+                                            }
+                                          >
+                                            {item.name}
+                                          </option>
+                                        );
+                                      })}
+                                    </select>
+                                  </label>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="col-md-5">
+                              <div
+                                className={
+                                  roleID == 7 &&
+                                  IsReturn == "1" &&
+                                  getFrequencyID == "1"
+                                    ? "inner_form_new-sm"
+                                    : "d-none"
+                                }
+                              >
+                                <label className="controlform-sm">
+                                  Frequency Date
+                                </label>
+                                <div className="form-bx-sm">
+                                  <DatePicker
+                                    ref={FrequencyDateRef}
+                                    placeholderText="Select Frequency Date"
+                                    closeOnScroll={(e) => e.target === document}
+                                    selected={IsReturnExpiringDate}
+                                    onChange={(date) =>
+                                      setIsReturnExpiringDate(date)
+                                    }
+                                    peekNextMonth
+                                    showMonthDropdown
+                                    maxDate={new Date("03-31-2027")}
+                                    minDate={new Date()}
+                                    showYearDropdown
+                                    dropdownMode="select"
+                                    dateFormat="dd/MMM/yyyy"
+                                    onKeyDown={(e) => {
+                                      const key = e.key;
+                                      const allowedKeys = /[0-9\/]/;
+                                      if (
+                                        !allowedKeys.test(key) &&
+                                        key !== "Backspace" &&
+                                        key !== "Delete"
+                                      ) {
+                                        e.preventDefault();
+                                      }
+                                    }}
+                                  />
+                                  <span className="sspan"></span>
+                                  {errors.IsReturnExpiringDate &&
+                                  (IsReturnExpiringDate ==
+                                    "Select Frequency Date " ||
+                                    IsReturnExpiringDate == null) ? (
+                                    <small
+                                      className="errormsg"
+                                      style={{ marginBottom: "9px" }}
+                                    >
+                                      {errors.IsReturnExpiringDate}
+                                    </small>
+                                  ) : (
+                                    ""
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div
+                            className={
+                              roleID == 7
+                                ? "inner_form_new align-items-center"
+                                : "d-none"
+                            }
+                          >
+                            <label className="controlform">
+                              Is Expiry Required?
+                            </label>
+                            <div className="hidden-toggles">
+                              <input
+                                type="radio"
+                                id="exprqprs"
+                                name="dateexpityprs"
+                                onChange={(e) => HandleDateExpiryOption(e)}
+                                className="hidden-toggles__input"
+                                checked={defaultnoExpiry == "1"}
+                                value="1"
+                              />
+                              <label
+                                for="exprqprs"
+                                className="hidden-toggles__label"
+                              >
+                                Yes
+                              </label>
+                              <input
+                                type="radio"
+                                name="dateexpityprs"
+                                id="noexpprs"
+                                className="hidden-toggles__input"
+                                onChange={(e) => {
+                                  HandleDateExpiryOption(e);
+                                  setExpiringDate(null);
+                                }}
+                                value="0"
+                                checked={defaultnoExpiry == "0"}
+                              />
+                              <label
+                                for="noexpprs"
+                                className="hidden-toggles__label"
+                              >
+                                No
+                              </label>
+                            </div>
+                          </div>
+
+                          <div className="row">
+                            <div className="col-md-7">
+                              <div
+                                className={
+                                  roleID == 7 && DateExpiryOption == "1"
+                                    ? "inner_form_new align-items-center"
+                                    : "d-none"
+                                }
+                              >
+                                <label className="controlform">
+                                  Define Expiry Date
+                                </label>
+
+                                <div
+                                  className={
+                                    DateExpiryOption == "1"
+                                      ? "hidden-toggles"
+                                      : "d-none"
+                                  }
+                                >
+                                  <input
+                                    type="radio"
+                                    ref={dateExpirydisplayRef}
+                                    id="defineddatepr"
+                                    className="hidden-toggles__input"
+                                    name="dateExpirydisplaypr"
+                                    onChange={(e) =>
+                                      setDateExpirydisplay(e.target.value)
+                                    }
+                                    value="0"
+                                    checked={
+                                      DateExpirydisplay != "" &&
+                                      DateExpirydisplay == "0" &&
+                                      DateExpiryOption == "1"
+                                    }
+                                  />{" "}
+                                  <label
+                                    for="defineddatepr"
+                                    className="hidden-toggles__label"
+                                  >
+                                    Specific Date
+                                  </label>
+                                  <input
+                                    type="radio"
+                                    ref={optionExpirydisplayRef}
+                                    id="rerpetualdatepr"
+                                    name="dateExpirydisplaypr"
+                                    onChange={(e) => {
+                                      setDateExpirydisplay(e.target.value);
+                                      setExpiringDate(null);
+                                    }}
+                                    className="hidden-toggles__input"
+                                    value="1"
+                                    checked={
+                                      DateExpirydisplay == "1" &&
+                                      DateExpiryOption == "1"
+                                    }
+                                  />
+                                  <label
+                                    for="rerpetualdatepr"
+                                    className="hidden-toggles__label"
+                                  >
+                                    Perpetual
+                                  </label>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="col-md-5">
+                              <div
+                                className={
+                                  roleID == 7 &&
+                                  DateExpirydisplay == "0" &&
+                                  DateExpiryOption == "1"
+                                    ? "inner_form_new-sm"
+                                    : "d-none"
+                                }
+                              >
+                                <label className="controlform-sm">
+                                  Expiry Date
+                                </label>
+
+                                <div className="form-bx-sm">
+                                  <DatePicker
+                                    placeholderText="Select Expiry Date"
+                                    closeOnScroll={(e) => e.target === document}
+                                    selected={ExpiringDate}
+                                    onChange={(date) => setExpiringDate(date)}
+                                    peekNextMonth
+                                    showMonthDropdown
+                                    minDate={new Date()}
+                                    showYearDropdown
+                                    dropdownMode="select"
+                                    dateFormat="dd/MMM/yyyy"
+                                    onKeyDown={(e) => {
+                                      const key = e.key;
+                                      const allowedKeys = /[0-9\/]/;
+                                      if (
+                                        !allowedKeys.test(key) &&
+                                        key !== "Backspace" &&
+                                        key !== "Delete"
+                                      ) {
+                                        e.preventDefault();
+                                      }
+                                    }}
+                                  />
+                                  <span className="sspan"></span>
+                                  {errors.ExpiringDate &&
+                                  (ExpiringDate == "Select Expiring Date " ||
+                                    ExpiringDate == null) ? (
+                                    <small
+                                      className="errormsg"
+                                      style={{ marginBottom: "9px" }}
+                                    >
+                                      {errors.ExpiringDate}
+                                    </small>
+                                  ) : (
+                                    ""
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div
+                            className={
+                              (roleID == 7 && nextlevelvalue == "") ||
+                              recomdAnalyst == "121"
+                                ? "inner_form_new align-items-center"
+                                : "d-none"
+                            }
+                          >
+                            <label className="controlform">Decision</label>
+                            <div className="row">
+                              <div className="col-md-12">
+                                <div className="hidden-toggles">
+                                  <input
+                                    type="radio"
+                                    id="srcoloration-Approvedved3"
+                                    value="10"
+                                    onChange={(e) => {
+                                      ChangeApplicationStatus(e);
+                                      GetRoleHandle(10);
+                                    }}
+                                    name="applicationstausprs"
+                                    className="hidden-toggles__input"
+                                    checked={
+                                      applicationstaus == "10" ? true : false
+                                    }
+                                  />
+                                  <label
+                                    for="srcoloration-Approvedved3"
+                                    className="hidden-toggles__label"
+                                  >
+                                    Approved
+                                  </label>
+
+                                  <input
+                                    type="radio"
+                                    id="srcoloration-Rejected"
+                                    value="30"
+                                    onChange={(e) => {
+                                      ChangeApplicationStatus(e);
+                                    }}
+                                    name="applicationstausprs"
+                                    className="hidden-toggles__input"
+                                    checked={
+                                      applicationstaus == "30" ? true : false
+                                    }
+                                  />
+                                  <label
+                                    for="srcoloration-Rejected"
+                                    className="hidden-toggles__label"
+                                  >
+                                    Rejected
+                                  </label>
+
+                                  <input
+                                    type="radio"
+                                    id="srcoloration-Deferred"
+                                    onChange={(e) => {
+                                      ChangeApplicationStatus(e);
+                                    }}
+                                    name="applicationstausprs"
+                                    value="40"
+                                    className="hidden-toggles__input"
+                                    checked={
+                                      applicationstaus == "40" ? true : false
+                                    }
+                                  />
+                                  <label
+                                    for="srcoloration-Deferred"
+                                    className="hidden-toggles__label"
+                                  >
+                                    Deferred
+                                  </label>
+
+                                  <input
+                                    type="radio"
+                                    id="srcoloration-Cancelled"
+                                    onChange={(e) => {
+                                      ChangeApplicationStatus(e);
+                                    }}
+                                    name="applicationstausprs"
+                                    value="25"
+                                    className="hidden-toggles__input"
+                                    checked={
+                                      applicationstaus == "25" ? true : false
+                                    }
+                                  />
+                                  <label
+                                    for="srcoloration-Cancelled"
+                                    className="hidden-toggles__label"
+                                  >
+                                    Cancelled
+                                  </label>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </>
+                      )}
                     </div>
 
                     {allcomment?.map((cur) => {
@@ -10131,6 +10842,11 @@ const ImportDashboardEditDetails = ({
                                   setapplicationstaus(
                                     applicationDetail?.analystRecommendation
                                   );
+                                  setOtherDepartment("");
+                                  setOtherDepartmentRole("");
+                                  setOtherDepartmentRoles([]);
+                                  setOtherDepartmentUser("");
+                                  setOtherDepartmentUsers([]);
                                 }}
                                 name="nextactiondupty"
                                 className={
@@ -10169,6 +10885,11 @@ const ImportDashboardEditDetails = ({
                                   setapplicationstaus(
                                     applicationDetail?.analystRecommendation
                                   );
+                                  setOtherDepartment("");
+                                  setOtherDepartmentRole("");
+                                  setOtherDepartmentRoles([]);
+                                  setOtherDepartmentUser("");
+                                  setOtherDepartmentUsers([]);
                                 }}
                                 onClick={() => setRecomdAnalyst("")}
                                 name="nextactiondupty"
@@ -10192,6 +10913,11 @@ const ImportDashboardEditDetails = ({
                                   setapplicationstaus(
                                     applicationDetail?.analystRecommendation
                                   );
+                                  setOtherDepartment("");
+                                  setOtherDepartmentRole("");
+                                  setOtherDepartmentRoles([]);
+                                  setOtherDepartmentUser("");
+                                  setOtherDepartmentUsers([]);
                                 }}
                                 name="nextactiondupty"
                                 onClick={() => setRecomdAnalyst("")}
@@ -10216,6 +10942,11 @@ const ImportDashboardEditDetails = ({
                                   setapplicationstaus(
                                     applicationDetail?.analystRecommendation
                                   );
+                                  setOtherDepartment("");
+                                  setOtherDepartmentRole("");
+                                  setOtherDepartmentRoles([]);
+                                  setOtherDepartmentUser("");
+                                  setOtherDepartmentUsers([]);
                                 }}
                                 name="nextactiondupty"
                                 onClick={() => setRecomdAnalyst("")}
@@ -10258,7 +10989,11 @@ const ImportDashboardEditDetails = ({
                       </div>
 
                       <div
-                        className={checkSupervisor == true ? "row" : "d-none"}
+                        className={
+                          checkSupervisor == true && nextlevelvalue != "35"
+                            ? "row"
+                            : "d-none"
+                        }
                       >
                         <div className="col-md-12 d-flex c-gap">
                           <div
@@ -10362,11 +11097,166 @@ const ImportDashboardEditDetails = ({
                         </div>
                       </div>
 
-                      {attachmentData?.map((items, index) => {
-                        return (
+                      {nextlevelvalue == 35 ? (
+                        <div className="row mt-2">
+                          <div className="col-md-6">
+                            <div className="inner_form_new align-items-center">
+                              <label className="controlform">Department</label>
+                              <div className="form-bx">
+                                <label>
+                                  <select
+                                    ref={optionOtherDepartmentRef}
+                                    name="OtherDepartment"
+                                    onChange={(e) => {
+                                      setOtherDepartment(e.target.value);
+                                      OtherDepartmentRole();
+                                      setOtherDepartmentRole("");
+                                      setOtherDepartmentRoles([]);
+                                      setOtherDepartmentUser("");
+                                      setOtherDepartmentUsers([]);
+                                    }}
+                                    className={
+                                      errors.assignedTo && !SupervisorRoleId
+                                        ? "error"
+                                        : ""
+                                    }
+                                  >
+                                    <option value="">Select Department</option>
+                                    <option value="2">Export</option>
+                                    <option value="4">
+                                      Foreign Investments
+                                    </option>
+                                    <option value="5">Inspectorate</option>
+                                  </select>
+                                  <span className="sspan"></span>
+                                  {errors.assignedTo && !SupervisorRoleId ? (
+                                    <small className="errormsg">
+                                      Senior Analyst is required{" "}
+                                    </small>
+                                  ) : (
+                                    ""
+                                  )}
+                                </label>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="col-md-3">
+                            <div className="inner_form_new-sm align-items-center">
+                              <label className="controlform-sm">Role</label>
+                              <div className="form-bx-sm">
+                                <label>
+                                  <select
+                                    onChange={(e) => {
+                                      setOtherDepartmentRole(e.target.value);
+                                      OtherDepartmentUserByRole(e.target.value);
+                                      setOtherDepartmentUser("");
+                                      setOtherDepartmentUsers([]);
+                                    }}
+                                  >
+                                    <option value="">Select Role</option>
+                                    {otherDepartmentRoles?.map(
+                                      (item, index) => {
+                                        return (
+                                          <option key={index} value={item.id}>
+                                            {item.name}
+                                          </option>
+                                        );
+                                      }
+                                    )}
+                                  </select>
+                                </label>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="col-md-3">
+                            <div className="inner_form_new-sm align-items-center">
+                              <label className="controlform-sm">User</label>
+                              <div className="form-bx-sm">
+                                <label>
+                                  <select
+                                    onChange={(e) =>
+                                      setOtherDepartmentUser(e.target.value)
+                                    }
+                                  >
+                                    <option value="">Select User</option>
+                                    {otherDepartmentUsers?.map(
+                                      (item, index) => {
+                                        return (
+                                          <option
+                                            key={index}
+                                            value={item.userID}
+                                          >
+                                            {item.name}
+                                          </option>
+                                        );
+                                      }
+                                    )}
+                                  </select>
+                                </label>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        ""
+                      )}
+
+                      {nextlevelvalue != "35" &&
+                        attachmentData?.map((items, index) => {
+                          return (
+                            <div
+                              className="attachemt_form-bx  mt-2"
+                              key={items.id}
+                            >
+                              <label
+                                style={{
+                                  background: "#d9edf7",
+                                  padding: "9px 3px",
+                                  border: "0px",
+                                }}
+                              >
+                                <span style={{ fontWeight: "500" }}>
+                                  {items.filename}
+                                </span>
+                              </label>
+                              <div className="browse-btn">
+                                Browse
+                                <input
+                                  type="file"
+                                  onChange={(e) =>
+                                    handleuserFileChange(e, "analyst" + index)
+                                  }
+                                />
+                              </div>
+                              <span className="filename">
+                                {userfiles?.find(
+                                  (f) => f.id === "analyst" + index
+                                )?.file?.name || "No file chosen"}
+                              </span>
+                              {userfiles?.length &&
+                              userfiles?.find((f) => f.id === "analyst" + index)
+                                ?.file?.name ? (
+                                <button
+                                  type="button"
+                                  className="remove-file"
+                                  onClick={() =>
+                                    removeUserImage(index, "analyst" + index)
+                                  }
+                                >
+                                  Remove
+                                </button>
+                              ) : (
+                                ""
+                              )}
+                            </div>
+                          );
+                        })}
+
+                      {nextlevelvalue != "35" &&
+                        otheruserfiles?.map((file, index) => (
                           <div
-                            className="attachemt_form-bx  mt-2"
-                            key={items.id}
+                            key={"other" + (index + 1)}
+                            className="attachemt_form-bx"
                           >
                             <label
                               style={{
@@ -10375,32 +11265,31 @@ const ImportDashboardEditDetails = ({
                                 border: "0px",
                               }}
                             >
-                              <span style={{ fontWeight: "500" }}>
-                                {items.filename}
-                              </span>
+                              Other File
+                              {index + 1}
                             </label>
                             <div className="browse-btn">
-                              Browse
+                              Browse{" "}
                               <input
                                 type="file"
-                                onChange={(e) =>
-                                  handleuserFileChange(e, "analyst" + index)
-                                }
+                                onChange={(e) => {
+                                  handleuserFileChange(e, "other" + index);
+                                }}
                               />
                             </div>
                             <span className="filename">
-                              {userfiles?.find(
-                                (f) => f.id === "analyst" + index
-                              )?.file?.name || "No file chosen"}
+                              {userfiles?.find((f) => f.id === "other" + index)
+                                ?.file?.name || "No file chosen"}
                             </span>
+
                             {userfiles?.length &&
-                            userfiles?.find((f) => f.id === "analyst" + index)
+                            userfiles?.find((f) => f.id === "other" + index)
                               ?.file?.name ? (
                               <button
                                 type="button"
                                 className="remove-file"
                                 onClick={() =>
-                                  removeUserImage(index, "analyst" + index)
+                                  removeUserImage(index, "other" + index)
                                 }
                               >
                                 Remove
@@ -10409,57 +11298,10 @@ const ImportDashboardEditDetails = ({
                               ""
                             )}
                           </div>
-                        );
-                      })}
+                        ))}
 
-                      {otheruserfiles?.map((file, index) => (
-                        <div
-                          key={"other" + (index + 1)}
-                          className="attachemt_form-bx"
-                        >
-                          <label
-                            style={{
-                              background: "#d9edf7",
-                              padding: "9px 3px",
-                              border: "0px",
-                            }}
-                          >
-                            Other File
-                            {index + 1}
-                          </label>
-                          <div className="browse-btn">
-                            Browse{" "}
-                            <input
-                              type="file"
-                              onChange={(e) => {
-                                handleuserFileChange(e, "other" + index);
-                              }}
-                            />
-                          </div>
-                          <span className="filename">
-                            {userfiles?.find((f) => f.id === "other" + index)
-                              ?.file?.name || "No file chosen"}
-                          </span>
-
-                          {userfiles?.length &&
-                          userfiles?.find((f) => f.id === "other" + index)?.file
-                            ?.name ? (
-                            <button
-                              type="button"
-                              className="remove-file"
-                              onClick={() =>
-                                removeUserImage(index, "other" + index)
-                              }
-                            >
-                              Remove
-                            </button>
-                          ) : (
-                            ""
-                          )}
-                        </div>
-                      ))}
-
-                      {otheruserfiles?.length || userfiles?.length ? (
+                      {(otheruserfiles?.length || userfiles?.length) &&
+                      nextlevelvalue != "35" ? (
                         <div className="attachemt_form-bx">
                           <label style={{ border: "0px" }}>{""}</label>
                           <button
@@ -10549,7 +11391,6 @@ const ImportDashboardEditDetails = ({
                           </label>
                         </div>
                       </div>
-                      {/* end form-bx  */}
 
                       <div
                         className={roleID == 8 ? "inner_form_new " : "d-none"}
@@ -10607,438 +11448,452 @@ const ImportDashboardEditDetails = ({
                         </div>
                       </div>
 
-                      <div className="inner_form_new align-items-center">
-                        <label className="controlform">CC To</label>
-                        <div className=" cccto">
-                          <div className="flex justify-content-center multiSelect">
-                            <MultiSelect
-                              value={selectedBanks}
-                              onChange={(e) => setSelectedBanks(e.value)}
-                              options={vOption}
-                              onShow={onShow}
-                              optionLabel="name"
-                              placeholder="Select Banks"
-                              display="chip"
-                              className="w-full md:w-20rem"
-                            />
+                      {nextlevelvalue != "35" && (
+                        <>
+                          <div className="inner_form_new align-items-center">
+                            <label className="controlform">CC To</label>
+                            <div className=" cccto">
+                              <div className="flex justify-content-center multiSelect">
+                                {/* <MultiSelect
+                                  value={selectedBanks}
+                                  onChange={(e) => setSelectedBanks(e.value)}
+                                  options={vOption}
+                                  onShow={onShow}
+                                  optionLabel="name"
+                                  placeholder="Select Banks"
+                                  display="chip"
+                                  className="w-full md:w-20rem"
+                                /> */}
+                                <CustomMultiSelect
+                                  key="multyselectprinciple"
+                                  options={vOption}
+                                  onChange={(e) => handleChangeBank(e)}
+                                  value={selectedBanks}
+                                  isSelectAll={true}
+                                  menuPlacement={"bottom"}
+                                />
+                              </div>
+                            </div>
                           </div>
-                        </div>
-                      </div>
 
-                      <div
-                        className={
-                          roleID == 8
-                            ? "inner_form_new align-items-center"
-                            : "d-none"
-                        }
-                      >
-                        <label className="controlform">Is Return Needed?</label>
-                        <div className="hidden-toggles">
-                          <input
-                            type="radio"
-                            id="YesIsReturndpd"
-                            name="IsReturnpd"
-                            onChange={(e) => HandleIsReturnOption(e)}
-                            className="hidden-toggles__input"
-                            checked={IsReturn == "1"}
-                            value="1"
-                          />
-                          <label
-                            for="YesIsReturndpd"
-                            className="hidden-toggles__label"
-                            id={IsReturn}
-                          >
-                            Yes
-                          </label>
-                          <input
-                            type="radio"
-                            name="IsReturnpd"
-                            id="NoIsReturndpd"
-                            className="hidden-toggles__input"
-                            onChange={(e) => HandleIsReturnOption(e)}
-                            value="0"
-                            checked={IsReturn == "0"}
-                          />
-                          <label
-                            for={IsReturn == "0" ? "" : "NoIsReturndpd"}
-                            className="hidden-toggles__label"
-                          >
-                            No
-                          </label>
-                        </div>
-                      </div>
-
-                      <div className="row">
-                        <div className="col-md-7">
                           <div
                             className={
-                              roleID == 8 && IsReturnOption == "1"
+                              roleID == 8
                                 ? "inner_form_new align-items-center"
                                 : "d-none"
                             }
                           >
                             <label className="controlform">
-                              Return Frequency
+                              Is Return Needed?
                             </label>
-                            <div className="form-bx">
-                              <label>
-                                <select
-                                  name="ReturnFrequency"
-                                  onChange={(e) => SelectReturnFrequency(e)}
-                                >
-                                  <option value="0" defaultChecked>
-                                    Select Frequency
-                                  </option>
-                                  {AllFrequency?.map((item, index) => {
-                                    return (
-                                      <option
-                                        key={index}
-                                        value={item.id}
-                                        selected={
-                                          getFrequencyID == item.id &&
-                                          getFrequencyID != ""
-                                            ? true
-                                            : false
-                                        }
-                                      >
-                                        {item.name}
-                                      </option>
-                                    );
-                                  })}
-                                </select>
-                              </label>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="col-md-5">
-                          <div
-                            className={
-                              roleID == 8 &&
-                              IsReturn == "1" &&
-                              getFrequencyID == "1"
-                                ? "inner_form_new-sm"
-                                : "d-none"
-                            }
-                          >
-                            <label className="controlform-sm">
-                              Frequency Date
-                            </label>
-                            <div className="form-bx-sm">
-                              <DatePicker
-                                ref={FrequencyDateRef}
-                                placeholderText="Select Frequency Date"
-                                closeOnScroll={(e) => e.target === document}
-                                selected={IsReturnExpiringDate}
-                                onChange={(date) =>
-                                  setIsReturnExpiringDate(date)
-                                }
-                                peekNextMonth
-                                showMonthDropdown
-                                maxDate={new Date("03-31-2027")}
-                                minDate={new Date()}
-                                showYearDropdown
-                                dropdownMode="select"
-                                dateFormat="dd/MMM/yyyy"
-                                onKeyDown={(e) => {
-                                  const key = e.key;
-                                  const allowedKeys = /[0-9\/]/;
-                                  if (
-                                    !allowedKeys.test(key) &&
-                                    key !== "Backspace" &&
-                                    key !== "Delete"
-                                  ) {
-                                    e.preventDefault();
-                                  }
-                                }}
-                              />
-                              <span className="sspan"></span>
-                              {errors.IsReturnExpiringDate &&
-                              (IsReturnExpiringDate ==
-                                "Select Frequency Date " ||
-                                IsReturnExpiringDate == null) ? (
-                                <small
-                                  className="errormsg"
-                                  style={{ marginBottom: "9px" }}
-                                >
-                                  {errors.IsReturnExpiringDate}
-                                </small>
-                              ) : (
-                                ""
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div
-                        className={
-                          roleID == 8
-                            ? "inner_form_new align-items-center"
-                            : "d-none"
-                        }
-                      >
-                        <label className="controlform">
-                          Is Expiry Required?
-                        </label>
-                        <div className="hidden-toggles">
-                          <input
-                            type="radio"
-                            id="exprqdp"
-                            name="dateexpitydp"
-                            onChange={(e) => HandleDateExpiryOption(e)}
-                            className="hidden-toggles__input"
-                            checked={defaultnoExpiry == "1"}
-                            value="1"
-                          />
-                          <label
-                            for={defaultnoExpiry == "1" ? "" : "exprqdp"}
-                            className="hidden-toggles__label"
-                          >
-                            Yes
-                          </label>
-                          <input
-                            type="radio"
-                            name="dateexpitydp"
-                            id="noexpdp"
-                            className="hidden-toggles__input"
-                            onChange={(e) => {
-                              HandleDateExpiryOption(e);
-                              setExpiringDate(null);
-                            }}
-                            value="0"
-                            checked={defaultnoExpiry == "0"}
-                          />
-                          <label
-                            for={defaultnoExpiry == "0" ? "" : "noexpdp"}
-                            className="hidden-toggles__label"
-                          >
-                            No
-                          </label>
-                        </div>
-                      </div>
-
-                      <div className="row">
-                        <div className="col-md-7">
-                          <div
-                            className={
-                              roleID == 8 && DateExpiryOption == "1"
-                                ? "inner_form_new align-items-center"
-                                : "d-none"
-                            }
-                          >
-                            <label className="controlform">
-                              Define Expiry Date
-                            </label>
-
-                            <div
-                              className={
-                                DateExpiryOption == "1"
-                                  ? "hidden-toggles"
-                                  : "d-none"
-                              }
-                            >
-                              <input
-                                type="radio"
-                                ref={dateExpirydisplayRef}
-                                id="defineddatedp"
-                                className="hidden-toggles__input"
-                                name="dateExpirydisplaydp"
-                                onChange={(e) =>
-                                  setDateExpirydisplay(e.target.value)
-                                }
-                                value="0"
-                                checked={
-                                  DateExpirydisplay != "" &&
-                                  DateExpirydisplay == "0" &&
-                                  DateExpiryOption == "1"
-                                }
-                              />{" "}
-                              <label
-                                for="defineddatedp"
-                                className="hidden-toggles__label"
-                              >
-                                Specific Date
-                              </label>
-                              <input
-                                type="radio"
-                                ref={optionExpirydisplayRef}
-                                id="rerpetualdatedp"
-                                name="dateExpirydisplaydp"
-                                onChange={(e) => {
-                                  setDateExpirydisplay(e.target.value);
-                                  setExpiringDate(null);
-                                }}
-                                className="hidden-toggles__input"
-                                value="1"
-                                checked={
-                                  DateExpirydisplay == "1" &&
-                                  DateExpiryOption == "1"
-                                }
-                              />
-                              <label
-                                for="rerpetualdatedp"
-                                className="hidden-toggles__label"
-                              >
-                                Perpetual
-                              </label>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="col-md-5">
-                          <div
-                            className={
-                              roleID == 8 &&
-                              DateExpirydisplay == "0" &&
-                              DateExpiryOption == "1"
-                                ? "inner_form_new-sm"
-                                : "d-none"
-                            }
-                          >
-                            <label className="controlform-sm">
-                              Expiry Date
-                            </label>
-
-                            <div className="form-bx-sm">
-                              <DatePicker
-                                placeholderText="Select Expiry Date"
-                                closeOnScroll={(e) => e.target === document}
-                                selected={ExpiringDate}
-                                onChange={(date) => setExpiringDate(date)}
-                                peekNextMonth
-                                showMonthDropdown
-                                minDate={new Date()}
-                                showYearDropdown
-                                dropdownMode="select"
-                                dateFormat="dd/MMM/yyyy"
-                                onKeyDown={(e) => {
-                                  const key = e.key;
-                                  const allowedKeys = /[0-9\/]/;
-                                  if (
-                                    !allowedKeys.test(key) &&
-                                    key !== "Backspace" &&
-                                    key !== "Delete"
-                                  ) {
-                                    e.preventDefault();
-                                  }
-                                }}
-                              />
-
-                              <span className="sspan"></span>
-                              {errors.ExpiringDate &&
-                              (ExpiringDate == "Select Expiring Date " ||
-                                ExpiringDate == null) ? (
-                                <small
-                                  className="errormsg"
-                                  style={{ marginBottom: "9px" }}
-                                >
-                                  {errors.ExpiringDate}
-                                </small>
-                              ) : (
-                                ""
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div
-                        className={
-                          (roleID == 8 && nextlevelvalue == "") ||
-                          recomdAnalyst == "121"
-                            ? "inner_form_new align-items-center"
-                            : "d-none"
-                        }
-                      >
-                        <label className="controlform">Decision</label>
-                        <div className="row">
-                          <div className="col-md-12">
                             <div className="hidden-toggles">
                               <input
                                 type="radio"
-                                id="srcoloration-Approvedved4"
-                                value="10"
-                                onChange={(e) => {
-                                  ChangeApplicationStatus(e);
-                                  GetRoleHandle(10);
-                                }}
-                                name="applicationstausdp"
+                                id="YesIsReturndpd"
+                                name="IsReturnpd"
+                                onChange={(e) => HandleIsReturnOption(e)}
                                 className="hidden-toggles__input"
-                                checked={
-                                  applicationstaus == "10" ? true : false
-                                }
+                                checked={IsReturn == "1"}
+                                value="1"
                               />
                               <label
-                                for="srcoloration-Approvedved4"
+                                for="YesIsReturndpd"
                                 className="hidden-toggles__label"
+                                id={IsReturn}
                               >
-                                Approved
+                                Yes
                               </label>
-
                               <input
                                 type="radio"
-                                id="srcoloration-Rejected"
-                                value="30"
-                                onChange={(e) => {
-                                  ChangeApplicationStatus(e);
-                                }}
-                                name="applicationstausdp"
+                                name="IsReturnpd"
+                                id="NoIsReturndpd"
                                 className="hidden-toggles__input"
-                                checked={
-                                  applicationstaus == "30" ? true : false
-                                }
+                                onChange={(e) => HandleIsReturnOption(e)}
+                                value="0"
+                                checked={IsReturn == "0"}
                               />
                               <label
-                                for="srcoloration-Rejected"
+                                for={IsReturn == "0" ? "" : "NoIsReturndpd"}
                                 className="hidden-toggles__label"
                               >
-                                Rejected
-                              </label>
-
-                              <input
-                                type="radio"
-                                id="srcoloration-Deferred"
-                                onChange={(e) => {
-                                  ChangeApplicationStatus(e);
-                                }}
-                                name="applicationstausdp"
-                                value="40"
-                                className="hidden-toggles__input"
-                                checked={
-                                  applicationstaus == "40" ? true : false
-                                }
-                              />
-                              <label
-                                for="srcoloration-Deferred"
-                                className="hidden-toggles__label"
-                              >
-                                Deferred
-                              </label>
-
-                              <input
-                                type="radio"
-                                id="srcoloration-Cancelled"
-                                onChange={(e) => {
-                                  ChangeApplicationStatus(e);
-                                }}
-                                name="applicationstausdp"
-                                value="25"
-                                className="hidden-toggles__input"
-                                checked={
-                                  applicationstaus == "25" ? true : false
-                                }
-                              />
-                              <label
-                                for="srcoloration-Cancelled"
-                                className="hidden-toggles__label"
-                              >
-                                Cancelled
+                                No
                               </label>
                             </div>
                           </div>
-                        </div>
-                      </div>
+
+                          <div className="row">
+                            <div className="col-md-7">
+                              <div
+                                className={
+                                  roleID == 8 && IsReturnOption == "1"
+                                    ? "inner_form_new align-items-center"
+                                    : "d-none"
+                                }
+                              >
+                                <label className="controlform">
+                                  Return Frequency
+                                </label>
+                                <div className="form-bx">
+                                  <label>
+                                    <select
+                                      name="ReturnFrequency"
+                                      onChange={(e) => SelectReturnFrequency(e)}
+                                    >
+                                      <option value="0" defaultChecked>
+                                        Select Frequency
+                                      </option>
+                                      {AllFrequency?.map((item, index) => {
+                                        return (
+                                          <option
+                                            key={index}
+                                            value={item.id}
+                                            selected={
+                                              getFrequencyID == item.id &&
+                                              getFrequencyID != ""
+                                                ? true
+                                                : false
+                                            }
+                                          >
+                                            {item.name}
+                                          </option>
+                                        );
+                                      })}
+                                    </select>
+                                  </label>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="col-md-5">
+                              <div
+                                className={
+                                  roleID == 8 &&
+                                  IsReturn == "1" &&
+                                  getFrequencyID == "1"
+                                    ? "inner_form_new-sm"
+                                    : "d-none"
+                                }
+                              >
+                                <label className="controlform-sm">
+                                  Frequency Date
+                                </label>
+                                <div className="form-bx-sm">
+                                  <DatePicker
+                                    ref={FrequencyDateRef}
+                                    placeholderText="Select Frequency Date"
+                                    closeOnScroll={(e) => e.target === document}
+                                    selected={IsReturnExpiringDate}
+                                    onChange={(date) =>
+                                      setIsReturnExpiringDate(date)
+                                    }
+                                    peekNextMonth
+                                    showMonthDropdown
+                                    maxDate={new Date("03-31-2027")}
+                                    minDate={new Date()}
+                                    showYearDropdown
+                                    dropdownMode="select"
+                                    dateFormat="dd/MMM/yyyy"
+                                    onKeyDown={(e) => {
+                                      const key = e.key;
+                                      const allowedKeys = /[0-9\/]/;
+                                      if (
+                                        !allowedKeys.test(key) &&
+                                        key !== "Backspace" &&
+                                        key !== "Delete"
+                                      ) {
+                                        e.preventDefault();
+                                      }
+                                    }}
+                                  />
+                                  <span className="sspan"></span>
+                                  {errors.IsReturnExpiringDate &&
+                                  (IsReturnExpiringDate ==
+                                    "Select Frequency Date " ||
+                                    IsReturnExpiringDate == null) ? (
+                                    <small
+                                      className="errormsg"
+                                      style={{ marginBottom: "9px" }}
+                                    >
+                                      {errors.IsReturnExpiringDate}
+                                    </small>
+                                  ) : (
+                                    ""
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div
+                            className={
+                              roleID == 8
+                                ? "inner_form_new align-items-center"
+                                : "d-none"
+                            }
+                          >
+                            <label className="controlform">
+                              Is Expiry Required?
+                            </label>
+                            <div className="hidden-toggles">
+                              <input
+                                type="radio"
+                                id="exprqdp"
+                                name="dateexpitydp"
+                                onChange={(e) => HandleDateExpiryOption(e)}
+                                className="hidden-toggles__input"
+                                checked={defaultnoExpiry == "1"}
+                                value="1"
+                              />
+                              <label
+                                for={defaultnoExpiry == "1" ? "" : "exprqdp"}
+                                className="hidden-toggles__label"
+                              >
+                                Yes
+                              </label>
+                              <input
+                                type="radio"
+                                name="dateexpitydp"
+                                id="noexpdp"
+                                className="hidden-toggles__input"
+                                onChange={(e) => {
+                                  HandleDateExpiryOption(e);
+                                  setExpiringDate(null);
+                                }}
+                                value="0"
+                                checked={defaultnoExpiry == "0"}
+                              />
+                              <label
+                                for={defaultnoExpiry == "0" ? "" : "noexpdp"}
+                                className="hidden-toggles__label"
+                              >
+                                No
+                              </label>
+                            </div>
+                          </div>
+
+                          <div className="row">
+                            <div className="col-md-7">
+                              <div
+                                className={
+                                  roleID == 8 && DateExpiryOption == "1"
+                                    ? "inner_form_new align-items-center"
+                                    : "d-none"
+                                }
+                              >
+                                <label className="controlform">
+                                  Define Expiry Date
+                                </label>
+
+                                <div
+                                  className={
+                                    DateExpiryOption == "1"
+                                      ? "hidden-toggles"
+                                      : "d-none"
+                                  }
+                                >
+                                  <input
+                                    type="radio"
+                                    ref={dateExpirydisplayRef}
+                                    id="defineddatedp"
+                                    className="hidden-toggles__input"
+                                    name="dateExpirydisplaydp"
+                                    onChange={(e) =>
+                                      setDateExpirydisplay(e.target.value)
+                                    }
+                                    value="0"
+                                    checked={
+                                      DateExpirydisplay != "" &&
+                                      DateExpirydisplay == "0" &&
+                                      DateExpiryOption == "1"
+                                    }
+                                  />{" "}
+                                  <label
+                                    for="defineddatedp"
+                                    className="hidden-toggles__label"
+                                  >
+                                    Specific Date
+                                  </label>
+                                  <input
+                                    type="radio"
+                                    ref={optionExpirydisplayRef}
+                                    id="rerpetualdatedp"
+                                    name="dateExpirydisplaydp"
+                                    onChange={(e) => {
+                                      setDateExpirydisplay(e.target.value);
+                                      setExpiringDate(null);
+                                    }}
+                                    className="hidden-toggles__input"
+                                    value="1"
+                                    checked={
+                                      DateExpirydisplay == "1" &&
+                                      DateExpiryOption == "1"
+                                    }
+                                  />
+                                  <label
+                                    for="rerpetualdatedp"
+                                    className="hidden-toggles__label"
+                                  >
+                                    Perpetual
+                                  </label>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="col-md-5">
+                              <div
+                                className={
+                                  roleID == 8 &&
+                                  DateExpirydisplay == "0" &&
+                                  DateExpiryOption == "1"
+                                    ? "inner_form_new-sm"
+                                    : "d-none"
+                                }
+                              >
+                                <label className="controlform-sm">
+                                  Expiry Date
+                                </label>
+
+                                <div className="form-bx-sm">
+                                  <DatePicker
+                                    placeholderText="Select Expiry Date"
+                                    closeOnScroll={(e) => e.target === document}
+                                    selected={ExpiringDate}
+                                    onChange={(date) => setExpiringDate(date)}
+                                    peekNextMonth
+                                    showMonthDropdown
+                                    minDate={new Date()}
+                                    showYearDropdown
+                                    dropdownMode="select"
+                                    dateFormat="dd/MMM/yyyy"
+                                    onKeyDown={(e) => {
+                                      const key = e.key;
+                                      const allowedKeys = /[0-9\/]/;
+                                      if (
+                                        !allowedKeys.test(key) &&
+                                        key !== "Backspace" &&
+                                        key !== "Delete"
+                                      ) {
+                                        e.preventDefault();
+                                      }
+                                    }}
+                                  />
+
+                                  <span className="sspan"></span>
+                                  {errors.ExpiringDate &&
+                                  (ExpiringDate == "Select Expiring Date " ||
+                                    ExpiringDate == null) ? (
+                                    <small
+                                      className="errormsg"
+                                      style={{ marginBottom: "9px" }}
+                                    >
+                                      {errors.ExpiringDate}
+                                    </small>
+                                  ) : (
+                                    ""
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div
+                            className={
+                              (roleID == 8 && nextlevelvalue == "") ||
+                              recomdAnalyst == "121"
+                                ? "inner_form_new align-items-center"
+                                : "d-none"
+                            }
+                          >
+                            <label className="controlform">Decision</label>
+                            <div className="row">
+                              <div className="col-md-12">
+                                <div className="hidden-toggles">
+                                  <input
+                                    type="radio"
+                                    id="srcoloration-Approvedved4"
+                                    value="10"
+                                    onChange={(e) => {
+                                      ChangeApplicationStatus(e);
+                                      GetRoleHandle(10);
+                                    }}
+                                    name="applicationstausdp"
+                                    className="hidden-toggles__input"
+                                    checked={
+                                      applicationstaus == "10" ? true : false
+                                    }
+                                  />
+                                  <label
+                                    for="srcoloration-Approvedved4"
+                                    className="hidden-toggles__label"
+                                  >
+                                    Approved
+                                  </label>
+
+                                  <input
+                                    type="radio"
+                                    id="srcoloration-Rejected"
+                                    value="30"
+                                    onChange={(e) => {
+                                      ChangeApplicationStatus(e);
+                                    }}
+                                    name="applicationstausdp"
+                                    className="hidden-toggles__input"
+                                    checked={
+                                      applicationstaus == "30" ? true : false
+                                    }
+                                  />
+                                  <label
+                                    for="srcoloration-Rejected"
+                                    className="hidden-toggles__label"
+                                  >
+                                    Rejected
+                                  </label>
+
+                                  <input
+                                    type="radio"
+                                    id="srcoloration-Deferred"
+                                    onChange={(e) => {
+                                      ChangeApplicationStatus(e);
+                                    }}
+                                    name="applicationstausdp"
+                                    value="40"
+                                    className="hidden-toggles__input"
+                                    checked={
+                                      applicationstaus == "40" ? true : false
+                                    }
+                                  />
+                                  <label
+                                    for="srcoloration-Deferred"
+                                    className="hidden-toggles__label"
+                                  >
+                                    Deferred
+                                  </label>
+
+                                  <input
+                                    type="radio"
+                                    id="srcoloration-Cancelled"
+                                    onChange={(e) => {
+                                      ChangeApplicationStatus(e);
+                                    }}
+                                    name="applicationstausdp"
+                                    value="25"
+                                    className="hidden-toggles__input"
+                                    checked={
+                                      applicationstaus == "25" ? true : false
+                                    }
+                                  />
+                                  <label
+                                    for="srcoloration-Cancelled"
+                                    className="hidden-toggles__label"
+                                  >
+                                    Cancelled
+                                  </label>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </>
+                      )}
                     </div>
 
                     {allcomment?.map((cur) => {
@@ -12304,7 +13159,7 @@ const ImportDashboardEditDetails = ({
                         <label className="controlform">CC To</label>
                         <div className=" cccto">
                           <div className="flex justify-content-center multiSelect">
-                            <MultiSelect
+                            {/* <MultiSelect
                               value={selectedBanks}
                               onChange={(e) => setSelectedBanks(e.value)}
                               options={vOption}
@@ -12313,6 +13168,14 @@ const ImportDashboardEditDetails = ({
                               placeholder="Select Banks"
                               display="chip"
                               className="w-full md:w-20rem"
+                            /> */}
+                            <CustomMultiSelect
+                              key="multyselectprinciple"
+                              options={vOption}
+                              onChange={(e) => handleChangeBank(e)}
+                              value={selectedBanks}
+                              isSelectAll={true}
+                              menuPlacement={"bottom"}
                             />
                           </div>
                         </div>
@@ -13224,6 +14087,189 @@ const ImportDashboardEditDetails = ({
               ""
             )}
 
+            {roleID >= 5 ? (
+              <>
+                <h5
+                  className={
+                    sharefiletab
+                      ? "section_top_subheading mt-1 py-3 btn-collapse_active cursorpointer"
+                      : "section_top_subheading mt-1 py-3 cursorpointer"
+                  }
+                  onClick={() => setsharefiletab(!sharefiletab)}
+                >
+                  Shared File{" "}
+                  <span className="counter-tab">{viewShareFile?.length}</span>
+                  <span className="btn-collapse">
+                    <i className="bi bi-caret-down-fill"></i>
+                  </span>
+                </h5>
+
+                <div className={sharefiletab ? "customtab  mt-2" : "d-none"}>
+                  {viewShareFile?.map((items, index) => {
+                    return (
+                      <div className="attachemt_form-bx" key={items.id}>
+                        <label>
+                          {/* {items.filename} */}
+                          {items?.fileName
+                            ? items?.fileName
+                            : `FileUpload ${index}`}
+                        </label>
+                        <div
+                          className={
+                            roleID == 2 || roleID == 3 ? "browse-btn" : "d-none"
+                          }
+                        >
+                          Browse{" "}
+                          <input
+                            type="file"
+                            onChange={(e) => handleFileChange(e, items.id)}
+                          />
+                        </div>
+                        <span className="filename">
+                          <Link
+                            to={items?.filePath}
+                            target="_blank"
+                            className="viewbtn"
+                          >
+                            View File
+                          </Link>
+                        </span>
+                        <button
+                          type="button"
+                          onClick={(e) => handleRemovfile(items.id)}
+                          className="remove-file"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    );
+                  })}
+
+                  {attachmentData?.map((items, index) => {
+                    return (
+                      <div className="attachemt_form-bx  mt-2" key={items.id}>
+                        <label
+                          style={{
+                            background: "#d9edf7",
+                            padding: "9px 3px",
+                            border: "0px",
+                          }}
+                        >
+                          <span style={{ fontWeight: "500" }}>
+                            {items.filename}
+                          </span>
+                        </label>
+                        <div className="browse-btn">
+                          Browse
+                          <input
+                            type="file"
+                            onChange={(e) =>
+                              handleshareFileChange(e, `sharefile ${index}`)
+                            }
+                          />
+                        </div>
+                        <span className="filename">
+                          {sharefile?.find((f) => f.id === `sharefile ${index}`)
+                            ?.file?.name || "No file chosen"}
+                        </span>
+
+                        {sharefile?.length &&
+                        sharefile?.find((f) => f.id === `sharefile ${index}`)
+                          ?.file?.name ? (
+                          <button
+                            type="button"
+                            className="remove-file"
+                            onClick={() =>
+                              removeshareImage(index, `sharefile ${index}`)
+                            }
+                          >
+                            Remove
+                          </button>
+                        ) : (
+                          ""
+                        )}
+                      </div>
+                    );
+                  })}
+
+                  {othersharefile.map((file, index) => (
+                    <div
+                      key={"other" + (index + 1)}
+                      className="attachemt_form-bx"
+                    >
+                      <label
+                        style={{
+                          background: "#d9edf7",
+                          padding: "9px 3px",
+                          border: "0px",
+                        }}
+                      >
+                        <b>
+                          Other File
+                          {index + 1}
+                        </b>
+                      </label>
+                      <div className="browse-btn">
+                        Browse{" "}
+                        <input
+                          type="file"
+                          onChange={(e) => {
+                            handleshareFileChange(
+                              e,
+                              "sharefileother" + (index + 1)
+                            );
+                            handleOthrefile(e, "sharefileother" + (index + 1));
+                          }}
+                        />
+                      </div>
+                      <span className="filename">
+                        {sharefile?.find(
+                          (f) => f.id === "sharefileother" + (index + 1)
+                        )?.file?.name || "No file chosen"}
+                      </span>
+                      {sharefile?.length &&
+                      sharefile?.find(
+                        (f) => f.id === "sharefileother" + (index + 1)
+                      )?.file?.name ? (
+                        <button
+                          type="button"
+                          className="remove-file"
+                          onClick={() =>
+                            removeshareImage(
+                              index,
+                              "sharefileother" + (index + 1)
+                            )
+                          }
+                        >
+                          Remove
+                        </button>
+                      ) : (
+                        ""
+                      )}
+                    </div>
+                  ))}
+
+                  {sharefile?.length ? (
+                    <div className="attachemt_form-bx">
+                      <label style={{ border: "0px" }}>{""}</label>
+                      <button
+                        type="button"
+                        className="addmore-btn mt-0"
+                        onClick={(e) => handlesharefileAddMore(e)}
+                      >
+                        {" "}
+                        Add More File{" "}
+                      </button>
+                    </div>
+                  ) : (
+                    ""
+                  )}
+                </div>
+              </>
+            ) : (
+              ""
+            )}
+
             <>
               <h5
                 className={
@@ -13294,75 +14340,98 @@ const ImportDashboardEditDetails = ({
               </button>
 
               <div>
-              {(roleID > 5 &&
-                    recomdAnalyst == "121" &&
-                    applicationstaus != "25") ||
-                  (roleID == 3 &&
-                    applicationstaus &&
-                    applicationstaus != 0 &&
-                    applicationstaus != "25") ||
-                  (roleID == 3 &&
-                    nextlevelvalue == "10" &&
-                    applicationstaus != "25") ? (
-                    <>
-                      <button
-                        type="button"
-                        className="login m-end-4"
-                        onClick={() => GetHandelDetailPDF()}
-                        disabled={btnLoader}
-                      >
-                        {btnLoader ? (
-                          <span className="loaderwait">Please Wait...</span>
-                        ) : (
-                          <span>Preview PDF</span>
-                        )}
-                      </button>
-                    </>
-                  ) : (
-                    ""
-                  )}
+                {(roleID > 5 &&
+                  recomdAnalyst == "121" &&
+                  applicationstaus != "25") ||
+                (roleID == 3 &&
+                  applicationstaus &&
+                  applicationstaus != 0 &&
+                  applicationstaus != "25") ||
+                (roleID == 3 &&
+                  nextlevelvalue == "10" &&
+                  applicationstaus != "25") ? (
+                  <>
+                    <button
+                      type="button"
+                      className="login m-end-4"
+                      onClick={() => GetHandelDetailPDF()}
+                      disabled={btnLoader}
+                    >
+                      {btnLoader ? (
+                        <span className="loaderwait">Please Wait...</span>
+                      ) : (
+                        <span>Preview PDF</span>
+                      )}
+                    </button>
+                  </>
+                ) : (
+                  ""
+                )}
 
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    HandleSubmit(e);
-                  }}
-                  className="login"
-                  disabled={
-                    ((applicationstaus == 3 ||
-                      AssignUserID == "" ||
-                      AssignUserID == null ||
-                      Description == "" ||
-                      Description == null ||
-                      !Description) &&
-                      applicationDetail?.analystDescription == null &&
-                      roleID == 5) ||
-                    updatepopup == true ||
-                    (AssignUserID == "" && roleID == 4) ||
-                    (nextlevelvalue == "" && roleID == 5) ||
-                    ((applicationstaus == "0" || applicationstaus == "") &&
-                      roleID == 5) ||
-                    SubmitBtnLoader == true
-                      ? true
-                      : false
-                  }
-                >
-                  {(roleID > 5 &&
-                    nextlevelvalue != "15" &&
-                    nextlevelvalue != "20" &&
-                    nextlevelvalue != "35" &&
-                    recomdAnalyst == "121") ||
-                  (roleID == 3 &&
-                    checkSupervisor == false &&
-                    nextlevelvalue == "")
-                    ? "Submit & Close"
-                    : "Submit"}{" "}
-                  {SubmitBtnLoader == true ? (
-                    <div className="smallloader"></div>
-                  ) : (
-                    ""
-                  )}
-                </button>
+                {nextlevelvalue == 35 ? (
+                  <button
+                    className="btn btn-primary"
+                    type="button"
+                    disabled={
+                      !otherDepartmentRole ||
+                      !otherDepartmentUser ||
+                      !asignnextLeveldata.Comment ||
+                      !asignnextLeveldata.Notes ||
+                      OtherDepartmentLoader
+                        ? true
+                        : false
+                    }
+                    onClick={() => SubmitOtherDepartment()}
+                  >
+                    {OtherDepartmentLoader ? (
+                      <span className="loaderwait">Please Wait...</span>
+                    ) : (
+                      <span>Submit</span>
+                    )}
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      HandleSubmit(e);
+                    }}
+                    className="login"
+                    disabled={
+                      ((applicationstaus == 3 ||
+                        AssignUserID == "" ||
+                        AssignUserID == null ||
+                        Description == "" ||
+                        Description == null ||
+                        !Description) &&
+                        applicationDetail?.analystDescription == null &&
+                        roleID == 5) ||
+                      updatepopup == true ||
+                      (AssignUserID == "" && roleID == 4) ||
+                      (nextlevelvalue == "" && roleID == 5) ||
+                      ((applicationstaus == "0" || applicationstaus == "") &&
+                        roleID == 5) ||
+                      SubmitBtnLoader == true
+                        ? true
+                        : false
+                    }
+                  >
+                    {(roleID > 5 &&
+                      nextlevelvalue != "15" &&
+                      nextlevelvalue != "20" &&
+                      nextlevelvalue != "35" &&
+                      recomdAnalyst == "121") ||
+                    (roleID == 3 &&
+                      checkSupervisor == false &&
+                      nextlevelvalue == "")
+                      ? "Submit & Close"
+                      : "Submit"}{" "}
+                    {SubmitBtnLoader == true ? (
+                      <div className="smallloader"></div>
+                    ) : (
+                      ""
+                    )}
+                  </button>
+                )}
               </div>
 
               {/* pdf-preview data start Arun Verma Final Pdf Generation and Preview */}
@@ -13453,20 +14522,6 @@ const ImportDashboardEditDetails = ({
                             ? applicationDetail?.bankAddress3
                             : ""}
                           <br />
-                          {/* <span
-                            style={{
-                              borderBottom: "1px solid #000",
-                              fontWeight: "800",
-                              fontSize: "18px",
-                              letterSpacing: "0.01px"
-                            }}
-                            className="text-uppercase"
-                          >
-                            {applicationDetail?.bankCity != null ||
-                            applicationDetail?.bankCity != ""
-                              ? applicationDetail?.bankCity
-                              : ""}
-                          </span> */}
                         </td>
                       </tr>
                       <tr>
@@ -13483,13 +14538,6 @@ const ImportDashboardEditDetails = ({
                           }}
                         >
                           Dear{" "}
-                          {/* {applicationDetail?.applicantType == 1
-                            ? applicationDetail?.companyName
-                            : applicationDetail?.applicantType == 2
-                            ? applicationDetail?.name
-                            : applicationDetail?.applicantType == 3
-                            ? applicationDetail?.agencyName
-                            : " "} */}
                           {applicationDetail?.companyName == null ||
                           applicationDetail?.companyName == ""
                             ? applicationDetail?.name
@@ -13530,7 +14578,7 @@ const ImportDashboardEditDetails = ({
                                   fontWeight: "400",
                                 }}
                               >
-                                Exporter
+                                Importer
                               </td>
                               <td
                                 style={{
@@ -13556,7 +14604,7 @@ const ImportDashboardEditDetails = ({
                                   letterSpacing: "0.01px",
                                 }}
                               >
-                                Date Submitted
+                                Date Submitted -1
                               </td>
                               <td
                                 style={{
@@ -13922,8 +14970,8 @@ const ImportDashboardEditDetails = ({
                                     display: "flex",
                                   }}
                                 >
-                                  {applicationDetail?.copiedResponses?.length || selectedBanks?.length >
-                                  0 ? (
+                                  {applicationDetail?.copiedResponses?.length ||
+                                  selectedBanks?.length > 0 ? (
                                     <>
                                       <p
                                         style={{
@@ -13946,7 +14994,7 @@ const ImportDashboardEditDetails = ({
                                                 fontWeight: "400",
                                               }}
                                             >
-                                              {item.name}
+                                              {item.label}
                                             </p>
                                           );
                                         })}
@@ -14104,7 +15152,7 @@ const ImportDashboardEditDetails = ({
                             <tr>
                               <td colSpan="2">&nbsp;</td>
                             </tr>
-                            <tr>
+                            {/* <tr>
                               <td
                                 style={{
                                   color: "#000",
@@ -14112,7 +15160,7 @@ const ImportDashboardEditDetails = ({
                                   fontWeight: "400",
                                 }}
                               >
-                                Exporter
+                                Importer
                               </td>
                               <td
                                 style={{
@@ -14128,7 +15176,7 @@ const ImportDashboardEditDetails = ({
                                   ? applicationDetail?.name
                                   : applicationDetail?.companyName}
                               </td>
-                            </tr>
+                            </tr> */}
                             <tr>
                               <td
                                 style={{
@@ -14154,7 +15202,7 @@ const ImportDashboardEditDetails = ({
                                 ).format("DD MMMM YYYY")}
                               </td>
                             </tr>
-                            <tr>
+                            {/* <tr>
                               <td
                                 style={{
                                   color: "#000",
@@ -14192,8 +15240,8 @@ const ImportDashboardEditDetails = ({
                                   {applicationDetail?.amount}
                                 </span>
                               </td>
-                            </tr>
-                            <tr>
+                            </tr> */}
+                            {/* <tr>
                               <td
                                 style={{
                                   color: "#000",
@@ -14231,8 +15279,8 @@ const ImportDashboardEditDetails = ({
                                   {applicationDetail?.usdEquivalent}
                                 </span>
                               </td>
-                            </tr>
-                            <tr>
+                            </tr> */}
+                            {/* <tr>
                               <td
                                 style={{
                                   color: "#000",
@@ -14261,9 +15309,9 @@ const ImportDashboardEditDetails = ({
                                   : applicationstaus == "25"
                                   ? "Cancelled"
                                   : ""}
-                                {/* {applicationDetail?.statusName} */}
+                                
                               </td>
-                            </tr>
+                            </tr> */}
                           </table>
                         </td>
                       </tr>
@@ -14483,37 +15531,23 @@ const ImportDashboardEditDetails = ({
                           ) : (
                             <>
                               <br />
-                              {applicationDetail?.bankAddress1 != null ||
-                              applicationDetail?.bankAddress1 != ""
-                                ? applicationDetail?.bankAddress1 + "," + " "
-                                : ""}
+                              {applicationDetail?.bankAddress1 == null ||
+                              applicationDetail?.bankAddress1 == ""
+                                ? ""
+                                : applicationDetail?.bankAddress1 + "," + " "}
                               <br></br>
-                              {applicationDetail?.bankAddress2 != null ||
-                              applicationDetail?.bankAddress2 != ""
-                                ? applicationDetail?.bankAddress2 + "," + " "
-                                : ""}
+                              {applicationDetail?.bankAddress2 == null ||
+                              applicationDetail?.bankAddress2 == ""
+                                ? ""
+                                : applicationDetail?.bankAddress2 + "," + " "}
                               <br></br>
-                              {applicationDetail?.bankAddress3 != null ||
-                              applicationDetail?.bankAddress3 != ""
-                                ? applicationDetail?.bankAddress3
-                                : ""}
+                              {applicationDetail?.bankAddress3 == null ||
+                              applicationDetail?.bankAddress3 == ""
+                                ? ""
+                                : applicationDetail?.bankAddress3}
                               <br />
                             </>
                           )}
-                          {/* <span
-                            style={{
-                              borderBottom: "1px solid #000",
-                              fontWeight: "800",
-                              fontSize: "18px",
-                              letterSpacing: "0.01px"
-                            }}
-                            className="text-uppercase"
-                          >
-                            {applicationDetail?.bankCity != null ||
-                            applicationDetail?.bankCity != ""
-                              ? applicationDetail?.bankCity
-                              : ""}
-                          </span> */}
                         </td>
                       </tr>
                       <tr>
@@ -14530,18 +15564,10 @@ const ImportDashboardEditDetails = ({
                           }}
                         >
                           Dear{" "}
-                          {/* {applicationDetail?.applicantType == 1
-                            ? applicationDetail?.companyName
-                            : applicationDetail?.applicantType == 2
-                            ? applicationDetail?.name
-                            : applicationDetail?.applicantType == 3
-                            ? applicationDetail?.agencyName
-                            : " "} */}
                           {applicationDetail?.companyName == null ||
                           applicationDetail?.companyName == ""
                             ? applicationDetail?.name
                             : applicationDetail?.companyName}
-                          {console.log(applicationDetail)},
                         </td>
                       </tr>
                       <tr>
@@ -14578,7 +15604,7 @@ const ImportDashboardEditDetails = ({
                                   fontWeight: "400",
                                 }}
                               >
-                                Exporter
+                                Importer
                               </td>
                               <td
                                 style={{
@@ -14593,7 +15619,6 @@ const ImportDashboardEditDetails = ({
                                 applicationDetail?.companyName == ""
                                   ? applicationDetail?.name
                                   : applicationDetail?.companyName}
-                                {console.log(applicationDetail)}
                               </td>
                             </tr>
                             <tr>
@@ -14604,7 +15629,7 @@ const ImportDashboardEditDetails = ({
                                   fontWeight: "400",
                                 }}
                               >
-                                Date Submitted
+                                Date Submitted -3
                               </td>
                               <td
                                 style={{
@@ -14968,9 +15993,8 @@ const ImportDashboardEditDetails = ({
                                     display: "flex",
                                   }}
                                 >
-                                  
-                                  {applicationDetail?.copiedResponses?.length || selectedBanks?.length >
-                                  0 ? (
+                                  {applicationDetail?.copiedResponses?.length ||
+                                  selectedBanks?.length > 0 ? (
                                     <>
                                       <p
                                         style={{
@@ -14994,7 +16018,7 @@ const ImportDashboardEditDetails = ({
                                                 fontWeight: "400",
                                               }}
                                             >
-                                              {item.name}
+                                              {item.label}
                                             </p>
                                           );
                                         })}
@@ -15095,15 +16119,15 @@ const ImportDashboardEditDetails = ({
                           ) : (
                             <>
                               <br />
-                              {applicationDetail?.bankAddress1 == null ||
-                              applicationDetail?.bankAddress1 == ""
-                                ? ""
-                                : applicationDetail?.bankAddress1 + "," + " "}
+                              {applicationDetail?.bankAddress1 != null ||
+                              applicationDetail?.bankAddress1 != ""
+                                ? applicationDetail?.bankAddress1 + "," + " "
+                                : ""}
                               <br></br>
-                              {applicationDetail?.bankAddress2 == null ||
-                              applicationDetail?.bankAddress2 == ""
-                                ? ""
-                                : applicationDetail?.bankAddress2 + "," + " "}
+                              {applicationDetail?.bankAddress2 != null ||
+                              applicationDetail?.bankAddress2 != ""
+                                ? applicationDetail?.bankAddress2 + "," + " "
+                                : ""}
                               <br></br>
                               {applicationDetail?.bankAddress3 != null ||
                               applicationDetail?.bankAddress3 != ""
@@ -15153,7 +16177,6 @@ const ImportDashboardEditDetails = ({
                           applicationDetail?.companyName == ""
                             ? applicationDetail?.name
                             : applicationDetail?.companyName}
-                          {console.log(applicationDetail)},
                         </td>
                       </tr>
                       <tr>
@@ -15190,7 +16213,7 @@ const ImportDashboardEditDetails = ({
                                   fontWeight: "400",
                                 }}
                               >
-                                Exporter
+                                Importer
                               </td>
                               <td
                                 style={{
@@ -15215,7 +16238,7 @@ const ImportDashboardEditDetails = ({
                                   fontWeight: "400",
                                 }}
                               >
-                                Date Submitted
+                                Date Submitted -4
                               </td>
                               <td
                                 style={{
@@ -15365,8 +16388,8 @@ const ImportDashboardEditDetails = ({
                                     display: "flex",
                                   }}
                                 >
-                                 {applicationDetail?.copiedResponses?.length || selectedBanks?.length >
-                                  0 ? (
+                                  {applicationDetail?.copiedResponses?.length ||
+                                  selectedBanks?.length > 0 ? (
                                     <>
                                       <p
                                         style={{
@@ -15390,7 +16413,7 @@ const ImportDashboardEditDetails = ({
                                                 fontWeight: "400",
                                               }}
                                             >
-                                              {item.name}
+                                              {item.label}
                                             </p>
                                           );
                                         })}
@@ -15414,6 +16437,17 @@ const ImportDashboardEditDetails = ({
                 <UpdatePopupMessage
                   heading={heading}
                   para={para}
+                  applicationNumber={applicationNumber}
+                  closePopupHandle={closePopupHandle}
+                ></UpdatePopupMessage>
+              ) : (
+                ""
+              )}
+
+              {OtherDepartmentPopup == true ? (
+                <UpdatePopupMessage
+                  heading={heading1}
+                  para={para1}
                   applicationNumber={applicationNumber}
                   closePopupHandle={closePopupHandle}
                 ></UpdatePopupMessage>

@@ -151,10 +151,7 @@
     border-radius: unset;
     background-color: #42a5f5;
 }
-
-.admin-sidebar .sidebar-nav {
-    height: 75%;
-}
+ 
 
 .adminDashboard .sc-dmXWDj {
     scrollbar-width: thin;
@@ -643,7 +640,7 @@ ul.labelbx li {
     top: 61px;
     left: 0;
     right: 0;
-    z-index: 111;
+    z-index: 1111;
 }
 
 

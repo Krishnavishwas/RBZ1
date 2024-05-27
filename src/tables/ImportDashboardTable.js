@@ -350,6 +350,21 @@ const ImportDashboardTable = () => {
       .catch((err) => {
         console.log(err);
       });
+
+      await axios
+      .post(APIURL + "ImportApplication/GetActionsByApplicationID", {
+        ID: id,
+      })
+      .then((res) => {
+        if (res.data.responseCode == 200) {
+          setActiondata(res.data.responseData);
+        } else {
+          setActiondata([]);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
   // ----- End Code For Geting Table Data
 

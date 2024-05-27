@@ -7,6 +7,7 @@ import AuthUser from "../login/AuthUser";
 import { Storage } from "../login/Storagesetting";
 import Menubar from "./Menubar";
 import Modal from "react-bootstrap/Modal";
+import moment from "moment";
 import { toast } from "react-toastify";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -57,6 +58,7 @@ const Header = () => {
   const [importuser, setimportuser] = useState([]);
   const [fibuser, setfib] = useState([]);
   const [inspecuser, setinspecuser] = useState([]);
+  const [actionHistory, setactionHistory] = useState([])
 
   const finalActiondata = allactingdata?.map((v) => {
     return {
@@ -115,6 +117,25 @@ const Header = () => {
       });
     }
   };
+
+  const handleActionghistor=()=>{
+    axios.post(APIURL + "User/GetActingRoleByUserID",{
+      UserID:userId.replace(/"/g, "")
+    })
+    .then((res)=>{
+      console.log("getactiong history",res)
+      if(res.data.responseCode == "200"){
+        setactionHistory(res.data.responseData)
+      }
+    })
+    .catch((err)=>{
+      console.log(err)
+    })
+  }
+
+  useEffect(()=>{
+    handleActionghistor()
+  },[])
 
   console.log("allactingdata", allactingdata);
 
@@ -176,7 +197,7 @@ const Header = () => {
       });
 
     axios
-      .post(APIURL + "ExportApplication/ExportApplicationCount", {
+      .post(APIURL + "User/MenuCount", {
         UserID: UserID?.replace(/"/g, ""),
         RoleID: valuess,
         BankID: bankId,
@@ -746,6 +767,32 @@ const Header = () => {
                        
 
                       </div>
+
+<div className="responsive-table">
+<table className="table table-custom">
+<tr>
+  <th>Start Date</th>
+  <th>End Date</th>
+  <th>Reason</th>
+  <th>Department/ User</th>
+  <th>Status</th> 
+</tr>
+{
+    actionHistory?.length && actionHistory?.map((item, index)=>{
+      return(
+        <tr>
+          <td>{moment(item?.assignedDate).format("DD/MMM/YYYY")}</td>
+          <td>{moment(item?.roleEndDate).format("DD/MMM/YYYY")}</td>
+          <td>{item?.reason}</td>
+          <td><span className="department-user">{item?.departmentName} / {item.userName}</span></td>
+          <td>{"--"}</td>
+        </tr>
+      )
+    })
+  }
+</table>
+</div>
+
                     </div>
                   </div>
 
