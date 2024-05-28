@@ -22,9 +22,18 @@ const ReferredDashboardTable = () => {
   const useId = Storage.getItem("userID");
   const rollId = Storage.getItem("roleIDs");
   const bankID = Storage.getItem("bankID");
-const menuname = Storage.getItem("menuname")
+  const menuname = Storage.getItem("menuname");
 
-const DeptID = menuname === "Exports" ? "2" : menuname === "Imports" ? "3": menuname === "Foreign Investments" ? "4" : menuname === "Inspectorate" ? "5" : ""
+  const DeptID =
+    menuname === "Exports"
+      ? "2"
+      : menuname === "Imports"
+      ? "3"
+      : menuname === "Foreign Investments"
+      ? "4"
+      : menuname === "Inspectorate"
+      ? "5"
+      : "";
 
   const [ExportsapproveRequests, setExportsapproveRequests] = useState([]);
   const [ExportsapproveAllRequests, setExportsapproveAllRequests] = useState(
@@ -109,7 +118,6 @@ const DeptID = menuname === "Exports" ? "2" : menuname === "Imports" ? "3": menu
             handleClickEditModal(rowData.title);
             GetHandelDetail(rowData?.rbzReferenceNumber, rowData.id);
             GetRoleHandle(applicationstaus);
-            // handleData();
             GetApplicationCount(rowData.id);
           }}
           onMouseEnter={(e) => {
@@ -248,17 +256,16 @@ const DeptID = menuname === "Exports" ? "2" : menuname === "Imports" ? "3": menu
           setPageLoader(false);
           setExportsapproveRequests(res.data.responseData);
         } else if (res.data.responseCode === "401") {
-          setExportsapproveRequests([])
+          setExportsapproveRequests([]);
           setPageLoader(false);
         }
       });
   };
 
   useEffect(() => {
-    setTabDepId(DeptID == "2" ? "3" : "2")
-    handleData()
-  }, [DeptID])
-  
+    setTabDepId(DeptID == "2" ? "3" : "2");
+    handleData();
+  }, [DeptID]);
 
   const handleViewData = (id) => {
     setShowUpdateModal(true);
@@ -323,6 +330,21 @@ const DeptID = menuname === "Exports" ? "2" : menuname === "Imports" ? "3": menu
         console.log(err);
       });
 
+    await axios
+      .post(APIURL + "ReferredApplication/GetReferredActionsByApplicationID", {
+        ID: id,
+      })
+      .then((res) => {
+        if (res.data.responseCode == 200) {
+          setActiondata(res.data.responseData);
+        } else {
+          setActiondata([]);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+
     // --------------------------vishwas start----------------------------
     await axios
       .post(APIURL + "ReferredApplication/GetReferredCommentsInfoByRoleID", {
@@ -362,44 +384,51 @@ const DeptID = menuname === "Exports" ? "2" : menuname === "Imports" ? "3": menu
   const tabHeader = (
     <div className="application-tab w-100 mt-4">
       <ul className="nav nav-pills mb-3">
-        {DeptID !== "2" && <li className="nav-item">
-          <a
-            className={tabDepId == "2" ? "nav-link active" : "nav-link"}
-            onClick={() => setTabDepId("2")}
-          >
-            Exports
-          </a>
-        </li>}
-      {DeptID !== "3" && <li className="nav-item">
-          <a
-            className={tabDepId == "3" ? "nav-link active" : "nav-link"}
-            onClick={() => setTabDepId("3")}
-          >
-            Imports
-          </a>
-        </li>}
-        {DeptID !== "4" && <li className="nav-item">
-          <a
-            className={tabDepId == "4" ? "nav-link active" : "nav-link"}
-            onClick={() => setTabDepId("4")}
-          >
-            Foreign Investments
-          </a>
-        </li>}
-        {DeptID !== "5" && <li className="nav-item">
-          <a
-            className={tabDepId == "5" ? "nav-link active" : "nav-link"}
-            onClick={() => setTabDepId("5")}
-          >
-            Inspectorate
-          </a>
-        </li>}
-        
+        {DeptID !== "2" && (
+          <li className="nav-item">
+            <a
+              className={tabDepId == "2" ? "nav-link active" : "nav-link"}
+              onClick={() => setTabDepId("2")}
+            >
+              Exports
+            </a>
+          </li>
+        )}
+        {DeptID !== "3" && (
+          <li className="nav-item">
+            <a
+              className={tabDepId == "3" ? "nav-link active" : "nav-link"}
+              onClick={() => setTabDepId("3")}
+            >
+              Imports
+            </a>
+          </li>
+        )}
+        {DeptID !== "4" && (
+          <li className="nav-item">
+            <a
+              className={tabDepId == "4" ? "nav-link active" : "nav-link"}
+              onClick={() => setTabDepId("4")}
+            >
+              Foreign Investments
+            </a>
+          </li>
+        )}
+        {DeptID !== "5" && (
+          <li className="nav-item">
+            <a
+              className={tabDepId == "5" ? "nav-link active" : "nav-link"}
+              onClick={() => setTabDepId("5")}
+            >
+              Inspectorate
+            </a>
+          </li>
+        )}
       </ul>
     </div>
   );
 
-  const onPageChange = (event) => {   
+  const onPageChange = (event) => {
     axios
       .post(APIURL + "ReferredApplication/GetReferredApplications", {
         UserID: useId.replace(/"/g, ""),
@@ -436,118 +465,6 @@ const DeptID = menuname === "Exports" ? "2" : menuname === "Imports" ? "3": menu
     handleData();
     setExportsapproveRequests([]);
   }, [tabDepId]);
-
-  // OLD
-  const [showOldModal, setShowOldModal] = useState(false);
-  const [oldApplicationDetail, setOldApplicationDetail] = useState({});
-  const [oldNoDataComment, setOldNoDataComment] = useState([]);
-  const [oldAllcomment, setOldAllcomment] = useState([]);
-  const [oldTatHistory, setOldTatHistory] = useState([]);
-  const [oldActiondata, setOldActiondata] = useState([]);
-  const [oldResponceCount, setOldResponceCount] = useState([]);
-  const [showOldDataLoader, setShowOldDataLoader] = useState(false);
-
-  const handleOldClose = () => setShowOldModal(false);
-
-  const handleOldViewData = (id) => {
-    setShowOldModal(true);
-  };
-
-  const GetOldHandelDetail = async (id) => {
-    setShowOldDataLoader(true);
-    await axios
-      .post(APIURL + "ImportApplication/GetImportRequestInfoByApplicationID", {
-        ID: id,
-      })
-      .then((res) => {
-        if (res.data.responseCode === "200") {
-          setOldApplicationDetail(res.data.responseData);
-          setTimeout(() => {
-            setShowOldDataLoader(false);
-          }, 2000);
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-
-    await axios
-      .post(APIURL + "ImportApplication/GetImportCommentsInfoByRoleID", {
-        ApplicationID: id,
-      })
-      .then((res) => {
-        if (res.data.responseCode == 200) {
-          setOldNoDataComment(res.data.responseData);
-        } else {
-          setOldNoDataComment([]);
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-
-    await axios
-      .post(APIURL + "ImportApplication/GetNewCommentsImport", {
-        ID: id,
-      })
-      .then((res) => {
-        if (res.data.responseCode == 200) {
-          setOldAllcomment(res.data.responseData);
-        } else {
-          setOldAllcomment([]);
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-
-    await axios
-      .post(APIURL + "ReferredApplication/GetReferredApplicationHistory", {
-        ID: id,
-      })
-      .then((res) => {
-        if (res.data.responseCode == 200) {
-          setOldTatHistory(res.data.responseData);
-        } else {
-          setOldTatHistory([]);
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-
-    await axios
-      .post(APIURL + "ImportApplication/GetActionsByApplicationID", {
-        ID: id,
-      })
-      .then((res) => {
-        if (res.data.responseCode == 200) {
-          setOldActiondata(res.data.responseData);
-        } else {
-          setOldActiondata([]);
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
-
-  const GetOldApplicationCount = async (id) => {
-    await axios
-      .post(APIURL + "ImportApplication/CountByApplicationIDImport", {
-        ApplicationID: id,
-      })
-      .then((res) => {
-        if (res.data.responseCode == 200) {
-          setOldResponceCount(res.data.responseData);
-        } else {
-          setOldResponceCount({});
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
 
   return (
     <>
@@ -707,35 +624,6 @@ const DeptID = menuname === "Exports" ? "2" : menuname === "Imports" ? "3": menu
                                 : ""}
                             </big>
                           </div>
-                          <div
-                            className={
-                              applicationDetail &&
-                              applicationDetail?.parentApplicationID == 0
-                                ? "d-none"
-                                : "col-md-6 text-center"
-                            }
-                          >
-                            <button
-                              className={
-                                applicationDetail?.parentApplicationID
-                                  ? "btn btn-light viewcopybtn"
-                                  : "d-none"
-                              }
-                              onClick={() => {
-                                handleOldViewData(
-                                  applicationDetail?.parentApplicationID
-                                );
-                                GetOldHandelDetail(
-                                  applicationDetail?.parentApplicationID
-                                );
-                                GetOldApplicationCount(
-                                  applicationDetail?.parentApplicationID
-                                );
-                              }}
-                            >
-                              View Old Application
-                            </button>
-                          </div>
                         </div>
                       </Modal.Title>
                     </Modal.Header>
@@ -772,42 +660,6 @@ const DeptID = menuname === "Exports" ? "2" : menuname === "Imports" ? "3": menu
                       supervisorHangechangeRole={supervisorHangechangeRole}
                       setSupervisorRoleId={setSupervisorRoleId}
                       noDataComment={noDataComment}
-                    />
-                  </Modal.Body>
-                </div>
-              </div>
-            </div>
-          </Modal>
-
-          <Modal
-            show={showOldModal}
-            onHide={handleOldClose}
-            backdrop="static"
-            className="max-width-600 oldModal-full"
-          >
-            <div className="application-box">
-              <div className="login_inner">
-                <div className="login_form ">
-                  <h5>
-                    <Modal.Header closeButton className="p-0">
-                      <Modal.Title>
-                        View Old Export Request --{" "}
-                        <big>{oldApplicationDetail?.rbzReferenceNumber}</big>
-                      </Modal.Title>
-                    </Modal.Header>
-                  </h5>
-                </div>
-                <div className="login_form_panel">
-                  <Modal.Body className="p-0">
-                    <ImportDashboardViewDetails
-                      applicationDetail={oldApplicationDetail}
-                      handleFormClose={handleOldClose}
-                      allcomment={oldAllcomment}
-                      tatHistory={oldTatHistory}
-                      Actiondata={oldActiondata}
-                      noDataComment={oldNoDataComment}
-                      showdataLoader={showOldDataLoader}
-                      responceCount={oldResponceCount}
                     />
                   </Modal.Body>
                 </div>

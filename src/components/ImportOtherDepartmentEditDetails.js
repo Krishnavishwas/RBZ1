@@ -460,6 +460,7 @@ const ImportOtherDepartmentEditDetails = ({
   };
 
   console.log("error", errors);
+  console.log("Actiondata - ", Actiondata);
 
   const closePopupHandle = () => {
     handleData();
@@ -9316,7 +9317,7 @@ const ImportOtherDepartmentEditDetails = ({
                 Close
               </button>
 
-              <div>                
+              <div>
                 {nextlevelvalue == 35 ? (
                   <button
                     className="btn btn-primary"
