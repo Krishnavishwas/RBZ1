@@ -12,6 +12,7 @@ import { Storage } from "../login/Storagesetting";
 import { Link } from "react-router-dom";
 import Modal from "react-bootstrap/Modal";
 
+import ExportCircularViewDetails from '../components/ExportCircularViewDetails'
 import ExportCircularsCreateForm from '../components/ExportCircularsCreateForm'
 import ExportCircularsEditForm from '../components/ExportCircularsEditForm'
 import { TailSpin } from "react-loader-spinner";
@@ -114,7 +115,7 @@ const ExportCircularsTable = () => {
     const action = (rowData) => {
         return (
             <>
-                {/* <i
+                <i
                     className="pi pi-eye"
                     style={{
                         padding: "10px 5px",
@@ -132,7 +133,7 @@ const ExportCircularsTable = () => {
                     onMouseLeave={(e) => {
                         e.target.style.color = "";
                     }}
-                ></i> */}
+                ></i>
 
                 <i
                     className="pi pi-user-edit"
@@ -372,7 +373,7 @@ const ExportCircularsTable = () => {
 
     // ----- Start Code For Geting Table Data
     const GetHandelDetail = async (rbzrefnumber, id) => {
-
+// console.log("id----------",id);
         setshowdataloader(true)
         await axios
             .post(APIURL + "Circular/GetCircularDataByID", {
@@ -399,8 +400,8 @@ const ExportCircularsTable = () => {
 
         await axios
             .post(
-                APIURL + "ExportApplication/GetCommentsInfoByRoleID", {
-                ApplicationID: id,
+                APIURL + "Circular/GetCommentsInfoByRoleIDCircular", {
+                CircularID: id,
             }
             )
             .then((res) => {
@@ -701,7 +702,43 @@ const ExportCircularsTable = () => {
 
             </Modal>
             {/* circular form modal end */}
-         
+            {/* circular view modal start */}
+            <Modal
+                show={showUpdateModal}
+                onHide={handleFormClose}
+                backdrop="static"
+                className="max-width-600"
+            >
+                <div className="application-box">
+                    <div className="login_inner">
+                        <div className="login_form ">
+                            <h5>
+                                <Modal.Header closeButton className="p-0">
+                                    <Modal.Title>
+                                        View Export Request --{" "}
+                                        <big>{applicationDetail?.circularReferenceNumber}</big>
+                                    </Modal.Title>
+                                </Modal.Header>
+                            </h5>
+                        </div>
+                        <div className="login_form_panel">
+                            <Modal.Body className="p-0">
+                                <ExportCircularViewDetails
+                                    applicationDetail={applicationDetail}
+                                    handleFormClose={handleFormClose}
+                                    allcomment={allcomment}
+                                    tatHistory={tatHistory}
+                                    Actiondata={Actiondata}
+                                    noDataComment={noDataComment}
+                                    showdataLoader={showdataLoader}
+                                    responceCount={responceCount}
+                                />
+                            </Modal.Body>
+                        </div>
+                    </div>
+                </div>
+            </Modal>
+            {/* circular view modal close */}
 
             <Modal
                 show={showEditForm}

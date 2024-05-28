@@ -138,9 +138,7 @@ const ExportDashboardRenewEditDetails = ({
   const [ValidateShow, setValidateShow] = useState(false);
   const [applicationType, setapplicationType] = useState([]);
   const [subsectorData, setsubsectorData] = useState([]);
-  const [checkSupervisor, setcheckSupervisor] = useState(
-    roleID == 4 ? true : false
-  );
+  const [checkSupervisor, setcheckSupervisor] = useState(roleID == 4 ? true : false);
   const [attachmentData, setAttachmentData] = useState([
     { filename: "File Upload", upload: "" },
   ]);
@@ -509,7 +507,7 @@ const ExportDashboardRenewEditDetails = ({
     }
   };
 
-  const HandleDateCurrRate = (e) => {
+  const HandleDateCurrRate = (e) => { 
     axios
       .post(APIURL + "Master/GetRateByCurrencyID", {
         Id: applicationDetail.currency,
@@ -524,11 +522,12 @@ const ExportDashboardRenewEditDetails = ({
       })
       .catch((err) => {
         console.log(err);
-      });
-  };
-  useEffect(() => {
-    HandleDateCurrRate();
-  }, [curRate]);
+      }); 
+};
+useEffect(()=>{
+  HandleDateCurrRate()
+},[curRate])
+ 
 
   // const HandleDateExpiryOption = (e) => {
   //   const { name, value } = e.target;
@@ -947,7 +946,7 @@ const ExportDashboardRenewEditDetails = ({
     setErrors({});
     setselectuserRoleRecordofficer(value);
     setAssignUserID("");
-    setSupervisorRoleId("");
+    setSupervisorRoleId(""); 
     if (bankSupervisorRef.current) bankSupervisorRef.current.value = "";
     if (value == "") {
       setGetalluser([]);
@@ -1599,7 +1598,7 @@ const ExportDashboardRenewEditDetails = ({
                       placeholder="Purpose of the Application"
                       className={errors.applicationPurpose ? "error" : ""}
                       value={applicationDetail.applicationPurpose}
-                      disabled={roleID == 2 || roleID == 3 ? false : true}
+                      disabled={roleID == 2 || roleID == 4 ? false : true}
                     />
                     <span className="sspan"></span>
                     {errors.applicationPurpose ? (
@@ -1678,7 +1677,7 @@ const ExportDashboardRenewEditDetails = ({
                         }
                         onMenuClose={handleClear}
                         className="selectinput"
-                        isDisabled={roleID == 2 || roleID == 3 ? false : true}
+                        isDisabled={roleID == 2 || roleID == 4 ? false : true}
                       />
 
                       {errors.companyName ? (
@@ -1745,7 +1744,7 @@ const ExportDashboardRenewEditDetails = ({
                               ? "error"
                               : ""
                           }
-                          disabled={roleID == 2 || roleID == 3 ? false : true}
+                          disabled={roleID == 2 || roleID == 4 ? false : true}
                         />
                         <span className="sspan"></span>
                         {errors.applicant && applicationDetail.name === "" ? (
@@ -1819,7 +1818,7 @@ const ExportDashboardRenewEditDetails = ({
                             ? "error"
                             : ""
                         }
-                        disabled={roleID == 2 || roleID == 3 ? false : true}
+                        disabled={roleID == 2 || roleID == 4 ? false : true}
                       >
                         <option value="">
                           Select Government Agencies Name
@@ -1871,7 +1870,7 @@ const ExportDashboardRenewEditDetails = ({
                           ? applicationDetail?.applicantReferenceNumber
                           : ""
                       }
-                      disabled={roleID == 2 || roleID == 3 ? false : true}
+                      disabled={roleID == 2 || roleID == 4 ? false : true}
                     />
                     <span className="sspan"></span>
                     {errors.applicantReferenceNumber ? (
@@ -1903,7 +1902,7 @@ const ExportDashboardRenewEditDetails = ({
                     showYearDropdown
                     dropdownMode="select"
                     dateFormat="dd/MMM/yyyy"
-                    disabled={roleID == 2 || roleID == 3 ? false : true}
+                    disabled={roleID == 2 || roleID == 4 ? false : true}
                     onKeyDown={(e) => {
                       const key = e.key;
                       const allowedKeys = /[0-9\/]/; // Allow numbers and '/'
@@ -1934,7 +1933,7 @@ const ExportDashboardRenewEditDetails = ({
                         changeHandelForm(e);
                       }}
                       className={errors.applicationTypeID ? "error" : ""}
-                      disabled={roleID == 2 || roleID == 3 ? false : true}
+                      disabled={roleID == 2 || roleID == 4 ? false : true}
                     >
                       <option value="">Select Application Type</option>
                       {applicationType?.map((item, ind) => {
@@ -1982,7 +1981,7 @@ const ExportDashboardRenewEditDetails = ({
                               ? "error"
                               : ""
                           }
-                          disabled={roleID == 2 || roleID == 3 ? false : true}
+                          disabled={roleID == 2 || roleID == 4 ? false : true}
                         >
                           <option value="">Select Currency</option>
                           {currency?.map((cur, ind) => {
@@ -2031,7 +2030,7 @@ const ExportDashboardRenewEditDetails = ({
                               ? "error"
                               : ""
                           }
-                          disabled={roleID == 2 || roleID == 3 ? false : true}
+                          disabled={roleID == 2 || roleID == 4 ? false : true}
                         />
                         <span className="sspan"></span>
                         {errors.amount && applicationDetail?.amount === "" ? (
@@ -2266,7 +2265,7 @@ const ExportDashboardRenewEditDetails = ({
                           ? "error"
                           : ""
                       }
-                      disabled={roleID == 2 || roleID == 3 ? false : true}
+                      disabled={roleID == 2 || roleID == 4 ? false : true}
                     >
                       <option value="">Select Sector</option>
                       {sectorData?.map((item, ind) => {
@@ -2303,7 +2302,7 @@ const ExportDashboardRenewEditDetails = ({
                       }}
                       disabled={
                         applicationDetail.sector === "" ||
-                        (roleID == 2 || roleID == 3 ? false : true)
+                        (roleID == 2 || roleID == 4 ? false : true)
                           ? true
                           : false
                       }
@@ -2345,7 +2344,7 @@ const ExportDashboardRenewEditDetails = ({
                       placeholder="Applicant Comments"
                       className={errors.applicantComment ? "error" : ""}
                       value={applicationDetail.applicantComment}
-                      disabled={roleID == 2 || roleID == 3 ? false : true}
+                      disabled={roleID == 2 || roleID == 4 ? false : true}
                     />
                     <span className="sspan"></span>
                     {errors.applicantComment ? (
@@ -2360,16 +2359,16 @@ const ExportDashboardRenewEditDetails = ({
               </div>
 
               <div className={roleID == 4 ? "d-none" : "inner_form_new "}>
-                <label className="controlform">Submit To Next Level </label>
-                <input
-                  type="checkbox"
-                  onChange={HandelSupervisorcheck}
-                  checked={checkSupervisor}
-                  disabled={roleID == 2 ? false : true}
-                />
-              </div>
+                  <label className="controlform">Submit To Next Level </label>
+                  <input
+                    type="checkbox"
+                    onChange={HandelSupervisorcheck}
+                    checked={checkSupervisor}
+                    disabled={roleID == 2 ? false : true}
+                  />
+                </div> 
 
-              {checkSupervisor === true && roleID == 2 ? (
+              {checkSupervisor === true && roleID == 2  ? (
                 <div className="inner_form_new ">
                   <label className="controlform">Bank Supervisor</label>
                   <div className="form-bx">
@@ -2413,87 +2412,87 @@ const ExportDashboardRenewEditDetails = ({
                 ""
               )}
 
-              {checkSupervisor == true && roleID == 4 ? (
-                <div className="inner_form_new ">
-                  <label className="controlform">
-                    RBZ Record Officer Submit to
-                  </label>
-                  <div className="form-bx">
-                    <label>
-                      <select
-                        name="SupervisorRoleId"
-                        onChange={(e) => {
-                          supervisorHangechangeRoleRecordofficer(e);
-                        }}
-                      >
-                        <option value="">Select Role</option>
-                        {userRole?.map((item, index) => {
-                          return (
-                            <option key={index} value={item.id}>
-                              {item.designation}
-                            </option>
-                          );
-                        })}
-                      </select>
-                      <span className="sspan"></span>
-                      {errors.selectuserRoleRecordofficer &&
-                      selectuserRoleRecordofficer === "" ? (
-                        <small className="errormsg">Role is required</small>
-                      ) : (
-                        ""
-                      )}
-                    </label>
-                  </div>
-                </div>
-              ) : (
-                ""
-              )}
+{checkSupervisor == true && roleID == 4 ? (
+          <div className="inner_form_new ">
+            <label className="controlform">RBZ Record Officer Submit to</label>
+            <div className="form-bx">
+              <label>
+                <select
+                  name="SupervisorRoleId"
+                  onChange={(e) => {
+                    supervisorHangechangeRoleRecordofficer(e);
+                  }}
+                  // className={
+                  //   errors.assignedTo && !SupervisorRoleId
+                  //     ? "error"
+                  //     : ""
+                  // }
+                >
+                  <option value="">Select Role</option>
+                  {userRole?.map((item, index) => {
+                    return (
+                      <option key={index} value={item.id}>
+                        {item.designation}
+                      </option>
+                    );
+                  })}
+                </select>
+                <span className="sspan"></span>
+                {errors.selectuserRoleRecordofficer && selectuserRoleRecordofficer === "" ? (
+                  <small className="errormsg">Role is required</small>
+                ) : (
+                  ""
+                )}
+              </label>
+            </div>
+          </div>
+        ) : (
+          ""
+        )}
 
-              {checkSupervisor == true && roleID == 4 && getalluser?.length ? (
-                <div className="w-100">
-                  <div className="inner_form_new">
-                    <label className="controlform">User</label>
+{checkSupervisor == true && roleID == 4 && getalluser?.length ? (
+          <div className="w-100">
+            <div className="inner_form_new">
+              <label className="controlform">User</label>
 
-                    <div className="form-bx">
-                      <label>
-                        <select
-                          ref={bankSupervisorRef}
-                          name="bankSupervisor"
-                          onChange={(e) => {
-                            handleuserByrecordOfficer(e);
-                          }}
-                          className={
-                            errors.bankSupervisor &&
-                            applicationDetail.bankSupervisor === ""
-                              ? "error"
-                              : ""
-                          }
-                        >
-                          <option value="" selected>
-                            Select User
-                          </option>
-                          {getalluser?.map((item, index) => {
-                            return (
-                              <option key={item.id} value={item.userID}>
-                                {item.name}
-                              </option>
-                            );
-                          })}
-                        </select>
-                        <span className="sspan"></span>
-                        {errors.bankSupervisor &&
-                        applicationDetail.bankSupervisor === "" ? (
-                          <small className="errormsg">User is required</small>
-                        ) : (
-                          ""
-                        )}
-                      </label>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                ""
-              )}
+              <div className="form-bx">
+                <label>
+                  <select
+                    ref={bankSupervisorRef}
+                    name="bankSupervisor"
+                    onChange={(e) => {
+                      handleuserByrecordOfficer(e);
+                    }}
+                    className={
+                      errors.bankSupervisor && applicationDetail.bankSupervisor === ""
+                        ? "error"
+                        : ""
+                    }
+                  >
+                    <option value="" selected>
+                      Select User
+                    </option>
+                    {getalluser?.map((item, index) => {
+                      return (
+                        <option key={item.id} value={item.userID}>
+                          {item.name}
+                        </option>
+                      );
+                    })}
+                  </select>
+                  <span className="sspan"></span>
+                  {errors.bankSupervisor && applicationDetail.bankSupervisor === "" ? (
+                    <small className="errormsg">User is required</small>
+                  ) : (
+                    ""
+                  )}
+                </label>
+              </div>
+            </div>
+          </div>
+        ) : (
+          ""
+        )}
 
               <h5 className="section_top_subheading mt-2">Attachments</h5>
 
@@ -2562,7 +2561,7 @@ const ExportDashboardRenewEditDetails = ({
                         </Link>
                       </span>
 
-                      {roleID == 2 || roleID == 3 ? (
+                      {roleID == 2 || roleID == 4 ? (
                         <button
                           type="button"
                           onClick={(e) => handleRemovfile(items?.id)}
@@ -2672,7 +2671,6 @@ const ExportDashboardRenewEditDetails = ({
                   )}
                 </div>
               ))}
-              
               {files?.length ? (
                 <button
                   type="button"
@@ -2731,6 +2729,7 @@ const ExportDashboardRenewEditDetails = ({
                   }
                   className="login"
                 >
+                  {" "}
                   Submit{" "}
                 </button>
               </div>

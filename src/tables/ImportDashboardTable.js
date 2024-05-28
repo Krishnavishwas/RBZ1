@@ -273,7 +273,10 @@ const ImportDashboardTable = () => {
 
   const EditModalClose = () => {
     setshowEditForm(false);
+    // setapplicationstaus("0");
     setnextlevelvalue("");
+    setreferredDataTrue(false);
+    setReferredData({})
   };
   const handleFormClose = () => setShowUpdateModal(false);
 
@@ -639,7 +642,6 @@ const ImportDashboardTable = () => {
   const [referredDataTrue, setreferredDataTrue] = useState(false);
   const [RODLoader, setRODLoader] = useState(false);
   const [referredData, setReferredData] = useState({});
-
   const GetReferredData = async (id) => {
     try {
       setRODLoader(true);
@@ -648,6 +650,7 @@ const ImportDashboardTable = () => {
           ID: id,
         })
         .then((res) => {
+          console.log(res.data);
           if (res.data.responseCode == 200) {
             setReferredData(res.data.responseData);
             setRODLoader(false);

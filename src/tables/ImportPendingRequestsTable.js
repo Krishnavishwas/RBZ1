@@ -499,7 +499,7 @@ const ImportPendingRequestsTable = () => {
               className="primeDatatTable"
               value={ExportsPendingRequests}
               scrollable
-              scrollHeight="500px"
+              scrollHeight="600px"
               // className="mt-4"
               // paginator={ExportsPendingRequests.length > 10 ? true : false}
               filters={filters}

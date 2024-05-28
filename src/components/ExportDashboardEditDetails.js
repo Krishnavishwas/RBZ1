@@ -107,6 +107,7 @@ const ExportDashboardEditDetails = ({
   const BeneficiaryNameRef = useRef(null);
   const applicantCommentsRef = useRef(null);
   const applicantReferenceNumberRef = useRef(null);
+  // const applicantYearRef = useRef(null);
   const applicationTypeRef = useRef(null);
   const assignedToRef = useRef(null);
   const companyNameRef = useRef(null);
@@ -134,19 +135,8 @@ const ExportDashboardEditDetails = ({
   const PdfRolename = Storage.getItem("roleName");
   const bankidcheck = bankID !== "" ? "1" : "3";
   const roleID = Storage.getItem("roleIDs");
-  const userSign = Storage.getItem("signImageURL");
-  const menuname = Storage.getItem("menuname");
 
-  const DeptID =
-    menuname === "Exports"
-      ? "2"
-      : menuname === "Imports"
-      ? "3"
-      : menuname === "Foreign Investments"
-      ? "4"
-      : menuname === "Inspectorate"
-      ? "5"
-      : "";
+  const userSign = Storage.getItem("signImageURL");
 
   const navigate = useNavigate();
 
@@ -202,18 +192,25 @@ const ExportDashboardEditDetails = ({
   const [deputyTab, setdeputyTab] = useState(roleID == 8 ? true : false);
   const [director, setdirector] = useState(roleID == 9 ? true : false);
   const [sharefiletab, setsharefiletab] = useState(false);
+
   const [recomdAnalyst, setRecomdAnalyst] = useState("121");
   const [selectedBanks, setSelectedBanks] = useState([]);
   const [registerusertype, setregisterusertype] = useState(
     applicationDetail?.userTypeID
   );
   const [supervisordecision, setsupervisordecision] = useState(false);
+
   const [files, setFiles] = useState([]);
+
   const [otherfiles, setOtherfiles] = useState([]);
+
   const [userfiles, setuserFiles] = useState([]);
+
   const [otheruserfiles, setOtheruserfiles] = useState([]);
+
   const [sharefile, setsharefile] = useState([]);
   const [othersharefile, setOthersharefile] = useState([]);
+
   const [errors, setErrors] = useState({});
   const [applicationType, setapplicationType] = useState([]);
   const [subsectorData, setsubsectorData] = useState([]);
@@ -235,6 +232,7 @@ const ExportDashboardEditDetails = ({
   });
   const [DateExpiryOption, setDateExpiryOption] = useState("");
   const [defaultnoExpiry, setdefaultnoExpiry] = useState("0");
+
   const [IsReturnOption, setIsReturnOption] = useState("");
   const [AllFrequency, setAllFrequency] = useState([]);
   const [getFrequencyID, setGetFrequencyID] = useState("0");
@@ -243,15 +241,18 @@ const ExportDashboardEditDetails = ({
   const [IsReturnExpiringDate, setIsReturnExpiringDate] = useState(new Date());
   const [DateExpirydisplay, setDateExpirydisplay] = useState("");
   const [curRate, setCurrate] = useState();
+
   const [userRoleRecordofficer, setuserRoleRecordofficer] = useState([]);
   const [selectuserRoleRecordofficer, setselectuserRoleRecordofficer] =
     useState("");
   const [getalluser, setGetalluser] = useState([]);
+
   const [getBlankFile, setgetBlankFile] = useState([]);
   const [viewShareFile, setviewShareFile] = useState([]);
   const [geninfoFile, setgeninfoFile] = useState([]);
   const [newData, setnewData] = useState([]);
   const [SubmitBtnLoader, setSubmitBtnLoader] = useState(false);
+
   const [OtherDepartment, setOtherDepartment] = useState("");
   const [otherDepartmentRole, setOtherDepartmentRole] = useState("");
   const [otherDepartmentRoles, setOtherDepartmentRoles] = useState([]);
@@ -266,6 +267,19 @@ const ExportDashboardEditDetails = ({
   const para = "Export request updated successfully!";
   const heading1 = "Submit Successfully";
   const para1 = "Application Successfully Submitted to Other Department!";
+
+  const menuname = Storage.getItem("menuname");
+
+  const DeptID =
+    menuname === "Exports"
+      ? "2"
+      : menuname === "Imports"
+      ? "3"
+      : menuname === "Foreign Investments"
+      ? "4"
+      : menuname === "Inspectorate"
+      ? "5"
+      : "";
 
   const ChangeApplicationStatus = (e) => {
     const values = e.target.value;
@@ -1334,12 +1348,12 @@ const ExportDashboardEditDetails = ({
   const clearInputFile = (index) => {
     if (fileInputRefs[index].current) fileInputRefs[index].current.value = "";
   };
-
   const clearInputFileother = (index) => {
     if (fileInputRefsother[index]?.current)
       fileInputRefsother[index].current.value = "";
   };
 
+  /* PDF Preview code starts */
   const GetHandelDetailPDF = async () => {
     setBtnLoader(true);
     setTimeout(() => {
@@ -1495,6 +1509,7 @@ const ExportDashboardEditDetails = ({
         });
     }, 1500);
   };
+  /* Ends Here */
 
   const HandleNextleveldata = (e) => {
     const name = e.target.name;
@@ -1672,7 +1687,6 @@ const ExportDashboardEditDetails = ({
         console.log(err);
       });
   };
-
   useEffect(() => {
     handleFIleview();
   }, [applicationDetail]);
@@ -1968,6 +1982,7 @@ const ExportDashboardEditDetails = ({
     if(optionOtherDepartmentRef.current) optionOtherDepartmentRef.current.value = "";
   };
 
+  // Code start for save form
   const HandleSubmit = async (e) => {
     e.preventDefault();
     let formData = new FormData();
@@ -2491,6 +2506,7 @@ const ExportDashboardEditDetails = ({
       setToastDisplayed(true);
     }
   };
+  // End code for save form
 
   useEffect(() => {
     handleData();
@@ -2560,6 +2576,8 @@ const ExportDashboardEditDetails = ({
       });
   };
 
+  console.log("errors", errors);
+
   const getLastComment = async (id) => {
     await axios
       .post(APIURL + "ExportApplication/GetLastApplicationDataByID", {
@@ -2614,6 +2632,28 @@ const ExportDashboardEditDetails = ({
 
   const SubmitOtherDepartment = async () => {
     try {
+      console.log({
+        ID: applicationDetail.id,
+        RoleID: roleID,
+        UserID: UserID.replace(/"/g, ""),
+        ReferredDepartmentID: OtherDepartment,
+        AssignedToRoleID: otherDepartmentRole,
+        AssignedTo: otherDepartmentUser,
+        Comment: asignnextLeveldata.Comment,
+        Notes: asignnextLeveldata.Notes,
+        Description: Description,
+        DepartmentID: DeptID,
+          Status:
+            OtherDepartment == "2"
+              ? "275"
+              : OtherDepartment == "3"
+              ? "280"
+              : OtherDepartment == "4"
+              ? "285"
+              : OtherDepartment == "5"
+              ? "290"
+              : "",
+      });
       setOtherDepartmentLoader(true);
       await axios
         .post(APIURL + "ReferredApplication/CreateReferredApplication", {
@@ -2626,17 +2666,7 @@ const ExportDashboardEditDetails = ({
           Comment: asignnextLeveldata.Comment,
           Notes: asignnextLeveldata.Notes,
           Description: Description,
-          DepartmentID: DeptID,
-          Status:
-            OtherDepartment == "2"
-              ? "275"
-              : OtherDepartment == "3"
-              ? "280"
-              : OtherDepartment == "4"
-              ? "285"
-              : OtherDepartment == "5"
-              ? "290"
-              : "",
+          Status: "35",
         })
         .then((res) => {
           if (res.data.responseCode == 200) {
@@ -3836,6 +3866,12 @@ const ExportDashboardEditDetails = ({
                                     aria-controls="home"
                                     aria-selected="true"
                                   >
+                                    {/* {index == 0
+                ? "Recent"
+                : `Response ${
+                    cur?.applicationActivityData.length -
+                    index
+                  }`} */}
                                     Response{" "}
                                     {cur?.applicationActivityData?.length -
                                       index}
@@ -3873,10 +3909,13 @@ const ExportDashboardEditDetails = ({
                       role="tabpanel"
                       aria-labelledby="banksupervisrotab"
                     >
+                      {/* Edit bank supervisor */}
                       <>
                         {Actiondata?.map((cur) => {
-                          const firstItem = cur?.applicationActivityData?.[0];
+                          const firstItem = cur?.applicationActivityData?.[0]; // Accessing the first element directly
+
                           if (cur?.assignedToRoleID === 3 && firstItem) {
+                            // Check if firstItem exists
                             return (
                               <div className="bakgroundaction">
                                 <div key={firstItem.actionID}>
@@ -4023,6 +4062,14 @@ const ExportDashboardEditDetails = ({
                               }
                             >
                               <label className="controlform">Next Action</label>
+
+                              {/* <input
+         type="checkbox"
+         onChange={HandelSupervisorcheckSelect}
+         checked={checkSupervisor}
+         style={{ width: "18px" }}
+       /> */}
+
                               <div className="row">
                                 <div className="col-md-12  position-relative">
                                   <div className="hidden-toggles">
@@ -4285,6 +4332,7 @@ const ExportDashboardEditDetails = ({
                         ) : (
                           ""
                         )}
+                        {/* ENDS HERE */}
 
                         <div
                           className={
@@ -4303,6 +4351,46 @@ const ExportDashboardEditDetails = ({
                             <div className="mt-2 py-1">
                               <MenuBar editor={editor} />
                               <EditorContent editor={editor} />
+
+                              {/*<SunEditor
+         setContents={
+           Description
+             ? Description
+             : applicationDetail?.analystDescription
+         }
+         onChange={(newcomment) => setDescription(newcomment)}
+         setOptions={{
+           buttonList: [
+             ["undo", "redo"],
+             ["fontSize"],
+             [
+               "bold",
+               "underline",
+               "italic",
+               "strike",
+               "subscript",
+               "superscript",
+             ],
+             ["fontColor", "hiliteColor"],
+             ["align", "list", "lineHeight"],
+             ["outdent", "indent"],
+
+             [
+               "table",
+               "horizontalRule",
+               "link",
+               "image",
+               "video",
+             ],
+             ["preview", "print"],
+             ["removeFormat"],
+           ],
+           defaultTag: "div",
+           minHeight: "120px",
+           showPathLabel: false,
+         }}
+	 />*/}
+
                               <span className="sspan"></span>
                               {(errors.Description && Description == " ") ||
                               Description == null ||
@@ -4649,6 +4737,27 @@ const ExportDashboardEditDetails = ({
                                         </div>
                                       </div>
                                     </div>
+                                    {/* <div class="col-md-6">
+                                            <div class="inner_form_new-sm ">
+                                              <label class="controlform-sm">
+                                                Assigned To User
+                                              </label>
+                                              <div class="form-bx-sm">
+                                                <label>
+                                                  <input
+                                                    type="text"
+                                                    class=""
+                                                    disabled
+                                                    value={
+                                                      items?.assignedToName
+                                                        ? items?.assignedToName
+                                                        : "N/A"
+                                                    }
+                                                  />
+                                                </label>
+                                              </div>
+                                            </div>
+                                          </div> */}
                                   </div>
                                 </div>
                               </>

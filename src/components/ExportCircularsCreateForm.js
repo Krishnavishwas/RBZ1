@@ -176,8 +176,8 @@ const ExportCircularsCreateForm = ({ handleFormClose, handleCircularListData }) 
       newErrors.subject = "Subject is required";
       valid = false;
     }
-    // if (exportForm.content === "") {
-    //   newErrors.content = "Content is required";
+    // if (Description.length == 7) {
+    //   newErrors.Description = "Content is required";
     //   valid = false;
     // }
 
@@ -215,7 +215,7 @@ const ExportCircularsCreateForm = ({ handleFormClose, handleCircularListData }) 
 
     const data = {
       UserID: userID.replace(/"/g, ""),
-      RoleID: roleID,
+      RoleID: checkAnalyst != true ? "0" : roleID,
       Name: exportForm.name,
       // BankID: '"'+bankSelectedID.join()+'"',
       BankID: bankSelectedID.join(),
@@ -226,7 +226,7 @@ const ExportCircularsCreateForm = ({ handleFormClose, handleCircularListData }) 
       // Description: Description,
       AssignedTo: checkAnalyst ? exportForm.analyst : userID.replace(/"/g, ""),
       // AssignedToRoleID: checkAnalyst ? "6" : roleID,
-      AssignedToRoleID: checkAnalyst ? parseInt(roleID) + 1 : roleID,
+      AssignedToRoleID: checkAnalyst ? parseInt(roleID) + 1 : checkAnalyst != true ? "0" : roleID,
       // FutureDate: futureDate,
       ReleasingDate: releasingDate,
       DepartmentID: "2"
@@ -734,7 +734,7 @@ const ExportCircularsCreateForm = ({ handleFormClose, handleCircularListData }) 
     }
   }, [editor]);
 
- console.log("exportForm.analyst",exportForm.analyst);
+
   return (
     <>
       <form className="circular-form">
@@ -796,18 +796,18 @@ const ExportCircularsCreateForm = ({ handleFormClose, handleCircularListData }) 
 
               <span className="sspan"></span>
               {/* {(errors.Description && Description == " ") ||
-                              Description == null ||
-                              Description == "<p></p>" ||
-                              !Description ? (
-                              <small
-                                className="errormsg"
-                                style={{ bottom: "-13px" }}
-                              >
-                                {errors.Description}
-                              </small>
-                            ) : (
-                              ""
-                            )} */}
+                Description == null ||
+                Description == "<p></p>" ||
+                !Description ? (
+                <small
+                  className="errormsg"
+                  style={{ bottom: "-13px" }}
+                >
+                  {errors.Description}
+                </small>
+              ) : (
+                ""
+              )} */}
             </div>
           </div>
         </div>

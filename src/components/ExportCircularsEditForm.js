@@ -145,6 +145,7 @@ const ExportCircularsEditForm = ({
 
   const [adminDirectives, setAdminDirectives] = useState([]);
   const [btnLoader, setBtnLoader] = useState(false);
+  const [geninfoTab, setgeninfoTab] = useState(true);
   const [analystTab, setanalystTab] = useState(roleID == 5 ? true : false);
   const [sranalystTab, setsranalystTab] = useState(roleID == 6 ? true : false);
   const [principalanalystTab, setprincipalanalystTab] = useState(
@@ -1734,7 +1735,6 @@ const ExportCircularsEditForm = ({
   const directiveSelectedID = selectedDirectives?.map((res) => res.code);
   // select BankiId & Directived Id end
 
-
   // Code start for save form
   const HandleSubmit = async (e) => {
     // setSubmitBtnLoader(true);
@@ -1749,8 +1749,9 @@ const ExportCircularsEditForm = ({
           RoleID: roleID,
           Name: applicationDetail?.name,
           Subject: applicationDetail.subject,
-          Description: Description,
-          Content: applicationDetail.content,
+          // Description: Description,
+          // Content: applicationDetail.content,
+          Content: Description,
           ReleasingDate: releasingDate,
           BankID: bankSelectedID?.join(),
           DirectiveID: directiveSelectedID?.join(),
@@ -1944,7 +1945,10 @@ const ExportCircularsEditForm = ({
   };
 
   console.log("applicationDetail-----", applicationDetail);
-  console.log("allcomment--------",allcomment);
+  console.log("allcomment--------", allcomment);
+  console.log("Actiondata------", Actiondata);
+  console.log("noDataComment", noDataComment);
+
   return (
     <>
       {/* <h3 className="export-pop-heading">
@@ -1965,97 +1969,25 @@ const ExportCircularsEditForm = ({
           <>
             <h5
               className={
-                analystTab
+                geninfoTab
                   ? "section_top_subheading mt-0 py-3 btn-collapse_active cursorpointer"
                   : "section_top_subheading mt-0 py-3 cursorpointer"
               }
-              onClick={() => setanalystTab(!analystTab)}
+              onClick={() => setgeninfoTab(!geninfoTab)}
             >
-              Analyst{" "}
+              Circular Info{" "}
               <span className="btn-collapse">
                 <i className="bi bi-caret-down-fill"></i>
               </span>
             </h5>
 
             <form className="circular-form">
-              <div className={analystTab ? "customtab" : "d-none"}>
-
-                {/* {applicationDetail?.assignedToRoleID != 5 && applicationDetail && roleID != 5 ? <ExportCirculargenInfo applicationDetail={applicationDetail}  /> : ""} */}
-
-                {applicationDetail?.roleID == 5 ? <ExportCirculargenInfo applicationDetail={applicationDetail}  /> : applicationDetail?.roleID != 5   && applicationDetail ? "No Data" : " "}
-
-
-                {allcomment?.map((cur, i) => {
-                  if (cur.assignedToRoleID == 5) {
-                    return (
-                      <ul
-                        className={
-                          cur?.circularActivityData?.length >= 1
-                            ? "nav nav-pills mb-3"
-                            : "d-none"
-                        }
-                        role="tablist"
-                      >
-                        <li
-                          className={roleID == 5 ? "nav-item" : "d-none"}
-                          role="presentation"
-                        >
-                          <button
-                            className={
-                              roleID == 5
-                                ? "nav-link w-100 border-radius0 active"
-                                : "nav-link w-100 border-radius0"
-                            }
-                            id="analyst"
-                            data-bs-toggle="tab"
-                            data-bs-target="#analyst-justified-home"
-                            type="button"
-                            role="tab"
-                            aria-controls="home"
-                            aria-selected="true"
-                          >
-                            Action
-                          </button>
-                        </li>
-                        {cur?.circularActivityData
-                          ?.slice()
-                          ?.reverse()
-                          .map((items, index) => {
-                            return (
-                              <li className="nav-item" role="presentation">
-                                <button
-                                  className={
-                                    index == 0 && roleID > 5
-                                      ? "nav-link w-100 border-radius0 active"
-                                      : "nav-link border-radius0 w-100 "
-                                  }
-                                  id={"analyst" + index}
-                                  data-bs-toggle="tab"
-                                  data-bs-target={
-                                    "#analyst-justified-home" + index
-                                  }
-                                  type="button"
-                                  role="tab"
-                                  aria-controls="home"
-                                  aria-selected="true"
-                                >
-
-                                  Response{" "}
-                                  {cur?.circularActivityData?.length -
-                                    index}
-                                </button>
-                              </li>
-                            );
-                          })}
-                      </ul>
-                    );
-                  }
-                })}
+              <div className={geninfoTab ? "customtab" : "d-none"}>
 
                 <div className="tab-content pt-2">
                   <div
                     className={
-                      roleID == 5
+                      roleID
                         ? "tab-pane fade show active"
                         : "tab-pane fade show"
                     }
@@ -2063,151 +1995,7 @@ const ExportCircularsEditForm = ({
                     role="tabpanel"
                     aria-labelledby="analyst"
                   >
-                    {Actiondata?.map((cur) => {
 
-                      const firstItem = cur?.circularActivityData?.[0];
-                      // Accessing the first element directly
-
-                      if (cur?.assignedToRoleID === 5 && firstItem) {
-                        // Check if firstItem exists
-                        return (
-                          <div className="bakgroundaction">
-                            <div key={firstItem.actionID}>
-                              {" "}
-                              {/* Remember to add a unique key */}
-                              <div className="row">
-                                <div className="col-md-6">
-                                  <div className="inner_form_new">
-                                    <label className="controlform">
-                                      Action Type
-                                    </label>
-                                    <div className="form-bx">
-                                      <label>
-                                        {" "}
-                                        <input
-                                          type="text"
-                                          className=""
-                                          disabled
-                                          // value={firstItem?.actionStatusName}
-                                          value={
-                                            firstItem?.actionStatusName ==
-                                              "Approved" ||
-                                              firstItem?.actionStatusName ==
-                                              "Reject" ||
-                                              firstItem?.actionStatusName ==
-                                              "Cancelled" ||
-                                              firstItem?.actionStatusName ==
-                                              "Draft"
-                                              ? "Assigned"
-                                              : firstItem?.actionStatusName
-                                          }
-                                        />
-                                      </label>
-                                    </div>
-                                  </div>
-                                </div>
-
-                                <div className="col-md-3">
-                                  <div className="inner_form_new-sm">
-                                    <label className="controlform-sm">
-                                      User{" "}
-                                      <i
-                                        className="bi bi-info-circle icons-info"
-                                        title={`Role : ${firstItem?.actionRoleName}`}
-                                      ></i>
-                                    </label>
-                                    <div className="form-bx-sm">
-                                      <label>
-                                        {" "}
-                                        <input
-                                          type="text"
-                                          className=""
-                                          disabled
-                                          value={firstItem?.actionUserName}
-                                        />
-                                      </label>
-                                    </div>
-                                  </div>
-                                </div>
-
-                                <div className="col-md-3">
-                                  <div className="inner_form_new-sm">
-                                    <label className="controlform-sm">
-                                      {firstItem?.actionStatusName ==
-                                        "Approved" ||
-                                        firstItem?.actionStatusName ==
-                                        "Reject" ||
-                                        firstItem?.actionStatusName ==
-                                        "Cancelled"
-                                        ? "Assigned"
-                                        : firstItem?.actionStatusName}{" "}
-                                      Date
-                                    </label>
-                                    <div className="form-bx-sm">
-                                      <label>
-                                        <input
-                                          type="text"
-                                          className=""
-                                          disabled
-                                          value={moment(
-                                            firstItem?.createdDate
-                                          ).format("DD/MMM/yyyy")}
-                                        />
-                                      </label>
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                              <div
-                                className={
-                                  firstItem?.actionNotes
-                                    ? "inner_form_new"
-                                    : "d-none"
-                                }
-                              >
-                                <label className="controlform">
-                                  Action Note
-                                </label>
-                                <div className="form-bx">
-                                  <label>
-                                    {" "}
-                                    <textarea
-                                      type="text"
-                                      className=""
-                                      disabled
-                                      value={firstItem?.actionNotes}
-                                    />
-                                  </label>
-                                </div>
-                              </div>
-                              <div
-                                className={
-                                  firstItem?.actionComment
-                                    ? "inner_form_new"
-                                    : "d-none"
-                                }
-                              >
-                                <label className="controlform">
-                                  Action Comment
-                                </label>
-                                <div className="form-bx">
-                                  <label>
-                                    {" "}
-                                    <textarea
-                                      type="text"
-                                      className=""
-                                      disabled
-                                      value={firstItem?.actionComment}
-                                    />
-                                  </label>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        );
-                      }
-                    })}
-                    {/* previous edit form start  */}
                     <div className="inner_form_new ">
                       <label className="controlform">Name</label>
                       <div className="form-bx">
@@ -2221,7 +2009,7 @@ const ExportCircularsEditForm = ({
                             }}
                             // value={exportForm.name}
                             value={applicationDetail.name}
-                            disabled={roleID > 5}
+                            disabled={applicationDetail?.userID !== UserID.replace(/"/g, "") ? true : false}
                           />
                           <span className="sspan"></span>
                         </label>
@@ -2233,60 +2021,38 @@ const ExportCircularsEditForm = ({
                       </div>
                     </div>
                     {/* end form-bx  */}
-                    {/* <div className="inner_form_new ">
-                      <label className="controlform">Content </label>
-                      <div className="form-bx">
-                        <label>
-                          <input
-                            type="text"
-                            name="content"
-                            placeholder="Content"
-                            onChange={(e) => {
-                              changeHandelForm(e);
-                            }}
-                            value={applicationDetail.content}
-                            disabled={roleID > 5}
-                          />
-                          <span className="sspan"></span>
-                        </label>
-                        {errors?.content ? (
-                          <span className="errormsg">
-                            {errors?.content}
-                          </span>
-                        ) : ""}
-                      </div>
-                    </div> */}
+
 
                     <div
-                        className={
-                          roleID == 5
-                            ? "inner_form_new align-items-start mt-2"
-                            : "d-none"
-                        }
-                      >
-                        <label className="controlform">Content</label>
-                        <div className="form-bx editorFieldBox">
-                          <div className="mt-2 py-1">
-                            <MenuBar editor={editorAnalyst} />
-                            <EditorContent editor={editorAnalyst} />
+                      className={
+                        roleID == 5
+                          ? "inner_form_new align-items-start mt-2"
+                          : "d-none"
+                      }
+                    >
+                      <label className="controlform">Content</label>
+                      <div className="form-bx editorFieldBox">
+                        <div className="mt-2 py-1">
+                          <MenuBar editor={editorAnalyst} />
+                          <EditorContent editor={editorAnalyst} />
 
-                            <span className="sspan"></span>
-                            {(errors.Description && Description == " ") ||
-                              Description == null ||
-                              Description == "<p></p>" ||
-                              !Description ? (
-                              <small
-                                className="errormsg"
-                                style={{ bottom: "-13px" }}
-                              >
-                                {errors.Description}
-                              </small>
-                            ) : (
-                              ""
-                            )}
-                          </div>
+                          <span className="sspan"></span>
+                          {(errors.Description && Description == " ") ||
+                            Description == null ||
+                            Description == "<p></p>" ||
+                            !Description ? (
+                            <small
+                              className="errormsg"
+                              style={{ bottom: "-13px" }}
+                            >
+                              {errors.Description}
+                            </small>
+                          ) : (
+                            ""
+                          )}
                         </div>
                       </div>
+                    </div>
                     {/* end form-bx  */}
 
                     {attachmentData?.map((items, index) => {
@@ -2313,6 +2079,7 @@ const ExportCircularsEditForm = ({
                               onChange={(e) =>
                                 handleuserFileChange(e, "circular" + (index + 1))
                               }
+                              disabled={applicationDetail?.userID !== UserID.replace(/"/g, "") ? true : false}
                             />
                           </div>
                           <span className="filename">
@@ -2417,7 +2184,7 @@ const ExportCircularsEditForm = ({
                             onShow={onShow}
                             placeholder="Select Banks"
                             display="chip"
-                            disabled={roleID > 5}
+                            disabled={applicationDetail?.userID !== UserID.replace(/"/g, "") ? true : false}
                           />
                         </div>
 
@@ -2436,7 +2203,7 @@ const ExportCircularsEditForm = ({
                               changeHandelForm(e);
                             }}
                             value={applicationDetail.subject}
-                            disabled={roleID > 5}
+                            disabled={applicationDetail?.userID !== UserID.replace(/"/g, "") ? true : false}
                           />
                           <span className="sspan"></span>
                         </label>
@@ -2448,258 +2215,1103 @@ const ExportCircularsEditForm = ({
                       </div>
                     </div>
 
-                  {/* end form-bx  */}
-                  <div className="inner_form_new ">
-                    <label className="controlform">Directives</label>
-                    <div className="form-bx">
-                      <div className="multiselect flex justify-content-center">
-                        <MultiSelect
-                          value={selectedDirectives}
-                          onChange={(e) => setSelectedDirectives(e.value)}
-                          options={DirectiveOption}
-                          optionLabel="name"
-                          name="directiveData"
-                          placeholder="Select Directives"
-                          display="chip"
-                          disabled={roleID > 5}
-                        />
-                        {errors?.directiveData ? (
-                          <small className="errormsg">{errors.directiveData}</small>
-                        ) : (
-                          ""
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                  {/* end form-bx  */}
-                  <div className="inner_form_new ">
-                    <label className="controlform">Releasing Date</label>
-                    <div className="form-bx">
-                      <DatePicker
-                        placeholderText="Select Releasing Date"
-                        closeOnScroll={(e) => e.target === document}
-                        selected={releasingDate}
-                        onChange={(date) => setReleasingDate(date)}
-                        peekNextMonth
-                        showMonthDropdown
-                        showYearDropdown
-                        minDate={new Date()}
-                        dropdownMode="select"
-                        dateFormat="dd/MMMM/yyyy"
-                        disabled={roleID > 5}
-                      />
-                      {
-                        errors?.releasingDate ? (
-                          <small className="errormsg">{errors.releasingDate}</small>
-                        ) : (" ")
-                      }
-                    </div>
-                  </div>
-                  {/* end form-bx  */}
-                  <div className="inner_form_new ">
-                    <label className="controlform">Assign to Next Level</label>
-                    <input
-                      type="checkbox"
-                      onChange={HandelSupervisorcheck}
-                      checked={checkSupervisor}
-                      // disabled={roleID >= 6 ? true : false}
-                      disabled={roleID > 5}
-                    />
-                  </div>
-                  {/* previous edit form end   */}
-
-
-                  {roleID == "5" && checkSupervisor == true ? (
-                    <>
-                      <div className="inner_form_new">
-                        <label className="controlform">Select Analyst</label>
-                        <div className="form-bx">
-                          <label>
-                            <select
-                              ref={assignedToRef}
-                              name="assignedTo"
-                              onChange={supervisorHangechangeBankuser}
-                              className={
-                                errors.assignedTo && !AssignUserID ? "error" : ""
-                              }
-                            >
-                              <option value="">Select Analyst</option>
-                              {Supervisors?.map((item, index) => {
-                                return (
-                                  <option
-                                    key={index}
-                                    value={JSON?.stringify(item)}
-                                    selected={
-                                      item.userID == applicationDetail?.assignedTo
-                                    }
-                                  >
-                                    {item.name}
-                                  </option>
-                                );
-                              })}
-                            </select>
-                            <span className="sspan"></span>
-                            {errors.assignedTo && !AssignUserID ? (
-                              <small className="errormsg">
-                                {errors.assignedTo}
-                              </small>
-                            ) : (
-                              ""
-                            )}
-                          </label>
+                    {/* end form-bx  */}
+                    <div className="inner_form_new ">
+                      <label className="controlform">Directives</label>
+                      <div className="form-bx">
+                        <div className="multiselect flex justify-content-center">
+                          <MultiSelect
+                            value={selectedDirectives}
+                            onChange={(e) => setSelectedDirectives(e.value)}
+                            options={DirectiveOption}
+                            optionLabel="name"
+                            name="directiveData"
+                            placeholder="Select Directives"
+                            display="chip"
+                            disabled={applicationDetail?.userID !== UserID.replace(/"/g, "") ? true : false}
+                          />
+                          {errors?.directiveData ? (
+                            <small className="errormsg">{errors.directiveData}</small>
+                          ) : (
+                            ""
+                          )}
                         </div>
                       </div>
-                    </>
-                  ) : (
-                    ""
-                  )}
+                    </div>
+                    {/* end form-bx  */}
+                    <div className="inner_form_new ">
+                      <label className="controlform">Releasing Date</label>
+                      <div className="form-bx">
+                        <DatePicker
+                          placeholderText="Select Releasing Date"
+                          closeOnScroll={(e) => e.target === document}
+                          selected={releasingDate}
+                          onChange={(date) => setReleasingDate(date)}
+                          peekNextMonth
+                          showMonthDropdown
+                          showYearDropdown
+                          minDate={new Date()}
+                          dropdownMode="select"
+                          dateFormat="dd/MMMM/yyyy"
+                          disabled={applicationDetail?.userID !== UserID.replace(/"/g, "") ? true : false}
+                        />
+                        {
+                          errors?.releasingDate ? (
+                            <small className="errormsg">{errors.releasingDate}</small>
+                          ) : (" ")
+                        }
+                      </div>
+                    </div>
+                    {/* end form-bx  */}
+                    <div className="inner_form_new ">
+                      <label className="controlform">Assign to Next Level</label>
+                      <input
+                        type="checkbox"
+                        onChange={HandelSupervisorcheck}
+                        checked={checkSupervisor}
+                        disabled={applicationDetail?.userID !== UserID.replace(/"/g, "") ? true : false}
 
-                  {/* upload file Data Start */}
+                      />
+                    </div>
+                    {/* previous edit form end   */}
 
 
-                  <h5 className="section_top_subheading mt-2">Attachments</h5>
+                    {roleID >= "5" && checkSupervisor == true ? (
+                      <>
+                        <div className="inner_form_new">
+                          <label className="controlform">Select Analyst</label>
+                          <div className="form-bx">
+                            <label>
+                              <select
+                                ref={assignedToRef}
+                                name="assignedTo"
+                                onChange={supervisorHangechangeBankuser}
+                                className={
+                                  errors.assignedTo && !AssignUserID ? "error" : ""
+                                }
+                              >
+                                <option value="">Select Analyst</option>
+                                {Supervisors?.map((item, index) => {
+                                  return (
+                                    <option
+                                      key={index}
+                                      value={JSON?.stringify(item)}
+                                      selected={
+                                        item.userID == applicationDetail?.assignedTo
+                                      }
+                                    >
+                                      {item.name}
+                                    </option>
+                                  );
+                                })}
+                              </select>
+                              <span className="sspan"></span>
+                              {errors.assignedTo && !AssignUserID ? (
+                                <small className="errormsg">
+                                  {errors.assignedTo}
+                                </small>
+                              ) : (
+                                ""
+                              )}
+                            </label>
+                          </div>
+                        </div>
+                      </>
+                    ) : (
+                      ""
+                    )}
 
-                  {applicationDetail?.attachedFiles.length > 0 ? (
-                    applicationDetail?.attachedFiles?.map((item) => {
-                      return (
-                        < div
+                    {/* upload file Data Start */}
+
+
+                    <h5 className="section_top_subheading mt-2">Attachments</h5>
+
+                    {applicationDetail?.attachedFiles.length > 0 ? (
+                      applicationDetail?.attachedFiles?.map((item) => {
+                        return (
+                          < div
+                            className={
+                              item?.filePath != null
+                                ? "attachemt_form-bx"
+                                : "d-none"
+                            }
+                          >
+                            <label
+                              style={{
+                                background: "#d9edf7",
+                                padding: "9px 3px",
+                                border: "0px",
+                              }}
+                            >
+                              {item?.fileName ? (
+                                <span style={{ fontWeight: "500" }}>
+                                  {item?.fileName}
+                                </span>
+                              ) : (
+                                <span style={{ fontWeight: "500" }}>Cover Letter</span>
+                              )}
+                            </label>
+                            {item?.filePath ? (
+                              <span className="filename">
+                                <Link
+                                  to={item?.filePath}
+                                  target="_blank"
+                                  className={
+                                    item?.filePath
+                                      ? "viewbtn_file"
+                                      : "viewbtn_file pe-none"
+                                  }
+                                >
+                                  View File
+                                </Link>
+                              </span>
+                            ) : (
+                              <span className="disabletext">Not Found</span>
+                            )}
+                          </div>
+                        )
+                      })
+
+                    ) : (
+                      ""
+                    )}
+                  </div>
+
+                </div>
+
+              </div>
+              {/* -------------start next level------- */}
+              {/* analyst analyst code start */}
+              {/* {applicationDetail?.userID !== UserID.replace(/"/g, "") && roleID >= 5 ? ( */}
+              {roleID >= 5 ? (
+                <>
+                  <h5
+                    className={
+                      analystTab
+                        ? "section_top_subheading mt-0 py-3 btn-collapse_active cursorpointer"
+                        : "section_top_subheading mt-0 py-3 cursorpointer"
+                    }
+                    onClick={() => setanalystTab(!analystTab)}
+                  >
+                    Analyst{" "}
+                    <span className="btn-collapse">
+                      <i className="bi bi-caret-down-fill"></i>
+                    </span>
+                  </h5>
+                  <div className={analystTab ? "customtab" : "d-none"}>
+
+
+                    {allcomment?.map((cur, i) => {
+                      if (cur.assignedToRoleID == 5) {
+                        return (
+                          <ul
+                            className={
+                              cur?.circularActivityData?.length >= 1
+                                ? "nav nav-pills mb-3"
+                                : "d-none"
+                            }
+                            role="tablist"
+                          >
+                            <li
+                              className={roleID == 5 ? "nav-item" : "d-none"}
+                              role="presentation"
+                            >
+                              <button
+                                className={
+                                  roleID == 5
+                                    ? "nav-link w-100 border-radius0 active"
+                                    : "nav-link w-100 border-radius0"
+                                }
+                                id="analyst"
+                                data-bs-toggle="tab"
+                                data-bs-target="#analyst-justified-home"
+                                type="button"
+                                role="tab"
+                                aria-controls="home"
+                                aria-selected="true"
+                              >
+                                Action
+                              </button>
+                            </li>
+                            {cur?.circularActivityData
+                              ?.slice()
+                              ?.reverse()
+                              .map((items, index) => {
+                                return (
+                                  <li className="nav-item" role="presentation">
+                                    <button
+                                      className={
+                                        index == 0 && roleID > 5
+                                          ? "nav-link w-100 border-radius0 active"
+                                          : "nav-link border-radius0 w-100 "
+                                      }
+                                      id={"analyst" + index}
+                                      data-bs-toggle="tab"
+                                      data-bs-target={
+                                        "#analyst-justified-home" + index
+                                      }
+                                      type="button"
+                                      role="tab"
+                                      aria-controls="home"
+                                      aria-selected="true"
+                                    >
+
+                                      Response{" "}
+                                      {cur?.circularActivityData?.length -
+                                        index}
+                                    </button>
+                                  </li>
+                                );
+                              })}
+                          </ul>
+                        );
+                      }
+                    })
+
+                    }
+
+                    <div className="tab-content pt-2">
+                      <div
+                        className={
+                          roleID >= 5
+                            ? "tab-pane fade show active"
+                            : "tab-pane fade show"
+                        }
+                        id="analyst-justified-home"
+                        role="tabpanel"
+                        aria-labelledby="analyst"
+                      >
+                        {Actiondata?.map((cur) => {
+
+                          const firstItem = cur?.circularActivityData?.[0];
+                          // Accessing the first element directly
+
+                          if (cur?.assignedToRoleID === 5 && firstItem) {
+                            // Check if firstItem exists
+                            return (
+                              <div className="bakgroundaction">
+                                <div key={firstItem.actionID}>
+                                  {" "}
+                                  {/* Remember to add a unique key */}
+                                  <div className="row">
+                                    <div className="col-md-6">
+                                      <div className="inner_form_new">
+                                        <label className="controlform">
+                                          Action Type
+                                        </label>
+                                        <div className="form-bx">
+                                          <label>
+                                            {" "}
+                                            <input
+                                              type="text"
+                                              className=""
+                                              disabled
+                                              // value={firstItem?.actionStatusName}
+                                              value={
+                                                firstItem?.actionStatusName ==
+                                                  "Approved" ||
+                                                  firstItem?.actionStatusName ==
+                                                  "Reject" ||
+                                                  firstItem?.actionStatusName ==
+                                                  "Cancelled" ||
+                                                  firstItem?.actionStatusName ==
+                                                  "Draft"
+                                                  ? "Assigned"
+                                                  : firstItem?.actionStatusName
+                                              }
+                                            />
+                                          </label>
+                                        </div>
+                                      </div>
+                                    </div>
+
+                                    <div className="col-md-3">
+                                      <div className="inner_form_new-sm">
+                                        <label className="controlform-sm">
+                                          User{" "}
+                                          <i
+                                            className="bi bi-info-circle icons-info"
+                                            title={`Role : ${firstItem?.actionRoleName}`}
+                                          ></i>
+                                        </label>
+                                        <div className="form-bx-sm">
+                                          <label>
+                                            {" "}
+                                            <input
+                                              type="text"
+                                              className=""
+                                              disabled
+                                              value={firstItem?.actionUserName}
+                                            />
+                                          </label>
+                                        </div>
+                                      </div>
+                                    </div>
+
+                                    <div className="col-md-3">
+                                      <div className="inner_form_new-sm">
+                                        <label className="controlform-sm">
+                                          {firstItem?.actionStatusName ==
+                                            "Approved" ||
+                                            firstItem?.actionStatusName ==
+                                            "Reject" ||
+                                            firstItem?.actionStatusName ==
+                                            "Cancelled"
+                                            ? "Assigned"
+                                            : firstItem?.actionStatusName}{" "}
+                                          Date
+                                        </label>
+                                        <div className="form-bx-sm">
+                                          <label>
+                                            <input
+                                              type="text"
+                                              className=""
+                                              disabled
+                                              value={moment(
+                                                firstItem?.createdDate
+                                              ).format("DD/MMM/yyyy")}
+                                            />
+                                          </label>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div
+                                    className={
+                                      firstItem?.actionNotes
+                                        ? "inner_form_new"
+                                        : "d-none"
+                                    }
+                                  >
+                                    <label className="controlform">
+                                      Action Note
+                                    </label>
+                                    <div className="form-bx">
+                                      <label>
+                                        {" "}
+                                        <textarea
+                                          type="text"
+                                          className=""
+                                          disabled
+                                          value={firstItem?.actionNotes}
+                                        />
+                                      </label>
+                                    </div>
+                                  </div>
+                                  <div
+                                    className={
+                                      firstItem?.actionComment
+                                        ? "inner_form_new"
+                                        : "d-none"
+                                    }
+                                  >
+                                    <label className="controlform">
+                                      Action Comment
+                                    </label>
+                                    <div className="form-bx">
+                                      <label>
+                                        {" "}
+                                        <textarea
+                                          type="text"
+                                          className=""
+                                          disabled
+                                          value={firstItem?.actionComment}
+                                        />
+                                      </label>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            );
+                          }
+                        })}
+                        {/* previous edit form start  */}
+                        {/* <div className="inner_form_new ">
+                          <label className="controlform">Name</label>
+                          <div className="form-bx">
+                            <label>
+                              <input
+                                type="text"
+                                name="name"
+                                placeholder="Name"
+                                onChange={(e) => {
+                                  changeHandelForm(e);
+                                }}
+                                // value={exportForm.name}
+                                value={applicationDetail.name}
+                                disabled={roleID > 5}
+                              />
+                              <span className="sspan"></span>
+                            </label>
+                            {errors?.name ? (
+                              <span className="errormsg">
+                                {errors?.name}
+                              </span>
+                            ) : ""}
+                          </div>
+                        </div>
+                     
+                        <div
                           className={
-                            item?.filePath != null
-                              ? "attachemt_form-bx"
+                            roleID == 5
+                              ? "inner_form_new align-items-start mt-2"
                               : "d-none"
                           }
                         >
-                          <label
-                            style={{
-                              background: "#d9edf7",
-                              padding: "9px 3px",
-                              border: "0px",
-                            }}
-                          >
-                            {item?.fileName ? (
-                              <span style={{ fontWeight: "500" }}>
-                                {item?.fileName}
+                          <label className="controlform">Content</label>
+                          <div className="form-bx editorFieldBox">
+                            <div className="mt-2 py-1">
+                              <MenuBar editor={editorAnalyst} />
+                              <EditorContent editor={editorAnalyst} />
+
+                              <span className="sspan"></span>
+                              {(errors.Description && Description == " ") ||
+                                Description == null ||
+                                Description == "<p></p>" ||
+                                !Description ? (
+                                <small
+                                  className="errormsg"
+                                  style={{ bottom: "-13px" }}
+                                >
+                                  {errors.Description}
+                                </small>
+                              ) : (
+                                ""
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                    
+
+                        {attachmentData?.map((items, index) => {
+                          return (
+                            <div
+                              className="attachemt_form-bx  mt-2"
+                              key={items.id}
+                            >
+                              <label
+                                style={{
+                                  background: "#d9edf7",
+                                  padding: "9px 3px",
+                                  border: "0px",
+                                }}
+                              >
+                                <span style={{ fontWeight: "500" }}>
+                                  {items.filename}
+                                </span>
+                              </label>
+                              <div className="browse-btn">
+                                Browse
+                                <input
+                                  type="file"
+                                  onChange={(e) =>
+                                    handleuserFileChange(e, "circular" + (index + 1))
+                                  }
+                                />
+                              </div>
+                              <span className="filename">
+                                {userfiles?.find(
+                                  (f) => f.id === "circular" + (index + 1)
+                                )?.file?.name || "No file chosen"}
                               </span>
-                            ) : (
-                              <span style={{ fontWeight: "500" }}>Cover Letter</span>
-                            )}
-                          </label>
-                          {item?.filePath ? (
+                              {userfiles?.length &&
+                                userfiles?.find((f) => f.id === "circular" + (index + 1))
+                                  ?.file?.name ? (
+                                <button
+                                  type="button"
+                                  className="remove-file"
+                                  onClick={() =>
+                                    removeUserImage(index, "circular" + (index + 1))
+                                  }
+                                >
+                                  Remove
+                                </button>
+                              ) : (
+                                ""
+                              )}
+                            </div>
+                          );
+                        })}
+
+                        {otheruserfiles.map((file, index) => (
+                          <div
+                            key={"other" + (index + 1)}
+                            className="attachemt_form-bx"
+                          >
+                            <label
+                              style={{
+                                background: "#d9edf7",
+                                padding: "9px 3px",
+                                border: "0px",
+                              }}
+                            >
+                              <b>
+                                Other File
+                                {index + 1}
+                              </b>
+                            </label>
+                            <div className="browse-btn">
+                              Browse{" "}
+                              <input
+                                type="file"
+                                onChange={(e) => {
+                                  handleuserFileChange(e, "other" + index);
+                                  handleOthrefile(e, `other ${index}`);
+                                }}
+                              />
+                            </div>
                             <span className="filename">
-                              <Link
-                                to={item?.filePath}
-                                target="_blank"
-                                className={
-                                  item?.filePath
-                                    ? "viewbtn_file"
-                                    : "viewbtn_file pe-none"
+                              {userfiles?.find((f) => f.id === "other" + index)
+                                ?.file?.name || "No file chosen"}
+                            </span>
+
+                            {userfiles?.length &&
+                              userfiles?.find((f) => f.id === "other" + index)
+                                ?.file?.name ? (
+                              <button
+                                type="button"
+                                className="remove-file"
+                                onClick={() =>
+                                  removeUserImage(index, "other" + index)
                                 }
                               >
-                                View File
-                              </Link>
-                            </span>
-                          ) : (
-                            <span className="disabletext">Not Found</span>
-                          )}
-                        </div>
-                      )
-                    })
+                                Remove
+                              </button>
+                            ) : (
+                              ""
+                            )}
+                          </div>
+                        ))}
 
-                  ) : (
-                    ""
-                  )}
-
-
-                  {/* {otherfiles.map((file, index) => (
-                      <div
-                        key={"other file" + (index + 1)}
-                        className="attachemt_form-bx"
-                      >
-                        <label
-                          style={{
-                            background: "#d9edf7",
-                            padding: "9px 3px",
-                            border: "0px",
-                          }}
-                        >
-                          <span style={{ fontWeight: "500" }}>
-                            {" "}
-                            Other File {index + 1}{" "}
-                          </span>
-                        </label>
-                        <div className="browse-btn">
-                          Browse{" "}
-                          <input
-                            type="file"
-                            onChange={(e) => {
-                              handleFileChange(e, "other file" + (index + 1));
-                            }}
-                          />
-                        </div>
-                        <span className="filename">
-                          {files.find(
-                            (f) => f.label === "other file" + (index + 1)
-                          )?.file?.name || "No file chosen"}
-                        </span>
-
-                        {files?.length &&
-                          files?.find(
-                            (f) => f.label == "other file" + (index + 1)
-                          )?.file?.name ? (
-                          <button
-                            type="button"
-                            className="remove-file"
-                            onClick={() =>
-                              removefileImage("other file" + (index + 1))
-                            }
-                          >
-                            Remove
-                          </button>
+                        {otheruserfiles?.length || userfiles?.length ? (
+                          <div className="attachemt_form-bx">
+                            <label style={{ border: "0px" }}>{""}</label>
+                            <button
+                              type="button"
+                              className="addmore-btn mt-0"
+                              onClick={(e) => handleuserAddMore(e)}
+                            >
+                              {" "}
+                              Add More File{" "}
+                            </button>
+                          </div>
                         ) : (
                           ""
                         )}
-                      </div>
-                    ))
-                    }
-                    {
-                      <button
-                        type="button"
-                        className="addmore-btn mb-2"
-                        onClick={(e) => handleAddMore(e)}
-                        disabled={roleID > 5}
-                      >
-                        {" "}
-                        Add More File{" "}
-                      </button>
-                    } */}
-                </div>
-                {allcomment?.map((cur) => {
+                        <div className="inner_form_new">
+                          <label className="controlform">Bank</label>
+                          <div className="form-bx">
+                            <div className="multiselect flex justify-content-center">
+                              <MultiSelect
+                                value={selectedBanks}
+                                onChange={(e) => setSelectedBanks(e.value)}
+                                options={vOption}
+                                optionLabel="name"
+                                // selected={applicationDetail?.bankData?.map((item) => item.bankName == vOption.name)}
+                                onShow={onShow}
+                                placeholder="Select Banks"
+                                display="chip"
+                                disabled={roleID > 5}
+                              />
+                            </div>
 
-                  return cur?.circularActivityData
-                    ?.slice()
-                    ?.reverse()
-                    .map((item, index) => {
+                          </div>
+                        </div>
+                     
+                        <div className="inner_form_new ">
+                          <label className="controlform">Subject</label>
+                          <div className="form-bx">
+                            <label>
+                              <input
+                                type="text"
+                                name="subject"
+                                placeholder="Subject"
+                                onChange={(e) => {
+                                  changeHandelForm(e);
+                                }}
+                                value={applicationDetail.subject}
+                                disabled={roleID > 5}
+                              />
+                              <span className="sspan"></span>
+                            </label>
+                            {errors?.subject ? (
+                              <span className="errormsg">
+                                {errors?.subject}
+                              </span>
+                            ) : ""}
+                          </div>
+                        </div>
 
-                      if (cur?.assignedToRoleID == 5) {
-                        return (
+                      
+                        <div className="inner_form_new ">
+                          <label className="controlform">Directives</label>
+                          <div className="form-bx">
+                            <div className="multiselect flex justify-content-center">
+                              <MultiSelect
+                                value={selectedDirectives}
+                                onChange={(e) => setSelectedDirectives(e.value)}
+                                options={DirectiveOption}
+                                optionLabel="name"
+                                name="directiveData"
+                                placeholder="Select Directives"
+                                display="chip"
+                                disabled={roleID > 5}
+                              />
+                              {errors?.directiveData ? (
+                                <small className="errormsg">{errors.directiveData}</small>
+                              ) : (
+                                ""
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                     
+                        <div className="inner_form_new ">
+                          <label className="controlform">Releasing Date</label>
+                          <div className="form-bx">
+                            <DatePicker
+                              placeholderText="Select Releasing Date"
+                              closeOnScroll={(e) => e.target === document}
+                              selected={releasingDate}
+                              onChange={(date) => setReleasingDate(date)}
+                              peekNextMonth
+                              showMonthDropdown
+                              showYearDropdown
+                              minDate={new Date()}
+                              dropdownMode="select"
+                              dateFormat="dd/MMMM/yyyy"
+                              disabled={roleID > 5}
+                            />
+                            {
+                              errors?.releasingDate ? (
+                                <small className="errormsg">{errors.releasingDate}</small>
+                              ) : (" ")
+                            }
+                          </div>
+                        </div>
+                     
+                        <div className="inner_form_new ">
+                          <label className="controlform">Assign to Next Level</label>
+                          <input
+                            type="checkbox"
+                            onChange={HandelSupervisorcheck}
+                            checked={checkSupervisor}
+                            // disabled={roleID >= 6 ? true : false}
+                            disabled={roleID > 5}
+                          />
+                        </div>
+                      
+
+
+                        {roleID == "5" && checkSupervisor == true ? (
                           <>
-                            <div
-                              key={index}
-                              className={
-                                index == 0 && roleID != 5
-                                  ? "tab-pane fade show active"
-                                  : "tab-pane fade show  "
-                              }
-                              id={"analyst-justified-home" + index}
-                              role="tabpanel"
-                              aria-labelledby={"analyst" + index}
-                            >
-                              <div className={item?.actionStatusName ? "bakgroundaction" : "d-none"}>
-                                <div className="row">
-                                  <div className="col-md-6">
+                            <div className="inner_form_new">
+                              <label className="controlform">Select Analyst</label>
+                              <div className="form-bx">
+                                <label>
+                                  <select
+                                    ref={assignedToRef}
+                                    name="assignedTo"
+                                    onChange={supervisorHangechangeBankuser}
+                                    className={
+                                      errors.assignedTo && !AssignUserID ? "error" : ""
+                                    }
+                                  >
+                                    <option value="">Select Analyst</option>
+                                    {Supervisors?.map((item, index) => {
+                                      return (
+                                        <option
+                                          key={index}
+                                          value={JSON?.stringify(item)}
+                                          selected={
+                                            item.userID == applicationDetail?.assignedTo
+                                          }
+                                        >
+                                          {item.name}
+                                        </option>
+                                      );
+                                    })}
+                                  </select>
+                                  <span className="sspan"></span>
+                                  {errors.assignedTo && !AssignUserID ? (
+                                    <small className="errormsg">
+                                      {errors.assignedTo}
+                                    </small>
+                                  ) : (
+                                    ""
+                                  )}
+                                </label>
+                              </div>
+                            </div>
+                          </>
+                        ) : (
+                          ""
+                        )}
+
+                      <h5 className="section_top_subheading mt-2">Attachments</h5>
+
+                        {applicationDetail?.attachedFiles.length > 0 ? (
+                          applicationDetail?.attachedFiles?.map((item) => {
+                            return (
+                              < div
+                                className={
+                                  item?.filePath != null
+                                    ? "attachemt_form-bx"
+                                    : "d-none"
+                                }
+                              >
+                                <label
+                                  style={{
+                                    background: "#d9edf7",
+                                    padding: "9px 3px",
+                                    border: "0px",
+                                  }}
+                                >
+                                  {item?.fileName ? (
+                                    <span style={{ fontWeight: "500" }}>
+                                      {item?.fileName}
+                                    </span>
+                                  ) : (
+                                    <span style={{ fontWeight: "500" }}>Cover Letter</span>
+                                  )}
+                                </label>
+                                {item?.filePath ? (
+                                  <span className="filename">
+                                    <Link
+                                      to={item?.filePath}
+                                      target="_blank"
+                                      className={
+                                        item?.filePath
+                                          ? "viewbtn_file"
+                                          : "viewbtn_file pe-none"
+                                      }
+                                    >
+                                      View File
+                                    </Link>
+                                  </span>
+                                ) : (
+                                  <span className="disabletext">Not Found</span>
+                                )}
+                              </div>
+                            )
+                          })
+
+                        ) : (
+                          ""
+                        )} */}
+
+                      </div>
+                      {allcomment?.map((cur) => {
+
+                        return cur?.circularActivityData
+                          ?.slice()
+                          ?.reverse()
+                          .map((item, index) => {
+
+                            if (cur?.assignedToRoleID == 5) {
+                              return (
+                                <>
+                                  <div
+                                    key={index}
+                                    className={
+                                      index == 0 && roleID != 5
+                                        ? "tab-pane fade show active"
+                                        : "tab-pane fade show  "
+                                    }
+                                    id={"analyst-justified-home" + index}
+                                    role="tabpanel"
+                                    aria-labelledby={"analyst" + index}
+                                  >
+                                    <div className={item?.actionStatusName ? "bakgroundaction" : "d-none"}>
+                                      <div className="row">
+                                        <div className="col-md-6">
+                                          <div className="inner_form_new ">
+                                            <label className="controlform">
+                                              Action Type
+                                            </label>
+                                            <div className="form-bx">
+                                              <label>
+                                                <input
+                                                  type="text"
+                                                  className=""
+                                                  disabled
+                                                  value={
+
+                                                    item?.actionStatusName ==
+                                                      "Approved" ||
+                                                      item?.actionStatusName ==
+                                                      "Reject" ||
+                                                      item?.actionStatusName ==
+                                                      "Cancelled"
+                                                      ? "Assigned" ||
+                                                      item?.actionStatusName ==
+                                                      "Draft"
+                                                      : item?.actionStatusName
+                                                  }
+                                                />
+                                              </label>
+                                            </div>
+                                          </div>
+                                        </div>
+
+                                        <div className="col-md-3">
+                                          <div className="inner_form_new-sm ">
+                                            <label className="controlform-sm">
+                                              User{" "}
+                                              <i
+                                                className="bi bi-info-circle icons-info"
+                                                title={`Role : ${item?.actionRoleName}`}
+                                              ></i>
+                                            </label>
+                                            <div className="form-bx-sm">
+                                              <label>
+                                                <input
+                                                  type="text"
+                                                  className=""
+                                                  disabled
+                                                  value={item?.actionUserName}
+                                                />
+                                              </label>
+                                            </div>
+                                          </div>
+                                        </div>
+
+                                        <div className="col-md-3">
+                                          <div className="inner_form_new-sm">
+                                            <label className="controlform-sm">
+                                              {item?.actionStatusName ==
+                                                "Approved" ||
+                                                item?.actionStatusName ==
+                                                "Reject" ||
+                                                item?.actionStatusName ==
+                                                "Cancelled"
+                                                ? "Assigned"
+                                                : item?.actionStatusName}{" "}
+                                              Date
+                                            </label>
+                                            <div className="form-bx-sm">
+                                              <label>
+                                                <input
+                                                  type="text"
+                                                  className=""
+                                                  disabled
+                                                  value={moment(
+                                                    item?.createdDate
+                                                  ).format("DD/MMM/yyyy")}
+                                                />
+                                              </label>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+
+                                      <div
+                                        className={
+                                          item?.actionNotes
+                                            ? "inner_form_new "
+                                            : "d-none"
+                                        }
+                                      >
+                                        <label className="controlform">
+                                          Action Note
+                                        </label>
+                                        <div className="form-bx">
+                                          <label>
+                                            <textarea
+                                              disabled
+                                              value={item?.actionNotes}
+                                            />
+                                          </label>
+                                        </div>
+                                      </div>
+
+                                      <div
+                                        className={
+                                          item?.actionComment
+                                            ? "inner_form_new "
+                                            : "d-none"
+                                        }
+                                      >
+                                        <label className="controlform">
+                                          Action Comment
+                                        </label>
+                                        <div className="form-bx">
+                                          <label>
+                                            <textarea
+                                              disabled
+                                              value={item?.actionComment}
+                                            />
+                                          </label>
+                                        </div>
+                                      </div>
+                                    </div>
+
+
+
                                     <div className="inner_form_new ">
                                       <label className="controlform">
-                                        Action Type
+                                        Name
+                                      </label>
+                                      <div className="form-bx">
+                                        <label>
+                                          <input
+                                            type="text"
+                                            className=""
+                                            value={item?.name}
+                                            disabled
+                                          />
+                                        </label>
+                                      </div>
+                                    </div>
+
+                                    <div className="inner_form_new ">
+                                      <label className="controlform">
+                                        Content
+                                      </label>
+                                      <div className="form-bx">
+                                        <label>
+                                          {/* <input
+                                        type="text"
+                                        className=""
+                                        value={item?.content}
+                                        disabled
+                                      /> */}
+                                          <p className="showData" dangerouslySetInnerHTML={applicationDetail?.content ? { __html: applicationDetail.content } : { __html: "-" }}></p>
+                                        </label>
+                                      </div>
+                                    </div>
+
+
+
+                                    <div className="inner_form_new ">
+                                      <label className="controlform">
+                                        Attachments
+                                      </label>
+
+                                      <div className="form-bx">
+                                        {item?.filesData?.length ? (
+                                          item?.filesData?.map(
+                                            (items, index) => {
+                                              return (
+                                                <div
+                                                  className="attachemt_form-bx mb-0 width-80"
+                                                  key={items.id}
+                                                >
+                                                  <label className="mb-2 mb-0 pt-2 pb-2">
+                                                    {/* {items.filename} */}
+                                                    {items?.fileName
+                                                      ? items?.fileName
+                                                      : `FileUpload ${index}`}
+                                                  </label>
+                                                  <div
+                                                    className={
+                                                      roleID == 2 || roleID == 3
+                                                        ? "browse-btn"
+                                                        : "d-none"
+                                                    }
+                                                  >
+                                                    Browse{" "}
+                                                    <input
+                                                      type="file"
+                                                      onChange={(e) =>
+                                                        handleFileChange(
+                                                          e,
+                                                          items.id
+                                                        )
+                                                      }
+                                                    />
+                                                  </div>
+                                                  <span className="filename">
+                                                    <Link
+                                                      to={items?.filePath}
+                                                      target="_blank"
+                                                      className="viewbtn"
+                                                    >
+                                                      View File
+                                                    </Link>
+                                                  </span>
+                                                </div>
+                                              );
+                                            }
+                                          )
+                                        ) : (
+                                          <label className="notfound">
+                                            File Not Found
+                                          </label>
+                                        )}
+                                      </div>
+                                    </div>
+                                    <div className="inner_form_new ">
+                                      <label className="controlform">
+                                        Bank
+                                      </label>
+                                      <div className="form-bx">
+                                        <label>
+                                          <ul className="nalist">
+                                            {item?.bankData
+                                              ?.length ? (
+                                              item?.bankData?.map(
+                                                (res) => {
+                                                  return (
+                                                    <li>{res?.bankName}</li>
+                                                  );
+                                                }
+                                              )
+                                            ) : (
+                                              <li className="disabletext">
+                                                N/A
+                                              </li>
+                                            )}
+                                          </ul>
+                                        </label>
+                                      </div>
+                                    </div>
+
+                                    <div className="inner_form_new ">
+                                      <label className="controlform">
+                                        Subject
+                                      </label>
+                                      <div className="form-bx">
+                                        <label>
+                                          <input
+                                            type="text"
+                                            className=""
+                                            value={item?.subject}
+                                            disabled
+                                          />
+                                        </label>
+                                      </div>
+                                    </div>
+
+                                    <div className="inner_form_new ">
+                                      <label className="controlform">
+                                        Directive
+                                      </label>
+                                      <div className="form-bx">
+                                        <label>
+                                          <ul className="nalist">
+                                            {item?.directiveData
+                                              ?.length ? (
+                                              item?.directiveData?.map(
+                                                (res) => {
+                                                  return (
+                                                    <li>{res?.directiveName
+                                                    }</li>
+                                                  );
+                                                }
+                                              )
+                                            ) : (
+                                              <li className="disabletext">
+                                                N/A
+                                              </li>
+                                            )}
+                                          </ul>
+                                        </label>
+                                      </div>
+                                    </div>
+                                    <div className="inner_form_new">
+                                      <label className="controlform">
+                                        Releasing Date
                                       </label>
                                       <div className="form-bx">
                                         <label>
@@ -2707,297 +3319,14 @@ const ExportCircularsEditForm = ({
                                             type="text"
                                             className=""
                                             disabled
-                                            value={
-
-                                              item?.actionStatusName ==
-                                                "Approved" ||
-                                                item?.actionStatusName ==
-                                                "Reject" ||
-                                                item?.actionStatusName ==
-                                                "Cancelled"
-                                                ? "Assigned" ||
-                                                item?.actionStatusName ==
-                                                "Draft"
-                                                : item?.actionStatusName
-                                            }
-                                          />
-                                        </label>
-                                      </div>
-                                    </div>
-                                  </div>
-
-                                  <div className="col-md-3">
-                                    <div className="inner_form_new-sm ">
-                                      <label className="controlform-sm">
-                                        User{" "}
-                                        <i
-                                          className="bi bi-info-circle icons-info"
-                                          title={`Role : ${item?.actionRoleName}`}
-                                        ></i>
-                                      </label>
-                                      <div className="form-bx-sm">
-                                        <label>
-                                          <input
-                                            type="text"
-                                            className=""
-                                            disabled
-                                            value={item?.actionUserName}
-                                          />
-                                        </label>
-                                      </div>
-                                    </div>
-                                  </div>
-
-                                  <div className="col-md-3">
-                                    <div className="inner_form_new-sm">
-                                      <label className="controlform-sm">
-                                        {item?.actionStatusName ==
-                                          "Approved" ||
-                                          item?.actionStatusName ==
-                                          "Reject" ||
-                                          item?.actionStatusName ==
-                                          "Cancelled"
-                                          ? "Assigned"
-                                          : item?.actionStatusName}{" "}
-                                        Date
-                                      </label>
-                                      <div className="form-bx-sm">
-                                        <label>
-                                          <input
-                                            type="text"
-                                            className=""
-                                            disabled
                                             value={moment(
-                                              item?.createdDate
+                                              item?.releasingDate
                                             ).format("DD/MMM/yyyy")}
                                           />
                                         </label>
                                       </div>
                                     </div>
-                                  </div>
-                                </div>
-
-                                <div
-                                  className={
-                                    item?.actionNotes
-                                      ? "inner_form_new "
-                                      : "d-none"
-                                  }
-                                >
-                                  <label className="controlform">
-                                    Action Note
-                                  </label>
-                                  <div className="form-bx">
-                                    <label>
-                                      <textarea
-                                        disabled
-                                        value={item?.actionNotes}
-                                      />
-                                    </label>
-                                  </div>
-                                </div>
-
-                                <div
-                                  className={
-                                    item?.actionComment
-                                      ? "inner_form_new "
-                                      : "d-none"
-                                  }
-                                >
-                                  <label className="controlform">
-                                    Action Comment
-                                  </label>
-                                  <div className="form-bx">
-                                    <label>
-                                      <textarea
-                                        disabled
-                                        value={item?.actionComment}
-                                      />
-                                    </label>
-                                  </div>
-                                </div>
-                              </div>
-
-
-
-                              <div className="inner_form_new ">
-                                <label className="controlform">
-                                  Name
-                                </label>
-                                <div className="form-bx">
-                                  <label>
-                                    <input
-                                      type="text"
-                                      className=""
-                                      value={item?.name}
-                                      disabled
-                                    />
-                                  </label>
-                                </div>
-                              </div>
-
-                              <div className="inner_form_new ">
-                                <label className="controlform">
-                                  Content
-                                </label>
-                                <div className="form-bx">
-                                  <label>
-                                    <input
-                                      type="text"
-                                      className=""
-                                      value={item?.content}
-                                      disabled
-                                    />
-                                  </label>
-                                </div>
-                              </div>
-
-
-
-                              <div className="inner_form_new ">
-                                <label className="controlform">
-                                  Attachments
-                                </label>
-
-                                <div className="form-bx">
-                                  {item?.filesData?.length ? (
-                                    item?.filesData?.map(
-                                      (items, index) => {
-                                        return (
-                                          <div
-                                            className="attachemt_form-bx mb-0 width-80"
-                                            key={items.id}
-                                          >
-                                            <label className="mb-2 mb-0 pt-2 pb-2">
-                                              {/* {items.filename} */}
-                                              {items?.fileName
-                                                ? items?.fileName
-                                                : `FileUpload ${index}`}
-                                            </label>
-                                            <div
-                                              className={
-                                                roleID == 2 || roleID == 3
-                                                  ? "browse-btn"
-                                                  : "d-none"
-                                              }
-                                            >
-                                              Browse{" "}
-                                              <input
-                                                type="file"
-                                                onChange={(e) =>
-                                                  handleFileChange(
-                                                    e,
-                                                    items.id
-                                                  )
-                                                }
-                                              />
-                                            </div>
-                                            <span className="filename">
-                                              <Link
-                                                to={items?.filePath}
-                                                target="_blank"
-                                                className="viewbtn"
-                                              >
-                                                View File
-                                              </Link>
-                                            </span>
-                                          </div>
-                                        );
-                                      }
-                                    )
-                                  ) : (
-                                    <label className="notfound">
-                                      File Not Found
-                                    </label>
-                                  )}
-                                </div>
-                              </div>
-                              <div className="inner_form_new ">
-                                <label className="controlform">
-                                  Bank
-                                </label>
-                                <div className="form-bx">
-                                  <label>
-                                    <ul className="nalist">
-                                      {item?.bankData
-                                        ?.length ? (
-                                        item?.bankData?.map(
-                                          (res) => {
-                                            return (
-                                              <li>{res?.bankName}</li>
-                                            );
-                                          }
-                                        )
-                                      ) : (
-                                        <li className="disabletext">
-                                          N/A
-                                        </li>
-                                      )}
-                                    </ul>
-                                  </label>
-                                </div>
-                              </div>
-
-                              <div className="inner_form_new ">
-                                <label className="controlform">
-                                  Subject
-                                </label>
-                                <div className="form-bx">
-                                  <label>
-                                    <input
-                                      type="text"
-                                      className=""
-                                      value={item?.subject}
-                                      disabled
-                                    />
-                                  </label>
-                                </div>
-                              </div>
-
-                              <div className="inner_form_new ">
-                                <label className="controlform">
-                                  Directive
-                                </label>
-                                <div className="form-bx">
-                                  <label>
-                                    <ul className="nalist">
-                                      {item?.directiveData
-                                        ?.length ? (
-                                        item?.directiveData?.map(
-                                          (res) => {
-                                            return (
-                                              <li>{res?.directiveName
-                                              }</li>
-                                            );
-                                          }
-                                        )
-                                      ) : (
-                                        <li className="disabletext">
-                                          N/A
-                                        </li>
-                                      )}
-                                    </ul>
-                                  </label>
-                                </div>
-                              </div>
-                              <div className="inner_form_new">
-                                <label className="controlform">
-                                  Releasing Date
-                                </label>
-                                <div className="form-bx">
-                                  <label>
-                                    <input
-                                      type="text"
-                                      className=""
-                                      disabled
-                                      value={moment(
-                                        item?.releasingDate
-                                      ).format("DD/MMM/yyyy")}
-                                    />
-                                  </label>
-                                </div>
-                              </div>
-                              {/* <div class="row">
+                                    {/* <div class="row">
                                   <div class="col-md-12">
                                     <div class="inner_form_new ">
                                       <label class="controlform">
@@ -3027,724 +3356,734 @@ const ExportCircularsEditForm = ({
                                 </div> */}
 
 
-                              <div
+                                    <div
+                                      className={
+                                        item?.assignedToName == null &&
+                                          item?.assignedToName == null
+                                          ? "d-none"
+                                          : "row"
+                                      }
+                                    >
+                                      <div className="col-md-6">
+                                        <div className="inner_form_new ">
+                                          <label className="controlform">
+                                            Assigned To Role
+                                          </label>
+                                          <div className="form-bx">
+                                            <label>
+                                              <input
+                                                type="text"
+                                                className=""
+                                                disabled
+                                                value={
+                                                  item?.roleName
+                                                    ? item?.roleName
+                                                    : ""
+                                                }
+                                              />
+                                            </label>
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <div className="col-md-6">
+                                        <div className="inner_form_new-sm ">
+                                          <label className="controlform-sm">
+                                            Assigned To User
+                                          </label>
+                                          <div className="form-bx-sm">
+                                            <label>
+                                              <input
+                                                type="text"
+                                                className=""
+                                                disabled
+                                                value={
+                                                  item?.assignedToName
+                                                    ? item?.assignedToName
+                                                    : ""
+                                                }
+                                              />
+                                            </label>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </>
+                              );
+                            }
+                          });
+                      })}
+                      {/* {noDataComment?.map((data, i) => {
+                        if (data.roleID == 5 && data.isDataAvailable == 0) {
+                          return (
+                            <div
+                              className={
+                                analystTab ? "customtab" : "d-none"
+                              }
+                              key={i}
+                            >
+                              <div className="text-center">No Data Found</div>
+                            </div>
+                          );
+                        }
+                      })} */}
+                    </div>
+                  </div>
+                </>
+              ) : (
+                ""
+              )}
+              {/* analyst analyst code end */}
+
+
+              {/* senior analyst code start */}
+              {roleID >= 6 ? (
+                <>
+                  <h5
+                    className={
+                      sranalystTab
+                        ? "section_top_subheading mt-3 py-3 btn-collapse_active cursorpointer"
+                        : "section_top_subheading mt-3 py-3 cursorpointer"
+                    }
+                    onClick={() => setsranalystTab(!sranalystTab)}
+                  >
+                    Senior Analyst{" "}
+
+                    <span className="btn-collapse">
+                      <i className="bi bi-caret-down-fill"></i>
+                    </span>
+                  </h5>
+
+                  <div className={sranalystTab ? "customtab" : "d-none"}>
+
+                    {/* {applicationDetail?.id != 6 && applicationDetail && roleID != 6 ? <ExportCirculargenInfo applicationDetail={applicationDetail}  /> : ""} */}
+
+                    {allcomment?.map((cur, i) => {
+
+                      if (cur.assignedToRoleID == 6) {
+                        return (
+                          <ul
+                            className={
+                              cur?.circularActivityData?.length >= 1
+                                ? "nav nav-pills mb-3"
+                                : "d-none"
+                            }
+                            role="tablist"
+                          >
+                            <li
+                              className={roleID == 6 ? "nav-item" : "d-none"}
+                              role="presentation"
+                            >
+                              <button
                                 className={
-                                  item?.assignedToName == null &&
-                                    item?.assignedToName == null
-                                    ? "d-none"
-                                    : "row"
+                                  roleID == 6
+                                    ? "nav-link w-100 border-radius0 active"
+                                    : "nav-link w-100 border-radius0"
                                 }
+                                id="sranalystab"
+                                data-bs-toggle="tab"
+                                data-bs-target="#sranalystab-justified-home"
+                                type="button"
+                                role="tab"
+                                aria-controls="home"
+                                aria-selected="true"
                               >
-                                <div className="col-md-6">
-                                  <div className="inner_form_new ">
+                                Action
+                              </button>
+                            </li>
+
+                            {cur?.circularActivityData
+                              ?.slice()
+                              ?.reverse()
+                              .map((items, index) => {
+                                return (
+                                  <li className="nav-item" role="presentation">
+                                    <button
+                                      className={
+                                        index == 0 && roleID != 6
+                                          ? "nav-link w-100 border-radius0 active"
+                                          : "nav-link border-radius0 w-100 "
+                                      }
+                                      id={"sranalystab" + index}
+                                      data-bs-toggle="tab"
+                                      data-bs-target={
+                                        "#sranalystab-justified-home" + index
+                                      }
+                                      type="button"
+                                      role="tab"
+                                      aria-controls="home"
+                                      aria-selected="true"
+                                    >
+
+                                      Response{" "}
+                                      {cur?.circularActivityData?.length -
+                                        index}
+                                    </button>
+                                  </li>
+                                );
+                              })}
+                          </ul>
+                        );
+                        // } else {
+                        //   return (
+                        //     <div>
+                        //       {applicationDetail?.roleID == 6 ? <ExportCirculargenInfo applicationDetail={applicationDetail} /> : applicationDetail?.roleID != 6 && applicationDetail && roleID != 6 ? "No Data" : " "}
+                        //     </div>
+                        //   )
+                        // }
+                      }
+
+                    })}
+
+                    <div className="tab-content pt-2">
+                      <div
+                        className={
+                          roleID >= 6
+                            ? "tab-pane fade show active"
+                            : "tab-pane fade show "
+                        }
+                        id="sranalystab-justified-home"
+                        role="tabpanel"
+                        aria-labelledby="sranalystab"
+                      >
+                        {Actiondata?.map((cur) => {
+                          const firstItem = cur?.circularActivityData?.[0]; // Accessing the first element directly
+
+                          if (cur?.assignedToRoleID === 6 && firstItem) {
+                            // Check if firstItem exists
+                            return (
+                              <div className="bakgroundaction">
+                                <div key={firstItem.actionID}>
+                                  {" "}
+                                  {/* Remember to add a unique key */}
+                                  <div className="row">
+                                    <div className="col-md-6">
+                                      <div className="inner_form_new">
+                                        <label className="controlform">
+                                          Action Type s
+                                        </label>
+                                        <div className="form-bx">
+                                          <label>
+                                            {" "}
+                                            <input
+                                              type="text"
+                                              className=""
+                                              disabled
+                                              // value={firstItem?.actionStatusName}
+                                              value={
+                                                firstItem?.actionStatusName ==
+                                                  "Approved" ||
+                                                  firstItem?.actionStatusName ==
+                                                  "Reject" ||
+                                                  firstItem?.actionStatusName ==
+                                                  "Cancelled"
+                                                  ? "Assigned" ||
+                                                  firstItem?.actionStatusName ==
+                                                  "Draft"
+                                                  : firstItem?.actionStatusName
+                                              }
+                                            />
+                                          </label>
+                                        </div>
+                                      </div>
+                                    </div>
+
+                                    <div className="col-md-3">
+                                      <div className="inner_form_new-sm">
+                                        <label className="controlform-sm">
+                                          User{" "}
+                                          <i
+                                            className="bi bi-info-circle icons-info"
+                                            title={`Role : ${firstItem?.actionRoleName}`}
+                                          ></i>
+                                        </label>
+                                        <div className="form-bx-sm">
+                                          <label>
+                                            {" "}
+                                            <input
+                                              type="text"
+                                              className=""
+                                              disabled
+                                              value={firstItem?.actionUserName}
+                                            />
+                                          </label>
+                                        </div>
+                                      </div>
+                                    </div>
+
+                                    <div className="col-md-3">
+                                      <div className="inner_form_new-sm">
+                                        <label className="controlform-sm">
+                                          {firstItem?.actionStatusName ==
+                                            "Approved" ||
+                                            firstItem?.actionStatusName ==
+                                            "Reject" ||
+                                            firstItem?.actionStatusName ==
+                                            "Cancelled"
+                                            ? "Assigned"
+                                            : firstItem?.actionStatusName}{" "}
+                                          Date
+                                        </label>
+                                        <div className="form-bx-sm">
+                                          <label>
+                                            <input
+                                              type="text"
+                                              className=""
+                                              disabled
+                                              value={moment(
+                                                firstItem?.createdDate
+                                              ).format("DD/MMM/yyyy")}
+                                            />
+                                          </label>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div
+                                    className={
+                                      firstItem?.actionNotes
+                                        ? "inner_form_new"
+                                        : "d-none"
+                                    }
+                                  >
                                     <label className="controlform">
-                                      Assigned To Role
+                                      Action Note
                                     </label>
                                     <div className="form-bx">
                                       <label>
-                                        <input
+                                        {" "}
+                                        <textarea
                                           type="text"
                                           className=""
                                           disabled
-                                          value={
-                                            item?.roleName
-                                              ? item?.roleName
-                                              : ""
-                                          }
+                                          value={firstItem?.actionNotes}
                                         />
                                       </label>
                                     </div>
                                   </div>
-                                </div>
-                                <div className="col-md-6">
-                                  <div className="inner_form_new-sm ">
-                                    <label className="controlform-sm">
-                                      Assigned To User
+                                  <div
+                                    className={
+                                      firstItem?.actionComment
+                                        ? "inner_form_new"
+                                        : "d-none"
+                                    }
+                                  >
+                                    <label className="controlform">
+                                      Action Comment
                                     </label>
-                                    <div className="form-bx-sm">
+                                    <div className="form-bx">
                                       <label>
-                                        <input
+                                        {" "}
+                                        <textarea
                                           type="text"
                                           className=""
                                           disabled
-                                          value={
-                                            item?.assignedToName
-                                              ? item?.assignedToName
-                                              : ""
-                                          }
+                                          value={firstItem?.actionComment}
                                         />
                                       </label>
                                     </div>
                                   </div>
                                 </div>
                               </div>
-                            </div>
-                          </>
-                        );
-                      }
-                    });
-                })}
-              </div>
-            </div>
-
-            {/* upload file Data End */}
-            {/* -------------start next level------- */}
-
-            {/* senior analyst code start */}
-            {roleID >= 6 ? (
-              <>
-                <h5
-                  className={
-                    sranalystTab
-                      ? "section_top_subheading mt-3 py-3 btn-collapse_active cursorpointer"
-                      : "section_top_subheading mt-3 py-3 cursorpointer"
-                  }
-                  onClick={() => setsranalystTab(!sranalystTab)}
-                >
-                  Senior Analyst{" "}
-
-                  <span className="btn-collapse">
-                    <i className="bi bi-caret-down-fill"></i>
-                  </span>
-                </h5>
-
-                <div className={sranalystTab ? "customtab" : "d-none"}>
-
-                  {/* {applicationDetail?.id != 6 && applicationDetail && roleID != 6 ? <ExportCirculargenInfo applicationDetail={applicationDetail}  /> : ""} */}
-                 
-                 
-                  {applicationDetail?.roleID == 6 ? <ExportCirculargenInfo applicationDetail={applicationDetail}  /> :  applicationDetail?.roleID != 6  && applicationDetail ? "No Data" : " "}
-
-                  {allcomment?.map((cur, i) => {
-
-                    if (cur.assignedToRoleID == 6) {
-                      return (
-                        <ul
-                          className={
-                            cur?.circularActivityData?.length >= 1
-                              ? "nav nav-pills mb-3"
-                              : "d-none"
+                            );
                           }
-                          role="tablist"
-                        >
-                          <li
-                            className={roleID == 6 ? "nav-item" : "d-none"}
-                            role="presentation"
-                          >
-                            <button
+                        })}
+
+                        {/* next level data show and assign behalf of not equal userID  start*/}
+                        {console.log("applicationDetail?.userID !== UserID.replace(/", applicationDetail?.userID !== UserID.replace(/"/g, "") && roleID == 6)}
+
+                        {applicationDetail?.userID !== UserID.replace(/"/g, "") && roleID == 6 ?
+                          <>
+                            <div
                               className={
                                 roleID == 6
-                                  ? "nav-link w-100 border-radius0 active"
-                                  : "nav-link w-100 border-radius0"
+                                  ? "inner_form_new align-items-center"
+                                  : "d-none"
                               }
-                              id="sranalystab"
-                              data-bs-toggle="tab"
-                              data-bs-target="#sranalystab-justified-home"
-                              type="button"
-                              role="tab"
-                              aria-controls="home"
-                              aria-selected="true"
                             >
-                              Action
-                            </button>
-                          </li>
+                              <label className="controlform">Next Action</label>
+                              <div className="row">
+                                <div className="col-md-12 my-2">
+                                  <div className="hidden-toggles">
 
-                          {cur?.circularActivityData
-                            ?.slice()
-                            ?.reverse()
-                            .map((items, index) => {
-                              return (
-                                <li className="nav-item" role="presentation">
-                                  <button
-                                    className={
-                                      index == 0 && roleID != 6
-                                        ? "nav-link w-100 border-radius0 active"
-                                        : "nav-link border-radius0 w-100 "
-                                    }
-                                    id={"sranalystab" + index}
-                                    data-bs-toggle="tab"
-                                    data-bs-target={
-                                      "#sranalystab-justified-home" + index
-                                    }
-                                    type="button"
-                                    role="tab"
-                                    aria-controls="home"
-                                    aria-selected="true"
-                                  >
-
-                                    Response{" "}
-                                    {cur?.circularActivityData?.length -
-                                      index}
-                                  </button>
-                                </li>
-                              );
-                            })}
-                        </ul>
-                      );
-                    }
-                  })}
-
-                  <div className="tab-content pt-2">
-                    <div
-                      className={
-                        roleID == 6
-                          ? "tab-pane fade show active"
-                          : "tab-pane fade show "
-                      }
-                      id="sranalystab-justified-home"
-                      role="tabpanel"
-                      aria-labelledby="sranalystab"
-                    >
-                      {Actiondata?.map((cur) => {
-                        const firstItem = cur?.circularActivityData?.[0]; // Accessing the first element directly
-
-                        if (cur?.assignedToRoleID === 6 && firstItem) {
-                          // Check if firstItem exists
-                          return (
-                            <div className="bakgroundaction">
-                              <div key={firstItem.actionID}>
-                                {" "}
-                                {/* Remember to add a unique key */}
-                                <div className="row">
-                                  <div className="col-md-6">
-                                    <div className="inner_form_new">
-                                      <label className="controlform">
-                                        Action Type
-                                      </label>
-                                      <div className="form-bx">
-                                        <label>
-                                          {" "}
-                                          <input
-                                            type="text"
-                                            className=""
-                                            disabled
-                                            // value={firstItem?.actionStatusName}
-                                            value={
-                                              firstItem?.actionStatusName ==
-                                                "Approved" ||
-                                                firstItem?.actionStatusName ==
-                                                "Reject" ||
-                                                firstItem?.actionStatusName ==
-                                                "Cancelled"
-                                                ? "Assigned" ||
-                                                firstItem?.actionStatusName ==
-                                                "Draft"
-                                                : firstItem?.actionStatusName
-                                            }
-                                          />
-                                        </label>
-                                      </div>
-                                    </div>
-                                  </div>
-
-                                  <div className="col-md-3">
-                                    <div className="inner_form_new-sm">
-                                      <label className="controlform-sm">
-                                        User{" "}
-                                        <i
-                                          className="bi bi-info-circle icons-info"
-                                          title={`Role : ${firstItem?.actionRoleName}`}
-                                        ></i>
-                                      </label>
-                                      <div className="form-bx-sm">
-                                        <label>
-                                          {" "}
-                                          <input
-                                            type="text"
-                                            className=""
-                                            disabled
-                                            value={firstItem?.actionUserName}
-                                          />
-                                        </label>
-                                      </div>
-                                    </div>
-                                  </div>
-
-                                  <div className="col-md-3">
-                                    <div className="inner_form_new-sm">
-                                      <label className="controlform-sm">
-                                        {firstItem?.actionStatusName ==
-                                          "Approved" ||
-                                          firstItem?.actionStatusName ==
-                                          "Reject" ||
-                                          firstItem?.actionStatusName ==
-                                          "Cancelled"
-                                          ? "Assigned"
-                                          : firstItem?.actionStatusName}{" "}
-                                        Date
-                                      </label>
-                                      <div className="form-bx-sm">
-                                        <label>
-                                          <input
-                                            type="text"
-                                            className=""
-                                            disabled
-                                            value={moment(
-                                              firstItem?.createdDate
-                                            ).format("DD/MMM/yyyy")}
-                                          />
-                                        </label>
-                                      </div>
-                                    </div>
-                                  </div>
-                                </div>
-                                <div
-                                  className={
-                                    firstItem?.actionNotes
-                                      ? "inner_form_new"
-                                      : "d-none"
-                                  }
-                                >
-                                  <label className="controlform">
-                                    Action Note
-                                  </label>
-                                  <div className="form-bx">
-                                    <label>
-                                      {" "}
-                                      <textarea
-                                        type="text"
-                                        className=""
-                                        disabled
-                                        value={firstItem?.actionNotes}
-                                      />
+                                    <input
+                                      type="radio"
+                                      id="srasignto"
+                                      onChange={(e) => {
+                                        setcheckSupervisor(true);
+                                        supervisorHangechangeRole(e);
+                                        ChangeNextlevelHandle(e);
+                                        GetRoleHandle(10);
+                                        setAssignUserID("");
+                                        setapplicationstaus(
+                                          applicationDetail?.analystRecommendation
+                                        );
+                                      }}
+                                      onClick={() => setRecomdAnalyst("10")}
+                                      name="nextaction"
+                                      className="hidden-toggles__input"
+                                      value="10"
+                                      disabled={roleID > 6}
+                                    />
+                                    <label
+                                      for="srasignto"
+                                      className="hidden-toggles__label"
+                                    >
+                                      Assign
                                     </label>
-                                  </div>
-                                </div>
-                                <div
-                                  className={
-                                    firstItem?.actionComment
-                                      ? "inner_form_new"
-                                      : "d-none"
-                                  }
-                                >
-                                  <label className="controlform">
-                                    Action Comment
-                                  </label>
-                                  <div className="form-bx">
-                                    <label>
-                                      {" "}
-                                      <textarea
-                                        type="text"
-                                        className=""
-                                        disabled
-                                        value={firstItem?.actionComment}
-                                      />
+
+                                    <input
+                                      type="radio"
+                                      id="srcoloration-Refer"
+                                      onChange={(e) => {
+                                        ChangeNextlevelHandle(e);
+                                        // ChangeApplicationStatus(e);
+                                        setcheckSupervisor(true);
+                                        GetRoleHandle(15);
+                                        setAssignUserID("");
+                                        setapplicationstaus(
+                                          applicationDetail?.analystRecommendation
+                                        );
+                                      }}
+                                      onClick={() => setRecomdAnalyst("")}
+                                      name="nextaction"
+                                      // name="applicationstaus"
+                                      value="15"
+                                      className="hidden-toggles__input"
+                                      disabled={roleID > 6}
+                                    />
+                                    <label
+                                      for="srcoloration-Refer"
+                                      className="hidden-toggles__label"
+                                    >
+                                      Refer Back
                                     </label>
+
                                   </div>
                                 </div>
                               </div>
                             </div>
-                          );
-                        }
-                      })}
-                      <div
-                        className={
-                          roleID == 6
-                            ? "inner_form_new align-items-center"
-                            : "d-none"
-                        }
-                      >
-                        <label className="controlform">Next Action</label>
-                        <div className="row">
-                          <div className="col-md-12 my-2">
-                            <div className="hidden-toggles">
 
-                              <input
-                                type="radio"
-                                id="srasignto"
-                                onChange={(e) => {
-                                  setcheckSupervisor(true);
-                                  supervisorHangechangeRole(e);
-                                  ChangeNextlevelHandle(e);
-                                  GetRoleHandle(10);
-                                  setAssignUserID("");
-                                  setapplicationstaus(
-                                    applicationDetail?.analystRecommendation
-                                  );
-                                }}
-                                onClick={() => setRecomdAnalyst("10")}
-                                name="nextaction"
-                                className="hidden-toggles__input"
-                                value="10"
-                                disabled={roleID > 6}
-                              />
-                              <label
-                                for="srasignto"
-                                className="hidden-toggles__label"
-                              >
-                                Assign
-                              </label>
-
-                              <input
-                                type="radio"
-                                id="srcoloration-Refer"
-                                onChange={(e) => {
-                                  ChangeNextlevelHandle(e);
-                                  // ChangeApplicationStatus(e);
-                                  setcheckSupervisor(true);
-                                  GetRoleHandle(15);
-                                  setAssignUserID("");
-                                  setapplicationstaus(
-                                    applicationDetail?.analystRecommendation
-                                  );
-                                }}
-                                onClick={() => setRecomdAnalyst("")}
-                                name="nextaction"
-                                // name="applicationstaus"
-                                value="15"
-                                className="hidden-toggles__input"
-                                disabled={roleID > 6}
-                              />
-                              <label
-                                for="srcoloration-Refer"
-                                className="hidden-toggles__label"
-                              >
-                                Refer Back
-                              </label>
-
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div
-                        className={checkSupervisor == true ? "row" : "d-none"}
-                      >
-                        <div className="col-md-12 d-flex c-gap">
-                          <div
-                            className={
-                              nextlevelvalue == 15 ? "w-50" : "d-none"
-                            }
-                          >
-                            {checkSupervisor == true && roleID == 6 ? (
-                              <>
-                                <div className="inner_form_new">
-                                  <label className="controlform">Role </label>
-
-                                  <div className="form-bx">
-                                    <label>
-                                      <select
-                                        ref={assignedToRef}
-                                        name="SupervisorRoleId"
-                                        onChange={(e) => {
-                                          supervisorHangechangeRole(e);
-                                          handleUserRole(e);
-                                        }}
-                                        className={
-                                          errors.assignedTo &&
-                                            !SupervisorRoleId
-                                            ? "error"
-                                            : ""
-                                        }
-                                      >
-                                        <option value="">Select Role</option>
-                                        {userRole?.map((item, index) => {
-                                          return (
-                                            <option
-                                              key={index}
-                                              value={item.id}
-                                            >
-                                              {item.designation}
-                                            </option>
-                                          );
-                                        })}
-                                      </select>
-                                      <span className="sspan"></span>
-                                      {errors.SupervisorRoleId &&
-                                        (
-                                          <small className="errormsg">
-                                            Role is required{" "}
-                                          </small>
-                                        )}
-                                    </label>
-                                  </div>
-                                </div>
-                                {/* end form-bx  */}
-                              </>
-                            ) : (
-                              ""
-                            )}
-                          </div>
-                          <div
-                            className={
-                              nextlevelvalue == 15 ? "w-50" : "w-100"
-                            }
-                          >
-                            {roleID == 6 && recomdAnalyst != "121" ? (
-                              <>
-                                <div className="inner_form_new">
-                                  <label className="controlform">User </label>
-
-                                  <div className="form-bx">
-                                    <label>
-                                      <select
-                                        ref={assignedToRef}
-                                        name="AssignUserID"
-                                        onChange={(e) =>
-                                          supervisorHangechange(e)
-                                        }
-                                        className={
-                                          errors.assignUserID && !AssignUserID
-                                            ? "error"
-                                            : ""
-                                        }
-                                      >
-                                        <option value="">Select User</option>
-                                        {asignUser?.map((item, index) => {
-                                          return (
-                                            <option
-                                              key={index}
-                                              value={item.userID}
-                                            >
-                                              {item.name}
-                                            </option>
-                                          );
-                                        })}
-                                      </select>
-                                      <span className="sspan"></span>
-                                      {errors.assignUserID &&
-                                        (
-                                          <small className="errormsg">
-                                            {errors.assignUserID}
-                                          </small>
-                                        )}
-                                    </label>
-                                  </div>
-                                </div>
-                                {/* end form-bx  */}
-                              </>
-                            ) : (
-                              ""
-                            )}
-                          </div>
-
-                          {/* end form-bx  */}
-                        </div>
-                      </div>
-
-                      {attachmentData?.map((items, index) => {
-                        return (
-                          <div
-                            className="attachemt_form-bx  mt-2"
-                            key={items.id}
-                          >
-                            <label
-                              style={{
-                                background: "#d9edf7",
-                                padding: "9px 3px",
-                                border: "0px",
-                              }}
+                            <div
+                              className={checkSupervisor == true ? "row" : "d-none"}
                             >
-                              <span style={{ fontWeight: "500" }}>
-                                {items.filename}
-                              </span>
-                            </label>
-                            <div className="browse-btn">
-                              Browse
-                              <input
-                                type="file"
-                                onChange={(e) =>
-                                  handleuserFileChange(e, "circular" + (index + 1))
-                                }
-                              />
+                              <div className="col-md-12 d-flex c-gap">
+                                <div
+                                  className={
+                                    nextlevelvalue == 15 ? "w-50" : "d-none"
+                                  }
+                                >
+                                  {checkSupervisor == true && roleID == 6 ? (
+                                    <>
+                                      <div className="inner_form_new">
+                                        <label className="controlform">Role </label>
+
+                                        <div className="form-bx">
+                                          <label>
+                                            <select
+                                              ref={assignedToRef}
+                                              name="SupervisorRoleId"
+                                              onChange={(e) => {
+                                                supervisorHangechangeRole(e);
+                                                handleUserRole(e);
+                                              }}
+                                              className={
+                                                errors.assignedTo &&
+                                                  !SupervisorRoleId
+                                                  ? "error"
+                                                  : ""
+                                              }
+                                            >
+                                              <option value="">Select Role</option>
+                                              {userRole?.map((item, index) => {
+                                                return (
+                                                  <option
+                                                    key={index}
+                                                    value={item.id}
+                                                  >
+                                                    {item.designation}
+                                                  </option>
+                                                );
+                                              })}
+                                            </select>
+                                            <span className="sspan"></span>
+                                            {errors.SupervisorRoleId &&
+                                              (
+                                                <small className="errormsg">
+                                                  Role is required{" "}
+                                                </small>
+                                              )}
+                                          </label>
+                                        </div>
+                                      </div>
+                                      {/* end form-bx  */}
+                                    </>
+                                  ) : (
+                                    ""
+                                  )}
+                                </div>
+                                <div
+                                  className={
+                                    nextlevelvalue == 15 ? "w-50" : "w-100"
+                                  }
+                                >
+                                  {roleID == 6 && recomdAnalyst != "121" ? (
+                                    <>
+                                      <div className="inner_form_new">
+                                        <label className="controlform">User </label>
+
+                                        <div className="form-bx">
+                                          <label>
+                                            <select
+                                              ref={assignedToRef}
+                                              name="AssignUserID"
+                                              onChange={(e) =>
+                                                supervisorHangechange(e)
+                                              }
+                                              className={
+                                                errors.assignUserID && !AssignUserID
+                                                  ? "error"
+                                                  : ""
+                                              }
+                                            >
+                                              <option value="">Select User</option>
+                                              {asignUser?.map((item, index) => {
+                                                return (
+                                                  <option
+                                                    key={index}
+                                                    value={item.userID}
+                                                  >
+                                                    {item.name}
+                                                  </option>
+                                                );
+                                              })}
+                                            </select>
+                                            <span className="sspan"></span>
+                                            {errors.assignUserID &&
+                                              (
+                                                <small className="errormsg">
+                                                  {errors.assignUserID}
+                                                </small>
+                                              )}
+                                          </label>
+                                        </div>
+                                      </div>
+                                      {/* end form-bx  */}
+                                    </>
+                                  ) : (
+                                    ""
+                                  )}
+                                </div>
+
+                                {/* end form-bx  */}
+                              </div>
                             </div>
-                            <span className="filename">
-                              {userfiles?.find(
-                                (f) => f.id === "circular" + (index + 1)
-                              )?.file?.name || "No file chosen"}
-                            </span>
-                            {userfiles?.length &&
-                              userfiles?.find((f) => f.id === "circular" + (index + 1))
-                                ?.file?.name ? (
-                              <button
-                                type="button"
-                                className="remove-file"
-                                onClick={() =>
-                                  removeUserImage(index, "circular" + (index + 1))
-                                }
-                              >
-                                Remove
-                              </button>
-                            ) : (
-                              ""
-                            )}
-                          </div>
-                        );
-                      })}
+                            {roleID == 6 && <p>
+                              {attachmentData?.map((items, index) => {
+                                return (
+                                  <div
+                                    className="attachemt_form-bx  mt-2"
+                                    key={items.id}
+                                  >
+                                    <label
+                                      style={{
+                                        background: "#d9edf7",
+                                        padding: "9px 3px",
+                                        border: "0px",
+                                      }}
+                                    >
+                                      <span style={{ fontWeight: "500" }}>
+                                        {items.filename}
+                                      </span>
+                                    </label>
+                                    <div className="browse-btn">
+                                      Browse
+                                      <input
+                                        type="file"
+                                        onChange={(e) =>
+                                          handleuserFileChange(e, "circular" + (index + 1))
+                                        }
+                                      />
+                                    </div>
+                                    <span className="filename">
+                                      {userfiles?.find(
+                                        (f) => f.id === "circular" + (index + 1)
+                                      )?.file?.name || "No file chosen"}
+                                    </span>
+                                    {userfiles?.length &&
+                                      userfiles?.find((f) => f.id === "circular" + (index + 1))
+                                        ?.file?.name ? (
+                                      <button
+                                        type="button"
+                                        className="remove-file"
+                                        onClick={() =>
+                                          removeUserImage(index, "circular" + (index + 1))
+                                        }
+                                      >
+                                        Remove
+                                      </button>
+                                    ) : (
+                                      ""
+                                    )}
+                                  </div>
+                                );
+                              })}
 
-                      {otheruserfiles.map((file, index) => (
-                        <div
-                          key={"other" + (index + 1)}
-                          className="attachemt_form-bx"
-                        >
-                          <label
-                            style={{
-                              background: "#d9edf7",
-                              padding: "9px 3px",
-                              border: "0px",
-                            }}
-                          >
-                            <b>
-                              Other File
-                              {index + 1}
-                            </b>
-                          </label>
-                          <div className="browse-btn">
-                            Browse{" "}
-                            <input
-                              type="file"
-                              onChange={(e) => {
-                                handleuserFileChange(e, "other" + index);
-                                handleOthrefile(e, `other ${index}`);
-                              }}
-                            />
-                          </div>
-                          <span className="filename">
-                            {userfiles?.find((f) => f.id === "other" + index)
-                              ?.file?.name || "No file chosen"}
-                          </span>
+                              {otheruserfiles.map((file, index) => (
+                                <div
+                                  key={"other" + (index + 1)}
+                                  className="attachemt_form-bx"
+                                >
+                                  <label
+                                    style={{
+                                      background: "#d9edf7",
+                                      padding: "9px 3px",
+                                      border: "0px",
+                                    }}
+                                  >
+                                    <b>
+                                      Other File
+                                      {index + 1}
+                                    </b>
+                                  </label>
+                                  <div className="browse-btn">
+                                    Browse{" "}
+                                    <input
+                                      type="file"
+                                      onChange={(e) => {
+                                        handleuserFileChange(e, "other" + index);
+                                        handleOthrefile(e, `other ${index}`);
+                                      }}
+                                    />
+                                  </div>
+                                  <span className="filename">
+                                    {userfiles?.find((f) => f.id === "other" + index)
+                                      ?.file?.name || "No file chosen"}
+                                  </span>
 
-                          {userfiles?.length &&
-                            userfiles?.find((f) => f.id === "other" + index)
-                              ?.file?.name ? (
-                            <button
-                              type="button"
-                              className="remove-file"
-                              onClick={() =>
-                                removeUserImage(index, "other" + index)
+                                  {userfiles?.length &&
+                                    userfiles?.find((f) => f.id === "other" + index)
+                                      ?.file?.name ? (
+                                    <button
+                                      type="button"
+                                      className="remove-file"
+                                      onClick={() =>
+                                        removeUserImage(index, "other" + index)
+                                      }
+                                    >
+                                      Remove
+                                    </button>
+                                  ) : (
+                                    ""
+                                  )}
+                                </div>
+                              ))}
+
+                              {otheruserfiles?.length || userfiles?.length ? (
+                                <div className="attachemt_form-bx">
+                                  <label style={{ border: "0px" }}>{""}</label>
+                                  <button
+                                    type="button"
+                                    className="addmore-btn mt-0"
+                                    onClick={(e) => handleuserAddMore(e)}
+                                  >
+                                    {" "}
+                                    Add More File{" "}
+                                  </button>
+                                </div>
+                              ) : (
+                                ""
+                              )
+                              }
+                            </p>}
+                            {/* end form-bx  */}
+
+                            <div
+                              className={
+                                roleID == 6
+                                  ? "inner_form_new align-items-start mt-2"
+                                  : "d-none"
                               }
                             >
-                              Remove
-                            </button>
-                          ) : (
-                            ""
-                          )}
-                        </div>
-                      ))}
+                              <label className="controlform">Recommendation</label>
+                              <div className="form-bx editorFieldBox">
+                                <div className="mt-2 py-1">
+                                  <MenuBar editor={editorSrAnalyst} />
+                                  <EditorContent editor={editorSrAnalyst} />
 
-                      {otheruserfiles?.length || userfiles?.length ? (
-                        <div className="attachemt_form-bx">
-                          <label style={{ border: "0px" }}>{""}</label>
-                          <button
-                            type="button"
-                            className="addmore-btn mt-0"
-                            onClick={(e) => handleuserAddMore(e)}
-                          >
-                            {" "}
-                            Add More File{" "}
-                          </button>
-                        </div>
-                      ) : (
-                        ""
-                      )}
+                                  <span className="sspan"></span>
+                                  {(errors.Description && Description == " ") ||
+                                    Description == null ||
+                                    Description == "<p></p>" ||
+                                    !Description ? (
+                                    <small
+                                      className="errormsg"
+                                      style={{ bottom: "-13px" }}
+                                    >
+                                      {errors.Description}
+                                    </small>
+                                  ) : (
+                                    ""
+                                  )}
+                                </div>
+                              </div>
+                            </div>
 
-                      {/* end form-bx  */}
-
-                      <div
-                        className={
-                          roleID == 6
-                            ? "inner_form_new align-items-start mt-2"
-                            : "d-none"
-                        }
-                      >
-                        <label className="controlform">Recommendation</label>
-                        <div className="form-bx editorFieldBox">
-                          <div className="mt-2 py-1">
-                            <MenuBar editor={editorSrAnalyst} />
-                            <EditorContent editor={editorSrAnalyst} />
-
-                            <span className="sspan"></span>
-                            {(errors.Description && Description == " ") ||
-                              Description == null ||
-                              Description == "<p></p>" ||
-                              !Description ? (
-                              <small
-                                className="errormsg"
-                                style={{ bottom: "-13px" }}
-                              >
-                                {errors.Description}
-                              </small>
-                            ) : (
-                              ""
-                            )}
-                          </div>
-                        </div>
-                      </div>
-
-                      <div
-                        className={roleID == 6 ? "inner_form_new " : "d-none"}
-                      >
-                        <label className="controlform">
-                          {nextlevelvalue == "10"
-                            ? "Assign Notes"
-
-                            : nextlevelvalue == "15"
-                              ? "Refer Back Notes"
-                              : "Notes"}
-                        </label>
-
-                        <div className="form-bx">
-                          <label>
-                            <textarea
-                              name="Notes"
-                              onChange={(e) => {
-                                HandleNextleveldata(e);
-                              }}
-                              placeholder={
-                                nextlevelvalue == "10"
+                            <div
+                              className={roleID == 6 ? "inner_form_new " : "d-none"}
+                            >
+                              <label className="controlform">
+                                {nextlevelvalue == "10"
                                   ? "Assign Notes"
+
                                   : nextlevelvalue == "15"
                                     ? "Refer Back Notes"
-                                    : "Notes"
-                              }
-                              className={errors.Notes ? "error" : ""}
-                              value={asignnextLeveldata.Notes}
-                            />
-                            <span className="sspan"></span>
-                            {errors.Notes ? (
-                              <small className="errormsg">
+                                    : "Notes"}
+                              </label>
+
+                              <div className="form-bx">
+                                <label>
+                                  <textarea
+                                    name="Notes"
+                                    onChange={(e) => {
+                                      HandleNextleveldata(e);
+                                    }}
+                                    placeholder={
+                                      nextlevelvalue == "10"
+                                        ? "Assign Notes"
+                                        : nextlevelvalue == "15"
+                                          ? "Refer Back Notes"
+                                          : "Notes"
+                                    }
+                                    className={errors.Notes ? "error" : ""}
+                                    value={asignnextLeveldata.Notes}
+                                  />
+                                  <span className="sspan"></span>
+                                  {errors.Notes ? (
+                                    <small className="errormsg">
+                                      {nextlevelvalue == "10"
+                                        ? "Assign notes is required"
+                                        : nextlevelvalue == "20"
+                                          ? "Delegate notes is required"
+                                          : nextlevelvalue == "35"
+                                            ? "Referred to other department notes is required"
+                                            : nextlevelvalue == "15"
+                                              ? "Refer back notes is required"
+                                              : "Notes is required"}
+                                    </small>
+                                  ) : (
+                                    ""
+                                  )}
+                                </label>
+                              </div>
+                            </div>
+                            {/* end form-bx  */}
+
+                            <div
+                              className={roleID == 6 ? "inner_form_new " : "d-none"}
+                            >
+                              <label className="controlform">
                                 {nextlevelvalue == "10"
-                                  ? "Assign notes is required"
-                                  : nextlevelvalue == "20"
-                                    ? "Delegate notes is required"
-                                    : nextlevelvalue == "35"
-                                      ? "Referred to other department notes is required"
-                                      : nextlevelvalue == "15"
-                                        ? "Refer back notes is required"
-                                        : "Notes is required"}
-                              </small>
-                            ) : (
-                              ""
-                            )}
-                          </label>
-                        </div>
-                      </div>
-                      {/* end form-bx  */}
-
-                      <div
-                        className={roleID == 6 ? "inner_form_new " : "d-none"}
-                      >
-                        <label className="controlform">
-                          {nextlevelvalue == "10"
-                            ? "Assign Comments"
-                            : nextlevelvalue == "20"
-                              ? "Delegate Comments"
-                              : nextlevelvalue == "35"
-                                ? "Referred to Other Department Comments"
-                                : nextlevelvalue == "15"
-                                  ? "Refer Back Comments"
-                                  : "Comments"}
-                        </label>
-
-                        <div className="form-bx">
-                          <label>
-                            <textarea
-                              name="Comment"
-                              onChange={(e) => {
-                                HandleNextleveldata(e);
-                              }}
-                              placeholder={
-                                nextlevelvalue == "10"
                                   ? "Assign Comments"
                                   : nextlevelvalue == "20"
                                     ? "Delegate Comments"
@@ -3752,4244 +4091,465 @@ const ExportCircularsEditForm = ({
                                       ? "Referred to Other Department Comments"
                                       : nextlevelvalue == "15"
                                         ? "Refer Back Comments"
-                                        : "Comments"
-                              }
-                              className={errors.Comment ? "error" : ""}
-                              value={asignnextLeveldata.Comment}
-                            />
-                            <span className="sspan"></span>
-                            {errors.Comment ? (
-                              <small className="errormsg">
-                                {nextlevelvalue == "10"
-                                  ? "Assign comments is required"
-                                  : nextlevelvalue == "20"
-                                    ? "Delegate comments is required"
-                                    : nextlevelvalue == "35"
-                                      ? "Referred to other department comments is required"
-                                      : nextlevelvalue == "15"
-                                        ? "Refer back comments is required"
-                                        : "Comments is required"}
-                              </small>
-                            ) : (
-                              ""
-                            )}
-                          </label>
-                        </div>
-                      </div>
+                                        : "Comments"}
+                              </label>
 
-                      <div className="inner_form_new align-items-center">
-                        <label className="controlform">Bank </label>
-                        <div className=" cccto">
-                          <div className="flex justify-content-center multiSelect">
-                            <MultiSelect
-                              value={selectedBanks}
-                              onChange={(e) => setSelectedBanks(e.value)}
-                              options={vOption}
-                              onShow={onShow}
-                              optionLabel="name"
-                              placeholder="Select Banks"
-                              // maxSelectedLabels={3}
-                              display="chip"
-                              className="w-full md:w-20rem"
-                            />
-
-                          </div>
-                        </div>
-                      </div>
-                      {/* end form-bx  */}
-                      <div className="inner_form_new ">
-                        <label className="controlform">Directives</label>
-                        <div className="form-bx">
-                          <div className="multiselect flex justify-content-center">
-                            <MultiSelect
-                              value={selectedDirectives}
-                              onChange={(e) => setSelectedDirectives(e.value)}
-                              options={DirectiveOption}
-                              optionLabel="name"
-                              name="directiveData"
-                              placeholder="Select Directives"
-                              display="chip"
-                            />
-                            {errors?.directiveData ? (
-                              <small className="errormsg">{errors.directiveData}</small>
-                            ) : (
-                              ""
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                      {/* end form-bx  */}
-                      {/* end form-bx  */}
-                      <div className="inner_form_new ">
-                        <label className="controlform">Releasing Date</label>
-                        <div className="form-bx">
-                          <DatePicker
-                            placeholderText="Select Releasing Date"
-                            closeOnScroll={(e) => e.target === document}
-                            selected={releasingDate}
-                            onChange={(date) => setReleasingDate(date)}
-                            peekNextMonth
-                            showMonthDropdown
-                            showYearDropdown
-                            minDate={new Date()}
-                            dropdownMode="select"
-                            dateFormat="dd/MMMM/yyyy"
-                          />
-                          {
-                            errors?.releasingDate ? (
-                              <small className="errormsg">{errors.releasingDate}</small>
-                            ) : (" ")
-                          }
-                        </div>
-                      </div>
-                      {/* end form-bx  */}
-                    </div>
-                    {allcomment?.map((cur) => {
-
-                      return cur?.circularActivityData
-                        ?.slice()
-                        ?.reverse()
-                        .map((item, index) => {
-
-                          if (cur?.assignedToRoleID == 6) {
-                            return (
-                              <>
-                                <div
-                                  key={index}
-                                  className={
-                                    index == 0 && roleID != 6
-                                      ? "tab-pane fade show active"
-                                      : "tab-pane fade show  "
-                                  }
-                                  id={"sranalystab-justified-home" + index}
-                                  role="tabpanel"
-                                  aria-labelledby={"sranalystab" + index}
-                                >
-                                  <div className={item?.actionStatusName ? "bakgroundaction" : "d-none"}>
-                                    <div className="row">
-                                      <div className="col-md-6">
-                                        <div className="inner_form_new ">
-                                          <label className="controlform">
-                                            Action Type
-                                          </label>
-                                          <div className="form-bx">
-                                            <label>
-                                              <input
-                                                type="text"
-                                                className=""
-                                                disabled
-                                                // value={item?.actionStatusName}
-                                                value={
-                                                  item?.actionStatusName ==
-                                                    "Approved" ||
-                                                    item?.actionStatusName ==
-                                                    "Reject" ||
-                                                    item?.actionStatusName ==
-                                                    "Cancelled"
-                                                    ? "Assigned" ||
-                                                    item?.actionStatusName ==
-                                                    "Draft"
-                                                    : item?.actionStatusName
-                                                }
-                                              />
-                                            </label>
-                                          </div>
-                                        </div>
-                                      </div>
-
-                                      <div className="col-md-3">
-                                        <div className="inner_form_new-sm ">
-                                          <label className="controlform-sm">
-                                            User{" "}
-                                            <i
-                                              className="bi bi-info-circle icons-info"
-                                              title={`Role : ${item?.actionRoleName}`}
-                                            ></i>
-                                          </label>
-                                          <div className="form-bx-sm">
-                                            <label>
-                                              <input
-                                                type="text"
-                                                className=""
-                                                disabled
-                                                value={item?.actionUserName}
-                                              />
-                                            </label>
-                                          </div>
-                                        </div>
-                                      </div>
-
-                                      <div className="col-md-3">
-                                        <div className="inner_form_new-sm">
-                                          <label className="controlform-sm">
-                                            {item?.actionStatusName ==
-                                              "Approved" ||
-                                              item?.actionStatusName ==
-                                              "Reject" ||
-                                              item?.actionStatusName ==
-                                              "Cancelled"
-                                              ? "Assigned"
-                                              : item?.actionStatusName}{" "}
-                                            Date
-                                          </label>
-                                          <div className="form-bx-sm">
-                                            <label>
-                                              <input
-                                                type="text"
-                                                className=""
-                                                disabled
-                                                value={moment(
-                                                  item?.createdDate
-                                                ).format("DD/MMM/yyyy")}
-                                              />
-                                            </label>
-                                          </div>
-                                        </div>
-                                      </div>
-                                    </div>
-
-                                    <div
-                                      className={
-                                        item?.actionNotes
-                                          ? "inner_form_new "
-                                          : "d-none"
-                                      }
-                                    >
-                                      <label className="controlform">
-                                        Action Note
-                                      </label>
-                                      <div className="form-bx">
-                                        <label>
-                                          <textarea
-                                            disabled
-                                            value={item?.actionNotes}
-                                          />
-                                        </label>
-                                      </div>
-                                    </div>
-
-                                    <div
-                                      className={
-                                        item?.actionComment
-                                          ? "inner_form_new "
-                                          : "d-none"
-                                      }
-                                    >
-                                      <label className="controlform">
-                                        Action Comment
-                                      </label>
-                                      <div className="form-bx">
-                                        <label>
-                                          <textarea
-                                            disabled
-                                            value={item?.actionComment}
-                                          />
-                                        </label>
-                                      </div>
-                                    </div>
-                                  </div>
-
-
-
-                                  <div className="inner_form_new">
-                                    <label className="controlform">
-                                      Recommendation
-                                    </label>
-                                    <div className="form-bx">
-                                      <label>
-                                        <div
-                                          className="viewdiscription tableEditorData"
-                                          dangerouslySetInnerHTML={{
-                                            __html: item?.description
-                                              ? item?.description
-                                              : "N/A",
-                                          }}
-                                        />
-                                      </label>
-                                    </div>
-                                  </div>
-
-                                  <div className="inner_form_new ">
-                                    <label className="controlform">
-                                      Notes
-                                    </label>
-                                    <div className="form-bx">
-                                      <label>
-                                        <textarea
-                                          name="Notes"
-                                          placeholder="Notes"
-                                          className=""
-                                          disabled
-                                        >
-                                          {item?.notes ? item?.notes : "N/A"}
-                                        </textarea>
-                                      </label>
-                                    </div>
-                                  </div>
-                                  <div className="inner_form_new ">
-                                    <label className="controlform">
-                                      Comments
-                                    </label>
-                                    <div className="form-bx">
-                                      <label>
-                                        <textarea
-                                          name="Notes"
-                                          placeholder="Notes"
-                                          className=""
-                                          disabled
-                                        >
-                                          {item?.comment
-                                            ? item?.comment
-                                            : "N/A"}
-                                        </textarea>
-                                      </label>
-                                    </div>
-                                  </div>
-
-                                  <div className="inner_form_new ">
-                                    <label className="controlform">
-                                      Attachments
-                                    </label>
-                                    <div className="form-bx">
-                                      {item?.filesData?.length ? (
-                                        item?.filesData?.map(
-                                          (items, index) => {
-                                            return (
-                                              <div
-                                                className="attachemt_form-bx mb-0 width-80"
-                                                key={items.id}
-                                              >
-                                                <label className="mb-2 mb-0 pt-2 pb-2">
-                                                  {/* {items.filename} */}
-                                                  {items?.fileName
-                                                    ? items?.fileName
-                                                    : `FileUpload ${index}`}
-                                                </label>
-                                                <div
-                                                  className={
-                                                    roleID == 2 || roleID == 3
-                                                      ? "browse-btn"
-                                                      : "d-none"
-                                                  }
-                                                >
-                                                  Browse{" "}
-                                                  <input
-                                                    type="file"
-                                                    onChange={(e) =>
-                                                      handleFileChange(
-                                                        e,
-                                                        items.id
-                                                      )
-                                                    }
-                                                  />
-                                                </div>
-                                                <span className="filename">
-                                                  <Link
-                                                    to={items?.filePath}
-                                                    target="_blank"
-                                                    className="viewbtn"
-                                                  >
-                                                    View File
-                                                  </Link>
-                                                </span>
-                                              </div>
-                                            );
-                                          }
-                                        )
-                                      ) : (
-                                        <label className="notfound">
-                                          File Not Found
-                                        </label>
-                                      )}
-                                    </div>
-                                  </div>
-
-                                  <div className="inner_form_new ">
-                                    <label className="controlform">
-                                      Bank
-                                    </label>
-                                    <div className="form-bx">
-                                      <label>
-                                        <ul className="nalist">
-                                          {item?.bankData
-                                            ?.length ? (
-                                            item?.bankData?.map(
-                                              (res) => {
-                                                return (
-                                                  <li>{res?.bankName}</li>
-                                                );
-                                              }
-                                            )
-                                          ) : (
-                                            <li className="disabletext">
-                                              N/A
-                                            </li>
-                                          )}
-                                        </ul>
-                                      </label>
-                                    </div>
-                                  </div>
-
-                                  <div className="inner_form_new ">
-                                    <label className="controlform">
-                                      Directives
-                                    </label>
-                                    <div className="form-bx">
-                                      <label>
-                                        <ul className="nalist">
-                                          {item?.directiveData
-                                            ?.length ? (
-                                            item?.directiveData?.map(
-                                              (res) => {
-                                                return (
-                                                  <li>{res?.directiveName}</li>
-                                                );
-                                              }
-                                            )
-                                          ) : (
-                                            <li className="disabletext">
-                                              N/A
-                                            </li>
-                                          )}
-                                        </ul>
-                                      </label>
-                                    </div>
-                                  </div>
-                                  <div className="inner_form_new">
-                                    <label className="controlform">
-                                      Releasing Date
-                                    </label>
-                                    <div className="form-bx">
-                                      <label>
-                                        <input
-                                          type="text"
-                                          className=""
-                                          disabled
-                                          value={moment(
-                                            item?.releasingDate
-                                          ).format("DD/MMM/yyyy")}
-                                        />
-                                      </label>
-                                    </div>
-                                  </div>
-                                  {/* <div class="row">
-                                      <div class="col-md-12">
-                                        <div class="inner_form_new ">
-                                          <label class="controlform">
-                                            Action
-                                          </label>
-                                          <div class="form-bx">
-                                            <label>
-                                              <input
-                                                type="text"
-                                                class=""
-                                                disabled
-                                                value={
-                                                  item?.assignedAction ==
-                                                    "Approved" ||
-                                                    item?.assignedAction ==
-                                                    "Reject" ||
-                                                    item?.assignedAction ==
-                                                    "Cancelled"
-                                                    ? "Assigned"
-                                                    : item?.assignedAction
-                                                }
-                                              />
-                                            </label>
-                                          </div>
-                                        </div>
-                                      </div>
-                                    </div> */}
-
-
-                                  <div
-                                    className={
-                                      item?.assignedToName == null &&
-                                        item?.assignedToName == null
-                                        ? "d-none"
-                                        : "row"
+                              <div className="form-bx">
+                                <label>
+                                  <textarea
+                                    name="Comment"
+                                    onChange={(e) => {
+                                      HandleNextleveldata(e);
+                                    }}
+                                    placeholder={
+                                      nextlevelvalue == "10"
+                                        ? "Assign Comments"
+                                        : nextlevelvalue == "20"
+                                          ? "Delegate Comments"
+                                          : nextlevelvalue == "35"
+                                            ? "Referred to Other Department Comments"
+                                            : nextlevelvalue == "15"
+                                              ? "Refer Back Comments"
+                                              : "Comments"
                                     }
-                                  >
-                                    <div className="col-md-6">
-                                      <div className="inner_form_new ">
-                                        <label className="controlform">
-                                          Assigned To Role
-                                        </label>
-                                        <div className="form-bx">
-                                          <label>
-                                            <input
-                                              type="text"
-                                              className=""
-                                              disabled
-                                              value={
-                                                item?.roleName
-                                                  ? item?.roleName
-                                                  : ""
-                                              }
-                                            />
-                                          </label>
-                                        </div>
-                                      </div>
-                                    </div>
-                                    <div className="col-md-6">
-                                      <div className="inner_form_new-sm ">
-                                        <label className="controlform-sm">
-                                          Assigned To User
-                                        </label>
-                                        <div className="form-bx-sm">
-                                          <label>
-                                            <input
-                                              type="text"
-                                              className=""
-                                              disabled
-                                              value={
-                                                item?.assignedToName
-                                                  ? item?.assignedToName
-                                                  : ""
-                                              }
-                                            />
-                                          </label>
-                                        </div>
-                                      </div>
-                                    </div>
-                                  </div>
-                                </div>
-                              </>
-                            );
-                          }
-                        });
-                    })}
-                  </div>
-                </div>
-              </>
-            ) : (
-              ""
-            )}
-            {/* senior analyst code end */}
-            {/* Principal analyst code start */}
+                                    className={errors.Comment ? "error" : ""}
+                                    value={asignnextLeveldata.Comment}
+                                  />
+                                  <span className="sspan"></span>
+                                  {errors.Comment ? (
+                                    <small className="errormsg">
+                                      {nextlevelvalue == "10"
+                                        ? "Assign comments is required"
+                                        : nextlevelvalue == "20"
+                                          ? "Delegate comments is required"
+                                          : nextlevelvalue == "35"
+                                            ? "Referred to other department comments is required"
+                                            : nextlevelvalue == "15"
+                                              ? "Refer back comments is required"
+                                              : "Comments is required"}
+                                    </small>
+                                  ) : (
+                                    ""
+                                  )}
+                                </label>
+                              </div>
+                            </div>
 
-            {roleID >= 7 ? (
-              <>
-                <h5
-                  className={
-                    principalanalystTab
-                      ? "section_top_subheading mt-3 py-3 btn-collapse_active cursorpointer"
-                      : "section_top_subheading mt-3 py-3 cursorpointer"
-                  }
-                  onClick={() => setprincipalanalystTab(!principalanalystTab)}
-                >
-                  Principal Analyst{" "}
+                            <div className={roleID == 6 ? "inner_form_new inner_form_new align-items-center" : "d-none"}>
+                              <label className="controlform">Bank</label>
+                              <div className=" cccto">
+                                <div className="flex justify-content-center multiSelect">
+                                  <MultiSelect
+                                    value={selectedBanks}
+                                    onChange={(e) => setSelectedBanks(e.value)}
+                                    options={vOption}
+                                    onShow={onShow}
+                                    optionLabel="name"
+                                    placeholder="Select Banks"
+                                    // maxSelectedLabels={3}
+                                    display="chip"
+                                    className="w-full md:w-20rem"
+                                  />
 
-                  <span className="btn-collapse">
-                    <i className="bi bi-caret-down-fill"></i>
-                  </span>
-                </h5>
-
-                <div className={principalanalystTab ? "customtab" : "d-none"}>
-                  
-                {applicationDetail?.roleID == 7 ? <ExportCirculargenInfo applicationDetail={applicationDetail}  /> :  applicationDetail?.roleID != 7   && applicationDetail ? "No Data" : " "}
-                
-                  {allcomment?.map((cur, i) => {
-                    if (cur.assignedToRoleID == 7) {
-                      return (
-                        <ul
-                          className={
-                            cur?.circularActivityData?.length >= 1
-                              ? "nav nav-pills mb-3"
-                              : "d-none"
-                          }
-                          role="tablist"
-                        >
-                          <li
-                            className={roleID == 7 ? "nav-item" : "d-none"}
-                            role="presentation"
-                          >
-                            <button
-                              className={
-                                roleID == 7
-                                  ? "nav-link w-100 border-radius0 active"
-                                  : "nav-link w-100 border-radius0"
-                              }
-                              id="pranalyst"
-                              data-bs-toggle="tab"
-                              data-bs-target="#pranalyst-justified-home"
-                              type="button"
-                              role="tab"
-                              aria-controls="home"
-                              aria-selected="true"
-                            >
-                              Action
-                            </button>
-                          </li>
-
-                          {cur?.circularActivityData
-                            ?.slice()
-                            ?.reverse()
-                            .map((items, index) => {
-                              return (
-                                <li className="nav-item" role="presentation">
-                                  <button
-                                    className={
-                                      index == 0 && roleID != 7
-                                        ? "nav-link w-100 border-radius0 active"
-                                        : "nav-link border-radius0 w-100 "
-                                    }
-                                    id={"pranalyst" + index}
-                                    data-bs-toggle="tab"
-                                    data-bs-target={
-                                      "#pranalyst-justified-home" + index
-                                    }
-                                    type="button"
-                                    role="tab"
-                                    aria-controls="home"
-                                    aria-selected="true"
-                                  >
-
-                                    Response{" "}
-                                    {cur?.circularActivityData?.length -
-                                      index}
-                                  </button>
-                                </li>
-                              );
-                            })}
-                        </ul>
-                      );
-                    }
-                  })}
-
-
-                  <div className="tab-content pt-2">
-                    <div
-                      className={
-                        roleID == 7
-                          ? "tab-pane fade show active"
-                          : "tab-pane fade show "
-                      }
-                      id="pranalyst-justified-home"
-                      role="tabpanel"
-                      aria-labelledby="pranalyst"
-                    >
-                      {Actiondata?.map((cur) => {
-                        const firstItem = cur?.circularActivityData?.[0]; // Accessing the first element directly
-                        if (cur?.assignedToRoleID === 7 && firstItem) {
-                          // Check if firstItem exists
-                          return (
-                            <div className="bakgroundaction">
-                              <div key={firstItem.circularID}>
-                                {" "}
-                                {/* Remember to add a unique key */}
-                                <div className="row">
-                                  <div className="col-md-6">
-                                    <div className="inner_form_new">
-                                      <label className="controlform">
-                                        Action Type
-                                      </label>
-                                      <div className="form-bx">
-                                        <label>
-                                          {" "}
-                                          <input
-                                            type="text"
-                                            className=""
-                                            disabled
-                                            // value={firstItem?.actionStatusName}
-                                            value={
-                                              firstItem?.actionStatusName ==
-                                                "Approved" ||
-                                                firstItem?.actionStatusName ==
-                                                "Reject" ||
-                                                firstItem?.actionStatusName ==
-                                                "Cancelled" ||
-                                                firstItem?.actionStatusName ==
-                                                "Draft"
-                                                ? "Assigned"
-                                                : firstItem?.actionStatusName
-                                            }
-                                          />
-                                        </label>
-                                      </div>
-                                    </div>
-                                  </div>
-
-                                  <div className="col-md-3">
-                                    <div className="inner_form_new-sm">
-                                      <label className="controlform-sm">
-                                        User{" "}
-                                        <i
-                                          className="bi bi-info-circle icons-info"
-                                          title={`Role : ${firstItem?.actionRoleName}`}
-                                        ></i>
-                                      </label>
-                                      <div className="form-bx-sm">
-                                        <label>
-                                          {" "}
-                                          <input
-                                            type="text"
-                                            className=""
-                                            disabled
-                                            value={firstItem?.actionUserName}
-                                          />
-                                        </label>
-                                      </div>
-                                    </div>
-                                  </div>
-
-                                  <div className="col-md-3">
-                                    <div className="inner_form_new-sm">
-                                      <label className="controlform-sm">
-                                        {firstItem?.actionStatusName ==
-                                          "Approved" ||
-                                          firstItem?.actionStatusName ==
-                                          "Reject" ||
-                                          firstItem?.actionStatusName ==
-                                          "Cancelled"
-                                          ? "Assigned"
-                                          : firstItem?.actionStatusName}{" "}
-                                        Date
-                                      </label>
-                                      <div className="form-bx-sm">
-                                        <label>
-                                          <input
-                                            type="text"
-                                            className=""
-                                            disabled
-                                            value={moment(
-                                              firstItem?.createdDate
-                                            ).format("DD/MMM/yyyy")}
-                                          />
-                                        </label>
-                                      </div>
-                                    </div>
-                                  </div>
-                                </div>
-                                <div
-                                  className={
-                                    firstItem?.actionNotes
-                                      ? "inner_form_new"
-                                      : "d-none"
-                                  }
-                                >
-                                  <label className="controlform">
-                                    Action Note
-                                  </label>
-                                  <div className="form-bx">
-                                    <label>
-                                      {" "}
-                                      <textarea
-                                        type="text"
-                                        className=""
-                                        disabled
-                                        value={firstItem?.actionNotes}
-                                      />
-                                    </label>
-                                  </div>
-                                </div>
-                                <div
-                                  className={
-                                    firstItem?.actionComment
-                                      ? "inner_form_new"
-                                      : "d-none"
-                                  }
-                                >
-                                  <label className="controlform">
-                                    Action Comment
-                                  </label>
-                                  <div className="form-bx">
-                                    <label>
-                                      {" "}
-                                      <textarea
-                                        type="text"
-                                        className=""
-                                        disabled
-                                        value={firstItem?.actionComment}
-                                      />
-                                    </label>
-                                  </div>
                                 </div>
                               </div>
                             </div>
-                          );
-                        }
-                      })}
-
-                      <div
-                        className={
-                          roleID == 7
-                            ? "inner_form_new align-items-center"
-                            : "d-none"
-                        }
-                      >
-                        <label className="controlform">Next Action</label>
-                        <div className="row">
-                          <div className="col-md-12 my-2">
-                            <div className="hidden-toggles">
-
-                              <input
-                                type="radio"
-                                id="prasignto"
-                                onChange={(e) => {
-                                  setcheckSupervisor(true);
-                                  supervisorHangechangeRole(e);
-                                  ChangeNextlevelHandle(e);
-                                  setAssignUserID("");
-                                  GetRoleHandle(10);
-                                  setapplicationstaus(
-                                    applicationDetail?.analystRecommendation
-                                  );
-                                }}
-                                onClick={() => setRecomdAnalyst("")}
-                                name="nextactionprincipal"
-                                className="hidden-toggles__input"
-                                value="10"
-                              />
-                              <label
-                                for="prasignto"
-                                className="hidden-toggles__label"
-                              >
-                                Assign
-                              </label>
-
-                              <input
-                                type="radio"
-                                id="prcoloration-Refer"
-                                onChange={(e) => {
-                                  ChangeNextlevelHandle(e);
-                                  // ChangeApplicationStatus(e);
-                                  setcheckSupervisor(true);
-                                  GetRoleHandle(15);
-                                  setAssignUserID("");
-                                  setapplicationstaus(
-                                    applicationDetail?.analystRecommendation
-                                  );
-                                }}
-                                onClick={() => setRecomdAnalyst("")}
-                                name="nextactionprincipal"
-                                // name="applicationstaus"
-                                value="15"
-                                className="hidden-toggles__input"
-                              />
-                              <label
-                                for="prcoloration-Refer"
-                                className="hidden-toggles__label"
-                              >
-                                Refer Back
-                              </label>
-
-
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div
-                        className={checkSupervisor == true ? "row" : "d-none"}
-                      >
-                        <div className="col-md-12 d-flex c-gap">
-                          <div
-                            className={
-                              nextlevelvalue == 15 ? "w-50" : "d-none"
-                            }
-                          >
-                            {checkSupervisor == true &&
-                              roleID == 7 &&
-                              recomdAnalyst != "121" ? (
-                              <>
-                                <div className="inner_form_new">
-                                  <label className="controlform">Role</label>
-
-                                  <div className="form-bx">
-                                    <label>
-                                      <select
-                                        ref={assignedToRef}
-                                        name="SupervisorRoleId"
-                                        onChange={(e) => {
-                                          supervisorHangechangeRole(e);
-                                          handleUserRole(e);
-                                        }}
-                                        className={
-                                          errors.assignedTo &&
-                                            !SupervisorRoleId
-                                            ? "error"
-                                            : ""
-                                        }
-                                      >
-                                        <option value="">Select Role</option>
-                                        {userRole?.map((item, index) => {
-                                          return (
-                                            <option
-                                              key={index}
-                                              value={item.id}
-                                            >
-                                              {item.designation}
-                                            </option>
-                                          );
-                                        })}
-                                      </select>
-                                      <span className="sspan"></span>
-                                      {errors.assignedTo &&
-                                        !SupervisorRoleId ? (
-                                        <small className="errormsg">
-                                          Role is required{" "}
-                                        </small>
-                                      ) : (
-                                        ""
-                                      )}
-                                    </label>
-                                  </div>
-                                </div>
-                                {/* end form-bx  */}
-                              </>
-                            ) : (
-                              ""
-                            )}
-                          </div>
-                          <div
-                            className={
-                              nextlevelvalue == 15 ? "w-50" : "w-100"
-                            }
-                          >
-                            {roleID == 7 && recomdAnalyst != "121" ? (
-                              <>
-                                <div className="inner_form_new">
-                                  <label className="controlform">User</label>
-
-                                  <div className="form-bx">
-                                    <label>
-                                      <select
-                                        ref={assignedToRef}
-                                        name="AssignUserID"
-                                        onChange={(e) =>
-                                          supervisorHangechange(e)
-                                        }
-                                        className={
-                                          errors.assignUserID && !AssignUserID
-                                            ? "error"
-                                            : ""
-                                        }
-                                      >
-                                        <option value="">Select User</option>
-                                        {asignUser?.map((item, index) => {
-                                          return (
-                                            <option
-                                              key={index}
-                                              value={item.userID}
-                                            >
-                                              {item.name}
-                                            </option>
-                                          );
-                                        })}
-                                      </select>
-                                      <span className="sspan"></span>
-                                      {errors.assignUserID &&
-                                        !AssignUserID ? (
-                                        <small className="errormsg">
-                                          {errors.assignUserID}
-                                        </small>
-                                      ) : (
-                                        ""
-                                      )}
-                                    </label>
-                                  </div>
-                                </div>
-                                {/* end form-bx  */}
-                              </>
-                            ) : (
-                              ""
-                            )}
-                          </div>
-
-                          {/* end form-bx  */}
-                        </div>
-                      </div>
-
-                      {attachmentData?.map((items, index) => {
-                        return (
-                          <div
-                            className="attachemt_form-bx  mt-2"
-                            key={items.id}
-                          >
-                            <label
-                              style={{
-                                background: "#d9edf7",
-                                padding: "9px 3px",
-                                border: "0px",
-                              }}
-                            >
-                              <span style={{ fontWeight: "500" }}>
-                                {items.filename}
-                              </span>
-                            </label>
-                            <div className="browse-btn">
-                              Browse
-                              <input
-                                type="file"
-                                onChange={(e) =>
-                                  handleuserFileChange(e, "circular" + (index + 1))
-                                }
-                              />
-                            </div>
-                            <span className="filename">
-                              {userfiles?.find(
-                                (f) => f.id === "circular" + (index + 1)
-                              )?.file?.name || "No file chosen"}
-                            </span>
-                            {userfiles?.length &&
-                              userfiles?.find((f) => f.id === "circular" + (index + 1))
-                                ?.file?.name ? (
-                              <button
-                                type="button"
-                                className="remove-file"
-                                onClick={() =>
-                                  removeUserImage(index, "circular" + (index + 1))
-                                }
-                              >
-                                Remove
-                              </button>
-                            ) : (
-                              ""
-                            )}
-                          </div>
-                        );
-                      })}
-
-                      {otheruserfiles.map((file, index) => (
-                        <div
-                          key={"other" + (index + 1)}
-                          className="attachemt_form-bx"
-                        >
-                          <label
-                            style={{
-                              background: "#d9edf7",
-                              padding: "9px 3px",
-                              border: "0px",
-                            }}
-                          >
-                            <b>
-                              Other File
-                              {index + 1}
-                            </b>
-                          </label>
-                          <div className="browse-btn">
-                            Browse{" "}
-                            <input
-                              type="file"
-                              onChange={(e) => {
-                                handleuserFileChange(e, "other" + index);
-                                handleOthrefile(e, `other ${index}`);
-                              }}
-                            />
-                          </div>
-                          <span className="filename">
-                            {userfiles?.find((f) => f.id === "other" + index)
-                              ?.file?.name || "No file chosen"}
-                          </span>
-
-                          {userfiles?.length &&
-                            userfiles?.find((f) => f.id === "other" + index)
-                              ?.file?.name ? (
-                            <button
-                              type="button"
-                              className="remove-file"
-                              onClick={() =>
-                                removeUserImage(index, "other" + index)
-                              }
-                            >
-                              Remove
-                            </button>
-                          ) : (
-                            ""
-                          )}
-                        </div>
-                      ))}
-
-                      {otheruserfiles?.length || userfiles?.length ? (
-                        <div className="attachemt_form-bx">
-                          <label style={{ border: "0px" }}>{""}</label>
-                          <button
-                            type="button"
-                            className="addmore-btn mt-0"
-                            onClick={(e) => handleuserAddMore(e)}
-                          >
-                            {" "}
-                            Add More File{" "}
-                          </button>
-                        </div>
-                      ) : (
-                        ""
-                      )}
-
-                      <div
-                        className={
-                          roleID == 7
-                            ? "inner_form_new align-items-start mt-2"
-                            : "d-none"
-                        }
-                      >
-                        <label className="controlform">Recommendation</label>
-                        <div className="form-bx editorFieldBox">
-                          <div className="mt-2 py-1">
-                            <MenuBar editor={editorPrincipleAnalyst} />
-                            <EditorContent editor={editorPrincipleAnalyst} />
-
-                            <span className="sspan"></span>
-                            {(errors.Description && Description == " ") ||
-                              Description == null ||
-                              Description == "<p></p>" ||
-                              !Description ? (
-                              <small className="errormsg">
-                                {errors.Description}
-                              </small>
-                            ) : (
-                              ""
-                            )}
-                          </div>
-                        </div>
-                      </div>
-
-                      <div
-                        className={roleID == 7 ? "inner_form_new " : "d-none"}
-                      >
-                        <label className="controlform">
-                          {nextlevelvalue == "10"
-                            ? "Assign Notes"
-                            : nextlevelvalue == "20"
-                              ? "Delegate Notes"
-                              : nextlevelvalue == "35"
-                                ? "Referred to Other Department Notes"
-                                : nextlevelvalue == "15"
-                                  ? "Refer Back Notes"
-                                  : "Notes"}
-                        </label>
-
-                        <div className="form-bx">
-                          <label>
-                            <textarea
-                              name="Notes"
-                              onChange={(e) => {
-                                HandleNextleveldata(e);
-                              }}
-                              placeholder={
-                                nextlevelvalue == "10"
-                                  ? "Assign Notes"
-                                  : nextlevelvalue == "20"
-                                    ? "Delegate Notes"
-                                    : nextlevelvalue == "35"
-                                      ? "Referred to Other Department Notes"
-                                      : nextlevelvalue == "15"
-                                        ? "Refer Back Notes"
-                                        : "Notes"
-                              }
-                              className={errors.Notes ? "error" : ""}
-                              value={asignnextLeveldata.Notes}
-                            />
-                            <span className="sspan"></span>
-                            {errors.Notes ? (
-                              <small className="errormsg">
-                                {nextlevelvalue == "10"
-                                  ? "Assign notes is required"
-                                  : nextlevelvalue == "20"
-                                    ? "Delegate notes is required"
-                                    : nextlevelvalue == "35"
-                                      ? "Referred to other department notes is required"
-                                      : nextlevelvalue == "15"
-                                        ? "Refer back notes is required"
-                                        : "Notes is required"}
-                              </small>
-                            ) : (
-                              ""
-                            )}
-                          </label>
-                        </div>
-                      </div>
-                      {/* end form-bx  */}
-
-                      <div
-                        className={roleID == 7 ? "inner_form_new " : "d-none"}
-                      >
-                        <label className="controlform">
-                          {nextlevelvalue == "10"
-                            ? "Assign Comments"
-                            : nextlevelvalue == "20"
-                              ? "Delegate Comments"
-                              : nextlevelvalue == "35"
-                                ? "Referred to Other Department Comments"
-                                : nextlevelvalue == "15"
-                                  ? "Refer Back Comments"
-                                  : "Comments"}
-                        </label>
-
-                        <div className="form-bx">
-                          <label>
-                            <textarea
-                              name="Comment"
-                              onChange={(e) => {
-                                HandleNextleveldata(e);
-                              }}
-                              placeholder={
-                                nextlevelvalue == "10"
-                                  ? "Assign Comments"
-                                  : nextlevelvalue == "20"
-                                    ? "Delegate Comments"
-                                    : nextlevelvalue == "35"
-                                      ? "Referred to Other Department Comments"
-                                      : nextlevelvalue == "15"
-                                        ? "Refer Back Comments"
-                                        : "Comments"
-                              }
-                              className={errors.Comment ? "error" : ""}
-                              value={asignnextLeveldata.Comment}
-                            />
-                            <span className="sspan"></span>
-                            {errors.Comment ? (
-                              <small className="errormsg">
-                                {nextlevelvalue == "10"
-                                  ? "Assign comments is required"
-                                  : nextlevelvalue == "20"
-                                    ? "Delegate comments is required"
-                                    : nextlevelvalue == "35"
-                                      ? "Referred to other department comments is required"
-                                      : nextlevelvalue == "15"
-                                        ? "Refer back comments is required"
-                                        : "Comments is required"}
-                              </small>
-                            ) : (
-                              ""
-                            )}
-                          </label>
-                        </div>
-                      </div>
-
-                      <div className="inner_form_new align-items-center">
-                        <label className="controlform">Bank </label>
-                        <div className=" cccto">
-                          <div className="flex justify-content-center multiSelect">
-                            <MultiSelect
-                              value={selectedBanks}
-                              onChange={(e) => setSelectedBanks(e.value)}
-                              options={vOption}
-                              onShow={onShow}
-                              optionLabel="name"
-                              placeholder="Select Banks"
-                              // maxSelectedLabels={3}
-                              display="chip"
-                              className="w-full md:w-20rem"
-                            />
-
-                          </div>
-                        </div>
-                      </div>
-                      {/* end form-bx  */}
-                      <div className="inner_form_new ">
-                        <label className="controlform">Directives</label>
-                        <div className="form-bx">
-                          <div className="multiselect flex justify-content-center">
-                            <MultiSelect
-                              value={selectedDirectives}
-                              onChange={(e) => setSelectedDirectives(e.value)}
-                              options={DirectiveOption}
-                              optionLabel="name"
-                              name="directiveData"
-                              placeholder="Select Directives"
-                              display="chip"
-                            />
-                            {errors?.directiveData ? (
-                              <small className="errormsg">{errors.directiveData}</small>
-                            ) : (
-                              ""
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                      {/* end form-bx  */}
-                      {/* end form-bx  */}
-                      <div className="inner_form_new ">
-                        <label className="controlform">Releasing Date</label>
-                        <div className="form-bx">
-                          <DatePicker
-                            placeholderText="Select Releasing Date"
-                            closeOnScroll={(e) => e.target === document}
-                            selected={releasingDate}
-                            onChange={(date) => setReleasingDate(date)}
-                            peekNextMonth
-                            showMonthDropdown
-                            showYearDropdown
-                            minDate={new Date()}
-                            dropdownMode="select"
-                            dateFormat="dd/MMMM/yyyy"
-                          />
-                          {
-                            errors?.releasingDate ? (
-                              <small className="errormsg">{errors.releasingDate}</small>
-                            ) : (" ")
-                          }
-                        </div>
-                      </div>
-                      {/* end form-bx  */}
-                    </div>
-                    {allcomment?.map((cur) => {
-                      return cur?.circularActivityData
-                        ?.slice()
-                        ?.reverse()
-                        .map((item, index) => {
-                          if (cur?.assignedToRoleID == 7) {
-                            return (
-                              <>
-                                <div
-                                  key={index}
-                                  className={
-                                    index == 0 && roleID != 7
-                                      ? "tab-pane fade show active"
-                                      : "tab-pane fade show  "
-                                  }
-                                  id={"pranalyst-justified-home" + index}
-                                  role="tabpanel"
-                                  aria-labelledby={"pranalyst" + index}
-                                >
-                                  <div className={item?.actionStatusName ? "bakgroundaction" : "d-none"}>
-                                    <div className="row">
-                                      <div className="col-md-6">
-                                        <div className="inner_form_new ">
-                                          <label className="controlform">
-                                            Action Type
-                                          </label>
-                                          <div className="form-bx">
-                                            <label>
-                                              <input
-                                                type="text"
-                                                className=""
-                                                disabled
-                                                // value={item?.actionStatusName}
-                                                value={
-                                                  item?.actionStatusName ==
-                                                    "Approved" ||
-                                                    item?.actionStatusName ==
-                                                    "Reject" ||
-                                                    item?.actionStatusName ==
-                                                    "Cancelled" ||
-                                                    item?.actionStatusName ==
-                                                    "Draft"
-                                                    ? "Assigned"
-                                                    : item?.actionStatusName
-                                                }
-                                              />
-                                            </label>
-                                          </div>
-                                        </div>
-                                      </div>
-
-                                      <div className="col-md-3">
-                                        <div className="inner_form_new-sm ">
-                                          <label className="controlform-sm">
-                                            User{" "}
-                                            <i
-                                              className="bi bi-info-circle icons-info"
-                                              title={`Role : ${item?.actionRoleName}`}
-                                            ></i>
-                                          </label>
-                                          <div className="form-bx-sm">
-                                            <label>
-                                              <input
-                                                type="text"
-                                                className=""
-                                                disabled
-                                                value={item?.actionUserName}
-                                              />
-                                            </label>
-                                          </div>
-                                        </div>
-                                      </div>
-
-                                      <div className="col-md-3">
-                                        <div className="inner_form_new-sm">
-                                          <label className="controlform-sm">
-                                            {item?.actionStatusName ==
-                                              "Approved" ||
-                                              item?.actionStatusName ==
-                                              "Reject" ||
-                                              item?.actionStatusName ==
-                                              "Cancelled"
-                                              ? "Assigned"
-                                              : item?.actionStatusName}{" "}
-                                            Date
-                                          </label>
-                                          <div className="form-bx-sm">
-                                            <label>
-                                              <input
-                                                type="text"
-                                                className=""
-                                                disabled
-                                                value={moment(
-                                                  item?.createdDate
-                                                ).format("DD/MMM/yyyy")}
-                                              />
-                                            </label>
-                                          </div>
-                                        </div>
-                                      </div>
-                                    </div>
-
-                                    <div
-                                      className={
-                                        item?.actionNotes
-                                          ? "inner_form_new "
-                                          : "d-none"
-                                      }
-                                    >
-                                      <label className="controlform">
-                                        Action Note
-                                      </label>
-                                      <div className="form-bx">
-                                        <label>
-                                          <textarea
-                                            disabled
-                                            value={
-                                              item?.actionNotes
-                                                ? item?.actionNotes
-                                                : "N/A"
-                                            }
-                                          />
-                                        </label>
-                                      </div>
-                                    </div>
-
-                                    <div
-                                      className={
-                                        item?.actionComment
-                                          ? "inner_form_new "
-                                          : "d-none"
-                                      }
-                                    >
-                                      <label className="controlform">
-                                        Action Comment
-                                      </label>
-                                      <div className="form-bx">
-                                        <label>
-                                          <textarea
-                                            disabled
-                                            value={item?.actionComment}
-                                          />
-                                        </label>
-                                      </div>
-                                    </div>
-                                  </div>
-
-
-                                  <div className="inner_form_new">
-                                    <label className="controlform">
-                                      Recommendation
-                                    </label>
-                                    <div className="form-bx">
-                                      <label>
-                                        <div
-                                          className="tableEditorData disabled viewdiscription"
-                                          dangerouslySetInnerHTML={{
-                                            __html: item?.description
-                                              ? item?.description
-                                              : "N/A",
-                                          }}
-                                          disabled
-                                        />
-                                      </label>
-                                    </div>
-                                  </div>
-
-                                  <div className="inner_form_new ">
-                                    <label className="controlform">
-                                      Notes
-                                    </label>
-                                    <div className="form-bx">
-                                      <label>
-                                        <textarea
-                                          name="Notes"
-                                          placeholder="Notes"
-                                          className=""
-                                          disabled
-                                        >
-                                          {item?.notes ? item?.notes : "N/A"}
-                                        </textarea>
-                                      </label>
-                                    </div>
-                                  </div>
-                                  <div className="inner_form_new ">
-                                    <label className="controlform">
-                                      Comments
-                                    </label>
-                                    <div className="form-bx">
-                                      <label>
-                                        <textarea
-                                          name="Notes"
-                                          placeholder="Comments"
-                                          className=""
-                                          disabled
-                                        >
-                                          {item?.comment
-                                            ? item?.comment
-                                            : "N/A"}
-                                        </textarea>
-                                      </label>
-                                    </div>
-                                  </div>
-
-                                  <div className="inner_form_new ">
-                                    <label className="controlform">
-                                      Attachments
-                                    </label>
-                                    <div className="form-bx">
-                                      {item?.filesData?.length ? (
-                                        item?.filesData?.map(
-                                          (items, index) => {
-                                            return (
-                                              <div
-                                                className="attachemt_form-bx mb-0 width-80"
-                                                key={items.id}
-                                              >
-                                                <label className="mb-2 mb-0 pt-2 pb-2">
-
-                                                  {items?.fileName
-                                                    ? items?.fileName
-                                                    : `FileUpload ${index}`}
-                                                </label>
-                                                <div
-                                                  className={
-                                                    roleID == 2 || roleID == 3
-                                                      ? "browse-btn"
-                                                      : "d-none"
-                                                  }
-                                                >
-                                                  Browse{" "}
-                                                  <input
-                                                    type="file"
-                                                    onChange={(e) =>
-                                                      handleFileChange(
-                                                        e,
-                                                        items.id
-                                                      )
-                                                    }
-                                                  />
-                                                </div>
-                                                <span className="filename">
-                                                  <Link
-                                                    to={items?.filePath}
-                                                    target="_blank"
-                                                    className="viewbtn"
-                                                  >
-                                                    View File
-                                                  </Link>
-                                                </span>
-                                              </div>
-                                            );
-                                          }
-                                        )
-                                      ) : (
-                                        <label className="notfound">
-                                          File Not Found
-                                        </label>
-                                      )}
-                                    </div>
-                                  </div>
-
-                                  <div className="inner_form_new ">
-                                    <label className="controlform">
-                                      Bank
-                                    </label>
-                                    <div className="form-bx">
-                                      <label>
-                                        <ul className="nalist">
-                                          {item?.bankData
-                                            ?.length ? (
-                                            item?.bankData?.map(
-                                              (res) => {
-                                                return (
-                                                  <li>{res?.bankName}</li>
-                                                );
-                                              }
-                                            )
-                                          ) : (
-                                            <li className="disabletext">
-                                              N/A
-                                            </li>
-                                          )}
-                                        </ul>
-                                      </label>
-                                    </div>
-                                  </div>
-                                  <div className="inner_form_new ">
-                                    <label className="controlform">
-                                      Directives
-                                    </label>
-                                    <div className="form-bx">
-                                      <label>
-                                        <ul className="nalist">
-                                          {item?.directiveData
-                                            ?.length ? (
-                                            item?.directiveData?.map(
-                                              (res) => {
-                                                return (
-                                                  <li>{res?.directiveName}</li>
-                                                );
-                                              }
-                                            )
-                                          ) : (
-                                            <li className="disabletext">
-                                              N/A
-                                            </li>
-                                          )}
-                                        </ul>
-                                      </label>
-                                    </div>
-                                  </div>
-                                  <div className="inner_form_new">
-                                    <label className="controlform">
-                                      Releasing Date
-                                    </label>
-                                    <div className="form-bx">
-                                      <label>
-                                        <input
-                                          type="text"
-                                          className=""
-                                          disabled
-                                          value={moment(
-                                            item?.releasingDate
-                                          ).format("DD/MMM/yyyy")}
-                                        />
-                                      </label>
-                                    </div>
-                                  </div>
-                                  {/* <div class="row">
-                                      <div class="col-md-12">
-                                        <div class="inner_form_new ">
-                                          <label class="controlform">
-                                            Action
-                                          </label>
-                                          <div class="form-bx">
-                                            <label>
-                                              <input
-                                                type="text"
-                                                class=""
-                                                disabled
-                                                value={
-                                                  item?.assignedAction ==
-                                                    "Approved" ||
-                                                    item?.assignedAction ==
-                                                    "Reject" ||
-                                                    item?.assignedAction ==
-                                                    "Cancelled"
-                                                    ? "Assigned"
-                                                    : item?.assignedAction
-                                                }
-                                              />
-                                            </label>
-                                          </div>
-                                        </div>
-                                      </div>
-                                    </div> */}
-
-
-
-                                  <div
-                                    className={
-                                      item?.assignedToName == null &&
-                                        item?.assignedToName == null
-                                        ? "d-none"
-                                        : "row"
-                                    }
-                                  >
-                                    <div className="col-md-6">
-                                      <div className="inner_form_new ">
-                                        <label className="controlform">
-                                          Assigned To Role
-                                        </label>
-                                        <div className="form-bx">
-                                          <label>
-                                            <input
-                                              type="text"
-                                              className=""
-                                              disabled
-                                              value={
-                                                item?.roleName
-                                                  ? item?.roleName
-                                                  : ""
-                                              }
-                                            />
-                                          </label>
-                                        </div>
-                                      </div>
-                                    </div>
-                                    <div className="col-md-6">
-                                      <div className="inner_form_new-sm ">
-                                        <label className="controlform-sm">
-                                          Assigned To User
-                                        </label>
-                                        <div className="form-bx-sm">
-                                          <label>
-                                            <input
-                                              type="text"
-                                              className=""
-                                              disabled
-                                              value={
-                                                item?.assignedToName
-                                                  ? item?.assignedToName
-                                                  : ""
-                                              }
-                                            />
-                                          </label>
-                                        </div>
-                                      </div>
-                                    </div>
-                                  </div>
-                                </div>
-                              </>
-                            );
-                          }
-                        });
-                    })}
-
-                  </div>
-                </div>
-              </>
-            ) : (
-              ""
-            )}
-
-            {/* Principal analyst code end */}
-            {/* Dupty director code start */}
-            {roleID >= 8 ? (
-              <>
-                <h5
-                  className={
-                    deputyTab
-                      ? "section_top_subheading mt-3 py-3 btn-collapse_active cursorpointer"
-                      : "section_top_subheading mt-3 py-3 cursorpointer"
-                  }
-                  onClick={() => setdeputyTab(!deputyTab)}
-                >
-                  Deputy Director{" "}
-
-                  <span className="btn-collapse">
-                    <i className="bi bi-caret-down-fill"></i>
-                  </span>
-                </h5>
-
-                <div className={deputyTab ? "customtab" : "d-none"}>
-                  
-
-                   {applicationDetail?.roleID == 8 ? <ExportCirculargenInfo applicationDetail={applicationDetail}  /> :  applicationDetail?.roleID != 8   && applicationDetail ? "No Data" : " "}
-
-                  {allcomment?.map((cur, i) => {
-                    if (cur.assignedToRoleID == 8) {
-                      return (
-                        <ul
-                          className={
-                            cur?.circularActivityData?.length >= 1
-                              ? "nav nav-pills mb-3"
-                              : "d-none"
-                          }
-                          role="tablist"
-                        >
-                          <li
-                            className={roleID == 8 ? "nav-item" : "d-none"}
-                            role="presentation"
-                          >
-                            <button
-                              className={
-                                roleID == 8
-                                  ? "nav-link w-100 border-radius0 active"
-                                  : "nav-link w-100 border-radius0"
-                              }
-                              id="deputy"
-                              data-bs-toggle="tab"
-                              data-bs-target="#deputy-justified-home"
-                              type="button"
-                              role="tab"
-                              aria-controls="home"
-                              aria-selected="true"
-                            >
-                              Action
-                            </button>
-                          </li>
-
-                          {cur?.circularActivityData
-                            ?.slice()
-                            ?.reverse()
-                            .map((items, index) => {
-                              return (
-                                <li className="nav-item" role="presentation">
-                                  <button
-                                    className={
-                                      index == 0 && roleID != 8
-                                        ? "nav-link w-100 border-radius0 active"
-                                        : "nav-link border-radius0 w-100 "
-                                    }
-                                    id={"deputy" + index}
-                                    data-bs-toggle="tab"
-                                    data-bs-target={
-                                      "#deputy-justified-home" + index
-                                    }
-                                    type="button"
-                                    role="tab"
-                                    aria-controls="home"
-                                    aria-selected="true"
-                                  >
-
-                                    Response{" "}
-                                    {cur?.circularActivityData?.length -
-                                      index}
-                                  </button>
-                                </li>
-                              );
-                            })}
-                        </ul>
-                      );
-                    }
-                  })}
-
-                  <div className="tab-content pt-2">
-                    <div
-                      className={
-                        roleID == 8
-                          ? "tab-pane fade show active"
-                          : "tab-pane fade show "
-                      }
-                      id="deputy-justified-home"
-                      role="tabpanel"
-                      aria-labelledby="deputy"
-                    >
-                      {Actiondata?.map((cur) => {
-                        const firstItem = cur?.circularActivityData?.[0]; // Accessing the first element directly
-
-                        if (cur?.assignedToRoleID === 8 && firstItem) {
-                          // Check if firstItem exists
-                          return (
-                            <div className="bakgroundaction">
-                              <div key={firstItem.actionID}>
-                                {" "}
-                                {/* Remember to add a unique key */}
-                                <div className="row">
-                                  <div className="col-md-6">
-                                    <div className="inner_form_new">
-                                      <label className="controlform">
-                                        Action Type
-                                      </label>
-                                      <div className="form-bx">
-                                        <label>
-                                          {" "}
-                                          <input
-                                            type="text"
-                                            className=""
-                                            disabled
-                                            // value={firstItem?.actionStatusName}
-                                            value={
-                                              firstItem?.actionStatusName ==
-                                                "Approved" ||
-                                                firstItem?.actionStatusName ==
-                                                "Reject" ||
-                                                firstItem?.actionStatusName ==
-                                                "Cancelled" ||
-                                                firstItem?.actionStatusName ==
-                                                "Draft"
-                                                ? "Assigned"
-                                                : firstItem?.actionStatusName
-                                            }
-                                          />
-                                        </label>
-                                      </div>
-                                    </div>
-                                  </div>
-
-                                  <div className="col-md-3">
-                                    <div className="inner_form_new-sm">
-                                      <label className="controlform-sm">
-                                        User{" "}
-                                        <i
-                                          className="bi bi-info-circle icons-info"
-                                          title={`Role : ${firstItem?.actionRoleName}`}
-                                        ></i>
-                                      </label>
-                                      <div className="form-bx-sm">
-                                        <label>
-                                          {" "}
-                                          <input
-                                            type="text"
-                                            className=""
-                                            disabled
-                                            value={firstItem?.actionUserName}
-                                          />
-                                        </label>
-                                      </div>
-                                    </div>
-                                  </div>
-
-                                  <div className="col-md-3">
-                                    <div className="inner_form_new-sm">
-                                      <label className="controlform-sm">
-                                        {firstItem?.actionStatusName ==
-                                          "Approved" ||
-                                          firstItem?.actionStatusName ==
-                                          "Reject" ||
-                                          firstItem?.actionStatusName ==
-                                          "Cancelled"
-                                          ? "Assigned"
-                                          : firstItem?.actionStatusName}{" "}
-                                        Date
-                                      </label>
-                                      <div className="form-bx-sm">
-                                        <label>
-                                          <input
-                                            type="text"
-                                            className=""
-                                            disabled
-                                            value={moment(
-                                              firstItem?.createdDate
-                                            ).format("DD/MMM/yyyy")}
-                                          />
-                                        </label>
-                                      </div>
-                                    </div>
-                                  </div>
-                                </div>
-                                <div
-                                  className={
-                                    firstItem?.actionNotes
-                                      ? "inner_form_new"
-                                      : "d-none"
-                                  }
-                                >
-                                  <label className="controlform">
-                                    Action Note
-                                  </label>
-                                  <div className="form-bx">
-                                    <label>
-                                      {" "}
-                                      <textarea
-                                        type="text"
-                                        className=""
-                                        disabled
-                                        value={firstItem?.actionNotes}
-                                      />
-                                    </label>
-                                  </div>
-                                </div>
-                                <div
-                                  className={
-                                    firstItem?.actionComment
-                                      ? "inner_form_new"
-                                      : "d-none"
-                                  }
-                                >
-                                  <label className="controlform">
-                                    Action Comment
-                                  </label>
-                                  <div className="form-bx">
-                                    <label>
-                                      {" "}
-                                      <textarea
-                                        type="text"
-                                        className=""
-                                        disabled
-                                        value={firstItem?.actionComment}
-                                      />
-                                    </label>
-                                  </div>
+                            {/* end form-bx  */}
+                            <div className={roleID == 6 ? "inner_form_new " : "d-none"}>
+                              <label className="controlform">Directives</label>
+                              <div className="form-bx">
+                                <div className="multiselect flex justify-content-center">
+                                  <MultiSelect
+                                    value={selectedDirectives}
+                                    onChange={(e) => setSelectedDirectives(e.value)}
+                                    options={DirectiveOption}
+                                    optionLabel="name"
+                                    name="directiveData"
+                                    placeholder="Select Directives"
+                                    display="chip"
+                                  />
+                                  {errors?.directiveData ? (
+                                    <small className="errormsg">{errors.directiveData}</small>
+                                  ) : (
+                                    ""
+                                  )}
                                 </div>
                               </div>
                             </div>
-                          );
-                        }
-                      })}
-
-                      <div
-                        className={
-                          roleID == 8
-                            ? "inner_form_new align-items-center"
-                            : "d-none"
-                        }
-                      >
-                        <label className="controlform">Next Action</label>
-                        <div className="row">
-                          <div className="col-md-12 my-2">
-                            <div className="hidden-toggles">
-                              <input
-                                type="radio"
-                                id="deptyrecomndByAnalyst"
-                                // onChange={(e) => {
-                                //   setcheckSupervisor(true);
-                                //   supervisorHangechangeRole(e);
-                                //   ChangeNextlevelHandle(e);
-                                //   GetRoleHandle(121);
-                                // }}
-                                onClick={() => {
-                                  setRecomdAnalyst("121");
-                                  setnextlevelvalue("");
-                                  setAssignUserID("");
-                                  setSupervisorRoleId("");
-                                  setAsignUser([]);
-                                  setapplicationstaus(
-                                    applicationDetail?.analystRecommendation
-                                  );
-                                }}
-                                name="nextactiondupty"
-                                className={
-                                  applicationDetail?.analystRecommendation ==
-                                    "" ||
-                                    applicationDetail?.analystRecommendation ==
-                                    "0"
-                                    ? "d-none"
-                                    : "hidden-toggles__input"
+                            {/* end form-bx  */}
+                            {/* end form-bx  */}
+                            <div className={roleID == 6 ? "inner_form_new " : "d-none"}>
+                              <label className="controlform">Releasing Date </label>
+                              <div className="form-bx">
+                                <DatePicker
+                                  placeholderText="Select Releasing Date"
+                                  closeOnScroll={(e) => e.target === document}
+                                  selected={releasingDate}
+                                  onChange={(date) => setReleasingDate(date)}
+                                  peekNextMonth
+                                  showMonthDropdown
+                                  showYearDropdown
+                                  minDate={new Date()}
+                                  dropdownMode="select"
+                                  dateFormat="dd/MMMM/yyyy"
+                                />
+                                {
+                                  errors?.releasingDate ? (
+                                    <small className="errormsg">{errors.releasingDate}</small>
+                                  ) : (" ")
                                 }
-                                value="121"
-                                checked={
-                                  recomdAnalyst == "121" ? true : false
-                                }
-                              />
-                              <label
-                                for="deptyrecomndByAnalyst"
-                                className={
-                                  applicationDetail?.analystRecommendation ==
-                                    "" ||
-                                    applicationDetail?.analystRecommendation ==
-                                    "0"
-                                    ? "d-none"
-                                    : "hidden-toggles__label"
-                                }
-                              >
-                                As Recommended by Analyst
-                              </label>
-
-                              <input
-                                type="radio"
-                                id="deptyasignto"
-                                onChange={(e) => {
-                                  setcheckSupervisor(true);
-                                  supervisorHangechangeRole(e);
-                                  ChangeNextlevelHandle(e);
-                                  setAssignUserID("");
-                                  GetRoleHandle(10);
-                                  setapplicationstaus(
-                                    applicationDetail?.analystRecommendation
-                                  );
-                                }}
-                                onClick={() => setRecomdAnalyst("")}
-                                name="nextactiondupty"
-                                className="hidden-toggles__input"
-                                value="10"
-                              />
-                              <label
-                                for="deptyasignto"
-                                className="hidden-toggles__label"
-                              >
-                                Assign
-                              </label>
-
-                              <input
-                                type="radio"
-                                id="deptyasignto-Refer"
-                                onChange={(e) => {
-                                  ChangeNextlevelHandle(e);
-                                  // ChangeApplicationStatus(e);
-                                  setcheckSupervisor(true);
-                                  GetRoleHandle(15);
-                                  setAssignUserID("");
-                                  setapplicationstaus(
-                                    applicationDetail?.analystRecommendation
-                                  );
-                                }}
-                                name="nextactiondupty"
-                                onClick={() => setRecomdAnalyst("")}
-                                value="15"
-                                className="hidden-toggles__input"
-                              />
-                              <label
-                                for="deptyasignto-Refer"
-                                className="hidden-toggles__label"
-                              >
-                                Refer Back
-                              </label>
-
-
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div
-                        className={checkSupervisor == true ? "row" : "d-none"}
-                      >
-                        <div className="col-md-12 d-flex c-gap">
-                          <div
-                            className={
-                              nextlevelvalue == 15 ? "w-50" : "d-none"
-                            }
-                          >
-                            {checkSupervisor == true && roleID == 8 ? (
-                              <>
-                                <div className="inner_form_new">
-                                  <label className="controlform">Role</label>
-
-                                  <div className="form-bx">
-                                    <label>
-                                      <select
-                                        ref={assignedToRef}
-                                        name="SupervisorRoleId"
-                                        onChange={(e) => {
-                                          supervisorHangechangeRole(e);
-                                          handleUserRole(e);
-                                        }}
-                                        className={
-                                          errors.assignedTo &&
-                                            !SupervisorRoleId
-                                            ? "error"
-                                            : ""
-                                        }
-                                      >
-                                        <option value="">Select Role</option>
-                                        {userRole?.map((item, index) => {
-                                          return (
-                                            <option
-                                              key={index}
-                                              value={item.id}
-                                            >
-                                              {item.designation}
-                                            </option>
-                                          );
-                                        })}
-                                      </select>
-                                      <span className="sspan"></span>
-                                      {errors.assignedTo &&
-                                        !SupervisorRoleId ? (
-                                        <small className="errormsg">
-                                          Role is required{" "}
-                                        </small>
-                                      ) : (
-                                        ""
-                                      )}
-                                    </label>
-                                  </div>
-                                </div>
-                                {/* end form-bx  */}
-                              </>
-                            ) : (
-                              ""
-                            )}
-                          </div>
-                          <div
-                            className={
-                              nextlevelvalue == 15 ? "w-50" : "w-100"
-                            }
-                          >
-                            {roleID == 8 && recomdAnalyst != "121" ? (
-                              <>
-                                <div className="inner_form_new">
-                                  <label className="controlform">User</label>
-
-                                  <div className="form-bx">
-                                    <label>
-                                      <select
-                                        ref={assignedToRef}
-                                        name="AssignUserID"
-                                        onChange={(e) =>
-                                          supervisorHangechange(e)
-                                        }
-                                        className={
-                                          errors.assignUserID && !AssignUserID
-                                            ? "error"
-                                            : ""
-                                        }
-                                      >
-                                        <option value="">Select User</option>
-                                        {asignUser?.map((item, index) => {
-                                          return (
-                                            <option
-                                              key={index}
-                                              value={item.userID}
-                                            >
-                                              {item.name}
-                                            </option>
-                                          );
-                                        })}
-                                      </select>
-                                      <span className="sspan"></span>
-                                      {errors.assignUserID &&
-                                        !AssignUserID ? (
-                                        <small className="errormsg">
-                                          {errors.assignUserID}
-                                        </small>
-                                      ) : (
-                                        ""
-                                      )}
-                                    </label>
-                                  </div>
-                                </div>
-                                {/* end form-bx  */}
-                              </>
-                            ) : (
-                              ""
-                            )}
-                          </div>
-
-                          {/* end form-bx  */}
-                        </div>
-                      </div>
-
-                      {attachmentData?.map((items, index) => {
-                        return (
-                          <div
-                            className="attachemt_form-bx  mt-2"
-                            key={items.id}
-                          >
-                            <label
-                              style={{
-                                background: "#d9edf7",
-                                padding: "9px 3px",
-                                border: "0px",
-                              }}
-                            >
-                              <span style={{ fontWeight: "500" }}>
-                                {items.filename}
-                              </span>
-                            </label>
-                            <div className="browse-btn">
-                              Browse
-                              <input
-                                type="file"
-                                onChange={(e) =>
-                                  handleuserFileChange(e, "circular" + (index + 1))
-                                }
-                              />
-                            </div>
-                            <span className="filename">
-                              {userfiles?.find(
-                                (f) => f.id === "circular" + (index + 1)
-                              )?.file?.name || "No file chosen"}
-                            </span>
-                            {userfiles?.length &&
-                              userfiles?.find((f) => f.id === "circular" + (index + 1))
-                                ?.file?.name ? (
-                              <button
-                                type="button"
-                                className="remove-file"
-                                onClick={() =>
-                                  removeUserImage(index, "circular" + (index + 1))
-                                }
-                              >
-                                Remove
-                              </button>
-                            ) : (
-                              ""
-                            )}
-                          </div>
-                        );
-                      })}
-
-                      {otheruserfiles.map((file, index) => (
-                        <div
-                          key={"other" + (index + 1)}
-                          className="attachemt_form-bx"
-                        >
-                          <label
-                            style={{
-                              background: "#d9edf7",
-                              padding: "9px 3px",
-                              border: "0px",
-                            }}
-                          >
-                            <b>
-                              Other File
-                              {index + 1}
-                            </b>
-                          </label>
-                          <div className="browse-btn">
-                            Browse{" "}
-                            <input
-                              type="file"
-                              onChange={(e) => {
-                                handleuserFileChange(e, "other" + index);
-                                // handleOthrefile(e,   `other ${index}`);
-                              }}
-                            />
-                          </div>
-                          <span className="filename">
-                            {userfiles?.find((f) => f.id === "other" + index)
-                              ?.file?.name || "No file chosen"}
-                          </span>
-
-                          {userfiles?.length &&
-                            userfiles?.find((f) => f.id === "other" + index)
-                              ?.file?.name ? (
-                            <button
-                              type="button"
-                              className="remove-file"
-                              onClick={() =>
-                                removeUserImage(index, "other" + index)
-                              }
-                            >
-                              Remove
-                            </button>
-                          ) : (
-                            ""
-                          )}
-                        </div>
-                      ))}
-
-                      {otheruserfiles?.length || userfiles?.length ? (
-                        <div className="attachemt_form-bx">
-                          <label style={{ border: "0px" }}>{""}</label>
-                          <button
-                            type="button"
-                            className="addmore-btn mt-0"
-                            onClick={(e) => handleuserAddMore(e)}
-                          >
-                            {" "}
-                            Add More File{" "}
-                          </button>
-                        </div>
-                      ) : (
-                        ""
-                      )}
-
-                      {/* end form-bx  */}
-
-                      <div
-                        className={roleID == 8 ? "inner_form_new align-items-start" : "d-none"}
-                      >
-                        <label className="controlform">Recommendation</label>
-                        <div className="form-bx editorFieldBox">
-                          <div className="mt-2 py-1">
-                            <MenuBar editor={editorDeputy} />
-                            <EditorContent editor={editorDeputy} />
-                            <span className="sspan"></span>
-                            {(errors.Description && Description == " ") ||
-                              Description == null ||
-                              Description == "<p></p>" ||
-                              !Description ? (
-                              <small className="errormsg">
-                                {errors.Description}
-                              </small>
-                            ) : (
-                              ""
-                            )}
-                          </div>
-                        </div>
-                      </div>
-
-                      <div
-                        className={roleID == 8 ? "inner_form_new " : "d-none"}
-                      >
-                        <label className="controlform">
-                          {nextlevelvalue == "10"
-                            ? "Assign Notes"
-                            : nextlevelvalue == "20"
-                              ? "Delegate Notes"
-                              : nextlevelvalue == "35"
-                                ? "Referred to Other Department Notes"
-                                : nextlevelvalue == "15"
-                                  ? "Refer Back Notes"
-                                  : "Notes"}
-                        </label>
-
-                        <div className="form-bx">
-                          <label>
-                            <textarea
-                              name="Notes"
-                              onChange={(e) => {
-                                HandleNextleveldata(e);
-                              }}
-                              placeholder={
-                                nextlevelvalue == "10"
-                                  ? "Assign Notes"
-                                  : nextlevelvalue == "20"
-                                    ? "Delegate Notes"
-                                    : nextlevelvalue == "35"
-                                      ? "Referred to Other Department Notes"
-                                      : nextlevelvalue == "15"
-                                        ? "Refer Back Notes"
-                                        : "Notes"
-                              }
-                              className={errors.Notes ? "error" : ""}
-                              value={asignnextLeveldata.Notes}
-                            />
-                            <span className="sspan"></span>
-                            {errors.Notes ? (
-                              <small className="errormsg">
-                                {nextlevelvalue == "10"
-                                  ? "Assign notes is required"
-                                  : nextlevelvalue == "20"
-                                    ? "Delegate notes is required"
-                                    : nextlevelvalue == "35"
-                                      ? "Referred to other department notes is required"
-                                      : nextlevelvalue == "15"
-                                        ? "Refer back notes is required"
-                                        : "Notes is required"}
-                              </small>
-                            ) : (
-                              ""
-                            )}
-                          </label>
-                        </div>
-                      </div>
-                      {/* end form-bx  */}
-
-                      <div
-                        className={roleID == 8 ? "inner_form_new " : "d-none"}
-                      >
-                        <label className="controlform">
-                          {nextlevelvalue == "10"
-                            ? "Assign Comments"
-                            : nextlevelvalue == "20"
-                              ? "Delegate Comments"
-                              : nextlevelvalue == "35"
-                                ? "Referred to Other Department Comments"
-                                : nextlevelvalue == "15"
-                                  ? "Refer Back Comments"
-                                  : "Comments"}
-                        </label>
-
-                        <div className="form-bx">
-                          <label>
-                            <textarea
-                              name="Comment"
-                              onChange={(e) => {
-                                HandleNextleveldata(e);
-                              }}
-                              placeholder={
-                                nextlevelvalue == "10"
-                                  ? "Assign Comments"
-                                  : nextlevelvalue == "20"
-                                    ? "Delegate Comments"
-                                    : nextlevelvalue == "35"
-                                      ? "Referred to Other Department Comments"
-                                      : nextlevelvalue == "15"
-                                        ? "Refer Back Comments"
-                                        : "Comments"
-                              }
-                              className={errors.Comment ? "error" : ""}
-                              value={asignnextLeveldata.Comment}
-                            />
-                            <span className="sspan"></span>
-                            {errors.Comment ? (
-                              <small className="errormsg">
-                                {nextlevelvalue == "10"
-                                  ? "Assign comments is required"
-                                  : nextlevelvalue == "20"
-                                    ? "Delegate comments is required"
-                                    : nextlevelvalue == "35"
-                                      ? "Referred to other department comments is required"
-                                      : nextlevelvalue == "15"
-                                        ? "Refer back comments is required"
-                                        : "Comments is required"}
-                              </small>
-                            ) : (
-                              ""
-                            )}
-                          </label>
-                        </div>
-                      </div>
-
-                      <div className="inner_form_new align-items-center">
-                        <label className="controlform">Bank</label>
-                        <div className=" cccto">
-                          <div className="flex justify-content-center multiSelect">
-                            <MultiSelect
-                              value={selectedBanks}
-                              onChange={(e) => setSelectedBanks(e.value)}
-                              options={vOption}
-                              onShow={onShow}
-                              optionLabel="name"
-                              placeholder="Select Banks"
-                              // maxSelectedLabels={3}
-                              display="chip"
-                              className="w-full md:w-20rem"
-                            />
-
-                          </div>
-                        </div>
-                      </div>
-                      {/* end form-bx  */}
-                      <div className="inner_form_new ">
-                        <label className="controlform">Directives</label>
-                        <div className="form-bx">
-                          <div className="multiselect flex justify-content-center">
-                            <MultiSelect
-                              value={selectedDirectives}
-                              onChange={(e) => setSelectedDirectives(e.value)}
-                              options={DirectiveOption}
-                              optionLabel="name"
-                              name="directiveData"
-                              placeholder="Select Directives"
-                              display="chip"
-                            />
-                            {errors?.directiveData ? (
-                              <small className="errormsg">{errors.directiveData}</small>
-                            ) : (
-                              ""
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                      {/* end form-bx  */}
-
-                      {/* end form-bx  */}
-                      <div className="inner_form_new ">
-                        <label className="controlform">Releasing Date</label>
-                        <div className="form-bx">
-                          <DatePicker
-                            placeholderText="Select Releasing Date"
-                            closeOnScroll={(e) => e.target === document}
-                            selected={releasingDate}
-                            onChange={(date) => setReleasingDate(date)}
-                            peekNextMonth
-                            showMonthDropdown
-                            showYearDropdown
-                            minDate={new Date()}
-                            dropdownMode="select"
-                            dateFormat="dd/MMMM/yyyy"
-                          />
-                          {
-                            errors?.releasingDate ? (
-                              <small className="errormsg">{errors.releasingDate}</small>
-                            ) : (" ")
-                          }
-                        </div>
-                      </div>
-                      {/* end form-bx  */}
-
-                      <div
-                        className={
-                          (roleID == 8 && nextlevelvalue == "") ||
-                            recomdAnalyst == "121"
-                            ? "inner_form_new align-items-center"
-                            : "d-none"
-                        }
-                      >
-                        <label className="controlform">Decision</label>
-                        <div className="row">
-                          <div className="col-md-12">
-                            <div className="hidden-toggles">
-                              <input
-                                type="radio"
-                                id="srcoloration-Approvedved4"
-                                value="10"
-                                onChange={(e) => {
-                                  ChangeApplicationStatus(e);
-                                  GetRoleHandle(10);
-                                  // supervisorHangechangeRole(e);
-                                }}
-                                name="applicationstausdp"
-                                className="hidden-toggles__input"
-                                checked={
-                                  applicationstaus == "10" ? true : false
-                                }
-                              />
-                              <label
-                                for="srcoloration-Approvedved4"
-                                className="hidden-toggles__label"
-                              >
-                                Approved
-                              </label>
-
-                              <input
-                                type="radio"
-                                id="srcoloration-Rejected"
-                                value="30"
-                                onChange={(e) => {
-                                  ChangeApplicationStatus(e);
-                                  // supervisorHangechangeRole(e);
-                                  // GetRoleHandle(30);
-                                }}
-                                name="applicationstausdp"
-                                className="hidden-toggles__input"
-                                checked={
-                                  applicationstaus == "30" ? true : false
-                                }
-                              />
-                              <label
-                                for="srcoloration-Rejected"
-                                className="hidden-toggles__label"
-                              >
-                                Rejected
-                              </label>
-
-                              <input
-                                type="radio"
-                                id="srcoloration-Deferred"
-                                onChange={(e) => {
-                                  ChangeApplicationStatus(e);
-                                  // supervisorHangechangeRole(e);
-                                  // GetRoleHandle(40);
-                                }}
-                                name="applicationstausdp"
-                                value="40"
-                                className="hidden-toggles__input"
-                                checked={
-                                  applicationstaus == "40" ? true : false
-                                }
-                              />
-                              <label
-                                for="srcoloration-Deferred"
-                                className="hidden-toggles__label"
-                              >
-                                Deferred
-                              </label>
-
-                              <input
-                                type="radio"
-                                id="srcoloration-Cancelled"
-                                onChange={(e) => {
-                                  ChangeApplicationStatus(e);
-                                  // supervisorHangechangeRole(e);
-                                  // GetRoleHandle(25);
-                                }}
-                                name="applicationstausdp"
-                                value="25"
-                                className="hidden-toggles__input"
-                                checked={
-                                  applicationstaus == "25" ? true : false
-                                }
-                              />
-                              <label
-                                for="srcoloration-Cancelled"
-                                className="hidden-toggles__label"
-                              >
-                                Cancelled
-                              </label>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                    </div>
-
-                    {allcomment?.map((cur) => {
-                      return cur?.circularActivityData
-                        ?.slice()
-                        ?.reverse()
-                        .map((item, index) => {
-                          if (cur?.assignedToRoleID == 8) {
-                            return (
-                              <>
-                                <div
-                                  key={index}
-                                  className={
-                                    index == 0 && roleID != 8
-                                      ? "tab-pane fade show active"
-                                      : "tab-pane fade show  "
-                                  }
-                                  id={"deputy-justified-home" + index}
-                                  role="tabpanel"
-                                  aria-labelledby={"deputy" + index}
-                                >
-                                  <div className={item?.actionStatusName ? "bakgroundaction" : "d-none"}>
-                                    <div className="row">
-                                      <div className="col-md-6">
-                                        <div className="inner_form_new ">
-                                          <label className="controlform">
-                                            Action Type
-                                          </label>
-                                          <div className="form-bx">
-                                            <label>
-                                              <input
-                                                type="text"
-                                                className=""
-                                                disabled
-                                                // value={item?.actionStatusName}
-                                                value={
-                                                  item?.actionStatusName ==
-                                                    "Approved" ||
-                                                    item?.actionStatusName ==
-                                                    "Reject" ||
-                                                    item?.actionStatusName ==
-                                                    "Cancelled" ||
-                                                    item?.actionStatusName ==
-                                                    "Draft"
-                                                    ? "Assigned"
-                                                    : item?.actionStatusName
-                                                }
-                                              />
-                                            </label>
-                                          </div>
-                                        </div>
-                                      </div>
-
-                                      <div className="col-md-3">
-                                        <div className="inner_form_new-sm ">
-                                          <label className="controlform-sm">
-                                            User{" "}
-                                            <i
-                                              className="bi bi-info-circle icons-info"
-                                              title={`Role : ${item?.actionRoleName}`}
-                                            ></i>
-                                          </label>
-                                          <div className="form-bx-sm">
-                                            <label>
-                                              <input
-                                                type="text"
-                                                className=""
-                                                disabled
-                                                value={item?.actionUserName}
-                                              />
-                                            </label>
-                                          </div>
-                                        </div>
-                                      </div>
-
-                                      <div className="col-md-3">
-                                        <div className="inner_form_new-sm">
-                                          <label className="controlform-sm">
-                                            {item?.actionStatusName ==
-                                              "Approved" ||
-                                              item?.actionStatusName ==
-                                              "Reject" ||
-                                              item?.actionStatusName ==
-                                              "Cancelled"
-                                              ? "Assigned"
-                                              : item?.actionStatusName}{" "}
-                                            Date
-                                          </label>
-                                          <div className="form-bx-sm">
-                                            <label>
-                                              <input
-                                                type="text"
-                                                className=""
-                                                disabled
-                                                value={moment(
-                                                  item?.createdDate
-                                                ).format("DD/MMM/yyyy")}
-                                              />
-                                            </label>
-                                          </div>
-                                        </div>
-                                      </div>
-                                    </div>
-
-                                    <div
-                                      className={
-                                        item?.actionNotes
-                                          ? "inner_form_new "
-                                          : "d-none"
-                                      }
-                                    >
-                                      <label className="controlform">
-                                        Action Note
-                                      </label>
-                                      <div className="form-bx">
-                                        <label>
-                                          <textarea
-                                            disabled
-                                            value={item?.actionNotes}
-                                          />
-                                        </label>
-                                      </div>
-                                    </div>
-
-                                    <div
-                                      className={
-                                        item?.actionComment
-                                          ? "inner_form_new "
-                                          : "d-none"
-                                      }
-                                    >
-                                      <label className="controlform">
-                                        Action Comment
-                                      </label>
-                                      <div className="form-bx">
-                                        <label>
-                                          <textarea
-                                            disabled
-                                            value={item?.actionComment}
-                                          />
-                                        </label>
-                                      </div>
-                                    </div>
-                                  </div>
-
-
-
-                                  <div className="inner_form_new">
-                                    <label className="controlform">
-                                      Recommendation
-                                    </label>
-                                    <div className="form-bx">
-                                      <label>
-                                        <div
-                                          className="tableEditorData disabled viewdiscription"
-                                          dangerouslySetInnerHTML={{
-                                            __html: item?.description
-                                              ? item?.description
-                                              : "N/A",
-                                          }}
-                                          disabled
-                                        />
-                                      </label>
-                                    </div>
-                                  </div>
-                                  <div className="inner_form_new ">
-                                    <label className="controlform">
-                                      Notes
-                                    </label>
-                                    <div className="form-bx">
-                                      <label>
-                                        <textarea
-                                          name="Notes"
-                                          placeholder="Notes"
-                                          className=""
-                                          disabled
-                                        >
-                                          {item?.notes ? item?.notes : "N/A"}
-                                        </textarea>
-                                      </label>
-                                    </div>
-                                  </div>
-                                  <div className="inner_form_new ">
-                                    <label className="controlform">
-                                      Comments
-                                    </label>
-                                    <div className="form-bx">
-                                      <label>
-                                        <textarea
-                                          name="Notes"
-                                          placeholder="Notes"
-                                          className=""
-                                          disabled
-                                        >
-                                          {item?.comment
-                                            ? item?.comment
-                                            : "N/A"}
-                                        </textarea>
-                                      </label>
-                                    </div>
-                                  </div>
-
-                                  <div className="inner_form_new ">
-                                    <label className="controlform">
-                                      Attachments
-                                    </label>
-                                    <div className="form-bx">
-                                      {item?.filesData?.length ? (
-                                        item?.filesData?.map(
-                                          (items, index) => {
-                                            return (
-                                              <div
-                                                className="attachemt_form-bx mb-0 width-80"
-                                                key={items.id}
-                                              >
-                                                <label className="mb-2 mb-0 pt-2 pb-2">
-                                                  {/* {items.filename} */}
-                                                  {items?.fileName
-                                                    ? items?.fileName
-                                                    : `FileUpload ${index}`}
-                                                </label>
-                                                <div
-                                                  className={
-                                                    roleID == 2 || roleID == 3
-                                                      ? "browse-btn"
-                                                      : "d-none"
-                                                  }
-                                                >
-                                                  Browse{" "}
-                                                  <input
-                                                    type="file"
-                                                    onChange={(e) =>
-                                                      handleFileChange(
-                                                        e,
-                                                        items.id
-                                                      )
-                                                    }
-                                                  />
-                                                </div>
-                                                <span className="filename">
-                                                  <Link
-                                                    to={items?.filePath}
-                                                    target="_blank"
-                                                    className="viewbtn"
-                                                  >
-                                                    View File
-                                                  </Link>
-                                                </span>
-                                              </div>
-                                            );
-                                          }
-                                        )
-                                      ) : (
-                                        <label className="notfound">
-                                          File Not Found
-                                        </label>
-                                      )}
-                                    </div>
-                                  </div>
-
-                                  <div className="inner_form_new ">
-                                    <label className="controlform">
-                                      Bank
-                                    </label>
-                                    <div className="form-bx">
-                                      <label>
-                                        <ul className="nalist">
-                                          {item?.bankData
-                                            ?.length ? (
-                                            item?.bankData?.map(
-                                              (res) => {
-                                                return (
-                                                  <li>{res?.bankName}</li>
-                                                );
-                                              }
-                                            )
-                                          ) : (
-                                            <li className="disabletext">
-                                              N/A
-                                            </li>
-                                          )}
-                                        </ul>
-                                      </label>
-                                    </div>
-                                  </div>
-                                  <div className="inner_form_new ">
-                                    <label className="controlform">
-                                      Directives
-                                    </label>
-                                    <div className="form-bx">
-                                      <label>
-                                        <ul className="nalist">
-                                          {item?.directiveData
-                                            ?.length ? (
-                                            item?.directiveData?.map(
-                                              (res) => {
-                                                return (
-                                                  <li>{res?.directiveName}</li>
-                                                );
-                                              }
-                                            )
-                                          ) : (
-                                            <li className="disabletext">
-                                              N/A
-                                            </li>
-                                          )}
-                                        </ul>
-                                      </label>
-                                    </div>
-                                  </div>
-                                  <div className="inner_form_new">
-                                    <label className="controlform">
-                                      Releasing Date
-                                    </label>
-                                    <div className="form-bx">
-                                      <label>
-                                        <input
-                                          type="text"
-                                          className=""
-                                          disabled
-                                          value={moment(
-                                            item?.releasingDate
-                                          ).format("DD/MMM/yyyy")}
-                                        />
-                                      </label>
-                                    </div>
-                                  </div>
-                                  {/* <div class="row">
-                                      <div class="col-md-12">
-                                        <div class="inner_form_new ">
-                                          <label class="controlform">
-                                            Action
-                                          </label>
-                                          <div class="form-bx">
-                                            <label>
-                                              <input
-                                                type="text"
-                                                class=""
-                                                disabled
-                                                value={
-                                                  item?.assignedAction ==
-                                                    "Approved" ||
-                                                    item?.assignedAction ==
-                                                    "Reject" ||
-                                                    item?.assignedAction ==
-                                                    "Cancelled"
-                                                    ? "Assigned"
-                                                    : item?.assignedAction
-                                                }
-                                              />
-                                            </label>
-                                          </div>
-                                        </div>
-                                      </div>
-                                    </div> */}
-
-
-                                  <div
-                                    className={
-                                      item?.assignedToName == null &&
-                                        item?.assignedToName == null
-                                        ? "d-none"
-                                        : "row"
-                                    }
-                                  >
-                                    <div className="col-md-6">
-                                      <div className="inner_form_new ">
-                                        <label className="controlform">
-                                          Assigned To Role
-                                        </label>
-                                        <div className="form-bx">
-                                          <label>
-                                            <input
-                                              type="text"
-                                              className=""
-                                              disabled
-                                              value={
-                                                item?.roleName
-                                                  ? item?.roleName
-                                                  : ""
-                                              }
-                                            />
-                                          </label>
-                                        </div>
-                                      </div>
-                                    </div>
-                                    <div className="col-md-6">
-                                      <div className="inner_form_new-sm ">
-                                        <label className="controlform-sm">
-                                          Assigned To User
-                                        </label>
-                                        <div className="form-bx-sm">
-                                          <label>
-                                            <input
-                                              type="text"
-                                              className=""
-                                              disabled
-                                              value={
-                                                item?.assignedToName
-                                                  ? item?.assignedToName
-                                                  : ""
-                                              }
-                                            />
-                                          </label>
-                                        </div>
-                                      </div>
-                                    </div>
-                                  </div>
-                                </div>
-                              </>
-                            );
-                          }
-                        });
-                    })}
-                  </div>
-                </div>
-              </>
-            ) : (
-              ""
-            )}
-
-            {/* Dupty director code end */}
-            {/* director code start */}
-
-            {roleID >= 9 ? (
-              <>
-                <h5
-                  className={
-                    director
-                      ? "section_top_subheading mt-3 py-3 btn-collapse_active cursorpointer"
-                      : "section_top_subheading mt-3 py-3 cursorpointer"
-                  }
-                  onClick={() => setdirector(!director)}
-                >
-                  Director{" "}
-
-                  <span className="btn-collapse">
-                    <i className="bi bi-caret-down-fill"></i>
-                  </span>
-                </h5>
-
-                <div className={director ? "customtab mb-3" : "d-none"}>
-                  
-                {applicationDetail?.roleID == 9 ? <ExportCirculargenInfo applicationDetail={applicationDetail}  /> :  applicationDetail?.roleID != 9   && applicationDetail ? "No Data" : " "}
-
-                  {allcomment?.map((cur, i) => {
-                    if (cur.assignedToRoleID == 9) {
-                      return (
-                        <ul
-                          className={
-                            cur?.circularActivityData?.length >= 1
-                              ? "nav nav-pills mb-3"
-                              : "d-none"
-                          }
-                          role="tablist"
-                        >
-                          <li
-                            className={roleID == 9 ? "nav-item" : "d-none"}
-                            role="presentation"
-                          >
-                            <button
-                              className={
-                                roleID == 9
-                                  ? "nav-link w-100 border-radius0 active"
-                                  : "nav-link w-100 border-radius0"
-                              }
-                              id="director"
-                              data-bs-toggle="tab"
-                              data-bs-target="#director-justified-home"
-                              type="button"
-                              role="tab"
-                              aria-controls="home"
-                              aria-selected="true"
-                            >
-                              Action
-                            </button>
-                          </li>
-
-                          {cur?.circularActivityData
-                            ?.slice()
-                            ?.reverse()
-                            .map((items, index) => {
-                              return (
-                                <li className="nav-item" role="presentation">
-                                  <button
-                                    className={
-                                      index == 0 && roleID != 9
-                                        ? "nav-link w-100 border-radius0 active"
-                                        : "nav-link border-radius0 w-100 "
-                                    }
-                                    id={"director" + index}
-                                    data-bs-toggle="tab"
-                                    data-bs-target={
-                                      "#director-justified-home" + index
-                                    }
-                                    type="button"
-                                    role="tab"
-                                    aria-controls="home"
-                                    aria-selected="true"
-                                  >
-
-                                    Response{" "}
-                                    {cur?.circularActivityData?.length -
-                                      index}
-                                  </button>
-                                </li>
-                              );
-                            })}
-                        </ul>
-                      );
-                    }
-                  })}
-
-
-                  <div className="tab-content pt-2 mb-2">
-                    <div
-                      className={
-                        roleID == 9
-                          ? "tab-pane fade show active"
-                          : "tab-pane fade show "
-                      }
-                      id="director-justified-home"
-                      role="tabpanel"
-                      aria-labelledby="director"
-                    >
-                      {Actiondata?.map((cur) => {
-                        const firstItem = cur?.circularActivityData?.[0]; // Accessing the first element directly
-
-                        if (cur?.assignedToRoleID === 9 && firstItem) {
-                          // Check if firstItem exists
-                          return (
-                            <div className="bakgroundaction">
-                              <div key={firstItem.actionID}>
-                                {" "}
-                                {/* Remember to add a unique key */}
-                                <div className="row">
-                                  <div className="col-md-6">
-                                    <div className="inner_form_new">
-                                      <label className="controlform">
-                                        Action Type
-                                      </label>
-                                      <div className="form-bx">
-                                        <label>
-                                          {" "}
-                                          <input
-                                            type="text"
-                                            className=""
-                                            disabled
-                                            // value={firstItem?.actionStatusName}
-                                            value={
-                                              firstItem?.actionStatusName ==
-                                                "Approved" ||
-                                                firstItem?.actionStatusName ==
-                                                "Reject" ||
-                                                firstItem?.actionStatusName ==
-                                                "Cancelled" ||
-                                                firstItem?.actionStatusName ==
-                                                "Draft"
-                                                ? "Assigned"
-                                                : firstItem?.actionStatusName
-                                            }
-                                          />
-                                        </label>
-                                      </div>
-                                    </div>
-                                  </div>
-
-                                  <div className="col-md-3">
-                                    <div className="inner_form_new-sm">
-                                      <label className="controlform-sm">
-                                        User{" "}
-                                        <i
-                                          className="bi bi-info-circle icons-info"
-                                          title={`Role : ${firstItem?.actionRoleName}`}
-                                        ></i>
-                                      </label>
-                                      <div className="form-bx-sm">
-                                        <label>
-                                          {" "}
-                                          <input
-                                            type="text"
-                                            className=""
-                                            disabled
-                                            value={firstItem?.actionUserName}
-                                          />
-                                        </label>
-                                      </div>
-                                    </div>
-                                  </div>
-
-                                  <div className="col-md-3">
-                                    <div className="inner_form_new-sm">
-                                      <label className="controlform-sm">
-                                        {firstItem?.actionStatusName ==
-                                          "Approved" ||
-                                          firstItem?.actionStatusName ==
-                                          "Reject" ||
-                                          firstItem?.actionStatusName ==
-                                          "Cancelled"
-                                          ? "Assigned"
-                                          : firstItem?.actionStatusName}{" "}
-                                        Date
-                                      </label>
-                                      <div className="form-bx-sm">
-                                        <label>
-                                          <input
-                                            type="text"
-                                            className=""
-                                            disabled
-                                            value={moment(
-                                              firstItem?.createdDate
-                                            ).format("DD/MMM/yyyy")}
-                                          />
-                                        </label>
-                                      </div>
-                                    </div>
-                                  </div>
-                                </div>
-                                <div
-                                  className={
-                                    firstItem?.actionNotes
-                                      ? "inner_form_new"
-                                      : "d-none"
-                                  }
-                                >
-                                  <label className="controlform">
-                                    Action Note
-                                  </label>
-                                  <div className="form-bx">
-                                    <label>
-                                      {" "}
-                                      <textarea
-                                        type="text"
-                                        className=""
-                                        disabled
-                                        value={firstItem?.actionNotes}
-                                      />
-                                    </label>
-                                  </div>
-                                </div>
-                                <div
-                                  className={
-                                    firstItem?.actionComment
-                                      ? "inner_form_new"
-                                      : "d-none"
-                                  }
-                                >
-                                  <label className="controlform">
-                                    Action Comment
-                                  </label>
-                                  <div className="form-bx">
-                                    <label>
-                                      {" "}
-                                      <textarea
-                                        type="text"
-                                        className=""
-                                        disabled
-                                        value={firstItem?.actionComment}
-                                      />
-                                    </label>
-                                  </div>
-                                </div>
                               </div>
                             </div>
-                          );
-                        }
-                      })}
-
-                      <div
-                        className={
-                          roleID == 9
-                            ? "inner_form_new align-items-center"
-                            : "d-none"
-                        }
-                      >
-                        <label className="controlform">Next Action</label>
-                        <div className="row">
-                          <div className="col-md-12 my-2">
-                            <div className="hidden-toggles">
-                              <input
-                                type="radio"
-                                id="direcotsrecomndByAnalyst"
-                                name="nextactionbuton"
-                                onClick={() => {
-                                  setRecomdAnalyst("121");
-                                  setnextlevelvalue("");
-                                  setAssignUserID("");
-                                  setSupervisorRoleId("");
-                                  setAsignUser([]);
-                                  setapplicationstaus(
-                                    applicationDetail?.analystRecommendation
+                            {/* end form-bx  */}
+                          </>
+                          : (
+                            <span>
+                              {/* {noDataComment?.map((data, i) => {
+                                if (data.roleID == 6 && data.isDataAvailable == 0) {
+                                  return (
+                                    <div
+                                      className={
+                                        sranalystTab ? "customtab" : "d-none"
+                                      }
+                                      key={i}
+                                    >
+                                      <div className="text-center">No Data Found</div>
+                                    </div>
                                   );
-                                }}
-                                className={
-                                  applicationDetail?.analystRecommendation ==
-                                    "" ||
-                                    applicationDetail?.analystRecommendation ==
-                                    "0"
-                                    ? "d-none"
-                                    : "hidden-toggles__input"
                                 }
-                                value="121"
-                                checked={
-                                  recomdAnalyst == "121" ? true : false
-                                }
-                              />
-                              <label
-                                for="direcotsrecomndByAnalyst"
-                                className={
-                                  applicationDetail?.analystRecommendation ==
-                                    "" ||
-                                    applicationDetail?.analystRecommendation ==
-                                    "0"
-                                    ? "d-none"
-                                    : "hidden-toggles__label"
-                                }
-                              >
-                                As Recommended by Analyst
-                              </label>
-
-                              <input
-                                type="radio"
-                                id="direcotsRefer"
-                                onChange={(e) => {
-                                  ChangeNextlevelHandle(e);
-                                  // ChangeApplicationStatus(e);
-                                  setcheckSupervisor(true);
-                                  GetRoleHandle(15);
-                                  setapplicationstaus(
-                                    applicationDetail?.analystRecommendation
-                                  );
-                                }}
-                                name="nextactionbuton"
-                                onClick={() => setRecomdAnalyst("")}
-                                value="15"
-                                className="hidden-toggles__input"
-                              />
-                              <label
-                                for="direcotsRefer"
-                                className="hidden-toggles__label"
-                              >
-                                Refer Back
-                              </label>
-
-
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div
-                        className={checkSupervisor == true ? "row" : "d-none"}
-                      >
-                        <div className="col-md-12 d-flex c-gap">
-                          <div
-                            className={
-                              nextlevelvalue == 15 ? "w-50" : "d-none"
-                            }
-                          >
-                            {checkSupervisor == true && roleID == 9 ? (
-                              <>
-                                <div className="inner_form_new">
-                                  <label className="controlform">Role</label>
-
-                                  <div className="form-bx">
-                                    <label>
-                                      <select
-                                        ref={assignedToRef}
-                                        name="SupervisorRoleId"
-                                        onChange={(e) => {
-                                          supervisorHangechangeRole(e);
-                                          handleUserRole(e);
-                                        }}
-                                        className={
-                                          errors.assignedTo &&
-                                            !SupervisorRoleId
-                                            ? "error"
-                                            : ""
-                                        }
-                                      >
-                                        <option value="">Select Role</option>
-                                        {userRole?.map((item, index) => {
-                                          return (
-                                            <option
-                                              key={index}
-                                              value={item.id}
-                                            >
-                                              {item.designation}
-                                            </option>
-                                          );
-                                        })}
-                                      </select>
-                                      <span className="sspan"></span>
-                                      {errors.assignedTo &&
-                                        !SupervisorRoleId ? (
-                                        <small className="errormsg">
-                                          Role is required{" "}
-                                        </small>
-                                      ) : (
-                                        ""
-                                      )}
-                                    </label>
-                                  </div>
-                                </div>
-                                {/* end form-bx  */}
-                              </>
-                            ) : (
-                              ""
-                            )}
-                          </div>
-                          <div
-                            className={
-                              nextlevelvalue == 15 ? "w-50" : "w-100"
-                            }
-                          >
-                            {roleID == 9 && recomdAnalyst != "121" ? (
-                              <>
-                                <div className="inner_form_new">
-                                  <label className="controlform">User</label>
-
-                                  <div className="form-bx">
-                                    <label>
-                                      <select
-                                        ref={assignedToRef}
-                                        name="AssignUserID"
-                                        onChange={(e) =>
-                                          supervisorHangechange(e)
-                                        }
-                                        className={
-                                          errors.assignUserID && !AssignUserID
-                                            ? "error"
-                                            : ""
-                                        }
-                                      >
-                                        <option value="">Select User</option>
-                                        {asignUser?.map((item, index) => {
-                                          return (
-                                            <option
-                                              key={index}
-                                              value={item.userID}
-                                            >
-                                              {item.name}
-                                            </option>
-                                          );
-                                        })}
-                                      </select>
-                                      <span className="sspan"></span>
-                                      {errors.assignUserID &&
-                                        !AssignUserID ? (
-                                        <small className="errormsg">
-                                          {errors.assignUserID}
-                                        </small>
-                                      ) : (
-                                        ""
-                                      )}
-                                    </label>
-                                  </div>
-                                </div>
-                                {/* end form-bx  */}
-                              </>
-                            ) : (
-                              ""
-                            )}
-                          </div>
-
-                          {/* end form-bx  */}
-                        </div>
-                      </div>
-
-                      {attachmentData?.map((items, index) => {
-                        return (
-                          <div
-                            className="attachemt_form-bx  mt-2"
-                            key={items.id}
-                          >
-                            <label
-                              style={{
-                                background: "#d9edf7",
-                                padding: "9px 3px",
-                                border: "0px",
-                              }}
-                            >
-                              <span style={{ fontWeight: "500" }}>
-                                {items.filename}
-                              </span>
-                            </label>
-                            <div className="browse-btn">
-                              Browse
-                              <input
-                                type="file"
-                                onChange={(e) =>
-                                  handleuserFileChange(e, "circular" + (index + 1))
-                                }
-                              />
-                            </div>
-                            <span className="filename">
-                              {userfiles?.find(
-                                (f) => f.id === "circular" + (index + 1)
-                              )?.file?.name || "No file chosen"}
+                              })} */}
                             </span>
-                            {userfiles?.length &&
-                              userfiles?.find((f) => f.id === "circular" + (index + 1))
-                                ?.file?.name ? (
-                              <button
-                                type="button"
-                                className="remove-file"
-                                onClick={() =>
-                                  removeUserImage(index, "circular" + (index + 1))
-                                }
-                              >
-                                Remove
-                              </button>
-                            ) : (
-                              ""
-                            )}
-                          </div>
-                        );
-                      })}
-
-                      {otheruserfiles.map((file, index) => (
-                        <div
-                          key={"other" + (index + 1)}
-                          className="attachemt_form-bx"
-                        >
-                          <label
-                            style={{
-                              background: "#d9edf7",
-                              padding: "9px 3px",
-                              border: "0px",
-                            }}
-                          >
-                            <b>
-                              Other File
-                              {index + 1}
-                            </b>
-                          </label>
-                          <div className="browse-btn">
-                            Browse{" "}
-                            <input
-                              type="file"
-                              onChange={(e) => {
-                                handleuserFileChange(e, "other" + index);
-                                handleOthrefile(e, `other ${index}`);
-                              }}
-                            />
-                          </div>
-                          <span className="filename">
-                            {userfiles?.find((f) => f.id === "other" + index)
-                              ?.file?.name || "No file chosen"}
-                          </span>
-
-                          {userfiles?.length &&
-                            userfiles?.find((f) => f.id === "other" + index)
-                              ?.file?.name ? (
-                            <button
-                              type="button"
-                              className="remove-file"
-                              onClick={() =>
-                                removeUserImage(index, "other" + index)
-                              }
-                            >
-                              Remove
-                            </button>
-                          ) : (
-                            ""
-                          )}
-                        </div>
-                      ))}
-
-                      {otheruserfiles?.length || userfiles?.length ? (
-                        <div className="attachemt_form-bx">
-                          <label style={{ border: "0px" }}>{""}</label>
-                          <button
-                            type="button"
-                            className="addmore-btn mt-0"
-                            onClick={(e) => handleuserAddMore(e)}
-                          >
-                            {" "}
-                            Add More File{" "}
-                          </button>
-                        </div>
-                      ) : (
-                        ""
-                      )}
-
-                      <div
-                        className={
-                          roleID == 9
-                            ? "inner_form_new align-items-start mt-2"
-                            : "d-none"
+                          )
                         }
-                      >
-                        <label className="controlform">Recommendation</label>
-                        <div className="form-bx editorFieldBox">
-                          <div className="mt-2 py-1">
-                            <MenuBar editor={editorDirector} />
-                            <EditorContent editor={editorDirector} />
-                            <span className="sspan"></span>
-                            {(errors.Description && Description == " ") ||
-                              Description == null ||
-                              Description == "<p></p>" ||
-                              !Description ||
-                              Description == "<p><br></p>" ? (
-                              <small
-                                className="errormsg"
-                                style={{ bottom: "-13px" }}
-                              >
-                                {errors.Description}
-                              </small>
-                            ) : (
-                              ""
-                            )}
-                          </div>
-                        </div>
+                        {/* next level data show and assign behalf of not equal userID  end*/}
                       </div>
+                      {allcomment?.map((cur) => {
+                        return cur?.circularActivityData
+                          ?.slice()
+                          ?.reverse()
+                          .map((item, index) => {
 
-                      <div
-                        className={roleID == 9 ? "inner_form_new " : "d-none"}
-                      >
-                        <label className="controlform">
-                          {nextlevelvalue == "10"
-                            ? "Assign Notes"
-                            : nextlevelvalue == "20"
-                              ? "Delegate Notes"
-                              : nextlevelvalue == "35"
-                                ? "Referred to Other Department Notes"
-                                : nextlevelvalue == "15"
-                                  ? "Refer Back Notes"
-                                  : "Notes"}
-                        </label>
-
-                        <div className="form-bx">
-                          <label>
-                            <textarea
-                              name="Notes"
-                              onChange={(e) => {
-                                HandleNextleveldata(e);
-                              }}
-                              placeholder={
-                                nextlevelvalue == "10"
-                                  ? "Assign Notes"
-                                  : nextlevelvalue == "20"
-                                    ? "Delegate Notes"
-                                    : nextlevelvalue == "35"
-                                      ? "Referred to Other Department Notes"
-                                      : nextlevelvalue == "15"
-                                        ? "Refer Back Notes"
-                                        : "Notes"
-                              }
-                              className={errors.Notes ? "error" : ""}
-                              value={asignnextLeveldata.Notes}
-                            />
-                            <span className="sspan"></span>
-                            {errors.Notes ? (
-                              <small className="errormsg">
-                                {nextlevelvalue == "10"
-                                  ? "Assign notes is required"
-                                  : nextlevelvalue == "20"
-                                    ? "Delegate notes is required"
-                                    : nextlevelvalue == "35"
-                                      ? "Referred to other department notes is required"
-                                      : nextlevelvalue == "15"
-                                        ? "Refer back notes is required"
-                                        : "Notes is required"}
-                              </small>
-                            ) : (
-                              ""
-                            )}
-                          </label>
-                        </div>
-                      </div>
-                      {/* end form-bx  */}
-
-                      <div
-                        className={roleID == 9 ? "inner_form_new " : "d-none"}
-                      >
-                        <label className="controlform">
-                          {nextlevelvalue == "10"
-                            ? "Assign Comments"
-                            : nextlevelvalue == "20"
-                              ? "Delegate Comments"
-                              : nextlevelvalue == "35"
-                                ? "Referred to Other Department Comments"
-                                : nextlevelvalue == "15"
-                                  ? "Refer Back Comments"
-                                  : "Comments"}
-                        </label>
-
-                        <div className="form-bx">
-                          <label>
-                            <textarea
-                              name="Comment"
-                              onChange={(e) => {
-                                HandleNextleveldata(e);
-                              }}
-                              placeholder={
-                                nextlevelvalue == "10"
-                                  ? "Assign Comments"
-                                  : nextlevelvalue == "20"
-                                    ? "Delegate Comments"
-                                    : nextlevelvalue == "35"
-                                      ? "Referred to Other Department Comments"
-                                      : nextlevelvalue == "15"
-                                        ? "Refer Back Comments"
-                                        : "Comments"
-                              }
-                              className={errors.Comment ? "error" : ""}
-                              value={asignnextLeveldata.Comment}
-                            />
-                            <span className="sspan"></span>
-                            {errors.Comment ? (
-                              <small className="errormsg">
-                                {nextlevelvalue == "10"
-                                  ? "Assign comments is required"
-                                  : nextlevelvalue == "20"
-                                    ? "Delegate comments is required"
-                                    : nextlevelvalue == "35"
-                                      ? "Referred to other department comments is required"
-                                      : nextlevelvalue == "15"
-                                        ? "Refer back comments is required"
-                                        : "Comments is required"}
-                              </small>
-                            ) : (
-                              ""
-                            )}
-                          </label>
-                        </div>
-                      </div>
-
-                      <div className="inner_form_new align-items-center">
-                        <label className="controlform">Bank</label>
-                        <div className="cccto">
-                          <div className="flex justify-content-center multiSelect">
-                            <MultiSelect
-                              value={selectedBanks}
-                              onChange={(e) => setSelectedBanks(e.value)}
-                              options={vOption}
-                              onShow={onShow}
-                              optionLabel="name"
-                              placeholder="Select Banks"
-                              // maxSelectedLabels={3}
-                              display="chip"
-                              className="w-full md:w-20rem"
-                            />
-
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* end form-bx  */}
-                      <div className="inner_form_new ">
-                        <label className="controlform">Directives</label>
-                        <div className="form-bx">
-                          <div className="multiselect flex justify-content-center">
-                            <MultiSelect
-                              value={selectedDirectives}
-                              onChange={(e) => setSelectedDirectives(e.value)}
-                              options={DirectiveOption}
-                              optionLabel="name"
-                              name="directiveData"
-                              placeholder="Select Directives"
-                              display="chip"
-                            />
-                            {errors?.directiveData ? (
-                              <small className="errormsg">{errors.directiveData}</small>
-                            ) : (
-                              ""
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                      {/* end form-bx  */}
-
-                      {/* end form-bx  */}
-                      <div className="inner_form_new ">
-                        <label className="controlform">Releasing Date</label>
-                        <div className="form-bx">
-                          <DatePicker
-                            placeholderText="Select Releasing Date"
-                            closeOnScroll={(e) => e.target === document}
-                            selected={releasingDate}
-                            onChange={(date) => setReleasingDate(date)}
-                            peekNextMonth
-                            showMonthDropdown
-                            showYearDropdown
-                            minDate={new Date()}
-                            dropdownMode="select"
-                            dateFormat="dd/MMMM/yyyy"
-                          />
-                          {
-                            errors?.releasingDate ? (
-                              <small className="errormsg">{errors.releasingDate}</small>
-                            ) : (" ")
-                          }
-                        </div>
-                      </div>
-                      {/* end form-bx  */}
-                      <div
-                        className={
-                          (roleID == 9 && nextlevelvalue == "") ||
-                            recomdAnalyst == "121"
-                            ? "inner_form_new align-items-center"
-                            : "d-none"
-                        }
-                      >
-                        <label className="controlform">Decision</label>
-                        <div className="row">
-                          <div className="col-md-12">
-                            <div className="hidden-toggles">
-                              <input
-                                type="radio"
-                                id="srcoloration-Approvedved5"
-                                value="10"
-                                onChange={(e) => {
-                                  ChangeApplicationStatus(e);
-                                  GetRoleHandle(10);
-                                  // supervisorHangechangeRole(e);
-                                }}
-                                name="applicationstausdir"
-                                className="hidden-toggles__input"
-                                checked={
-                                  applicationstaus == "10" ? true : false
-                                }
-                              />
-                              <label
-                                for="srcoloration-Approvedved5"
-                                className="hidden-toggles__label"
-                              >
-                                Approved
-                              </label>
-
-                              <input
-                                type="radio"
-                                id="srcoloration-Rejected"
-                                value="30"
-                                onChange={(e) => {
-                                  ChangeApplicationStatus(e);
-                                  // supervisorHangechangeRole(e);
-                                  // GetRoleHandle(30);
-                                }}
-                                name="applicationstausdir"
-                                className="hidden-toggles__input"
-                                checked={
-                                  applicationstaus == "30" ? true : false
-                                }
-                              />
-                              <label
-                                for="srcoloration-Rejected"
-                                className="hidden-toggles__label"
-                              >
-                                Rejected
-                              </label>
-
-                              <input
-                                type="radio"
-                                id="srcoloration-Deferred"
-                                onChange={(e) => {
-                                  ChangeApplicationStatus(e);
-                                  // supervisorHangechangeRole(e);
-                                  // GetRoleHandle(40);
-                                }}
-                                name="applicationstausdir"
-                                value="40"
-                                className="hidden-toggles__input"
-                                checked={
-                                  applicationstaus == "40" ? true : false
-                                }
-                              />
-                              <label
-                                for="srcoloration-Deferred"
-                                className="hidden-toggles__label"
-                              >
-                                Deferred
-                              </label>
-
-                              <input
-                                type="radio"
-                                id="srcoloration-Cancelled"
-                                onChange={(e) => {
-                                  ChangeApplicationStatus(e);
-                                  // supervisorHangechangeRole(e);
-                                  // GetRoleHandle(25);
-                                }}
-                                name="applicationstausdir"
-                                value="25"
-                                className="hidden-toggles__input"
-                                checked={
-                                  applicationstaus == "25" ? true : false
-                                }
-                              />
-                              <label
-                                for="srcoloration-Cancelled"
-                                className="hidden-toggles__label"
-                              >
-                                Cancelled
-                              </label>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {allcomment?.map((cur, indexcomment) => {
-                      return cur?.circularActivityData
-                        ?.slice()
-                        ?.reverse()
-                        ?.map((item, index) => {
-                          if (cur?.assignedToRoleID == 9) {
-                            return (
-                              <>
-                                <div
-                                  key={index}
-                                  className={
-                                    index == 0 && roleID != 9
-                                      ? "tab-pane fade show active"
-                                      : "tab-pane fade show  "
-                                  }
-                                  id={"director-justified-home" + index}
-                                  role="tabpanel"
-                                  aria-labelledby={"director" + index}
-                                >
-                                  <div className={item?.actionStatusName ? "bakgroundaction" : "d-none"}>
-                                    <div className="row">
-                                      <div className="col-md-6">
-                                        <div className="inner_form_new ">
-                                          <label className="controlform">
-                                            Action Type
-                                          </label>
-                                          <div className="form-bx">
-                                            <label>
-                                              <input
-                                                type="text"
-                                                className=""
-                                                disabled
-                                                // value={item?.actionStatusName}
-                                                value={
-                                                  item?.actionStatusName ==
-                                                    "Approved" ||
-                                                    item?.actionStatusName ==
-                                                    "Reject" ||
-                                                    item?.actionStatusName ==
-                                                    "Cancelled" ||
-                                                    item?.actionStatusName ==
-                                                    "Draft"
-                                                    ? "Assigned"
-                                                    : item?.actionStatusName
-                                                }
-                                              />
+                            if (cur?.assignedToRoleID == 6) {
+                              return (
+                                <>
+                                  <div
+                                    key={index}
+                                    className={
+                                      index == 0 && roleID != 6
+                                        ? "tab-pane fade show active"
+                                        : "tab-pane fade show  "
+                                    }
+                                    id={"sranalystab-justified-home" + index}
+                                    role="tabpanel"
+                                    aria-labelledby={"sranalystab" + index}
+                                  >
+                                    <div className={item?.actionStatusName ? "bakgroundaction" : "d-none"}>
+                                      <div className="row">
+                                        <div className="col-md-6">
+                                          <div className="inner_form_new ">
+                                            <label className="controlform">
+                                              Action Type manij
                                             </label>
+                                            <div className="form-bx">
+                                              <label>
+                                                <input
+                                                  type="text"
+                                                  className=""
+                                                  disabled
+                                                  // value={item?.actionStatusName}
+                                                  value={
+                                                    item?.actionStatusName ==
+                                                      "Approved" ||
+                                                      item?.actionStatusName ==
+                                                      "Reject" ||
+                                                      item?.actionStatusName ==
+                                                      "Cancelled"
+                                                      ? "Assigned" ||
+                                                      item?.actionStatusName ==
+                                                      "Draft"
+                                                      : item?.actionStatusName
+                                                  }
+                                                />
+                                              </label>
+                                            </div>
+                                          </div>
+                                        </div>
+
+                                        <div className="col-md-3">
+                                          <div className="inner_form_new-sm ">
+                                            <label className="controlform-sm">
+                                              User{" "}
+                                              <i
+                                                className="bi bi-info-circle icons-info"
+                                                title={`Role : ${item?.actionRoleName}`}
+                                              ></i>
+                                            </label>
+                                            <div className="form-bx-sm">
+                                              <label>
+                                                <input
+                                                  type="text"
+                                                  className=""
+                                                  disabled
+                                                  value={item?.actionUserName}
+                                                />
+                                              </label>
+                                            </div>
+                                          </div>
+                                        </div>
+
+                                        <div className="col-md-3">
+                                          <div className="inner_form_new-sm">
+                                            <label className="controlform-sm">
+                                              {item?.actionStatusName ==
+                                                "Approved" ||
+                                                item?.actionStatusName ==
+                                                "Reject" ||
+                                                item?.actionStatusName ==
+                                                "Cancelled"
+                                                ? "Assigned"
+                                                : item?.actionStatusName}{" "}
+                                              Date
+                                            </label>
+                                            <div className="form-bx-sm">
+                                              <label>
+                                                <input
+                                                  type="text"
+                                                  className=""
+                                                  disabled
+                                                  value={moment(
+                                                    item?.createdDate
+                                                  ).format("DD/MMM/yyyy")}
+                                                />
+                                              </label>
+                                            </div>
                                           </div>
                                         </div>
                                       </div>
 
                                       <div
                                         className={
-                                          item?.actionUserNam
-                                            ? "col-md-3"
+                                          item?.actionNotes
+                                            ? "inner_form_new "
                                             : "d-none"
                                         }
                                       >
-                                        <div className="inner_form_new-sm ">
-                                          <label className="controlform-sm">
-                                            User{" "}
-                                            <i
-                                              className="bi bi-info-circle icons-info"
-                                              title={`Role : ${item?.actionRoleName}`}
-                                            ></i>
+                                        <label className="controlform">
+                                          Action Note
+                                        </label>
+                                        <div className="form-bx">
+                                          <label>
+                                            <textarea
+                                              disabled
+                                              value={item?.actionNotes}
+                                            />
                                           </label>
-                                          <div className="form-bx-sm">
-                                            <label>
-                                              <input
-                                                type="text"
-                                                className=""
-                                                disabled
-                                                value={item?.actionUserName}
-                                              />
-                                            </label>
-                                          </div>
                                         </div>
                                       </div>
 
                                       <div
                                         className={
-                                          item?.actionUserNam
-                                            ? "col-md-3"
-                                            : "col-md-6"
+                                          item?.actionComment
+                                            ? "inner_form_new "
+                                            : "d-none"
                                         }
                                       >
-                                        <div className="inner_form_new-sm">
-                                          <label className="controlform-sm">
-                                            {item?.actionStatusName ==
-                                              "Approved" ||
-                                              item?.actionStatusName ==
-                                              "Reject" ||
-                                              item?.actionStatusName ==
-                                              "Cancelled"
-                                              ? "Assigned"
-                                              : item?.actionStatusName}{" "}
-                                            Date
+                                        <label className="controlform">
+                                          Action Comment
+                                        </label>
+                                        <div className="form-bx">
+                                          <label>
+                                            <textarea
+                                              disabled
+                                              value={item?.actionComment}
+                                            />
                                           </label>
-                                          <div className="form-bx-sm">
-                                            <label>
-                                              <input
-                                                type="text"
-                                                className=""
-                                                disabled
-                                                value={moment(
-                                                  item?.createdDate
-                                                ).format("DD/MMM/yyyy")}
-                                              />
-                                            </label>
-                                          </div>
                                         </div>
                                       </div>
                                     </div>
 
-                                    <div
-                                      className={
-                                        item?.actionNotes
-                                          ? "inner_form_new "
-                                          : "d-none"
-                                      }
-                                    >
+                                    <div className="inner_form_new">
                                       <label className="controlform">
-                                        Action Note
+                                        Recommendation
                                       </label>
                                       <div className="form-bx">
                                         <label>
-                                          <textarea
-                                            disabled
-                                            value={item?.actionNotes}
+                                          <div
+                                            className="viewdiscription tableEditorData circularEdiorDisData"
+                                            dangerouslySetInnerHTML={{
+                                              __html: item?.content
+                                                ? item?.content
+                                                : "N/A",
+                                            }}
                                           />
                                         </label>
                                       </div>
                                     </div>
 
-                                    <div
-                                      className={
-                                        item?.actionComment
-                                          ? "inner_form_new "
-                                          : "d-none"
-                                      }
-                                    >
+                                    <div className="inner_form_new ">
                                       <label className="controlform">
-                                        Action Comment
+                                        Notes
                                       </label>
                                       <div className="form-bx">
                                         <label>
                                           <textarea
+                                            name="Notes"
+                                            placeholder="Notes"
+                                            className=""
                                             disabled
-                                            value={item?.actionComment}
-                                          />
+                                          >
+                                            {item?.notes ? item?.notes : "N/A"}
+                                          </textarea>
                                         </label>
                                       </div>
                                     </div>
-                                  </div>
 
-                                  <div className="inner_form_new">
-                                    <label className="controlform">
-                                      Recommendation
-                                    </label>
-                                    <div className="form-bx">
-                                      <label>
-                                        <div
-                                          className="tableEditorData disabled viewdiscription"
-                                          dangerouslySetInnerHTML={{
-                                            __html: item?.description
-                                              ? item?.description
-                                              : "N/A",
-                                          }}
-                                          disabled
-                                        />
+                                    <div className="inner_form_new ">
+                                      <label className="controlform">
+                                        Comments
                                       </label>
+                                      <div className="form-bx">
+                                        <label>
+                                          <textarea
+                                            name="Notes"
+                                            placeholder="Notes"
+                                            className=""
+                                            disabled
+                                          >
+                                            {item?.comment
+                                              ? item?.comment
+                                              : "N/A"}
+                                          </textarea>
+                                        </label>
+                                      </div>
                                     </div>
-                                  </div>
 
-                                  <div className="inner_form_new ">
-                                    <label className="controlform">
-                                      Notes
-                                    </label>
-                                    <div className="form-bx">
-                                      <label>
-                                        <textarea
-                                          name="Notes"
-                                          placeholder="Notes"
-                                          className=""
-                                          disabled
-                                        >
-                                          {item?.notes}
-                                        </textarea>
+                                    <div className="inner_form_new ">
+                                      <label className="controlform">
+                                        Attachments
                                       </label>
-                                    </div>
-                                  </div>
-                                  <div className="inner_form_new ">
-                                    <label className="controlform">
-                                      Comments
-                                    </label>
-                                    <div className="form-bx">
-                                      <label>
-                                        <textarea
-                                          name="Notes"
-                                          placeholder="Comments"
-                                          className=""
-                                          disabled
-                                        >
-                                          {item?.comment}
-                                        </textarea>
-                                      </label>
-                                    </div>
-                                  </div>
-                                  <div className="inner_form_new ">
-                                    <label className="controlform">
-                                      Attachments
-                                    </label>
-                                    <div className="form-bx">
-                                      {item?.filesData?.length ? (
-                                        item?.filesData?.map(
-                                          (items, index) => {
-                                            return (
-                                              <div
-                                                className="attachemt_form-bx mb-0 width-80"
-                                                key={items.id}
-                                              >
-                                                <label className="mb-2 mb-0 pt-2 pb-2">
-                                                  {/* {items.filename} */}
-                                                  {items?.fileName
-                                                    ? items?.fileName
-                                                    : `FileUpload ${index}`}
-                                                </label>
+                                      <div className="form-bx">
+                                        {item?.filesData?.length ? (
+                                          item?.filesData?.map(
+                                            (items, index) => {
+                                              return (
                                                 <div
-                                                  className={
-                                                    roleID == 2 || roleID == 3
-                                                      ? "browse-btn"
-                                                      : "d-none"
-                                                  }
+                                                  className="attachemt_form-bx mb-0 width-80"
+                                                  key={items.id}
                                                 >
-                                                  Browse{" "}
-                                                  <input
-                                                    type="file"
-                                                    onChange={(e) =>
-                                                      handleFileChange(
-                                                        e,
-                                                        items.id
-                                                      )
+                                                  <label className="mb-2 mb-0 pt-2 pb-2">
+                                                    {/* {items.filename} */}
+                                                    {items?.fileName
+                                                      ? items?.fileName
+                                                      : `FileUpload ${index}`}
+                                                  </label>
+                                                  <div
+                                                    className={
+                                                      roleID == 2 || roleID == 3
+                                                        ? "browse-btn"
+                                                        : "d-none"
                                                     }
-                                                  />
-                                                </div>
-                                                <span className="filename">
-                                                  <Link
-                                                    to={items?.filePath}
-                                                    target="_blank"
-                                                    className="viewbtn"
                                                   >
-                                                    View File
-                                                  </Link>
-                                                </span>
-                                              </div>
-                                            );
-                                          }
-                                        )
-                                      ) : (
-                                        <label className="notfound">
-                                          File Not Found
+                                                    Browse{" "}
+                                                    <input
+                                                      type="file"
+                                                      onChange={(e) =>
+                                                        handleFileChange(
+                                                          e,
+                                                          items.id
+                                                        )
+                                                      }
+                                                    />
+                                                  </div>
+                                                  <span className="filename">
+                                                    <Link
+                                                      to={items?.filePath}
+                                                      target="_blank"
+                                                      className="viewbtn"
+                                                    >
+                                                      View File
+                                                    </Link>
+                                                  </span>
+                                                </div>
+                                              );
+                                            }
+                                          )
+                                        ) : (
+                                          <label className="notfound">
+                                            File Not Found
+                                          </label>
+                                        )}
+                                      </div>
+                                    </div>
+
+                                    {/* <div className="inner_form_new ">
+                                      <label className="controlform">
+                                        Bank 
+                                      </label>
+                                      <div className="form-bx">
+                                        <label>
+                                          <ul className="nalist">
+                                            {item?.bankData
+                                              ?.length ? (
+                                              item?.bankData?.map(
+                                                (res) => {
+                                                  return (
+                                                    <li>{res?.bankName}</li>
+                                                  );
+                                                }
+                                              )
+                                            ) : (
+                                              <li className="disabletext">
+                                                N/A
+                                              </li>
+                                            )}
+                                          </ul>
                                         </label>
-                                      )}
+                                      </div>
                                     </div>
-                                  </div>
-                                  <div className="inner_form_new ">
-                                    <label className="controlform">
-                                      Bank
-                                    </label>
-                                    <div className="form-bx">
-                                      <label>
-                                        <ul className="nalist">
-                                          {item?.bankData
-                                            ?.length ? (
-                                            item?.bankData?.map(
-                                              (res) => {
-                                                return (
-                                                  <li>{res?.bankName}</li>
-                                                );
-                                              }
-                                            )
-                                          ) : (
-                                            <li className="disabletext">
-                                              N/A
-                                            </li>
-                                          )}
-                                        </ul>
+
+                                    <div className="inner_form_new ">
+                                      <label className="controlform">
+                                        Directives
                                       </label>
-                                    </div>
-                                  </div>
-                                  <div className="inner_form_new ">
-                                    <label className="controlform">
-                                      Directives
-                                    </label>
-                                    <div className="form-bx">
-                                      <label>
-                                        <ul className="nalist">
-                                          {item?.directiveData
-                                            ?.length ? (
-                                            item?.directiveData?.map(
-                                              (res) => {
-                                                return (
-                                                  <li>{res?.directiveName}</li>
-                                                );
-                                              }
-                                            )
-                                          ) : (
-                                            <li className="disabletext">
-                                              N/A
-                                            </li>
-                                          )}
-                                        </ul>
+                                      <div className="form-bx">
+                                        <label>
+                                          <ul className="nalist">
+                                            {item?.directiveData
+                                              ?.length ? (
+                                              item?.directiveData?.map(
+                                                (res) => {
+                                                  return (
+                                                    <li>{res?.directiveName}</li>
+                                                  );
+                                                }
+                                              )
+                                            ) : (
+                                              <li className="disabletext">
+                                                N/A
+                                              </li>
+                                            )}
+                                          </ul>
+                                        </label>
+                                      </div>
+                                    </div> */}
+                                    <div className="inner_form_new">
+                                      <label className="controlform">
+                                        Releasing Date
                                       </label>
+                                      <div className="form-bx">
+                                        <label>
+                                          <input
+                                            type="text"
+                                            className=""
+                                            disabled
+                                            value={moment(
+                                              item?.releasingDate
+                                            ).format("DD/MMM/yyyy")}
+                                          />
+                                        </label>
+                                      </div>
                                     </div>
-                                  </div>
-                                  <div className="inner_form_new">
-                                    <label className="controlform">
-                                      Releasing Date
-                                    </label>
-                                    <div className="form-bx">
-                                      <label>
-                                        <input
-                                          type="text"
-                                          className=""
-                                          disabled
-                                          value={moment(
-                                            item?.releasingDate
-                                          ).format("DD/MMM/yyyy")}
-                                        />
-                                      </label>
-                                    </div>
-                                  </div>
-                                  {/* <div class="row">
+                                    {/* <div class="row">
                                       <div class="col-md-12">
                                         <div class="inner_form_new ">
                                           <label class="controlform">
@@ -8019,39 +4579,249 @@ const ExportCircularsEditForm = ({
                                     </div> */}
 
 
-                                  <div
-                                    className={
-                                      item?.assignedToName == null &&
-                                        item?.assignedToName == null
-                                        ? "d-none"
-                                        : "row"
-                                    }
-                                  >
+                                    <div
+                                      className={
+                                        item?.assignedToName == null &&
+                                          item?.assignedToName == null
+                                          ? "d-none"
+                                          : "row"
+                                      }
+                                    >
+                                      <div className="col-md-6">
+                                        <div className="inner_form_new ">
+                                          <label className="controlform">
+                                            Assigned To Role
+                                          </label>
+                                          <div className="form-bx">
+                                            <label>
+                                              <input
+                                                type="text"
+                                                className=""
+                                                disabled
+                                                value={
+                                                  item?.roleName
+                                                    ? item?.roleName
+                                                    : ""
+                                                }
+                                              />
+                                            </label>
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <div className="col-md-6">
+                                        <div className="inner_form_new-sm ">
+                                          <label className="controlform-sm">
+                                            Assigned To User
+                                          </label>
+                                          <div className="form-bx-sm">
+                                            <label>
+                                              <input
+                                                type="text"
+                                                className=""
+                                                disabled
+                                                value={
+                                                  item?.assignedToName
+                                                    ? item?.assignedToName
+                                                    : ""
+                                                }
+                                              />
+                                            </label>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </>
+                              );
+                            }
+                          });
+                      })}
+
+                    </div>
+                  </div>
+                </>
+              ) : (
+                ""
+              )}
+              {/* senior analyst code end */}
+              {/* Principal analyst code start */}
+
+              {roleID >= 7 ? (
+                <>
+                  <h5
+                    className={
+                      principalanalystTab
+                        ? "section_top_subheading mt-3 py-3 btn-collapse_active cursorpointer"
+                        : "section_top_subheading mt-3 py-3 cursorpointer"
+                    }
+                    onClick={() => setprincipalanalystTab(!principalanalystTab)}
+                  >
+                    Principal Analyst{" "}
+
+                    <span className="btn-collapse">
+                      <i className="bi bi-caret-down-fill"></i>
+                    </span>
+                  </h5>
+
+                  <div className={principalanalystTab ? "customtab" : "d-none"}>
+
+                    {allcomment?.map((cur, i) => {
+                      if (cur.assignedToRoleID == 7) {
+                        return (
+                          <ul
+                            className={
+                              cur?.circularActivityData?.length >= 1
+                                ? "nav nav-pills mb-3"
+                                : "d-none"
+                            }
+                            role="tablist"
+                          >
+                            <li
+                              className={roleID == 7 ? "nav-item" : "d-none"}
+                              role="presentation"
+                            >
+                              <button
+                                className={
+                                  roleID == 7
+                                    ? "nav-link w-100 border-radius0 active"
+                                    : "nav-link w-100 border-radius0"
+                                }
+                                id="pranalyst"
+                                data-bs-toggle="tab"
+                                data-bs-target="#pranalyst-justified-home"
+                                type="button"
+                                role="tab"
+                                aria-controls="home"
+                                aria-selected="true"
+                              >
+                                Action
+                              </button>
+                            </li>
+
+                            {cur?.circularActivityData
+                              ?.slice()
+                              ?.reverse()
+                              .map((items, index) => {
+                                return (
+                                  <li className="nav-item" role="presentation">
+                                    <button
+                                      className={
+                                        index == 0 && roleID != 7
+                                          ? "nav-link w-100 border-radius0 active"
+                                          : "nav-link border-radius0 w-100 "
+                                      }
+                                      id={"pranalyst" + index}
+                                      data-bs-toggle="tab"
+                                      data-bs-target={
+                                        "#pranalyst-justified-home" + index
+                                      }
+                                      type="button"
+                                      role="tab"
+                                      aria-controls="home"
+                                      aria-selected="true"
+                                    >
+
+                                      Response{" "}
+                                      {cur?.circularActivityData?.length -
+                                        index}
+                                    </button>
+                                  </li>
+                                );
+                              })}
+                          </ul>
+                        );
+                      }
+
+                    })}
+
+
+                    <div className="tab-content pt-2">
+                      <div
+                        className={
+                          roleID >= 7
+                            ? "tab-pane fade show active"
+                            : "tab-pane fade show "
+                        }
+                        id="pranalyst-justified-home"
+                        role="tabpanel"
+                        aria-labelledby="pranalyst"
+                      >
+                        {Actiondata?.map((cur) => {
+                          const firstItem = cur?.circularActivityData?.[0]; // Accessing the first element directly
+                          if (cur?.assignedToRoleID === 7 && firstItem) {
+                            // Check if firstItem exists
+                            return (
+                              <div className="bakgroundaction">
+                                <div key={firstItem.circularID}>
+                                  {" "}
+                                  {/* Remember to add a unique key */}
+                                  <div className="row">
                                     <div className="col-md-6">
-                                      <div className="inner_form_new ">
+                                      <div className="inner_form_new">
                                         <label className="controlform">
-                                          Assigned To Role
+                                          Action Type
                                         </label>
                                         <div className="form-bx">
                                           <label>
+                                            {" "}
                                             <input
                                               type="text"
                                               className=""
                                               disabled
+                                              // value={firstItem?.actionStatusName}
                                               value={
-                                                item?.roleName
-                                                  ? item?.roleName
-                                                  : ""
+                                                firstItem?.actionStatusName ==
+                                                  "Approved" ||
+                                                  firstItem?.actionStatusName ==
+                                                  "Reject" ||
+                                                  firstItem?.actionStatusName ==
+                                                  "Cancelled" ||
+                                                  firstItem?.actionStatusName ==
+                                                  "Draft"
+                                                  ? "Assigned"
+                                                  : firstItem?.actionStatusName
                                               }
                                             />
                                           </label>
                                         </div>
                                       </div>
                                     </div>
-                                    <div className="col-md-6">
-                                      <div className="inner_form_new-sm ">
+
+                                    <div className="col-md-3">
+                                      <div className="inner_form_new-sm">
                                         <label className="controlform-sm">
-                                          Assigned To User
+                                          User{" "}
+                                          <i
+                                            className="bi bi-info-circle icons-info"
+                                            title={`Role : ${firstItem?.actionRoleName}`}
+                                          ></i>
+                                        </label>
+                                        <div className="form-bx-sm">
+                                          <label>
+                                            {" "}
+                                            <input
+                                              type="text"
+                                              className=""
+                                              disabled
+                                              value={firstItem?.actionUserName}
+                                            />
+                                          </label>
+                                        </div>
+                                      </div>
+                                    </div>
+
+                                    <div className="col-md-3">
+                                      <div className="inner_form_new-sm">
+                                        <label className="controlform-sm">
+                                          {firstItem?.actionStatusName ==
+                                            "Approved" ||
+                                            firstItem?.actionStatusName ==
+                                            "Reject" ||
+                                            firstItem?.actionStatusName ==
+                                            "Cancelled"
+                                            ? "Assigned"
+                                            : firstItem?.actionStatusName}{" "}
+                                          Date
                                         </label>
                                         <div className="form-bx-sm">
                                           <label>
@@ -8059,46 +4829,3642 @@ const ExportCircularsEditForm = ({
                                               type="text"
                                               className=""
                                               disabled
-                                              value={
-                                                item?.assignedToName
-                                                  ? item?.assignedToName
-                                                  : ""
-                                              }
+                                              value={moment(
+                                                firstItem?.createdDate
+                                              ).format("DD/MMM/yyyy")}
                                             />
                                           </label>
                                         </div>
                                       </div>
                                     </div>
                                   </div>
+                                  <div
+                                    className={
+                                      firstItem?.actionNotes
+                                        ? "inner_form_new"
+                                        : "d-none"
+                                    }
+                                  >
+                                    <label className="controlform">
+                                      Action Note
+                                    </label>
+                                    <div className="form-bx">
+                                      <label>
+                                        {" "}
+                                        <textarea
+                                          type="text"
+                                          className=""
+                                          disabled
+                                          value={firstItem?.actionNotes}
+                                        />
+                                      </label>
+                                    </div>
+                                  </div>
+                                  <div
+                                    className={
+                                      firstItem?.actionComment
+                                        ? "inner_form_new"
+                                        : "d-none"
+                                    }
+                                  >
+                                    <label className="controlform">
+                                      Action Comment
+                                    </label>
+                                    <div className="form-bx">
+                                      <label>
+                                        {" "}
+                                        <textarea
+                                          type="text"
+                                          className=""
+                                          disabled
+                                          value={firstItem?.actionComment}
+                                        />
+                                      </label>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            );
+                          }
+                        })}
+                        {/* next level data show and assign behalf of not equal userID  start*/}
+                        {applicationDetail?.userID !== UserID.replace(/"/g, "") && roleID == 7 ? 
+                        <>
+                          <div
+                            className={
+                              roleID == 7
+                                ? "inner_form_new align-items-center"
+                                : "d-none"
+                            }
+                          >
+                            <label className="controlform">Next Action</label>
+                            <div className="row">
+                              <div className="col-md-12 my-2">
+                                <div className="hidden-toggles">
+
+                                  <input
+                                    type="radio"
+                                    id="prasignto"
+                                    onChange={(e) => {
+                                      setcheckSupervisor(true);
+                                      supervisorHangechangeRole(e);
+                                      ChangeNextlevelHandle(e);
+                                      setAssignUserID("");
+                                      GetRoleHandle(10);
+                                      setapplicationstaus(
+                                        applicationDetail?.analystRecommendation
+                                      );
+                                    }}
+                                    onClick={() => setRecomdAnalyst("")}
+                                    name="nextactionprincipal"
+                                    className="hidden-toggles__input"
+                                    value="10"
+                                  />
+                                  <label
+                                    for="prasignto"
+                                    className="hidden-toggles__label"
+                                  >
+                                    Assign
+                                  </label>
+
+                                  <input
+                                    type="radio"
+                                    id="prcoloration-Refer"
+                                    onChange={(e) => {
+                                      ChangeNextlevelHandle(e);
+                                      // ChangeApplicationStatus(e);
+                                      setcheckSupervisor(true);
+                                      GetRoleHandle(15);
+                                      setAssignUserID("");
+                                      setapplicationstaus(
+                                        applicationDetail?.analystRecommendation
+                                      );
+                                    }}
+                                    onClick={() => setRecomdAnalyst("")}
+                                    name="nextactionprincipal"
+                                    // name="applicationstaus"
+                                    value="15"
+                                    className="hidden-toggles__input"
+                                  />
+                                  <label
+                                    for="prcoloration-Refer"
+                                    className="hidden-toggles__label"
+                                  >
+                                    Refer Back
+                                  </label>
 
 
                                 </div>
-                              </>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div
+                            className={checkSupervisor == true ? "row" : "d-none"}
+                          >
+                            <div className="col-md-12 d-flex c-gap">
+                              <div
+                                className={
+                                  nextlevelvalue == 15 ? "w-50" : "d-none"
+                                }
+                              >
+                                {checkSupervisor == true &&
+                                  roleID == 7 &&
+                                  recomdAnalyst != "121" ? (
+                                  <>
+                                    <div className="inner_form_new">
+                                      <label className="controlform">Role</label>
+
+                                      <div className="form-bx">
+                                        <label>
+                                          <select
+                                            ref={assignedToRef}
+                                            name="SupervisorRoleId"
+                                            onChange={(e) => {
+                                              supervisorHangechangeRole(e);
+                                              handleUserRole(e);
+                                            }}
+                                            className={
+                                              errors.assignedTo &&
+                                                !SupervisorRoleId
+                                                ? "error"
+                                                : ""
+                                            }
+                                          >
+                                            <option value="">Select Role</option>
+                                            {userRole?.map((item, index) => {
+                                              return (
+                                                <option
+                                                  key={index}
+                                                  value={item.id}
+                                                >
+                                                  {item.designation}
+                                                </option>
+                                              );
+                                            })}
+                                          </select>
+                                          <span className="sspan"></span>
+                                          {errors.assignedTo &&
+                                            !SupervisorRoleId ? (
+                                            <small className="errormsg">
+                                              Role is required{" "}
+                                            </small>
+                                          ) : (
+                                            ""
+                                          )}
+                                        </label>
+                                      </div>
+                                    </div>
+                                    {/* end form-bx  */}
+                                  </>
+                                ) : (
+                                  ""
+                                )}
+                              </div>
+                              <div
+                                className={
+                                  nextlevelvalue == 15 ? "w-50" : "w-100"
+                                }
+                              >
+                                {roleID == 7 && recomdAnalyst != "121" ? (
+                                  <>
+                                    <div className="inner_form_new">
+                                      <label className="controlform">User</label>
+
+                                      <div className="form-bx">
+                                        <label>
+                                          <select
+                                            ref={assignedToRef}
+                                            name="AssignUserID"
+                                            onChange={(e) =>
+                                              supervisorHangechange(e)
+                                            }
+                                            className={
+                                              errors.assignUserID && !AssignUserID
+                                                ? "error"
+                                                : ""
+                                            }
+                                          >
+                                            <option value="">Select User</option>
+                                            {asignUser?.map((item, index) => {
+                                              return (
+                                                <option
+                                                  key={index}
+                                                  value={item.userID}
+                                                >
+                                                  {item.name}
+                                                </option>
+                                              );
+                                            })}
+                                          </select>
+                                          <span className="sspan"></span>
+                                          {errors.assignUserID &&
+                                            !AssignUserID ? (
+                                            <small className="errormsg">
+                                              {errors.assignUserID}
+                                            </small>
+                                          ) : (
+                                            ""
+                                          )}
+                                        </label>
+                                      </div>
+                                    </div>
+                                    {/* end form-bx  */}
+                                  </>
+                                ) : (
+                                  ""
+                                )}
+                              </div>
+
+                              {/* end form-bx  */}
+                            </div>
+                          </div>
+                          {roleID == 7 && <p>
+                            {attachmentData?.map((items, index) => {
+                              return (
+                                <div
+                                  className="attachemt_form-bx  mt-2"
+                                  key={items.id}
+                                >
+                                  <label
+                                    style={{
+                                      background: "#d9edf7",
+                                      padding: "9px 3px",
+                                      border: "0px",
+                                    }}
+                                  >
+                                    <span style={{ fontWeight: "500" }}>
+                                      {items.filename}
+                                    </span>
+                                  </label>
+                                  <div className="browse-btn">
+                                    Browse
+                                    <input
+                                      type="file"
+                                      onChange={(e) =>
+                                        handleuserFileChange(e, "circular" + (index + 1))
+                                      }
+                                    />
+                                  </div>
+                                  <span className="filename">
+                                    {userfiles?.find(
+                                      (f) => f.id === "circular" + (index + 1)
+                                    )?.file?.name || "No file chosen"}
+                                  </span>
+                                  {userfiles?.length &&
+                                    userfiles?.find((f) => f.id === "circular" + (index + 1))
+                                      ?.file?.name ? (
+                                    <button
+                                      type="button"
+                                      className="remove-file"
+                                      onClick={() =>
+                                        removeUserImage(index, "circular" + (index + 1))
+                                      }
+                                    >
+                                      Remove
+                                    </button>
+                                  ) : (
+                                    ""
+                                  )}
+                                </div>
+                              );
+                            })}
+
+                            {otheruserfiles.map((file, index) => (
+                              <div
+                                key={"other" + (index + 1)}
+                                className="attachemt_form-bx"
+                              >
+                                <label
+                                  style={{
+                                    background: "#d9edf7",
+                                    padding: "9px 3px",
+                                    border: "0px",
+                                  }}
+                                >
+                                  <b>
+                                    Other File
+                                    {index + 1}
+                                  </b>
+                                </label>
+                                <div className="browse-btn">
+                                  Browse{" "}
+                                  <input
+                                    type="file"
+                                    onChange={(e) => {
+                                      handleuserFileChange(e, "other" + index);
+                                      handleOthrefile(e, `other ${index}`);
+                                    }}
+                                  />
+                                </div>
+                                <span className="filename">
+                                  {userfiles?.find((f) => f.id === "other" + index)
+                                    ?.file?.name || "No file chosen"}
+                                </span>
+
+                                {userfiles?.length &&
+                                  userfiles?.find((f) => f.id === "other" + index)
+                                    ?.file?.name ? (
+                                  <button
+                                    type="button"
+                                    className="remove-file"
+                                    onClick={() =>
+                                      removeUserImage(index, "other" + index)
+                                    }
+                                  >
+                                    Remove
+                                  </button>
+                                ) : (
+                                  ""
+                                )}
+                              </div>
+                            ))}
+
+                            {otheruserfiles?.length || userfiles?.length ? (
+                              <div className="attachemt_form-bx">
+                                <label style={{ border: "0px" }}>{""}</label>
+                                <button
+                                  type="button"
+                                  className="addmore-btn mt-0"
+                                  onClick={(e) => handleuserAddMore(e)}
+                                >
+                                  {" "}
+                                  Add More File{" "}
+                                </button>
+                              </div>
+                            ) : (
+                              ""
+                            )}
+                          </p>}
+                          <div
+                            className={
+                              roleID == 7
+                                ? "inner_form_new align-items-start mt-2"
+                                : "d-none"
+                            }
+                          >
+                            <label className="controlform">Recommendation</label>
+                            <div className="form-bx editorFieldBox">
+                              <div className="mt-2 py-1">
+                                <MenuBar editor={editorPrincipleAnalyst} />
+                                <EditorContent editor={editorPrincipleAnalyst} />
+
+                                <span className="sspan"></span>
+                                {(errors.Description && Description == " ") ||
+                                  Description == null ||
+                                  Description == "<p></p>" ||
+                                  !Description ? (
+                                  <small className="errormsg">
+                                    {errors.Description}
+                                  </small>
+                                ) : (
+                                  ""
+                                )}
+                              </div>
+                            </div>
+                          </div>
+
+                          <div
+                            className={roleID == 7 ? "inner_form_new " : "d-none"}
+                          >
+                            <label className="controlform">
+                              {nextlevelvalue == "10"
+                                ? "Assign Notes"
+                                : nextlevelvalue == "20"
+                                  ? "Delegate Notes"
+                                  : nextlevelvalue == "35"
+                                    ? "Referred to Other Department Notes"
+                                    : nextlevelvalue == "15"
+                                      ? "Refer Back Notes"
+                                      : "Notes"}
+                            </label>
+
+                            <div className="form-bx">
+                              <label>
+                                <textarea
+                                  name="Notes"
+                                  onChange={(e) => {
+                                    HandleNextleveldata(e);
+                                  }}
+                                  placeholder={
+                                    nextlevelvalue == "10"
+                                      ? "Assign Notes"
+                                      : nextlevelvalue == "20"
+                                        ? "Delegate Notes"
+                                        : nextlevelvalue == "35"
+                                          ? "Referred to Other Department Notes"
+                                          : nextlevelvalue == "15"
+                                            ? "Refer Back Notes"
+                                            : "Notes"
+                                  }
+                                  className={errors.Notes ? "error" : ""}
+                                  value={asignnextLeveldata.Notes}
+                                />
+                                <span className="sspan"></span>
+                                {errors.Notes ? (
+                                  <small className="errormsg">
+                                    {nextlevelvalue == "10"
+                                      ? "Assign notes is required"
+                                      : nextlevelvalue == "20"
+                                        ? "Delegate notes is required"
+                                        : nextlevelvalue == "35"
+                                          ? "Referred to other department notes is required"
+                                          : nextlevelvalue == "15"
+                                            ? "Refer back notes is required"
+                                            : "Notes is required"}
+                                  </small>
+                                ) : (
+                                  ""
+                                )}
+                              </label>
+                            </div>
+                          </div>
+                          {/* end form-bx  */}
+
+                          <div
+                            className={roleID == 7 ? "inner_form_new " : "d-none"}
+                          >
+                            <label className="controlform">
+                              {nextlevelvalue == "10"
+                                ? "Assign Comments"
+                                : nextlevelvalue == "20"
+                                  ? "Delegate Comments"
+                                  : nextlevelvalue == "35"
+                                    ? "Referred to Other Department Comments"
+                                    : nextlevelvalue == "15"
+                                      ? "Refer Back Comments"
+                                      : "Comments"}
+                            </label>
+
+                            <div className="form-bx">
+                              <label>
+                                <textarea
+                                  name="Comment"
+                                  onChange={(e) => {
+                                    HandleNextleveldata(e);
+                                  }}
+                                  placeholder={
+                                    nextlevelvalue == "10"
+                                      ? "Assign Comments"
+                                      : nextlevelvalue == "20"
+                                        ? "Delegate Comments"
+                                        : nextlevelvalue == "35"
+                                          ? "Referred to Other Department Comments"
+                                          : nextlevelvalue == "15"
+                                            ? "Refer Back Comments"
+                                            : "Comments"
+                                  }
+                                  className={errors.Comment ? "error" : ""}
+                                  value={asignnextLeveldata.Comment}
+                                />
+                                <span className="sspan"></span>
+                                {errors.Comment ? (
+                                  <small className="errormsg">
+                                    {nextlevelvalue == "10"
+                                      ? "Assign comments is required"
+                                      : nextlevelvalue == "20"
+                                        ? "Delegate comments is required"
+                                        : nextlevelvalue == "35"
+                                          ? "Referred to other department comments is required"
+                                          : nextlevelvalue == "15"
+                                            ? "Refer back comments is required"
+                                            : "Comments is required"}
+                                  </small>
+                                ) : (
+                                  ""
+                                )}
+                              </label>
+                            </div>
+                          </div>
+
+                          <div className={roleID == 7 ? "inner_form_new align-items-center" : "d-none"} >
+                            <label className="controlform">Bank </label>
+                            <div className=" cccto">
+                              <div className="flex justify-content-center multiSelect">
+                                <MultiSelect
+                                  value={selectedBanks}
+                                  onChange={(e) => setSelectedBanks(e.value)}
+                                  options={vOption}
+                                  onShow={onShow}
+                                  optionLabel="name"
+                                  placeholder="Select Banks"
+                                  // maxSelectedLabels={3}
+                                  display="chip"
+                                  className="w-full md:w-20rem"
+                                />
+
+                              </div>
+                            </div>
+                          </div>
+                          {/* end form-bx  */}
+                          <div className={roleID == 7 ? "inner_form_new" : "d-none"}>
+                            <label className="controlform">Directives</label>
+                            <div className="form-bx">
+                              <div className="multiselect flex justify-content-center">
+                                <MultiSelect
+                                  value={selectedDirectives}
+                                  onChange={(e) => setSelectedDirectives(e.value)}
+                                  options={DirectiveOption}
+                                  optionLabel="name"
+                                  name="directiveData"
+                                  placeholder="Select Directives"
+                                  display="chip"
+                                />
+                                {errors?.directiveData ? (
+                                  <small className="errormsg">{errors.directiveData}</small>
+                                ) : (
+                                  ""
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                          {/* end form-bx  */}
+                          {/* end form-bx  */}
+                          <div className={roleID == 7 ? "inner_form_new" : "d-none"}>
+                            <label className="controlform">Releasing Date</label>
+                            <div className="form-bx">
+                              <DatePicker
+                                placeholderText="Select Releasing Date"
+                                closeOnScroll={(e) => e.target === document}
+                                selected={releasingDate}
+                                onChange={(date) => setReleasingDate(date)}
+                                peekNextMonth
+                                showMonthDropdown
+                                showYearDropdown
+                                minDate={new Date()}
+                                dropdownMode="select"
+                                dateFormat="dd/MMMM/yyyy"
+                              />
+                              {
+                                errors?.releasingDate ? (
+                                  <small className="errormsg">{errors.releasingDate}</small>
+                                ) : (" ")
+                              }
+                            </div>
+                          </div>
+                          {/* end form-bx  */}
+
+                        </> : (
+                        <span>
+                          {/* {noDataComment?.map((v, i) => {
+                          if (v.roleID == 7 && v.isDataAvailable == 0) {
+                            return (
+                              <div
+                                className={principalanalystTab ? "customtab" : "d-none"}
+                              >
+                                <div class="text-center">No Data Found</div>
+                              </div>
                             );
                           }
-                        });
-                    })}
+                        })} */}
+                        </span>
+                        )
+                        }
+                        {/* next level data show and assign behalf of not equal userID  end*/}
+                      </div>
+                      {allcomment?.map((cur) => {
+                        return cur?.circularActivityData
+                          ?.slice()
+                          ?.reverse()
+                          .map((item, index) => {
+                            if (cur?.assignedToRoleID == 7) {
+                              return (
+                                <>
+                                  <div
+                                    key={index}
+                                    className={
+                                      index == 0 && roleID != 7
+                                        ? "tab-pane fade show active"
+                                        : "tab-pane fade show  "
+                                    }
+                                    id={"pranalyst-justified-home" + index}
+                                    role="tabpanel"
+                                    aria-labelledby={"pranalyst" + index}
+                                  >
+                                    <div className={item?.actionStatusName ? "bakgroundaction" : "d-none"}>
+                                      <div className="row">
+                                        <div className="col-md-6">
+                                          <div className="inner_form_new ">
+                                            <label className="controlform">
+                                              Action Type
+                                            </label>
+                                            <div className="form-bx">
+                                              <label>
+                                                <input
+                                                  type="text"
+                                                  className=""
+                                                  disabled
+                                                  // value={item?.actionStatusName}
+                                                  value={
+                                                    item?.actionStatusName ==
+                                                      "Approved" ||
+                                                      item?.actionStatusName ==
+                                                      "Reject" ||
+                                                      item?.actionStatusName ==
+                                                      "Cancelled" ||
+                                                      item?.actionStatusName ==
+                                                      "Draft"
+                                                      ? "Assigned"
+                                                      : item?.actionStatusName
+                                                  }
+                                                />
+                                              </label>
+                                            </div>
+                                          </div>
+                                        </div>
+
+                                        <div className="col-md-3">
+                                          <div className="inner_form_new-sm ">
+                                            <label className="controlform-sm">
+                                              User{" "}
+                                              <i
+                                                className="bi bi-info-circle icons-info"
+                                                title={`Role : ${item?.actionRoleName}`}
+                                              ></i>
+                                            </label>
+                                            <div className="form-bx-sm">
+                                              <label>
+                                                <input
+                                                  type="text"
+                                                  className=""
+                                                  disabled
+                                                  value={item?.actionUserName}
+                                                />
+                                              </label>
+                                            </div>
+                                          </div>
+                                        </div>
+
+                                        <div className="col-md-3">
+                                          <div className="inner_form_new-sm">
+                                            <label className="controlform-sm">
+                                              {item?.actionStatusName ==
+                                                "Approved" ||
+                                                item?.actionStatusName ==
+                                                "Reject" ||
+                                                item?.actionStatusName ==
+                                                "Cancelled"
+                                                ? "Assigned"
+                                                : item?.actionStatusName}{" "}
+                                              Date
+                                            </label>
+                                            <div className="form-bx-sm">
+                                              <label>
+                                                <input
+                                                  type="text"
+                                                  className=""
+                                                  disabled
+                                                  value={moment(
+                                                    item?.createdDate
+                                                  ).format("DD/MMM/yyyy")}
+                                                />
+                                              </label>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+
+                                      <div
+                                        className={
+                                          item?.actionNotes
+                                            ? "inner_form_new "
+                                            : "d-none"
+                                        }
+                                      >
+                                        <label className="controlform">
+                                          Action Note
+                                        </label>
+                                        <div className="form-bx">
+                                          <label>
+                                            <textarea
+                                              disabled
+                                              value={
+                                                item?.actionNotes
+                                                  ? item?.actionNotes
+                                                  : "N/A"
+                                              }
+                                            />
+                                          </label>
+                                        </div>
+                                      </div>
+
+                                      <div
+                                        className={
+                                          item?.actionComment
+                                            ? "inner_form_new "
+                                            : "d-none"
+                                        }
+                                      >
+                                        <label className="controlform">
+                                          Action Comment
+                                        </label>
+                                        <div className="form-bx">
+                                          <label>
+                                            <textarea
+                                              disabled
+                                              value={item?.actionComment}
+                                            />
+                                          </label>
+                                        </div>
+                                      </div>
+                                    </div>
+
+
+                                    <div className="inner_form_new">
+                                      <label className="controlform">
+                                        Recommendation hey
+                                      </label>
+                                      <div className="form-bx">
+                                        <label>
+                                          <div
+                                            className="tableEditorData disabled viewdiscription circularEdiorDisData"
+                                            dangerouslySetInnerHTML={{
+                                              __html: item?.content
+                                                ? item?.content
+                                                : "N/A",
+                                            }}
+                                            disabled
+                                          />
+                                        </label>
+                                      </div>
+                                    </div>
+
+                                    <div className="inner_form_new ">
+                                      <label className="controlform">
+                                        Notes
+                                      </label>
+                                      <div className="form-bx">
+                                        <label>
+                                          <textarea
+                                            name="Notes"
+                                            placeholder="Notes"
+                                            className=""
+                                            disabled
+                                          >
+                                            {item?.notes ? item?.notes : "N/A"}
+                                          </textarea>
+                                        </label>
+                                      </div>
+                                    </div>
+                                    <div className="inner_form_new ">
+                                      <label className="controlform">
+                                        Comments
+                                      </label>
+                                      <div className="form-bx">
+                                        <label>
+                                          <textarea
+                                            name="Notes"
+                                            placeholder="Comments"
+                                            className=""
+                                            disabled
+                                          >
+                                            {item?.comment
+                                              ? item?.comment
+                                              : "N/A"}
+                                          </textarea>
+                                        </label>
+                                      </div>
+                                    </div>
+
+                                    <div className="inner_form_new ">
+                                      <label className="controlform">
+                                        Attachments
+                                      </label>
+                                      <div className="form-bx">
+                                        {item?.filesData?.length ? (
+                                          item?.filesData?.map(
+                                            (items, index) => {
+                                              return (
+                                                <div
+                                                  className="attachemt_form-bx mb-0 width-80"
+                                                  key={items.id}
+                                                >
+                                                  <label className="mb-2 mb-0 pt-2 pb-2">
+
+                                                    {items?.fileName
+                                                      ? items?.fileName
+                                                      : `FileUpload ${index}`}
+                                                  </label>
+                                                  <div
+                                                    className={
+                                                      roleID == 2 || roleID == 3
+                                                        ? "browse-btn"
+                                                        : "d-none"
+                                                    }
+                                                  >
+                                                    Browse{" "}
+                                                    <input
+                                                      type="file"
+                                                      onChange={(e) =>
+                                                        handleFileChange(
+                                                          e,
+                                                          items.id
+                                                        )
+                                                      }
+                                                    />
+                                                  </div>
+                                                  <span className="filename">
+                                                    <Link
+                                                      to={items?.filePath}
+                                                      target="_blank"
+                                                      className="viewbtn"
+                                                    >
+                                                      View File
+                                                    </Link>
+                                                  </span>
+                                                </div>
+                                              );
+                                            }
+                                          )
+                                        ) : (
+                                          <label className="notfound">
+                                            File Not Found
+                                          </label>
+                                        )}
+                                      </div>
+                                    </div>
+
+                                    {/* <div className="inner_form_new ">
+                                      <label className="controlform">
+                                        Bank
+                                      </label>
+                                      <div className="form-bx">
+                                        <label>
+                                          <ul className="nalist">
+                                            {item?.bankData
+                                              ?.length ? (
+                                              item?.bankData?.map(
+                                                (res) => {
+                                                  return (
+                                                    <li>{res?.bankName}</li>
+                                                  );
+                                                }
+                                              )
+                                            ) : (
+                                              <li className="disabletext">
+                                                N/A
+                                              </li>
+                                            )}
+                                          </ul>
+                                        </label>
+                                      </div>
+                                    </div>
+                                    <div className="inner_form_new ">
+                                      <label className="controlform">
+                                        Directives 
+                                      </label>
+                                      <div className="form-bx">
+                                        <label>
+                                          <ul className="nalist">
+                                            {item?.directiveData
+                                              ?.length ? (
+                                              item?.directiveData?.map(
+                                                (res) => {
+                                                  return (
+                                                    <li>{res?.directiveName}</li>
+                                                  );
+                                                }
+                                              )
+                                            ) : (
+                                              <li className="disabletext">
+                                                N/A
+                                              </li>
+                                            )}
+                                          </ul>
+                                        </label>
+                                      </div>
+                                    </div> */}
+                                    <div className="inner_form_new">
+                                      <label className="controlform">
+                                        Releasing Date
+                                      </label>
+                                      <div className="form-bx">
+                                        <label>
+                                          <input
+                                            type="text"
+                                            className=""
+                                            disabled
+                                            value={moment(
+                                              item?.releasingDate
+                                            ).format("DD/MMM/yyyy")}
+                                          />
+                                        </label>
+                                      </div>
+                                    </div>
+
+                                    <div
+                                      className={
+                                        item?.assignedToName == null &&
+                                          item?.assignedToName == null
+                                          ? "d-none"
+                                          : "row"
+                                      }
+                                    >
+                                      <div className="col-md-6">
+                                        <div className="inner_form_new ">
+                                          <label className="controlform">
+                                            Assigned To Role
+                                          </label>
+                                          <div className="form-bx">
+                                            <label>
+                                              <input
+                                                type="text"
+                                                className=""
+                                                disabled
+                                                value={
+                                                  item?.roleName
+                                                    ? item?.roleName
+                                                    : ""
+                                                }
+                                              />
+                                            </label>
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <div className="col-md-6">
+                                        <div className="inner_form_new-sm ">
+                                          <label className="controlform-sm">
+                                            Assigned To User
+                                          </label>
+                                          <div className="form-bx-sm">
+                                            <label>
+                                              <input
+                                                type="text"
+                                                className=""
+                                                disabled
+                                                value={
+                                                  item?.assignedToName
+                                                    ? item?.assignedToName
+                                                    : ""
+                                                }
+                                              />
+                                            </label>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </>
+                              );
+                            }
+                          });
+                      })}
+
+                    </div>
                   </div>
-                </div>
-              </>
-            ) : (
-              ""
-            )}
-            {/* director code end */}
+                </>
+              ) : (
+                ""
+              )}
 
-            <div className="form-footer mt-5 mb-3">
-              <button
-                type="reset"
-                onClick={(e) => {
-                  EditModalClose(e);
-                }}
-                className="register"
-              >
-                Close
-              </button>
+              {/* Principal analyst code end */}
+              {/* Dupty director code start */}
+              {roleID >= 8 ? (
+                <>
+                  <h5
+                    className={
+                      deputyTab
+                        ? "section_top_subheading mt-3 py-3 btn-collapse_active cursorpointer"
+                        : "section_top_subheading mt-3 py-3 cursorpointer"
+                    }
+                    onClick={() => setdeputyTab(!deputyTab)}
+                  >
+                    Deputy Director{" "}
 
-              <div>
-                {/* {(roleID > 5 &&
+                    <span className="btn-collapse">
+                      <i className="bi bi-caret-down-fill"></i>
+                    </span>
+                  </h5>
+
+                  <div className={deputyTab ? "customtab" : "d-none"}>
+
+
+                    {allcomment?.map((cur, i) => {
+                      if (cur.assignedToRoleID == 8) {
+                        return (
+                          <ul
+                            className={
+                              cur?.circularActivityData?.length >= 1
+                                ? "nav nav-pills mb-3"
+                                : "d-none"
+                            }
+                            role="tablist"
+                          >
+                            <li
+                              className={roleID == 8 ? "nav-item" : "d-none"}
+                              role="presentation"
+                            >
+                              <button
+                                className={
+                                  roleID == 8
+                                    ? "nav-link w-100 border-radius0 active"
+                                    : "nav-link w-100 border-radius0"
+                                }
+                                id="deputy"
+                                data-bs-toggle="tab"
+                                data-bs-target="#deputy-justified-home"
+                                type="button"
+                                role="tab"
+                                aria-controls="home"
+                                aria-selected="true"
+                              >
+                                Action
+                              </button>
+                            </li>
+
+                            {cur?.circularActivityData
+                              ?.slice()
+                              ?.reverse()
+                              .map((items, index) => {
+                                return (
+                                  <li className="nav-item" role="presentation">
+                                    <button
+                                      className={
+                                        index == 0 && roleID != 8
+                                          ? "nav-link w-100 border-radius0 active"
+                                          : "nav-link border-radius0 w-100 "
+                                      }
+                                      id={"deputy" + index}
+                                      data-bs-toggle="tab"
+                                      data-bs-target={
+                                        "#deputy-justified-home" + index
+                                      }
+                                      type="button"
+                                      role="tab"
+                                      aria-controls="home"
+                                      aria-selected="true"
+                                    >
+
+                                      Response{" "}
+                                      {cur?.circularActivityData?.length -
+                                        index}
+                                    </button>
+                                  </li>
+                                );
+                              })}
+                          </ul>
+                        );
+                      }
+                    })
+                    }
+
+                    <div className="tab-content pt-2">
+                      <div
+                        className={
+                          roleID >= 8
+                            ? "tab-pane fade show active"
+                            : "tab-pane fade show "
+                        }
+                        id="deputy-justified-home"
+                        role="tabpanel"
+                        aria-labelledby="deputy"
+                      >
+                        {Actiondata?.map((cur) => {
+                          const firstItem = cur?.circularActivityData?.[0]; // Accessing the first element directly
+
+                          if (cur?.assignedToRoleID === 8 && firstItem) {
+                            // Check if firstItem exists
+                            return (
+                              <div className="bakgroundaction">
+                                <div key={firstItem.actionID}>
+                                  {" "}
+                                  {/* Remember to add a unique key */}
+                                  <div className="row">
+                                    <div className="col-md-6">
+                                      <div className="inner_form_new">
+                                        <label className="controlform">
+                                          Action Type
+                                        </label>
+                                        <div className="form-bx">
+                                          <label>
+                                            {" "}
+                                            <input
+                                              type="text"
+                                              className=""
+                                              disabled
+                                              // value={firstItem?.actionStatusName}
+                                              value={
+                                                firstItem?.actionStatusName ==
+                                                  "Approved" ||
+                                                  firstItem?.actionStatusName ==
+                                                  "Reject" ||
+                                                  firstItem?.actionStatusName ==
+                                                  "Cancelled" ||
+                                                  firstItem?.actionStatusName ==
+                                                  "Draft"
+                                                  ? "Assigned"
+                                                  : firstItem?.actionStatusName
+                                              }
+                                            />
+                                          </label>
+                                        </div>
+                                      </div>
+                                    </div>
+
+                                    <div className="col-md-3">
+                                      <div className="inner_form_new-sm">
+                                        <label className="controlform-sm">
+                                          User{" "}
+                                          <i
+                                            className="bi bi-info-circle icons-info"
+                                            title={`Role : ${firstItem?.actionRoleName}`}
+                                          ></i>
+                                        </label>
+                                        <div className="form-bx-sm">
+                                          <label>
+                                            {" "}
+                                            <input
+                                              type="text"
+                                              className=""
+                                              disabled
+                                              value={firstItem?.actionUserName}
+                                            />
+                                          </label>
+                                        </div>
+                                      </div>
+                                    </div>
+
+                                    <div className="col-md-3">
+                                      <div className="inner_form_new-sm">
+                                        <label className="controlform-sm">
+                                          {firstItem?.actionStatusName ==
+                                            "Approved" ||
+                                            firstItem?.actionStatusName ==
+                                            "Reject" ||
+                                            firstItem?.actionStatusName ==
+                                            "Cancelled"
+                                            ? "Assigned"
+                                            : firstItem?.actionStatusName}{" "}
+                                          Date
+                                        </label>
+                                        <div className="form-bx-sm">
+                                          <label>
+                                            <input
+                                              type="text"
+                                              className=""
+                                              disabled
+                                              value={moment(
+                                                firstItem?.createdDate
+                                              ).format("DD/MMM/yyyy")}
+                                            />
+                                          </label>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div
+                                    className={
+                                      firstItem?.actionNotes
+                                        ? "inner_form_new"
+                                        : "d-none"
+                                    }
+                                  >
+                                    <label className="controlform">
+                                      Action Note
+                                    </label>
+                                    <div className="form-bx">
+                                      <label>
+                                        {" "}
+                                        <textarea
+                                          type="text"
+                                          className=""
+                                          disabled
+                                          value={firstItem?.actionNotes}
+                                        />
+                                      </label>
+                                    </div>
+                                  </div>
+                                  <div
+                                    className={
+                                      firstItem?.actionComment
+                                        ? "inner_form_new"
+                                        : "d-none"
+                                    }
+                                  >
+                                    <label className="controlform">
+                                      Action Comment
+                                    </label>
+                                    <div className="form-bx">
+                                      <label>
+                                        {" "}
+                                        <textarea
+                                          type="text"
+                                          className=""
+                                          disabled
+                                          value={firstItem?.actionComment}
+                                        />
+                                      </label>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            );
+                          }
+                        })}
+                        {/* next level data show and assign behalf of not equal userID  start*/}
+                        {applicationDetail?.userID !== UserID.replace(/"/g, "") && roleID == 8 ?
+                          <>
+                            <div
+                              className={
+                                roleID == 8
+                                  ? "inner_form_new align-items-center"
+                                  : "d-none"
+                              }
+                            >
+                              <label className="controlform">Next Action</label>
+                              <div className="row">
+                                <div className="col-md-12 my-2">
+                                  <div className="hidden-toggles">
+                                    <input
+                                      type="radio"
+                                      id="deptyrecomndByAnalyst"
+                                      // onChange={(e) => {
+                                      //   setcheckSupervisor(true);
+                                      //   supervisorHangechangeRole(e);
+                                      //   ChangeNextlevelHandle(e);
+                                      //   GetRoleHandle(121);
+                                      // }}
+                                      onClick={() => {
+                                        setRecomdAnalyst("121");
+                                        setnextlevelvalue("");
+                                        setAssignUserID("");
+                                        setSupervisorRoleId("");
+                                        setAsignUser([]);
+                                        setapplicationstaus(
+                                          applicationDetail?.analystRecommendation
+                                        );
+                                      }}
+                                      name="nextactiondupty"
+                                      className={
+                                        applicationDetail?.analystRecommendation ==
+                                          "" ||
+                                          applicationDetail?.analystRecommendation ==
+                                          "0"
+                                          ? "d-none"
+                                          : "hidden-toggles__input"
+                                      }
+                                      value="121"
+                                      checked={
+                                        recomdAnalyst == "121" ? true : false
+                                      }
+                                    />
+                                    <label
+                                      for="deptyrecomndByAnalyst"
+                                      className={
+                                        applicationDetail?.analystRecommendation ==
+                                          "" ||
+                                          applicationDetail?.analystRecommendation ==
+                                          "0"
+                                          ? "d-none"
+                                          : "hidden-toggles__label"
+                                      }
+                                    >
+                                      As Recommended by Analyst
+                                    </label>
+
+                                    <input
+                                      type="radio"
+                                      id="deptyasignto"
+                                      onChange={(e) => {
+                                        setcheckSupervisor(true);
+                                        supervisorHangechangeRole(e);
+                                        ChangeNextlevelHandle(e);
+                                        setAssignUserID("");
+                                        GetRoleHandle(10);
+                                        setapplicationstaus(
+                                          applicationDetail?.analystRecommendation
+                                        );
+                                      }}
+                                      onClick={() => setRecomdAnalyst("")}
+                                      name="nextactiondupty"
+                                      className="hidden-toggles__input"
+                                      value="10"
+                                    />
+                                    <label
+                                      for="deptyasignto"
+                                      className="hidden-toggles__label"
+                                    >
+                                      Assign
+                                    </label>
+
+                                    <input
+                                      type="radio"
+                                      id="deptyasignto-Refer"
+                                      onChange={(e) => {
+                                        ChangeNextlevelHandle(e);
+                                        // ChangeApplicationStatus(e);
+                                        setcheckSupervisor(true);
+                                        GetRoleHandle(15);
+                                        setAssignUserID("");
+                                        setapplicationstaus(
+                                          applicationDetail?.analystRecommendation
+                                        );
+                                      }}
+                                      name="nextactiondupty"
+                                      onClick={() => setRecomdAnalyst("")}
+                                      value="15"
+                                      className="hidden-toggles__input"
+                                    />
+                                    <label
+                                      for="deptyasignto-Refer"
+                                      className="hidden-toggles__label"
+                                    >
+                                      Refer Back
+                                    </label>
+
+
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div
+                              className={checkSupervisor == true ? "row" : "d-none"}
+                            >
+                              <div className="col-md-12 d-flex c-gap">
+                                <div
+                                  className={
+                                    nextlevelvalue == 15 ? "w-50" : "d-none"
+                                  }
+                                >
+                                  {checkSupervisor == true && roleID == 8 ? (
+                                    <>
+                                      <div className="inner_form_new">
+                                        <label className="controlform">Role</label>
+
+                                        <div className="form-bx">
+                                          <label>
+                                            <select
+                                              ref={assignedToRef}
+                                              name="SupervisorRoleId"
+                                              onChange={(e) => {
+                                                supervisorHangechangeRole(e);
+                                                handleUserRole(e);
+                                              }}
+                                              className={
+                                                errors.assignedTo &&
+                                                  !SupervisorRoleId
+                                                  ? "error"
+                                                  : ""
+                                              }
+                                            >
+                                              <option value="">Select Role</option>
+                                              {userRole?.map((item, index) => {
+                                                return (
+                                                  <option
+                                                    key={index}
+                                                    value={item.id}
+                                                  >
+                                                    {item.designation}
+                                                  </option>
+                                                );
+                                              })}
+                                            </select>
+                                            <span className="sspan"></span>
+                                            {errors.assignedTo &&
+                                              !SupervisorRoleId ? (
+                                              <small className="errormsg">
+                                                Role is required{" "}
+                                              </small>
+                                            ) : (
+                                              ""
+                                            )}
+                                          </label>
+                                        </div>
+                                      </div>
+                                      {/* end form-bx  */}
+                                    </>
+                                  ) : (
+                                    ""
+                                  )}
+                                </div>
+                                <div
+                                  className={
+                                    nextlevelvalue == 15 ? "w-50" : "w-100"
+                                  }
+                                >
+                                  {roleID == 8 && recomdAnalyst != "121" ? (
+                                    <>
+                                      <div className="inner_form_new">
+                                        <label className="controlform">User</label>
+
+                                        <div className="form-bx">
+                                          <label>
+                                            <select
+                                              ref={assignedToRef}
+                                              name="AssignUserID"
+                                              onChange={(e) =>
+                                                supervisorHangechange(e)
+                                              }
+                                              className={
+                                                errors.assignUserID && !AssignUserID
+                                                  ? "error"
+                                                  : ""
+                                              }
+                                            >
+                                              <option value="">Select User</option>
+                                              {asignUser?.map((item, index) => {
+                                                return (
+                                                  <option
+                                                    key={index}
+                                                    value={item.userID}
+                                                  >
+                                                    {item.name}
+                                                  </option>
+                                                );
+                                              })}
+                                            </select>
+                                            <span className="sspan"></span>
+                                            {errors.assignUserID &&
+                                              !AssignUserID ? (
+                                              <small className="errormsg">
+                                                {errors.assignUserID}
+                                              </small>
+                                            ) : (
+                                              ""
+                                            )}
+                                          </label>
+                                        </div>
+                                      </div>
+                                      {/* end form-bx  */}
+                                    </>
+                                  ) : (
+                                    ""
+                                  )}
+                                </div>
+
+                                {/* end form-bx  */}
+                              </div>
+                            </div>
+                            {roleID == 8 && <p>
+                              {attachmentData?.map((items, index) => {
+                                return (
+                                  <div
+                                    className="attachemt_form-bx  mt-2"
+                                    key={items.id}
+                                  >
+                                    <label
+                                      style={{
+                                        background: "#d9edf7",
+                                        padding: "9px 3px",
+                                        border: "0px",
+                                      }}
+                                    >
+                                      <span style={{ fontWeight: "500" }}>
+                                        {items.filename}
+                                      </span>
+                                    </label>
+                                    <div className="browse-btn">
+                                      Browse
+                                      <input
+                                        type="file"
+                                        onChange={(e) =>
+                                          handleuserFileChange(e, "circular" + (index + 1))
+                                        }
+                                      />
+                                    </div>
+                                    <span className="filename">
+                                      {userfiles?.find(
+                                        (f) => f.id === "circular" + (index + 1)
+                                      )?.file?.name || "No file chosen"}
+                                    </span>
+                                    {userfiles?.length &&
+                                      userfiles?.find((f) => f.id === "circular" + (index + 1))
+                                        ?.file?.name ? (
+                                      <button
+                                        type="button"
+                                        className="remove-file"
+                                        onClick={() =>
+                                          removeUserImage(index, "circular" + (index + 1))
+                                        }
+                                      >
+                                        Remove
+                                      </button>
+                                    ) : (
+                                      ""
+                                    )}
+                                  </div>
+                                );
+                              })}
+
+                              {otheruserfiles.map((file, index) => (
+                                <div
+                                  key={"other" + (index + 1)}
+                                  className="attachemt_form-bx"
+                                >
+                                  <label
+                                    style={{
+                                      background: "#d9edf7",
+                                      padding: "9px 3px",
+                                      border: "0px",
+                                    }}
+                                  >
+                                    <b>
+                                      Other File
+                                      {index + 1}
+                                    </b>
+                                  </label>
+                                  <div className="browse-btn">
+                                    Browse{" "}
+                                    <input
+                                      type="file"
+                                      onChange={(e) => {
+                                        handleuserFileChange(e, "other" + index);
+                                        // handleOthrefile(e,   `other ${index}`);
+                                      }}
+                                    />
+                                  </div>
+                                  <span className="filename">
+                                    {userfiles?.find((f) => f.id === "other" + index)
+                                      ?.file?.name || "No file chosen"}
+                                  </span>
+
+                                  {userfiles?.length &&
+                                    userfiles?.find((f) => f.id === "other" + index)
+                                      ?.file?.name ? (
+                                    <button
+                                      type="button"
+                                      className="remove-file"
+                                      onClick={() =>
+                                        removeUserImage(index, "other" + index)
+                                      }
+                                    >
+                                      Remove
+                                    </button>
+                                  ) : (
+                                    ""
+                                  )}
+                                </div>
+                              ))}
+
+                              {otheruserfiles?.length || userfiles?.length ? (
+                                <div className="attachemt_form-bx">
+                                  <label style={{ border: "0px" }}>{""}</label>
+                                  <button
+                                    type="button"
+                                    className="addmore-btn mt-0"
+                                    onClick={(e) => handleuserAddMore(e)}
+                                  >
+                                    {" "}
+                                    Add More File{" "}
+                                  </button>
+                                </div>
+                              ) : (
+                                ""
+                              )}
+                            </p>}
+                            {/* end form-bx  */}
+
+                            <div
+                              className={roleID == 8 ? "inner_form_new align-items-start" : "d-none"}
+                            >
+                              <label className="controlform">Recommendation</label>
+                              <div className="form-bx editorFieldBox">
+                                <div className="mt-2 py-1">
+                                  <MenuBar editor={editorDeputy} />
+                                  <EditorContent editor={editorDeputy} />
+                                  <span className="sspan"></span>
+                                  {(errors.Description && Description == " ") ||
+                                    Description == null ||
+                                    Description == "<p></p>" ||
+                                    !Description ? (
+                                    <small className="errormsg">
+                                      {errors.Description}
+                                    </small>
+                                  ) : (
+                                    ""
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+
+                            <div
+                              className={roleID == 8 ? "inner_form_new " : "d-none"}
+                            >
+                              <label className="controlform">
+                                {nextlevelvalue == "10"
+                                  ? "Assign Notes"
+                                  : nextlevelvalue == "20"
+                                    ? "Delegate Notes"
+                                    : nextlevelvalue == "35"
+                                      ? "Referred to Other Department Notes"
+                                      : nextlevelvalue == "15"
+                                        ? "Refer Back Notes"
+                                        : "Notes"}
+                              </label>
+
+                              <div className="form-bx">
+                                <label>
+                                  <textarea
+                                    name="Notes"
+                                    onChange={(e) => {
+                                      HandleNextleveldata(e);
+                                    }}
+                                    placeholder={
+                                      nextlevelvalue == "10"
+                                        ? "Assign Notes"
+                                        : nextlevelvalue == "20"
+                                          ? "Delegate Notes"
+                                          : nextlevelvalue == "35"
+                                            ? "Referred to Other Department Notes"
+                                            : nextlevelvalue == "15"
+                                              ? "Refer Back Notes"
+                                              : "Notes"
+                                    }
+                                    className={errors.Notes ? "error" : ""}
+                                    value={asignnextLeveldata.Notes}
+                                  />
+                                  <span className="sspan"></span>
+                                  {errors.Notes ? (
+                                    <small className="errormsg">
+                                      {nextlevelvalue == "10"
+                                        ? "Assign notes is required"
+                                        : nextlevelvalue == "20"
+                                          ? "Delegate notes is required"
+                                          : nextlevelvalue == "35"
+                                            ? "Referred to other department notes is required"
+                                            : nextlevelvalue == "15"
+                                              ? "Refer back notes is required"
+                                              : "Notes is required"}
+                                    </small>
+                                  ) : (
+                                    ""
+                                  )}
+                                </label>
+                              </div>
+                            </div>
+                            {/* end form-bx  */}
+
+                            <div
+                              className={roleID == 8 ? "inner_form_new " : "d-none"}
+                            >
+                              <label className="controlform">
+                                {nextlevelvalue == "10"
+                                  ? "Assign Comments"
+                                  : nextlevelvalue == "20"
+                                    ? "Delegate Comments"
+                                    : nextlevelvalue == "35"
+                                      ? "Referred to Other Department Comments"
+                                      : nextlevelvalue == "15"
+                                        ? "Refer Back Comments"
+                                        : "Comments"}
+                              </label>
+
+                              <div className="form-bx">
+                                <label>
+                                  <textarea
+                                    name="Comment"
+                                    onChange={(e) => {
+                                      HandleNextleveldata(e);
+                                    }}
+                                    placeholder={
+                                      nextlevelvalue == "10"
+                                        ? "Assign Comments"
+                                        : nextlevelvalue == "20"
+                                          ? "Delegate Comments"
+                                          : nextlevelvalue == "35"
+                                            ? "Referred to Other Department Comments"
+                                            : nextlevelvalue == "15"
+                                              ? "Refer Back Comments"
+                                              : "Comments"
+                                    }
+                                    className={errors.Comment ? "error" : ""}
+                                    value={asignnextLeveldata.Comment}
+                                  />
+                                  <span className="sspan"></span>
+                                  {errors.Comment ? (
+                                    <small className="errormsg">
+                                      {nextlevelvalue == "10"
+                                        ? "Assign comments is required"
+                                        : nextlevelvalue == "20"
+                                          ? "Delegate comments is required"
+                                          : nextlevelvalue == "35"
+                                            ? "Referred to other department comments is required"
+                                            : nextlevelvalue == "15"
+                                              ? "Refer back comments is required"
+                                              : "Comments is required"}
+                                    </small>
+                                  ) : (
+                                    ""
+                                  )}
+                                </label>
+                              </div>
+                            </div>
+
+                            <div className={roleID == 8 ? "inner_form_new align-items-start" : "d-none"}>
+                              <label className="controlform">Bank</label>
+                              <div className=" cccto">
+                                <div className="flex justify-content-center multiSelect">
+                                  <MultiSelect
+                                    value={selectedBanks}
+                                    onChange={(e) => setSelectedBanks(e.value)}
+                                    options={vOption}
+                                    onShow={onShow}
+                                    optionLabel="name"
+                                    placeholder="Select Banks"
+                                    // maxSelectedLabels={3}
+                                    display="chip"
+                                    className="w-full md:w-20rem"
+                                  />
+
+                                </div>
+                              </div>
+                            </div>
+                            {/* end form-bx  */}
+                            <div className={roleID == 8 ? "inner_form_new" : "d-none"}>
+                              <label className="controlform">Directives</label>
+                              <div className="form-bx">
+                                <div className="multiselect flex justify-content-center">
+                                  <MultiSelect
+                                    value={selectedDirectives}
+                                    onChange={(e) => setSelectedDirectives(e.value)}
+                                    options={DirectiveOption}
+                                    optionLabel="name"
+                                    name="directiveData"
+                                    placeholder="Select Directives"
+                                    display="chip"
+                                  />
+                                  {errors?.directiveData ? (
+                                    <small className="errormsg">{errors.directiveData}</small>
+                                  ) : (
+                                    ""
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                            {/* end form-bx  */}
+
+                            {/* end form-bx  */}
+                            <div className={roleID == 8 ? "inner_form_new" : "d-none"}>
+                              <label className="controlform">Releasing Date</label>
+                              <div className="form-bx">
+                                <DatePicker
+                                  placeholderText="Select Releasing Date"
+                                  closeOnScroll={(e) => e.target === document}
+                                  selected={releasingDate}
+                                  onChange={(date) => setReleasingDate(date)}
+                                  peekNextMonth
+                                  showMonthDropdown
+                                  showYearDropdown
+                                  minDate={new Date()}
+                                  dropdownMode="select"
+                                  dateFormat="dd/MMMM/yyyy"
+                                />
+                                {
+                                  errors?.releasingDate ? (
+                                    <small className="errormsg">{errors.releasingDate}</small>
+                                  ) : (" ")
+                                }
+                              </div>
+                            </div>
+                            {/* end form-bx  */}
+
+                            <div
+                              className={
+                                (roleID == 8 && nextlevelvalue == "") ||
+                                  recomdAnalyst == "121"
+                                  ? "inner_form_new align-items-center"
+                                  : "d-none"
+                              }
+                            >
+                              <label className="controlform">Decision</label>
+                              <div className="row">
+                                <div className="col-md-12">
+                                  <div className="hidden-toggles">
+                                    <input
+                                      type="radio"
+                                      id="srcoloration-Approvedved4"
+                                      value="10"
+                                      onChange={(e) => {
+                                        ChangeApplicationStatus(e);
+                                        GetRoleHandle(10);
+                                        // supervisorHangechangeRole(e);
+                                      }}
+                                      name="applicationstausdp"
+                                      className="hidden-toggles__input"
+                                      checked={
+                                        applicationstaus == "10" ? true : false
+                                      }
+                                    />
+                                    <label
+                                      for="srcoloration-Approvedved4"
+                                      className="hidden-toggles__label"
+                                    >
+                                      Approved
+                                    </label>
+
+                                    {/* <input
+                                  type="radio"
+                                  id="srcoloration-Rejected"
+                                  value="30"
+                                  onChange={(e) => {
+                                    ChangeApplicationStatus(e);
+                                   
+                                  }}
+                                  name="applicationstausdp"
+                                  className="hidden-toggles__input"
+                                  checked={
+                                    applicationstaus == "30" ? true : false
+                                  }
+                                />
+                                <label
+                                  for="srcoloration-Rejected"
+                                  className="hidden-toggles__label"
+                                >
+                                  Rejected
+                                </label> */}
+
+                                    {/* <input
+                                  type="radio"
+                                  id="srcoloration-Deferred"
+                                  onChange={(e) => {
+                                    ChangeApplicationStatus(e);
+                                   
+                                  }}
+                                  name="applicationstausdp"
+                                  value="40"
+                                  className="hidden-toggles__input"
+                                  checked={
+                                    applicationstaus == "40" ? true : false
+                                  }
+                                />
+                                <label
+                                  for="srcoloration-Deferred"
+                                  className="hidden-toggles__label"
+                                >
+                                  Deferred
+                                </label> */}
+
+                                    {/* <input
+                                  type="radio"
+                                  id="srcoloration-Cancelled"
+                                  onChange={(e) => {
+                                    ChangeApplicationStatus(e);
+                                   
+                                  }}
+                                  name="applicationstausdp"
+                                  value="25"
+                                  className="hidden-toggles__input"
+                                  checked={
+                                    applicationstaus == "25" ? true : false
+                                  }
+                                />
+                                <label
+                                  for="srcoloration-Cancelled"
+                                  className="hidden-toggles__label"
+                                >
+                                  Cancelled
+                                </label> */}
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </> : (
+                          <span>
+                            {/* {noDataComment?.map((v, i) => {
+                              if (v.roleID == 8 && v.isDataAvailable == 0) {
+                                return (
+                                  <div className={deputyTab ? "customtab" : "d-none"}>
+                                    <div class="text-center">No Data Found</div>
+                                  </div>
+                                );
+                              }
+                            })} */}
+                          </span>
+                        )
+                        }
+                        {/* next level data show and assign behalf of not equal userID  end*/}
+                      </div>
+
+                      {allcomment?.map((cur) => {
+                        return cur?.circularActivityData
+                          ?.slice()
+                          ?.reverse()
+                          .map((item, index) => {
+                            if (cur?.assignedToRoleID == 8) {
+                              return (
+                                <>
+                                  <div
+                                    key={index}
+                                    className={
+                                      index == 0 && roleID != 8
+                                        ? "tab-pane fade show active"
+                                        : "tab-pane fade show  "
+                                    }
+                                    id={"deputy-justified-home" + index}
+                                    role="tabpanel"
+                                    aria-labelledby={"deputy" + index}
+                                  >
+                                    <div className={item?.actionStatusName ? "bakgroundaction" : "d-none"}>
+                                      <div className="row">
+                                        <div className="col-md-6">
+                                          <div className="inner_form_new ">
+                                            <label className="controlform">
+                                              Action Type
+                                            </label>
+                                            <div className="form-bx">
+                                              <label>
+                                                <input
+                                                  type="text"
+                                                  className=""
+                                                  disabled
+                                                  // value={item?.actionStatusName}
+                                                  value={
+                                                    item?.actionStatusName ==
+                                                      "Approved" ||
+                                                      item?.actionStatusName ==
+                                                      "Reject" ||
+                                                      item?.actionStatusName ==
+                                                      "Cancelled" ||
+                                                      item?.actionStatusName ==
+                                                      "Draft"
+                                                      ? "Assigned"
+                                                      : item?.actionStatusName
+                                                  }
+                                                />
+                                              </label>
+                                            </div>
+                                          </div>
+                                        </div>
+
+                                        <div className="col-md-3">
+                                          <div className="inner_form_new-sm ">
+                                            <label className="controlform-sm">
+                                              User{" "}
+                                              <i
+                                                className="bi bi-info-circle icons-info"
+                                                title={`Role : ${item?.actionRoleName}`}
+                                              ></i>
+                                            </label>
+                                            <div className="form-bx-sm">
+                                              <label>
+                                                <input
+                                                  type="text"
+                                                  className=""
+                                                  disabled
+                                                  value={item?.actionUserName}
+                                                />
+                                              </label>
+                                            </div>
+                                          </div>
+                                        </div>
+
+                                        <div className="col-md-3">
+                                          <div className="inner_form_new-sm">
+                                            <label className="controlform-sm">
+                                              {item?.actionStatusName ==
+                                                "Approved" ||
+                                                item?.actionStatusName ==
+                                                "Reject" ||
+                                                item?.actionStatusName ==
+                                                "Cancelled"
+                                                ? "Assigned"
+                                                : item?.actionStatusName}{" "}
+                                              Date
+                                            </label>
+                                            <div className="form-bx-sm">
+                                              <label>
+                                                <input
+                                                  type="text"
+                                                  className=""
+                                                  disabled
+                                                  value={moment(
+                                                    item?.createdDate
+                                                  ).format("DD/MMM/yyyy")}
+                                                />
+                                              </label>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+
+                                      <div
+                                        className={
+                                          item?.actionNotes
+                                            ? "inner_form_new "
+                                            : "d-none"
+                                        }
+                                      >
+                                        <label className="controlform">
+                                          Action Note
+                                        </label>
+                                        <div className="form-bx">
+                                          <label>
+                                            <textarea
+                                              disabled
+                                              value={item?.actionNotes}
+                                            />
+                                          </label>
+                                        </div>
+                                      </div>
+
+                                      <div
+                                        className={
+                                          item?.actionComment
+                                            ? "inner_form_new "
+                                            : "d-none"
+                                        }
+                                      >
+                                        <label className="controlform">
+                                          Action Comment
+                                        </label>
+                                        <div className="form-bx">
+                                          <label>
+                                            <textarea
+                                              disabled
+                                              value={item?.actionComment}
+                                            />
+                                          </label>
+                                        </div>
+                                      </div>
+                                    </div>
+
+
+
+                                    <div className="inner_form_new">
+                                      <label className="controlform">
+                                        Recommendation
+                                      </label>
+                                      <div className="form-bx">
+                                        <label>
+                                          <div
+                                            className="tableEditorData disabled viewdiscription"
+                                            dangerouslySetInnerHTML={{
+                                              __html: item?.content
+                                                ? item?.content
+                                                : "N/A",
+                                            }}
+                                            disabled
+                                          />
+                                        </label>
+                                      </div>
+                                    </div>
+                                    <div className="inner_form_new ">
+                                      <label className="controlform">
+                                        Notes
+                                      </label>
+                                      <div className="form-bx">
+                                        <label>
+                                          <textarea
+                                            name="Notes"
+                                            placeholder="Notes"
+                                            className=""
+                                            disabled
+                                          >
+                                            {item?.notes ? item?.notes : "N/A"}
+                                          </textarea>
+                                        </label>
+                                      </div>
+                                    </div>
+                                    <div className="inner_form_new ">
+                                      <label className="controlform">
+                                        Comments
+                                      </label>
+                                      <div className="form-bx">
+                                        <label>
+                                          <textarea
+                                            name="Notes"
+                                            placeholder="Notes"
+                                            className=""
+                                            disabled
+                                          >
+                                            {item?.comment
+                                              ? item?.comment
+                                              : "N/A"}
+                                          </textarea>
+                                        </label>
+                                      </div>
+                                    </div>
+
+                                    <div className="inner_form_new ">
+                                      <label className="controlform">
+                                        Attachments
+                                      </label>
+                                      <div className="form-bx">
+                                        {item?.filesData?.length ? (
+                                          item?.filesData?.map(
+                                            (items, index) => {
+                                              return (
+                                                <div
+                                                  className="attachemt_form-bx mb-0 width-80"
+                                                  key={items.id}
+                                                >
+                                                  <label className="mb-2 mb-0 pt-2 pb-2">
+                                                    {/* {items.filename} */}
+                                                    {items?.fileName
+                                                      ? items?.fileName
+                                                      : `FileUpload ${index}`}
+                                                  </label>
+                                                  <div
+                                                    className={
+                                                      roleID == 2 || roleID == 3
+                                                        ? "browse-btn"
+                                                        : "d-none"
+                                                    }
+                                                  >
+                                                    Browse{" "}
+                                                    <input
+                                                      type="file"
+                                                      onChange={(e) =>
+                                                        handleFileChange(
+                                                          e,
+                                                          items.id
+                                                        )
+                                                      }
+                                                    />
+                                                  </div>
+                                                  <span className="filename">
+                                                    <Link
+                                                      to={items?.filePath}
+                                                      target="_blank"
+                                                      className="viewbtn"
+                                                    >
+                                                      View File
+                                                    </Link>
+                                                  </span>
+                                                </div>
+                                              );
+                                            }
+                                          )
+                                        ) : (
+                                          <label className="notfound">
+                                            File Not Found
+                                          </label>
+                                        )}
+                                      </div>
+                                    </div>
+
+                                    {/* <div className="inner_form_new ">
+                                      <label className="controlform">
+                                        Bank 
+                                      </label>
+                                      <div className="form-bx">
+                                        <label>
+                                          <ul className="nalist">
+                                            {item?.bankData
+                                              ?.length ? (
+                                              item?.bankData?.map(
+                                                (res) => {
+                                                  return (
+                                                    <li>{res?.bankName}</li>
+                                                  );
+                                                }
+                                              )
+                                            ) : (
+                                              <li className="disabletext">
+                                                N/A
+                                              </li>
+                                            )}
+                                          </ul>
+                                        </label>
+                                      </div>
+                                    </div>
+                                    <div className="inner_form_new ">
+                                      <label className="controlform">
+                                        Directives
+                                      </label>
+                                      <div className="form-bx">
+                                        <label>
+                                          <ul className="nalist">
+                                            {item?.directiveData
+                                              ?.length ? (
+                                              item?.directiveData?.map(
+                                                (res) => {
+                                                  return (
+                                                    <li>{res?.directiveName}</li>
+                                                  );
+                                                }
+                                              )
+                                            ) : (
+                                              <li className="disabletext">
+                                                N/A
+                                              </li>
+                                            )}
+                                          </ul>
+                                        </label>
+                                      </div>
+                                    </div> */}
+                                    <div className="inner_form_new">
+                                      <label className="controlform">
+                                        Releasing Date
+                                      </label>
+                                      <div className="form-bx">
+                                        <label>
+                                          <input
+                                            type="text"
+                                            className=""
+                                            disabled
+                                            value={moment(
+                                              item?.releasingDate
+                                            ).format("DD/MMM/yyyy")}
+                                          />
+                                        </label>
+                                      </div>
+                                    </div>
+
+                                    <div
+                                      className={
+                                        item?.assignedToName == null &&
+                                          item?.assignedToName == null
+                                          ? "d-none"
+                                          : "row"
+                                      }
+                                    >
+                                      <div className="col-md-6">
+                                        <div className="inner_form_new ">
+                                          <label className="controlform">
+                                            Assigned To Role
+                                          </label>
+                                          <div className="form-bx">
+                                            <label>
+                                              <input
+                                                type="text"
+                                                className=""
+                                                disabled
+                                                value={
+                                                  item?.roleName
+                                                    ? item?.roleName
+                                                    : ""
+                                                }
+                                              />
+                                            </label>
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <div className="col-md-6">
+                                        <div className="inner_form_new-sm ">
+                                          <label className="controlform-sm">
+                                            Assigned To User
+                                          </label>
+                                          <div className="form-bx-sm">
+                                            <label>
+                                              <input
+                                                type="text"
+                                                className=""
+                                                disabled
+                                                value={
+                                                  item?.assignedToName
+                                                    ? item?.assignedToName
+                                                    : ""
+                                                }
+                                              />
+                                            </label>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </>
+                              );
+                            }
+                          });
+                      })}
+
+                    </div>
+                  </div>
+                </>
+              ) : (
+                ""
+              )}
+
+              {/* Dupty director code end */}
+              {/* director code start */}
+
+              {roleID >= 9 ? (
+                <>
+                  <h5
+                    className={
+                      director
+                        ? "section_top_subheading mt-3 py-3 btn-collapse_active cursorpointer"
+                        : "section_top_subheading mt-3 py-3 cursorpointer"
+                    }
+                    onClick={() => setdirector(!director)}
+                  >
+                    Director{" "}
+
+                    <span className="btn-collapse">
+                      <i className="bi bi-caret-down-fill"></i>
+                    </span>
+                  </h5>
+
+                  <div className={director ? "customtab mb-3" : "d-none"}>
+
+
+
+                    {allcomment?.map((cur, i) => {
+                      if (cur.assignedToRoleID == 9) {
+                        return (
+                          <ul
+                            className={
+                              cur?.circularActivityData?.length >= 1
+                                ? "nav nav-pills mb-3"
+                                : "d-none"
+                            }
+                            role="tablist"
+                          >
+                            <li
+                              className={roleID == 9 ? "nav-item" : "d-none"}
+                              role="presentation"
+                            >
+                              <button
+                                className={
+                                  roleID == 9
+                                    ? "nav-link w-100 border-radius0 active"
+                                    : "nav-link w-100 border-radius0"
+                                }
+                                id="director"
+                                data-bs-toggle="tab"
+                                data-bs-target="#director-justified-home"
+                                type="button"
+                                role="tab"
+                                aria-controls="home"
+                                aria-selected="true"
+                              >
+                                Action
+                              </button>
+                            </li>
+
+                            {cur?.circularActivityData
+                              ?.slice()
+                              ?.reverse()
+                              .map((items, index) => {
+                                return (
+                                  <li className="nav-item" role="presentation">
+                                    <button
+                                      className={
+                                        index == 0 && roleID != 9
+                                          ? "nav-link w-100 border-radius0 active"
+                                          : "nav-link border-radius0 w-100 "
+                                      }
+                                      id={"director" + index}
+                                      data-bs-toggle="tab"
+                                      data-bs-target={
+                                        "#director-justified-home" + index
+                                      }
+                                      type="button"
+                                      role="tab"
+                                      aria-controls="home"
+                                      aria-selected="true"
+                                    >
+
+                                      Response{" "}
+                                      {cur?.circularActivityData?.length -
+                                        index}
+                                    </button>
+                                  </li>
+                                );
+                              })}
+                          </ul>
+                        );
+                      }
+                    })
+                    }
+
+
+                    <div className="tab-content pt-2 mb-2">
+                      <div
+                        className={
+                          roleID >= 9
+                            ? "tab-pane fade show active"
+                            : "tab-pane fade show "
+                        }
+                        id="director-justified-home"
+                        role="tabpanel"
+                        aria-labelledby="director"
+                      >
+                        {Actiondata?.map((cur) => {
+                          const firstItem = cur?.circularActivityData?.[0]; // Accessing the first element directly
+
+                          if (cur?.assignedToRoleID === 9 && firstItem) {
+                            // Check if firstItem exists
+                            return (
+                              <div className="bakgroundaction">
+                                <div key={firstItem.actionID}>
+                                  {" "}
+                                  {/* Remember to add a unique key */}
+                                  <div className="row">
+                                    <div className="col-md-6">
+                                      <div className="inner_form_new">
+                                        <label className="controlform">
+                                          Action Type
+                                        </label>
+                                        <div className="form-bx">
+                                          <label>
+                                            {" "}
+                                            <input
+                                              type="text"
+                                              className=""
+                                              disabled
+                                              // value={firstItem?.actionStatusName}
+                                              value={
+                                                firstItem?.actionStatusName ==
+                                                  "Approved" ||
+                                                  firstItem?.actionStatusName ==
+                                                  "Reject" ||
+                                                  firstItem?.actionStatusName ==
+                                                  "Cancelled" ||
+                                                  firstItem?.actionStatusName ==
+                                                  "Draft"
+                                                  ? "Assigned"
+                                                  : firstItem?.actionStatusName
+                                              }
+                                            />
+                                          </label>
+                                        </div>
+                                      </div>
+                                    </div>
+
+                                    <div className="col-md-3">
+                                      <div className="inner_form_new-sm">
+                                        <label className="controlform-sm">
+                                          User{" "}
+                                          <i
+                                            className="bi bi-info-circle icons-info"
+                                            title={`Role : ${firstItem?.actionRoleName}`}
+                                          ></i>
+                                        </label>
+                                        <div className="form-bx-sm">
+                                          <label>
+                                            {" "}
+                                            <input
+                                              type="text"
+                                              className=""
+                                              disabled
+                                              value={firstItem?.actionUserName}
+                                            />
+                                          </label>
+                                        </div>
+                                      </div>
+                                    </div>
+
+                                    <div className="col-md-3">
+                                      <div className="inner_form_new-sm">
+                                        <label className="controlform-sm">
+                                          {firstItem?.actionStatusName ==
+                                            "Approved" ||
+                                            firstItem?.actionStatusName ==
+                                            "Reject" ||
+                                            firstItem?.actionStatusName ==
+                                            "Cancelled"
+                                            ? "Assigned"
+                                            : firstItem?.actionStatusName}{" "}
+                                          Date
+                                        </label>
+                                        <div className="form-bx-sm">
+                                          <label>
+                                            <input
+                                              type="text"
+                                              className=""
+                                              disabled
+                                              value={moment(
+                                                firstItem?.createdDate
+                                              ).format("DD/MMM/yyyy")}
+                                            />
+                                          </label>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div
+                                    className={
+                                      firstItem?.actionNotes
+                                        ? "inner_form_new"
+                                        : "d-none"
+                                    }
+                                  >
+                                    <label className="controlform">
+                                      Action Note
+                                    </label>
+                                    <div className="form-bx">
+                                      <label>
+                                        {" "}
+                                        <textarea
+                                          type="text"
+                                          className=""
+                                          disabled
+                                          value={firstItem?.actionNotes}
+                                        />
+                                      </label>
+                                    </div>
+                                  </div>
+                                  <div
+                                    className={
+                                      firstItem?.actionComment
+                                        ? "inner_form_new"
+                                        : "d-none"
+                                    }
+                                  >
+                                    <label className="controlform">
+                                      Action Comment
+                                    </label>
+                                    <div className="form-bx">
+                                      <label>
+                                        {" "}
+                                        <textarea
+                                          type="text"
+                                          className=""
+                                          disabled
+                                          value={firstItem?.actionComment}
+                                        />
+                                      </label>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            );
+                          }
+                        })}
+                        {/* next level data show and assign behalf of not equal userID  start*/}
+                        {applicationDetail?.userID !== UserID.replace(/"/g, "") && roleID == 9 ? <>
+                          <div
+                            className={
+                              roleID == 9
+                                ? "inner_form_new align-items-center"
+                                : "d-none"
+                            }
+                          >
+                            <label className="controlform">Next Action</label>
+                            <div className="row">
+                              <div className="col-md-12 my-2">
+                                <div className="hidden-toggles">
+                                  <input
+                                    type="radio"
+                                    id="direcotsrecomndByAnalyst"
+                                    name="nextactionbuton"
+                                    onClick={() => {
+                                      setRecomdAnalyst("121");
+                                      setnextlevelvalue("");
+                                      setAssignUserID("");
+                                      setSupervisorRoleId("");
+                                      setAsignUser([]);
+                                      setapplicationstaus(
+                                        applicationDetail?.analystRecommendation
+                                      );
+                                    }}
+                                    className={
+                                      applicationDetail?.analystRecommendation ==
+                                        "" ||
+                                        applicationDetail?.analystRecommendation ==
+                                        "0"
+                                        ? "d-none"
+                                        : "hidden-toggles__input"
+                                    }
+                                    value="121"
+                                    checked={
+                                      recomdAnalyst == "121" ? true : false
+                                    }
+                                  />
+                                  <label
+                                    for="direcotsrecomndByAnalyst"
+                                    className={
+                                      applicationDetail?.analystRecommendation ==
+                                        "" ||
+                                        applicationDetail?.analystRecommendation ==
+                                        "0"
+                                        ? "d-none"
+                                        : "hidden-toggles__label"
+                                    }
+                                  >
+                                    As Recommended by Analyst
+                                  </label>
+
+                                  <input
+                                    type="radio"
+                                    id="direcotsRefer"
+                                    onChange={(e) => {
+                                      ChangeNextlevelHandle(e);
+                                      // ChangeApplicationStatus(e);
+                                      setcheckSupervisor(true);
+                                      GetRoleHandle(15);
+                                      setapplicationstaus(
+                                        applicationDetail?.analystRecommendation
+                                      );
+                                    }}
+                                    name="nextactionbuton"
+                                    onClick={() => setRecomdAnalyst("")}
+                                    value="15"
+                                    className="hidden-toggles__input"
+                                  />
+                                  <label
+                                    for="direcotsRefer"
+                                    className="hidden-toggles__label"
+                                  >
+                                    Refer Back
+                                  </label>
+
+
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div
+                            className={checkSupervisor == true ? "row" : "d-none"}
+                          >
+                            <div className="col-md-12 d-flex c-gap">
+                              <div
+                                className={
+                                  nextlevelvalue == 15 ? "w-50" : "d-none"
+                                }
+                              >
+                                {checkSupervisor == true && roleID == 9 ? (
+                                  <>
+                                    <div className="inner_form_new">
+                                      <label className="controlform">Role</label>
+
+                                      <div className="form-bx">
+                                        <label>
+                                          <select
+                                            ref={assignedToRef}
+                                            name="SupervisorRoleId"
+                                            onChange={(e) => {
+                                              supervisorHangechangeRole(e);
+                                              handleUserRole(e);
+                                            }}
+                                            className={
+                                              errors.assignedTo &&
+                                                !SupervisorRoleId
+                                                ? "error"
+                                                : ""
+                                            }
+                                          >
+                                            <option value="">Select Role</option>
+                                            {userRole?.map((item, index) => {
+                                              return (
+                                                <option
+                                                  key={index}
+                                                  value={item.id}
+                                                >
+                                                  {item.designation}
+                                                </option>
+                                              );
+                                            })}
+                                          </select>
+                                          <span className="sspan"></span>
+                                          {errors.assignedTo &&
+                                            !SupervisorRoleId ? (
+                                            <small className="errormsg">
+                                              Role is required{" "}
+                                            </small>
+                                          ) : (
+                                            ""
+                                          )}
+                                        </label>
+                                      </div>
+                                    </div>
+                                    {/* end form-bx  */}
+                                  </>
+                                ) : (
+                                  ""
+                                )}
+                              </div>
+                              <div
+                                className={
+                                  nextlevelvalue == 15 ? "w-50" : "w-100"
+                                }
+                              >
+                                {roleID == 9 && recomdAnalyst != "121" ? (
+                                  <>
+                                    <div className="inner_form_new">
+                                      <label className="controlform">User</label>
+
+                                      <div className="form-bx">
+                                        <label>
+                                          <select
+                                            ref={assignedToRef}
+                                            name="AssignUserID"
+                                            onChange={(e) =>
+                                              supervisorHangechange(e)
+                                            }
+                                            className={
+                                              errors.assignUserID && !AssignUserID
+                                                ? "error"
+                                                : ""
+                                            }
+                                          >
+                                            <option value="">Select User</option>
+                                            {asignUser?.map((item, index) => {
+                                              return (
+                                                <option
+                                                  key={index}
+                                                  value={item.userID}
+                                                >
+                                                  {item.name}
+                                                </option>
+                                              );
+                                            })}
+                                          </select>
+                                          <span className="sspan"></span>
+                                          {errors.assignUserID &&
+                                            !AssignUserID ? (
+                                            <small className="errormsg">
+                                              {errors.assignUserID}
+                                            </small>
+                                          ) : (
+                                            ""
+                                          )}
+                                        </label>
+                                      </div>
+                                    </div>
+                                    {/* end form-bx  */}
+                                  </>
+                                ) : (
+                                  ""
+                                )}
+                              </div>
+
+                              {/* end form-bx  */}
+                            </div>
+                          </div>
+                          {roleID == 9 && <p>
+                            {attachmentData?.map((items, index) => {
+                              return (
+                                <div
+                                  className="attachemt_form-bx  mt-2"
+                                  key={items.id}
+                                >
+                                  <label
+                                    style={{
+                                      background: "#d9edf7",
+                                      padding: "9px 3px",
+                                      border: "0px",
+                                    }}
+                                  >
+                                    <span style={{ fontWeight: "500" }}>
+                                      {items.filename}
+                                    </span>
+                                  </label>
+                                  <div className="browse-btn">
+                                    Browse
+                                    <input
+                                      type="file"
+                                      onChange={(e) =>
+                                        handleuserFileChange(e, "circular" + (index + 1))
+                                      }
+                                    />
+                                  </div>
+                                  <span className="filename">
+                                    {userfiles?.find(
+                                      (f) => f.id === "circular" + (index + 1)
+                                    )?.file?.name || "No file chosen"}
+                                  </span>
+                                  {userfiles?.length &&
+                                    userfiles?.find((f) => f.id === "circular" + (index + 1))
+                                      ?.file?.name ? (
+                                    <button
+                                      type="button"
+                                      className="remove-file"
+                                      onClick={() =>
+                                        removeUserImage(index, "circular" + (index + 1))
+                                      }
+                                    >
+                                      Remove
+                                    </button>
+                                  ) : (
+                                    ""
+                                  )}
+                                </div>
+                              );
+                            })}
+
+                            {otheruserfiles.map((file, index) => (
+                              <div
+                                key={"other" + (index + 1)}
+                                className="attachemt_form-bx"
+                              >
+                                <label
+                                  style={{
+                                    background: "#d9edf7",
+                                    padding: "9px 3px",
+                                    border: "0px",
+                                  }}
+                                >
+                                  <b>
+                                    Other File
+                                    {index + 1}
+                                  </b>
+                                </label>
+                                <div className="browse-btn">
+                                  Browse{" "}
+                                  <input
+                                    type="file"
+                                    onChange={(e) => {
+                                      handleuserFileChange(e, "other" + index);
+                                      handleOthrefile(e, `other ${index}`);
+                                    }}
+                                  />
+                                </div>
+                                <span className="filename">
+                                  {userfiles?.find((f) => f.id === "other" + index)
+                                    ?.file?.name || "No file chosen"}
+                                </span>
+
+                                {userfiles?.length &&
+                                  userfiles?.find((f) => f.id === "other" + index)
+                                    ?.file?.name ? (
+                                  <button
+                                    type="button"
+                                    className="remove-file"
+                                    onClick={() =>
+                                      removeUserImage(index, "other" + index)
+                                    }
+                                  >
+                                    Remove
+                                  </button>
+                                ) : (
+                                  ""
+                                )}
+                              </div>
+                            ))}
+
+                            {otheruserfiles?.length || userfiles?.length ? (
+                              <div className="attachemt_form-bx">
+                                <label style={{ border: "0px" }}>{""}</label>
+                                <button
+                                  type="button"
+                                  className="addmore-btn mt-0"
+                                  onClick={(e) => handleuserAddMore(e)}
+                                >
+                                  {" "}
+                                  Add More File{" "}
+                                </button>
+                              </div>
+                            ) : (
+                              ""
+                            )}
+                          </p>}
+                          <div
+                            className={
+                              roleID == 9
+                                ? "inner_form_new align-items-start mt-2"
+                                : "d-none"
+                            }
+                          >
+                            <label className="controlform">Recommendation</label>
+                            <div className="form-bx editorFieldBox">
+                              <div className="mt-2 py-1">
+                                <MenuBar editor={editorDirector} />
+                                <EditorContent editor={editorDirector} />
+                                <span className="sspan"></span>
+                                {(errors.Description && Description == " ") ||
+                                  Description == null ||
+                                  Description == "<p></p>" ||
+                                  !Description ||
+                                  Description == "<p><br></p>" ? (
+                                  <small
+                                    className="errormsg"
+                                    style={{ bottom: "-13px" }}
+                                  >
+                                    {errors.Description}
+                                  </small>
+                                ) : (
+                                  ""
+                                )}
+                              </div>
+                            </div>
+                          </div>
+
+                          <div
+                            className={roleID == 9 ? "inner_form_new " : "d-none"}
+                          >
+                            <label className="controlform">
+                              {nextlevelvalue == "10"
+                                ? "Assign Notes"
+                                : nextlevelvalue == "20"
+                                  ? "Delegate Notes"
+                                  : nextlevelvalue == "35"
+                                    ? "Referred to Other Department Notes"
+                                    : nextlevelvalue == "15"
+                                      ? "Refer Back Notes"
+                                      : "Notes"}
+                            </label>
+
+                            <div className="form-bx">
+                              <label>
+                                <textarea
+                                  name="Notes"
+                                  onChange={(e) => {
+                                    HandleNextleveldata(e);
+                                  }}
+                                  placeholder={
+                                    nextlevelvalue == "10"
+                                      ? "Assign Notes"
+                                      : nextlevelvalue == "20"
+                                        ? "Delegate Notes"
+                                        : nextlevelvalue == "35"
+                                          ? "Referred to Other Department Notes"
+                                          : nextlevelvalue == "15"
+                                            ? "Refer Back Notes"
+                                            : "Notes"
+                                  }
+                                  className={errors.Notes ? "error" : ""}
+                                  value={asignnextLeveldata.Notes}
+                                />
+                                <span className="sspan"></span>
+                                {errors.Notes ? (
+                                  <small className="errormsg">
+                                    {nextlevelvalue == "10"
+                                      ? "Assign notes is required"
+                                      : nextlevelvalue == "20"
+                                        ? "Delegate notes is required"
+                                        : nextlevelvalue == "35"
+                                          ? "Referred to other department notes is required"
+                                          : nextlevelvalue == "15"
+                                            ? "Refer back notes is required"
+                                            : "Notes is required"}
+                                  </small>
+                                ) : (
+                                  ""
+                                )}
+                              </label>
+                            </div>
+                          </div>
+                          {/* end form-bx  */}
+
+                          <div
+                            className={roleID == 9 ? "inner_form_new " : "d-none"}
+                          >
+                            <label className="controlform">
+                              {nextlevelvalue == "10"
+                                ? "Assign Comments"
+                                : nextlevelvalue == "20"
+                                  ? "Delegate Comments"
+                                  : nextlevelvalue == "35"
+                                    ? "Referred to Other Department Comments"
+                                    : nextlevelvalue == "15"
+                                      ? "Refer Back Comments"
+                                      : "Comments"}
+                            </label>
+
+                            <div className="form-bx">
+                              <label>
+                                <textarea
+                                  name="Comment"
+                                  onChange={(e) => {
+                                    HandleNextleveldata(e);
+                                  }}
+                                  placeholder={
+                                    nextlevelvalue == "10"
+                                      ? "Assign Comments"
+                                      : nextlevelvalue == "20"
+                                        ? "Delegate Comments"
+                                        : nextlevelvalue == "35"
+                                          ? "Referred to Other Department Comments"
+                                          : nextlevelvalue == "15"
+                                            ? "Refer Back Comments"
+                                            : "Comments"
+                                  }
+                                  className={errors.Comment ? "error" : ""}
+                                  value={asignnextLeveldata.Comment}
+                                />
+                                <span className="sspan"></span>
+                                {errors.Comment ? (
+                                  <small className="errormsg">
+                                    {nextlevelvalue == "10"
+                                      ? "Assign comments is required"
+                                      : nextlevelvalue == "20"
+                                        ? "Delegate comments is required"
+                                        : nextlevelvalue == "35"
+                                          ? "Referred to other department comments is required"
+                                          : nextlevelvalue == "15"
+                                            ? "Refer back comments is required"
+                                            : "Comments is required"}
+                                  </small>
+                                ) : (
+                                  ""
+                                )}
+                              </label>
+                            </div>
+                          </div>
+
+                          <div className={roleID == 9 ? "inner_form_new align-items-center" : "d-none"}>
+                            <label className="controlform">Bank</label>
+                            <div className="cccto">
+                              <div className="flex justify-content-center multiSelect">
+                                <MultiSelect
+                                  value={selectedBanks}
+                                  onChange={(e) => setSelectedBanks(e.value)}
+                                  options={vOption}
+                                  onShow={onShow}
+                                  optionLabel="name"
+                                  placeholder="Select Banks"
+                                  // maxSelectedLabels={3}
+                                  display="chip"
+                                  className="w-full md:w-20rem"
+                                />
+
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* end form-bx  */}
+                          <div className={roleID == 9 ? "inner_form_new" : "d-none"}>
+                            <label className="controlform">Directives</label>
+                            <div className="form-bx">
+                              <div className="multiselect flex justify-content-center">
+                                <MultiSelect
+                                  value={selectedDirectives}
+                                  onChange={(e) => setSelectedDirectives(e.value)}
+                                  options={DirectiveOption}
+                                  optionLabel="name"
+                                  name="directiveData"
+                                  placeholder="Select Directives"
+                                  display="chip"
+                                />
+                                {errors?.directiveData ? (
+                                  <small className="errormsg">{errors.directiveData}</small>
+                                ) : (
+                                  ""
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                          {/* end form-bx  */}
+
+                          {/* end form-bx  */}
+                          <div className={roleID == 9 ? "inner_form_new" : "d-none"}>
+                            <label className="controlform">Releasing Date</label>
+                            <div className="form-bx">
+                              <DatePicker
+                                placeholderText="Select Releasing Date"
+                                closeOnScroll={(e) => e.target === document}
+                                selected={releasingDate}
+                                onChange={(date) => setReleasingDate(date)}
+                                peekNextMonth
+                                showMonthDropdown
+                                showYearDropdown
+                                minDate={new Date()}
+                                dropdownMode="select"
+                                dateFormat="dd/MMMM/yyyy"
+                              />
+                              {
+                                errors?.releasingDate ? (
+                                  <small className="errormsg">{errors.releasingDate}</small>
+                                ) : (" ")
+                              }
+                            </div>
+                          </div>
+                          {/* end form-bx  */}
+                          <div
+                            className={
+                              (roleID == 9 && nextlevelvalue == "") ||
+                                recomdAnalyst == "121"
+                                ? "inner_form_new align-items-center"
+                                : "d-none"
+                            }
+                          >
+                            <label className="controlform">Decision</label>
+                            <div className="row">
+                              <div className="col-md-12">
+                                <div className="hidden-toggles">
+                                  <input
+                                    type="radio"
+                                    id="srcoloration-Approvedved5"
+                                    value="10"
+                                    onChange={(e) => {
+                                      ChangeApplicationStatus(e);
+                                      GetRoleHandle(10);
+                                      // supervisorHangechangeRole(e);
+                                    }}
+                                    name="applicationstausdir"
+                                    className="hidden-toggles__input"
+                                    checked={
+                                      applicationstaus == "10" ? true : false
+                                    }
+                                  />
+                                  <label
+                                    for="srcoloration-Approvedved5"
+                                    className="hidden-toggles__label"
+                                  >
+                                    Approved
+                                  </label>
+
+                                  {/* <input
+                                  type="radio"
+                                  id="srcoloration-Rejected"
+                                  value="30"
+                                  onChange={(e) => {
+                                    ChangeApplicationStatus(e);
+                                   
+                                  }}
+                                  name="applicationstausdir"
+                                  className="hidden-toggles__input"
+                                  checked={
+                                    applicationstaus == "30" ? true : false
+                                  }
+                                />
+                                <label
+                                  for="srcoloration-Rejected"
+                                  className="hidden-toggles__label"
+                                >
+                                  Rejected
+                                </label> */}
+
+                                  {/* <input
+                                  type="radio"
+                                  id="srcoloration-Deferred"
+                                  onChange={(e) => {
+                                    ChangeApplicationStatus(e);
+                                    
+                                  }}
+                                  name="applicationstausdir"
+                                  value="40"
+                                  className="hidden-toggles__input"
+                                  checked={
+                                    applicationstaus == "40" ? true : false
+                                  }
+                                />
+                                <label
+                                  for="srcoloration-Deferred"
+                                  className="hidden-toggles__label"
+                                >
+                                  Deferred
+                                </label> */}
+
+                                  {/* <input
+                                  type="radio"
+                                  id="srcoloration-Cancelled"
+                                  onChange={(e) => {
+                                    ChangeApplicationStatus(e);
+                                    
+                                  }}
+                                  name="applicationstausdir"
+                                  value="25"
+                                  className="hidden-toggles__input"
+                                  checked={
+                                    applicationstaus == "25" ? true : false
+                                  }
+                                />
+                                <label
+                                  for="srcoloration-Cancelled"
+                                  className="hidden-toggles__label"
+                                >
+                                  Cancelled
+                                </label> */}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </> : (<span>
+                          {/* {noDataComment?.map((data, i) => {
+                            if (data.roleID == 9 && data.isDataAvailable == 0) {
+                              return (
+                                <div
+                                  className={director ? "customtab" : "d-none"}
+                                  key={i}
+                                >
+                                  <div class="text-center">No Data Found</div>
+                                </div>
+                              );
+                            }
+                          })} */}
+                        </span>)}
+                        {/* next level data show and assign behalf of not equal userID  start*/}
+                      </div>
+
+                      {allcomment?.map((cur, indexcomment) => {
+                        return cur?.circularActivityData
+                          ?.slice()
+                          ?.reverse()
+                          ?.map((item, index) => {
+                            if (cur?.assignedToRoleID == 9) {
+                              return (
+                                <>
+                                  <div
+                                    key={index}
+                                    className={
+                                      index == 0 && roleID != 9
+                                        ? "tab-pane fade show active"
+                                        : "tab-pane fade show  "
+                                    }
+                                    id={"director-justified-home" + index}
+                                    role="tabpanel"
+                                    aria-labelledby={"director" + index}
+                                  >
+                                    <div className={item?.actionStatusName ? "bakgroundaction" : "d-none"}>
+                                      <div className="row">
+                                        <div className="col-md-6">
+                                          <div className="inner_form_new ">
+                                            <label className="controlform">
+                                              Action Type
+                                            </label>
+                                            <div className="form-bx">
+                                              <label>
+                                                <input
+                                                  type="text"
+                                                  className=""
+                                                  disabled
+                                                  // value={item?.actionStatusName}
+                                                  value={
+                                                    item?.actionStatusName ==
+                                                      "Approved" ||
+                                                      item?.actionStatusName ==
+                                                      "Reject" ||
+                                                      item?.actionStatusName ==
+                                                      "Cancelled" ||
+                                                      item?.actionStatusName ==
+                                                      "Draft"
+                                                      ? "Assigned"
+                                                      : item?.actionStatusName
+                                                  }
+                                                />
+                                              </label>
+                                            </div>
+                                          </div>
+                                        </div>
+
+                                        <div
+                                          className={
+                                            item?.actionUserNam
+                                              ? "col-md-3"
+                                              : "d-none"
+                                          }
+                                        >
+                                          <div className="inner_form_new-sm ">
+                                            <label className="controlform-sm">
+                                              User{" "}
+                                              <i
+                                                className="bi bi-info-circle icons-info"
+                                                title={`Role : ${item?.actionRoleName}`}
+                                              ></i>
+                                            </label>
+                                            <div className="form-bx-sm">
+                                              <label>
+                                                <input
+                                                  type="text"
+                                                  className=""
+                                                  disabled
+                                                  value={item?.actionUserName}
+                                                />
+                                              </label>
+                                            </div>
+                                          </div>
+                                        </div>
+
+                                        <div
+                                          className={
+                                            item?.actionUserNam
+                                              ? "col-md-3"
+                                              : "col-md-6"
+                                          }
+                                        >
+                                          <div className="inner_form_new-sm">
+                                            <label className="controlform-sm">
+                                              {item?.actionStatusName ==
+                                                "Approved" ||
+                                                item?.actionStatusName ==
+                                                "Reject" ||
+                                                item?.actionStatusName ==
+                                                "Cancelled"
+                                                ? "Assigned"
+                                                : item?.actionStatusName}{" "}
+                                              Date
+                                            </label>
+                                            <div className="form-bx-sm">
+                                              <label>
+                                                <input
+                                                  type="text"
+                                                  className=""
+                                                  disabled
+                                                  value={moment(
+                                                    item?.createdDate
+                                                  ).format("DD/MMM/yyyy")}
+                                                />
+                                              </label>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+
+                                      <div
+                                        className={
+                                          item?.actionNotes
+                                            ? "inner_form_new "
+                                            : "d-none"
+                                        }
+                                      >
+                                        <label className="controlform">
+                                          Action Note
+                                        </label>
+                                        <div className="form-bx">
+                                          <label>
+                                            <textarea
+                                              disabled
+                                              value={item?.actionNotes}
+                                            />
+                                          </label>
+                                        </div>
+                                      </div>
+
+                                      <div
+                                        className={
+                                          item?.actionComment
+                                            ? "inner_form_new "
+                                            : "d-none"
+                                        }
+                                      >
+                                        <label className="controlform">
+                                          Action Comment
+                                        </label>
+                                        <div className="form-bx">
+                                          <label>
+                                            <textarea
+                                              disabled
+                                              value={item?.actionComment}
+                                            />
+                                          </label>
+                                        </div>
+                                      </div>
+                                    </div>
+
+                                    <div className="inner_form_new">
+                                      <label className="controlform">
+                                        Recommendation
+                                      </label>
+                                      <div className="form-bx">
+                                        <label>
+                                          <div
+                                            className="tableEditorData disabled viewdiscription"
+                                            dangerouslySetInnerHTML={{
+                                              __html: item?.content
+                                                ? item?.content
+                                                : "N/A",
+                                            }}
+                                            disabled
+                                          />
+                                        </label>
+                                      </div>
+                                    </div>
+
+                                    <div className="inner_form_new ">
+                                      <label className="controlform">
+                                        Notes
+                                      </label>
+                                      <div className="form-bx">
+                                        <label>
+                                          <textarea
+                                            name="Notes"
+                                            placeholder="Notes"
+                                            className=""
+                                            disabled
+                                          >
+                                            {item?.notes}
+                                          </textarea>
+                                        </label>
+                                      </div>
+                                    </div>
+                                    <div className="inner_form_new ">
+                                      <label className="controlform">
+                                        Comments
+                                      </label>
+                                      <div className="form-bx">
+                                        <label>
+                                          <textarea
+                                            name="Notes"
+                                            placeholder="Comments"
+                                            className=""
+                                            disabled
+                                          >
+                                            {item?.comment}
+                                          </textarea>
+                                        </label>
+                                      </div>
+                                    </div>
+                                    <div className="inner_form_new ">
+                                      <label className="controlform">
+                                        Attachments
+                                      </label>
+                                      <div className="form-bx">
+                                        {item?.filesData?.length ? (
+                                          item?.filesData?.map(
+                                            (items, index) => {
+                                              return (
+                                                <div
+                                                  className="attachemt_form-bx mb-0 width-80"
+                                                  key={items.id}
+                                                >
+                                                  <label className="mb-2 mb-0 pt-2 pb-2">
+                                                    {/* {items.filename} */}
+                                                    {items?.fileName
+                                                      ? items?.fileName
+                                                      : `FileUpload ${index}`}
+                                                  </label>
+                                                  <div
+                                                    className={
+                                                      roleID == 2 || roleID == 3
+                                                        ? "browse-btn"
+                                                        : "d-none"
+                                                    }
+                                                  >
+                                                    Browse{" "}
+                                                    <input
+                                                      type="file"
+                                                      onChange={(e) =>
+                                                        handleFileChange(
+                                                          e,
+                                                          items.id
+                                                        )
+                                                      }
+                                                    />
+                                                  </div>
+                                                  <span className="filename">
+                                                    <Link
+                                                      to={items?.filePath}
+                                                      target="_blank"
+                                                      className="viewbtn"
+                                                    >
+                                                      View File
+                                                    </Link>
+                                                  </span>
+                                                </div>
+                                              );
+                                            }
+                                          )
+                                        ) : (
+                                          <label className="notfound">
+                                            File Not Found
+                                          </label>
+                                        )}
+                                      </div>
+                                    </div>
+                                    <div className="inner_form_new ">
+                                      <label className="controlform">
+                                        Bank
+                                      </label>
+                                      <div className="form-bx">
+                                        <label>
+                                          <ul className="nalist">
+                                            {item?.bankData
+                                              ?.length ? (
+                                              item?.bankData?.map(
+                                                (res) => {
+                                                  return (
+                                                    <li>{res?.bankName}</li>
+                                                  );
+                                                }
+                                              )
+                                            ) : (
+                                              <li className="disabletext">
+                                                N/A
+                                              </li>
+                                            )}
+                                          </ul>
+                                        </label>
+                                      </div>
+                                    </div>
+                                    <div className="inner_form_new ">
+                                      <label className="controlform">
+                                        Directives
+                                      </label>
+                                      <div className="form-bx">
+                                        <label>
+                                          <ul className="nalist">
+                                            {item?.directiveData
+                                              ?.length ? (
+                                              item?.directiveData?.map(
+                                                (res) => {
+                                                  return (
+                                                    <li>{res?.directiveName}</li>
+                                                  );
+                                                }
+                                              )
+                                            ) : (
+                                              <li className="disabletext">
+                                                N/A
+                                              </li>
+                                            )}
+                                          </ul>
+                                        </label>
+                                      </div>
+                                    </div>
+                                    <div className="inner_form_new">
+                                      <label className="controlform">
+                                        Releasing Date
+                                      </label>
+                                      <div className="form-bx">
+                                        <label>
+                                          <input
+                                            type="text"
+                                            className=""
+                                            disabled
+                                            value={moment(
+                                              item?.releasingDate
+                                            ).format("DD/MMM/yyyy")}
+                                          />
+                                        </label>
+                                      </div>
+                                    </div>
+                                    {/* <div class="row">
+                                      <div class="col-md-12">
+                                        <div class="inner_form_new ">
+                                          <label class="controlform">
+                                            Action
+                                          </label>
+                                          <div class="form-bx">
+                                            <label>
+                                              <input
+                                                type="text"
+                                                class=""
+                                                disabled
+                                                value={
+                                                  item?.assignedAction ==
+                                                    "Approved" ||
+                                                    item?.assignedAction ==
+                                                    "Reject" ||
+                                                    item?.assignedAction ==
+                                                    "Cancelled"
+                                                    ? "Assigned"
+                                                    : item?.assignedAction
+                                                }
+                                              />
+                                            </label>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div> */}
+
+
+                                    <div
+                                      className={
+                                        item?.assignedToName == null &&
+                                          item?.assignedToName == null
+                                          ? "d-none"
+                                          : "row"
+                                      }
+                                    >
+                                      <div className="col-md-6">
+                                        <div className="inner_form_new ">
+                                          <label className="controlform">
+                                            Assigned To Role
+                                          </label>
+                                          <div className="form-bx">
+                                            <label>
+                                              <input
+                                                type="text"
+                                                className=""
+                                                disabled
+                                                value={
+                                                  item?.roleName
+                                                    ? item?.roleName
+                                                    : ""
+                                                }
+                                              />
+                                            </label>
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <div className="col-md-6">
+                                        <div className="inner_form_new-sm ">
+                                          <label className="controlform-sm">
+                                            Assigned To User
+                                          </label>
+                                          <div className="form-bx-sm">
+                                            <label>
+                                              <input
+                                                type="text"
+                                                className=""
+                                                disabled
+                                                value={
+                                                  item?.assignedToName
+                                                    ? item?.assignedToName
+                                                    : ""
+                                                }
+                                              />
+                                            </label>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+
+
+                                  </div>
+                                </>
+                              );
+                            }
+                          });
+                      })}
+
+                    </div>
+                  </div>
+                </>
+              ) : (
+                ""
+              )}
+              {/* director code end */}
+
+              <div className="form-footer mt-5 mb-3">
+                <button
+                  type="reset"
+                  onClick={(e) => {
+                    EditModalClose(e);
+                  }}
+                  className="register"
+                >
+                  Close
+                </button>
+
+                <div>
+                  {/* {(roleID > 5 &&
                     recomdAnalyst == "121" &&
                     applicationstaus != "25") ||
                     (roleID == 3 &&
@@ -8126,118 +8492,117 @@ const ExportCircularsEditForm = ({
                     ""
                   )} */}
 
-                <button
-                  type="button"
+                  <button
+                    type="button"
 
-                  onClick={(e) => {
-                    HandleSubmit(e);
-                  }}
-                  className="login"
-                  // disabled={(roleID == "6" || roleID == "7") && nextlevelvalue.length == 0 ? true : false}
-                  disabled={nextlevelvalue == "" &&
-                    (
-                      roleID == 6) ||
-                    (nextlevelvalue == "" && roleID == 7) ||
-                    ((applicationstaus == "0" || applicationstaus == undefined) &&
-                      (roleID == 8) && (nextlevelvalue == "")) ||
-                    SubmitBtnLoader == true
-                    ? true
-                    : false
-                  }
-                >
-                  Submit
-                </button>
+                    onClick={(e) => {
+                      HandleSubmit(e);
+                    }}
+                    className="login"
+                    // disabled={(roleID == "6" || roleID == "7") && nextlevelvalue.length == 0 ? true : false}
+                    disabled={nextlevelvalue == "" &&
+                      (roleID == 6 && (applicationDetail.userID != UserID.replace(/"/g, ""))) ||
+                      (nextlevelvalue == "" && roleID == 7) ||
+                      ((applicationstaus == "0" || applicationstaus == undefined) &&
+                        (roleID == 8) && (nextlevelvalue == "")) ||
+                      (SubmitBtnLoader == true) || (applicationDetail.roleID == 0 && checkSupervisor == false)
+                      ? true
+                      : false
+                    }
+                  >
+                    Submit
+                  </button>
+                </div>
               </div>
-            </div>
-            {/* pdf-preview data start Arun Verma Final Pdf Generation and Preview */}
-            <div className="login_inner" style={{ display: "none" }}>
-              <div className="login_form_panel" style={{ display: "none" }}>
-                <div
-                  ref={PdftargetRef}
-                  className="p-5"
-                  style={{ position: "relative" }}
-                >
-                  <table width="100%">
-                    <tr>
-                      <td
-                        style={{
-                          marginBottom: "0px",
-                          color: "#000",
-                          fontSize: "18px",
-                          fontWeight: "800",
-                        }}
-                      >
-                        Exchange &nbsp; Control &nbsp; Ref
-                        <br />
-                        Previous &nbsp; Exchange &nbsp; Control &nbsp; Ref
-                      </td>
-                      <td>
-                        <p
+              {/* pdf-preview data start Arun Verma Final Pdf Generation and Preview */}
+              <div className="login_inner" style={{ display: "none" }}>
+                <div className="login_form_panel" style={{ display: "none" }}>
+                  <div
+                    ref={PdftargetRef}
+                    className="p-5"
+                    style={{ position: "relative" }}
+                  >
+                    <table width="100%">
+                      <tr>
+                        <td
                           style={{
                             marginBottom: "0px",
                             color: "#000",
                             fontSize: "18px",
-                            textAlign: "left",
                             fontWeight: "800",
+                          }}
+                        >
+                          Exchange &nbsp; Control &nbsp; Ref
+                          <br />
+                          Previous &nbsp; Exchange &nbsp; Control &nbsp; Ref
+                        </td>
+                        <td>
+                          <p
+                            style={{
+                              marginBottom: "0px",
+                              color: "#000",
+                              fontSize: "18px",
+                              textAlign: "left",
+                              fontWeight: "800",
+                              letterSpacing: "0.01px",
+                            }}
+                          >
+                            : {applicationDetail?.rbzReferenceNumber}
+                            <br />: N/A
+                          </p>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td colSpan="2">&nbsp;</td>
+                      </tr>
+                      <tr>
+                        <td
+                          colSpan="2"
+                          style={{
+                            color: "#000",
+                            fontSize: "18px",
+                            fontWeight: "600",
                             letterSpacing: "0.01px",
                           }}
                         >
-                          : {applicationDetail?.rbzReferenceNumber}
-                          <br />: N/A
-                        </p>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td colSpan="2">&nbsp;</td>
-                    </tr>
-                    <tr>
-                      <td
-                        colSpan="2"
-                        style={{
-                          color: "#000",
-                          fontSize: "18px",
-                          fontWeight: "600",
-                          letterSpacing: "0.01px",
-                        }}
-                      >
-                        {moment(
-                          applicationDetail?.applicationSubmittedDate
-                        ).format("DD MMMM YYYY")}
-                      </td>
-                    </tr>
-                    <tr>
-                      <td colSpan="2">&nbsp;</td>
-                    </tr>
-                    <tr>
-                      <td
-                        colSpan="2"
-                        style={{
-                          color: "#000",
-                          fontSize: "18px",
-                          fontWeight: "600",
-                          letterSpacing: "0.01px",
-                        }}
-                      >
-                        The Head - Exchange Control
-                        <br />
-                        {applicationDetail?.bankName}
-                        <br />
-                        {applicationDetail?.bankAddress1 != null ||
-                          applicationDetail?.bankAddress1 != ""
-                          ? applicationDetail?.bankAddress1 + "," + " "
-                          : ""}
-                        <br></br>
-                        {applicationDetail?.bankAddress2 != null ||
-                          applicationDetail?.bankAddress2 != ""
-                          ? applicationDetail?.bankAddress2 + "," + " "
-                          : ""}
-                        <br></br>
-                        {applicationDetail?.bankAddress3 != null ||
-                          applicationDetail?.bankAddress3 != ""
-                          ? applicationDetail?.bankAddress3
-                          : ""}
-                        <br />
-                        {/* <span
+                          {moment(
+                            applicationDetail?.applicationSubmittedDate
+                          ).format("DD MMMM YYYY")}
+                        </td>
+                      </tr>
+                      <tr>
+                        <td colSpan="2">&nbsp;</td>
+                      </tr>
+                      <tr>
+                        <td
+                          colSpan="2"
+                          style={{
+                            color: "#000",
+                            fontSize: "18px",
+                            fontWeight: "600",
+                            letterSpacing: "0.01px",
+                          }}
+                        >
+                          The Head - Exchange Control
+                          <br />
+                          {applicationDetail?.bankName}
+                          <br />
+                          {applicationDetail?.bankAddress1 != null ||
+                            applicationDetail?.bankAddress1 != ""
+                            ? applicationDetail?.bankAddress1 + "," + " "
+                            : ""}
+                          <br></br>
+                          {applicationDetail?.bankAddress2 != null ||
+                            applicationDetail?.bankAddress2 != ""
+                            ? applicationDetail?.bankAddress2 + "," + " "
+                            : ""}
+                          <br></br>
+                          {applicationDetail?.bankAddress3 != null ||
+                            applicationDetail?.bankAddress3 != ""
+                            ? applicationDetail?.bankAddress3
+                            : ""}
+                          <br />
+                          {/* <span
                             style={{
                               borderBottom: "1px solid #000",
                               fontWeight: "800",
@@ -8251,305 +8616,70 @@ const ExportCircularsEditForm = ({
                               ? applicationDetail?.bankCity
                               : ""}
                           </span> */}
-                      </td>
-                    </tr>
-                    <tr>
-                      <td colSpan="2">&nbsp;</td>
-                    </tr>
-                    <tr>
-                      <td
-                        colSpan="2"
-                        style={{
-                          color: "#000",
-                          fontSize: "18px",
-                          fontWeight: "600",
-                          letterSpacing: "0.01px",
-                        }}
-                      >
-                        Dear{" "}
-                        {/* {applicationDetail?.applicantType == 1
+                        </td>
+                      </tr>
+                      <tr>
+                        <td colSpan="2">&nbsp;</td>
+                      </tr>
+                      <tr>
+                        <td
+                          colSpan="2"
+                          style={{
+                            color: "#000",
+                            fontSize: "18px",
+                            fontWeight: "600",
+                            letterSpacing: "0.01px",
+                          }}
+                        >
+                          Dear{" "}
+                          {/* {applicationDetail?.applicantType == 1
                             ? applicationDetail?.companyName
                             : applicationDetail?.applicantType == 2
                             ? applicationDetail?.name
                             : applicationDetail?.applicantType == 3
                             ? applicationDetail?.agencyName
                             : " "} */}
-                        {applicationDetail?.companyName == null ||
-                          applicationDetail?.companyName == ""
-                          ? applicationDetail?.name
-                          : applicationDetail?.companyName}
-                      </td>
-                    </tr>
-                    <tr>
-                      <td colSpan="2">&nbsp;</td>
-                    </tr>
-                    <tr>
-                      <td colSpan="2">
-                        <table width="100%">
-                          <tr>
-                            <td colSpan="2">
-                              <p
-                                style={{
-                                  color: "#000",
-                                  fontSize: "18px",
-                                  fontWeight: "800",
-                                  borderBottom: "1px solid #000",
-                                  marginBottom: "0px",
-                                  letterSpacing: "0.01px",
-                                }}
-                              >
-                                RE &nbsp;:&nbsp;{" "}
-                                {applicationDetail?.applicationType}
-                              </p>
-                            </td>
-                          </tr>
-                          <tr>
-                            <td colSpan="2">&nbsp;</td>
-                          </tr>
-                          <tr>
-                            <td
-                              style={{
-                                color: "#000",
-                                fontSize: "18px",
-                                fontWeight: "400",
-                              }}
-                            >
-                              Exporter
-                            </td>
-                            <td
-                              style={{
-                                color: "#000",
-                                fontSize: "18px",
-                                fontWeight: "800",
-                                letterSpacing: "0.01px",
-                              }}
-                            >
-                              :{" "}
-                              {applicationDetail?.companyName == null ||
-                                applicationDetail?.companyName == ""
-                                ? applicationDetail?.name
-                                : applicationDetail?.companyName}
-                            </td>
-                          </tr>
-                          <tr>
-                            <td
-                              style={{
-                                color: "#000",
-                                fontSize: "18px",
-                                fontWeight: "400",
-                                letterSpacing: "0.01px",
-                              }}
-                            >
-                              Date Submitted
-                            </td>
-                            <td
-                              style={{
-                                color: "#000",
-                                fontSize: "18px",
-                                fontWeight: "800",
-                                letterSpacing: "0.01px",
-                              }}
-                            >
-                              :{" "}
-                              {moment(
-                                applicationDetail?.applicationSubmittedDate
-                              ).format("DD MMMM YYYY")}
-                            </td>
-                          </tr>
-                          <tr>
-                            <td
-                              style={{
-                                color: "#000",
-                                fontSize: "18px",
-                                fontWeight: "400",
-                                letterSpacing: "0.01px",
-                              }}
-                            >
-                              Currency and Amount
-                            </td>
-                            <td
-                              style={{
-                                color: "#000",
-                                fontSize: "18px",
-                                fontWeight: "800",
-                              }}
-                            >
-                              :{" "}
-                              <span
-                                style={{
-                                  minWidth: "45px",
-                                  display: "inline-block",
-                                  paddingRight: "5px",
-                                  fontWeight: "800",
-                                }}
-                              >
-                                {applicationDetail?.currencyCode}
-                              </span>
-                              <span
-                                style={{
-                                  fontSize: "18px",
-                                  fontWeight: "800",
-                                }}
-                              >
-                                {applicationDetail?.amount}
-                              </span>
-                            </td>
-                          </tr>
-                          <tr>
-                            <td
-                              style={{
-                                color: "#000",
-                                fontSize: "18px",
-                                fontWeight: "400",
-                                letterSpacing: "0.01px",
-                              }}
-                            >
-                              USD Equivalent
-                            </td>
-                            <td
-                              style={{
-                                color: "#000",
-                                fontSize: "18px",
-                                fontWeight: "800",
-                              }}
-                            >
-                              :{" "}
-                              <span
-                                style={{
-                                  minWidth: "45px",
-                                  display: "inline-block",
-                                  paddingRight: "5px",
-                                  fontWeight: "800",
-                                }}
-                              >
-                                USD
-                              </span>
-                              <span
-                                style={{
-                                  fontSize: "18px",
-                                  fontWeight: "800",
-                                }}
-                              >
-                                {applicationDetail?.usdEquivalent}
-                              </span>
-                            </td>
-                          </tr>
-                          <tr>
-                            <td
-                              style={{
-                                color: "#000",
-                                fontSize: "18px",
-                                fontWeight: "400",
-                                letterSpacing: "0.01px",
-                              }}
-                            >
-                              Status/Decision
-                            </td>
-                            <td
-                              style={{
-                                color: "#000",
-                                fontSize: "18px",
-                                fontWeight: "800",
-                                letterSpacing: "0.01px",
-                              }}
-                            >
-                              :{" "}
-                              {applicationstaus == "10"
-                                ? "Approved"
-                                : applicationstaus == "30"
-                                  ? "Rejected"
-                                  : applicationstaus == "40"
-                                    ? "Deferred"
-                                    : applicationstaus == "25"
-                                      ? "Cancelled"
-                                      : ""}
-                              {/* {applicationDetail?.statusName} */}
-                            </td>
-                          </tr>
-                          <tr
-                            className={
-                              applicationDetail?.expiringDate == null ||
-                                applicationDetail?.expiringDate == ""
-                                ? "d-none"
-                                : ""
-                            }
-                          >
-                            <td
-                              style={{
-                                color: "#000",
-                                fontSize: "18px",
-                                fontWeight: "400",
-                                letterSpacing: "0.01px",
-                              }}
-                            >
-                              Expiry Date
-                            </td>
-                            <td
-                              style={{
-                                color: "#000",
-                                fontSize: "18px",
-                                fontWeight: "800",
-                                letterSpacing: "0.01px",
-                              }}
-                            >
-                              :{" "}
-                              {applicationDetail?.expiringDate == null ||
-                                applicationDetail?.expiringDate == "" ||
-                                applicationDetail?.expiringDate ==
-                                "0001-01-01T00:00:00"
-                                ? "N/A"
-                                : moment(
-                                  applicationDetail?.expiringDate
-                                ).format("DD MMMM YYYY")}
-                            </td>
-                          </tr>
-                          <tr
-                            className={
-                              applicationDetail?.returnFrequencyName ==
-                                null ||
-                                applicationDetail?.returnFrequencyName == ""
-                                ? "d-none"
-                                : ""
-                            }
-                          >
-                            <td
-                              style={{
-                                fontSize: "18px",
-                                fontWeight: "400",
-                                color: "#000",
-                                letterSpacing: "0.01px",
-                              }}
-                            >
-                              Returns Frequency
-                            </td>
-                            <td
-                              style={{
-                                color: "#000",
-                                fontSize: "18px",
-                                fontWeight: "800",
-                                letterSpacing: "0.01px",
-                              }}
-                            >
-                              :{" "}
-                              {applicationDetail?.returnFrequencyName ==
-                                null ||
-                                applicationDetail?.returnFrequencyName == ""
-                                ? "N/A"
-                                : applicationDetail?.returnFrequencyName}
-                            </td>
-                          </tr>
-                          {applicationDetail?.returnFrequencyName ==
-                            "Once" ? (
+                          {applicationDetail?.companyName == null ||
+                            applicationDetail?.companyName == ""
+                            ? applicationDetail?.name
+                            : applicationDetail?.companyName}
+                        </td>
+                      </tr>
+                      <tr>
+                        <td colSpan="2">&nbsp;</td>
+                      </tr>
+                      <tr>
+                        <td colSpan="2">
+                          <table width="100%">
+                            <tr>
+                              <td colSpan="2">
+                                <p
+                                  style={{
+                                    color: "#000",
+                                    fontSize: "18px",
+                                    fontWeight: "800",
+                                    borderBottom: "1px solid #000",
+                                    marginBottom: "0px",
+                                    letterSpacing: "0.01px",
+                                  }}
+                                >
+                                  RE &nbsp;:&nbsp;{" "}
+                                  {applicationDetail?.applicationType}
+                                </p>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td colSpan="2">&nbsp;</td>
+                            </tr>
                             <tr>
                               <td
                                 style={{
+                                  color: "#000",
                                   fontSize: "18px",
                                   fontWeight: "400",
-                                  color: "#000",
-                                  letterSpacing: "0.01px",
                                 }}
                               >
-                                Returns Date
+                                Exporter
                               </td>
                               <td
                                 style={{
@@ -8560,1041 +8690,202 @@ const ExportCircularsEditForm = ({
                                 }}
                               >
                                 :{" "}
-                                {applicationDetail?.returnDate == null ||
-                                  applicationDetail?.returnDate == "" ||
-                                  applicationDetail?.returnDate ==
+                                {applicationDetail?.companyName == null ||
+                                  applicationDetail?.companyName == ""
+                                  ? applicationDetail?.name
+                                  : applicationDetail?.companyName}
+                              </td>
+                            </tr>
+                            <tr>
+                              <td
+                                style={{
+                                  color: "#000",
+                                  fontSize: "18px",
+                                  fontWeight: "400",
+                                  letterSpacing: "0.01px",
+                                }}
+                              >
+                                Date Submitted
+                              </td>
+                              <td
+                                style={{
+                                  color: "#000",
+                                  fontSize: "18px",
+                                  fontWeight: "800",
+                                  letterSpacing: "0.01px",
+                                }}
+                              >
+                                :{" "}
+                                {moment(
+                                  applicationDetail?.applicationSubmittedDate
+                                ).format("DD MMMM YYYY")}
+                              </td>
+                            </tr>
+                            <tr>
+                              <td
+                                style={{
+                                  color: "#000",
+                                  fontSize: "18px",
+                                  fontWeight: "400",
+                                  letterSpacing: "0.01px",
+                                }}
+                              >
+                                Currency and Amount
+                              </td>
+                              <td
+                                style={{
+                                  color: "#000",
+                                  fontSize: "18px",
+                                  fontWeight: "800",
+                                }}
+                              >
+                                :{" "}
+                                <span
+                                  style={{
+                                    minWidth: "45px",
+                                    display: "inline-block",
+                                    paddingRight: "5px",
+                                    fontWeight: "800",
+                                  }}
+                                >
+                                  {applicationDetail?.currencyCode}
+                                </span>
+                                <span
+                                  style={{
+                                    fontSize: "18px",
+                                    fontWeight: "800",
+                                  }}
+                                >
+                                  {applicationDetail?.amount}
+                                </span>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td
+                                style={{
+                                  color: "#000",
+                                  fontSize: "18px",
+                                  fontWeight: "400",
+                                  letterSpacing: "0.01px",
+                                }}
+                              >
+                                USD Equivalent
+                              </td>
+                              <td
+                                style={{
+                                  color: "#000",
+                                  fontSize: "18px",
+                                  fontWeight: "800",
+                                }}
+                              >
+                                :{" "}
+                                <span
+                                  style={{
+                                    minWidth: "45px",
+                                    display: "inline-block",
+                                    paddingRight: "5px",
+                                    fontWeight: "800",
+                                  }}
+                                >
+                                  USD
+                                </span>
+                                <span
+                                  style={{
+                                    fontSize: "18px",
+                                    fontWeight: "800",
+                                  }}
+                                >
+                                  {applicationDetail?.usdEquivalent}
+                                </span>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td
+                                style={{
+                                  color: "#000",
+                                  fontSize: "18px",
+                                  fontWeight: "400",
+                                  letterSpacing: "0.01px",
+                                }}
+                              >
+                                Status/Decision
+                              </td>
+                              <td
+                                style={{
+                                  color: "#000",
+                                  fontSize: "18px",
+                                  fontWeight: "800",
+                                  letterSpacing: "0.01px",
+                                }}
+                              >
+                                :{" "}
+                                {applicationstaus == "10"
+                                  ? "Approved"
+                                  : applicationstaus == "30"
+                                    ? "Rejected"
+                                    : applicationstaus == "40"
+                                      ? "Deferred"
+                                      : applicationstaus == "25"
+                                        ? "Cancelled"
+                                        : ""}
+                                {/* {applicationDetail?.statusName} */}
+                              </td>
+                            </tr>
+                            <tr
+                              className={
+                                applicationDetail?.expiringDate == null ||
+                                  applicationDetail?.expiringDate == ""
+                                  ? "d-none"
+                                  : ""
+                              }
+                            >
+                              <td
+                                style={{
+                                  color: "#000",
+                                  fontSize: "18px",
+                                  fontWeight: "400",
+                                  letterSpacing: "0.01px",
+                                }}
+                              >
+                                Expiry Date
+                              </td>
+                              <td
+                                style={{
+                                  color: "#000",
+                                  fontSize: "18px",
+                                  fontWeight: "800",
+                                  letterSpacing: "0.01px",
+                                }}
+                              >
+                                :{" "}
+                                {applicationDetail?.expiringDate == null ||
+                                  applicationDetail?.expiringDate == "" ||
+                                  applicationDetail?.expiringDate ==
                                   "0001-01-01T00:00:00"
                                   ? "N/A"
                                   : moment(
-                                    applicationDetail?.returnDate
+                                    applicationDetail?.expiringDate
                                   ).format("DD MMMM YYYY")}
                               </td>
                             </tr>
-                          ) : (
-                            ""
-                          )}
-                        </table>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td colSpan="2">&nbsp;</td>
-                    </tr>
-                    <tr>
-                      <td colSpan="2">
-                        <table>
-                          <tr>
-                            <td colSpan="2">
-                              <table width="100%">
-                                <tr>
-                                  <td
-                                    style={{
-                                      color: "#000",
-                                      fontSize: "18px",
-                                      fontWeight: "400",
-                                    }}
-                                  >
-                                    <div>
-                                      <span
-                                        style={{
-                                          fontWeight: "800",
-                                          padding: "15px 0px 15px",
-                                          letterSpacing: "0.01px",
-                                        }}
-                                      >
-                                        Response / Conditions
-                                      </span>
-                                    </div>
-                                    <div
-                                      className="tableEditorData"
-                                      dangerouslySetInnerHTML={{
-                                        __html: Description
-                                          ? Description
-                                          : applicationDetail?.content,
-                                      }}
-                                      style={{ letterSpacing: "0.01px" }}
-                                    />
-                                  </td>
-                                </tr>
-                              </table>
-                            </td>
-                          </tr>
-                          <tr>
-                            <td colSpan="2">&nbsp;</td>
-                          </tr>
-                          <tr>
-                            <td
-                              colSpan="2"
-                              style={{
-                                color: "#000",
-                                fontSize: "18px",
-                                fontWeight: "400",
-                              }}
+                            <tr
+                              className={
+                                applicationDetail?.returnFrequencyName ==
+                                  null ||
+                                  applicationDetail?.returnFrequencyName == ""
+                                  ? "d-none"
+                                  : ""
+                              }
                             >
-                              <span
-                                style={{
-                                  color: "#000",
-                                  fontSize: "18px",
-                                  fontWeight: "400",
-                                  display: "inline-block",
-                                  letterSpacing: "0.01px",
-                                }}
-                              >
-                                {" "}
-                                Yours Sincerely,
-                              </span>
-                              <img
-                                src={
-                                  applicationDetail?.getUserData?.filePath
-                                    ? applicationDetail?.getUserData.filePath
-                                    : NoSign
-                                }
-                                alt="Signature"
-                                style={{
-                                  width: "120px",
-                                  height: "50px",
-                                  display: "block",
-                                  objectFit: "contain",
-                                }}
-                              />
-                              <p
-                                style={{
-                                  marginBottom: "0px",
-                                  color: "#000",
-                                  fontSize: "14px",
-                                  fontWeight: "400",
-                                  padding: "15px 0px 3px",
-                                  lineHeight: "13px",
-                                  letterSpacing: "0.01px",
-                                }}
-                              >
-                                {PdfUsername
-                                  ? PdfUsername.replace(/"/g, "")
-                                  : "N/A"}
-                              </p>
-                              <p
-                                style={{
-                                  marginBottom: "0px",
-                                  color: "#000",
-                                  fontSize: "14px",
-                                  fontWeight: "400",
-                                  padding: "5px 0px",
-                                  lineHeight: "13px",
-                                  letterSpacing: "0.01px",
-                                }}
-                              >
-                                {PdfRolename
-                                  ? PdfRolename.replace(/"/g, "")
-                                  : "N/A"}
-                              </p>
-                              <h3
-                                style={{
-                                  color: "#000",
-                                  fontSize: "18px",
-                                  fontWeight: "800",
-                                }}
-                              >
-                                EXCHANGE &nbsp; CONTROL
-                              </h3>
-                              <div
-                                style={{
-                                  marginBottom: "0px",
-                                  color: "#000",
-                                  fontSize: "18px",
-                                  fontWeight: "400",
-                                  padding: "25px 0px 5px",
-                                  lineHeight: "13px",
-                                  display: "flex",
-                                }}
-                              >
-                                {applicationDetail?.copiedResponses?.length >
-                                  0 ? (
-                                  <>
-                                    <p
-                                      style={{
-                                        marginBottom: "0px",
-                                        fontSize: "18px",
-                                        fontWeight: "400",
-                                        paddingRight: "10px",
-                                      }}
-                                    >
-                                      CC:
-                                    </p>
-                                    <div>
-                                      {selectedBanks.map((item) => {
-                                        return (
-                                          <p
-                                            style={{
-                                              marginBottom: "3px",
-                                              letterSpacing: "0.01px",
-                                              fontSize: "18px",
-                                              fontWeight: "400",
-                                            }}
-                                          >
-                                            {item.name}
-                                          </p>
-                                        );
-                                      })}
-                                    </div>
-                                  </>
-                                ) : (
-                                  ""
-                                )}
-                              </div>
-                            </td>
-                          </tr>
-                        </table>
-                      </td>
-                    </tr>
-                  </table>
-                </div>
-              </div>
-            </div>
-            {/* pdf-preview data end */}
-
-            {/* Supervisor level final close application Arun Verma */}
-            <div className="login_inner" style={{ display: "none" }}>
-              <div className="login_form_panel" style={{ display: "none" }}>
-                <div
-                  ref={CoverigLetterRef}
-                  className="p-5"
-                  style={{ position: "relative" }}
-                >
-                  <table width="100%">
-                    <tr>
-                      <td
-                        style={{
-                          marginBottom: "0px",
-                          color: "#000",
-                          fontSize: "18px",
-                          fontWeight: "800",
-                        }}
-                      >
-                        Exchange &nbsp; Control &nbsp; Ref
-                        <br />
-                        Previous &nbsp; Exchange &nbsp; Control &nbsp; Ref
-                      </td>
-                      <td>
-                        <p
-                          style={{
-                            marginBottom: "0px",
-                            color: "#000",
-                            fontSize: "18px",
-                            textAlign: "left",
-                            fontWeight: "800",
-                            letterSpacing: "0.01px",
-                          }}
-                        >
-                          : {applicationDetail?.rbzReferenceNumber}
-                          <br />: N/A
-                        </p>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td colSpan="2">&nbsp;</td>
-                    </tr>
-                    <tr>
-                      <td
-                        colSpan="2"
-                        style={{
-                          color: "#000",
-                          fontSize: "18px",
-                          fontWeight: "600",
-                          letterSpacing: "0.01px",
-                        }}
-                      >
-                        {moment(
-                          applicationDetail?.applicationSubmittedDate
-                        ).format("DD MMMM YYYY")}
-                      </td>
-                    </tr>
-                    <tr>
-                      <td colSpan="2">&nbsp;</td>
-                    </tr>
-                    <tr>
-                      <td
-                        colSpan="2"
-                        style={{
-                          color: "#000",
-                          fontSize: "18px",
-                          fontWeight: "600",
-                          letterSpacing: "0.01px",
-                        }}
-                      >
-                        The Head - Exchange Control
-                        <br />
-                        {applicationDetail?.bankName}
-                        <br />
-                        {applicationDetail?.bankAddress1 != null ||
-                          applicationDetail?.bankAddress1 != ""
-                          ? applicationDetail?.bankAddress1 + "," + " "
-                          : ""}
-                        <br></br>
-                        {applicationDetail?.bankAddress2 != null ||
-                          applicationDetail?.bankAddress2 != ""
-                          ? applicationDetail?.bankAddress2 + "," + " "
-                          : ""}
-                        <br></br>
-                        {applicationDetail?.bankAddress3 != null ||
-                          applicationDetail?.bankAddress3 != ""
-                          ? applicationDetail?.bankAddress3
-                          : ""}
-                        <br />
-                      </td>
-                    </tr>
-                    <tr>
-                      <td colSpan="2">&nbsp;</td>
-                    </tr>
-                    <tr>
-                      <td
-                        colSpan="2"
-                        style={{
-                          color: "#000",
-                          fontSize: "18px",
-                          fontWeight: "600",
-                          letterSpacing: "0.01px",
-                        }}
-                      >
-                        Dear{" "}
-                        {applicationDetail?.companyName == null ||
-                          applicationDetail?.companyName == ""
-                          ? applicationDetail?.name
-                          : applicationDetail?.companyName}
-                        ,
-                      </td>
-                    </tr>
-                    <tr>
-                      <td colSpan="2">&nbsp;</td>
-                    </tr>
-                    <tr>
-                      <td colSpan="2">
-                        <table width="100%">
-                          <tr>
-                            <td colSpan="2">
-                              <p
-                                style={{
-                                  color: "#000",
-                                  fontSize: "18px",
-                                  fontWeight: "800",
-                                  borderBottom: "1px solid #000",
-                                  marginBottom: "0px",
-                                  letterSpacing: "0.01px",
-                                }}
-                              >
-                                RE &nbsp;:&nbsp;{" "}
-                                {applicationDetail?.applicationType}
-                              </p>
-                            </td>
-                          </tr>
-                          <tr>
-                            <td colSpan="2">&nbsp;</td>
-                          </tr>
-                          <tr>
-                            <td
-                              style={{
-                                color: "#000",
-                                fontSize: "18px",
-                                fontWeight: "400",
-                              }}
-                            >
-                              Exporter
-                            </td>
-                            <td
-                              style={{
-                                color: "#000",
-                                fontSize: "18px",
-                                fontWeight: "800",
-                                letterSpacing: "0.01px",
-                              }}
-                            >
-                              :{" "}
-                              {applicationDetail?.companyName == null ||
-                                applicationDetail?.companyName == ""
-                                ? applicationDetail?.name
-                                : applicationDetail?.companyName}
-                            </td>
-                          </tr>
-                          <tr>
-                            <td
-                              style={{
-                                color: "#000",
-                                fontSize: "18px",
-                                fontWeight: "400",
-                                letterSpacing: "0.01px",
-                              }}
-                            >
-                              Date Submitted
-                            </td>
-                            <td
-                              style={{
-                                color: "#000",
-                                fontSize: "18px",
-                                fontWeight: "800",
-                                letterSpacing: "0.01px",
-                              }}
-                            >
-                              :{" "}
-                              {moment(
-                                applicationDetail?.applicationSubmittedDate
-                              ).format("DD MMMM YYYY")}
-                            </td>
-                          </tr>
-                          <tr>
-                            <td
-                              style={{
-                                color: "#000",
-                                fontSize: "18px",
-                                fontWeight: "400",
-                                letterSpacing: "0.01px",
-                              }}
-                            >
-                              Currency and Amount
-                            </td>
-                            <td
-                              style={{
-                                color: "#000",
-                                fontSize: "18px",
-                                fontWeight: "800",
-                              }}
-                            >
-                              :{" "}
-                              <span
-                                style={{
-                                  minWidth: "45px",
-                                  display: "inline-block",
-                                  paddingRight: "5px",
-                                  fontWeight: "800",
-                                }}
-                              >
-                                {applicationDetail?.currencyCode}
-                              </span>
-                              <span
-                                style={{
-                                  fontSize: "18px",
-                                  fontWeight: "800",
-                                }}
-                              >
-                                {applicationDetail?.amount}
-                              </span>
-                            </td>
-                          </tr>
-                          <tr>
-                            <td
-                              style={{
-                                color: "#000",
-                                fontSize: "18px",
-                                fontWeight: "400",
-                                letterSpacing: "0.01px",
-                              }}
-                            >
-                              USD Equivalent
-                            </td>
-                            <td
-                              style={{
-                                color: "#000",
-                                fontSize: "18px",
-                                fontWeight: "800",
-                              }}
-                            >
-                              :{" "}
-                              <span
-                                style={{
-                                  minWidth: "45px",
-                                  display: "inline-block",
-                                  paddingRight: "5px",
-                                  fontWeight: "800",
-                                }}
-                              >
-                                USD
-                              </span>
-                              <span
-                                style={{
-                                  fontSize: "18px",
-                                  fontWeight: "800",
-                                }}
-                              >
-                                {applicationDetail?.usdEquivalent}
-                              </span>
-                            </td>
-                          </tr>
-                          <tr>
-                            <td
-                              style={{
-                                color: "#000",
-                                fontSize: "18px",
-                                fontWeight: "400",
-                                letterSpacing: "0.01px",
-                              }}
-                            >
-                              Status/Decision
-                            </td>
-                            <td
-                              style={{
-                                color: "#000",
-                                fontSize: "18px",
-                                fontWeight: "800",
-                                letterSpacing: "0.01px",
-                              }}
-                            >
-                              :{" "}
-                              {applicationstaus == "10"
-                                ? "Approved"
-                                : applicationstaus == "30"
-                                  ? "Rejected"
-                                  : applicationstaus == "40"
-                                    ? "Deferred"
-                                    : applicationstaus == "25"
-                                      ? "Cancelled"
-                                      : ""}
-                              {/* {applicationDetail?.statusName} */}
-                            </td>
-                          </tr>
-                        </table>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td colSpan="2">&nbsp;</td>
-                    </tr>
-                    <tr>
-                      <td colSpan="2">
-                        <table>
-                          <tr>
-                            <td colSpan="2">
-                              <table width="100%">
-                                <tr>
-                                  <td
-                                    style={{
-                                      color: "#000",
-                                      fontSize: "18px",
-                                      fontWeight: "400",
-                                    }}
-                                  >
-                                    <div>
-                                      <span
-                                        style={{
-                                          fontWeight: "800",
-                                          padding: "15px 0px 15px",
-                                          letterSpacing: "0.01px",
-                                        }}
-                                      >
-                                        Description
-                                      </span>
-                                    </div>
-                                    <div
-                                      className="tableEditorData"
-                                      dangerouslySetInnerHTML={{
-                                        __html: asignnextLeveldata
-                                          ? // ? asignnextLeveldata.Notes
-                                          Description
-                                          : "",
-                                      }}
-                                      style={{
-                                        paddingBottom: "60px",
-                                        letterSpacing: "0.01px",
-                                      }}
-                                    />
-                                  </td>
-                                </tr>
-                              </table>
-                            </td>
-                          </tr>
-                          <tr>
-                            <td colSpan="2">&nbsp;</td>
-                          </tr>
-                          <tr>
-                            <td
-                              colSpan="2"
-                              style={{
-                                color: "#000",
-                                fontSize: "18px",
-                                fontWeight: "400",
-                              }}
-                            >
-                              <span
-                                style={{
-                                  color: "#000",
-                                  fontSize: "18px",
-                                  fontWeight: "400",
-                                  display: "inline-block",
-                                  letterSpacing: "0.01px",
-                                }}
-                              >
-                                {" "}
-                                Yours Sincerely,
-                              </span>
-                              <img
-                                src={
-                                  applicationDetail?.getUserData?.filePath
-                                    ? applicationDetail?.getUserData.filePath
-                                    : NoSign
-                                }
-                                alt="Signature"
-                                style={{
-                                  width: "120px",
-                                  height: "50px",
-                                  display: "block",
-                                  objectFit: "contain",
-                                }}
-                              />
-                              <p
-                                style={{
-                                  marginBottom: "0px",
-                                  color: "#000",
-                                  fontSize: "14px",
-                                  fontWeight: "400",
-                                  padding: "15px 0px 3px",
-                                  lineHeight: "13px",
-                                  letterSpacing: "0.01px",
-                                }}
-                              >
-                                {PdfUsername
-                                  ? PdfUsername.replace(/"/g, "")
-                                  : "N/A"}
-                              </p>
-                              <p
-                                style={{
-                                  marginBottom: "0px",
-                                  color: "#000",
-                                  fontSize: "14px",
-                                  fontWeight: "400",
-                                  padding: "5px 0px",
-                                  lineHeight: "13px",
-                                  letterSpacing: "0.01px",
-                                }}
-                              >
-                                {PdfRolename
-                                  ? PdfRolename.replace(/"/g, "")
-                                  : "N/A"}
-                              </p>
-                              <h3
-                                style={{
-                                  color: "#000",
-                                  fontSize: "18px",
-                                  fontWeight: "800",
-                                  letterSpacing: "0.01px",
-                                }}
-                              >
-                                {applicationDetail?.bankName}
-                              </h3>
-                            </td>
-                          </tr>
-                        </table>
-                      </td>
-                    </tr>
-                  </table>
-                </div>
-              </div>
-            </div>
-            {/* coveri letter data end Arun Verma */}
-
-            <div className="login_inner" style={{ display: "none" }}>
-              <div className="login_form_panel" style={{ display: "none" }}>
-                <div
-                  ref={PdfPrivewRef}
-                  className="p-5"
-                  style={{ position: "relative" }}
-                >
-                  <table width="100%">
-                    <tr>
-                      <td
-                        style={{
-                          marginBottom: "0px",
-                          color: "#000",
-                          fontSize: "18px",
-                          fontWeight: "800",
-                        }}
-                      >
-                        Exchange &nbsp; Control &nbsp; Ref
-                        <br />
-                        Previous &nbsp; Exchange &nbsp; Control &nbsp; Ref
-                      </td>
-                      <td>
-                        <p
-                          style={{
-                            marginBottom: "0px",
-                            color: "#000",
-                            fontSize: "18px",
-                            textAlign: "left",
-                            fontWeight: "800",
-                            letterSpacing: "0.01px",
-                          }}
-                        >
-                          : {applicationDetail?.rbzReferenceNumber}
-                          <br />: N/A
-                        </p>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td colSpan="2">&nbsp;</td>
-                    </tr>
-                    <tr>
-                      <td
-                        colSpan="2"
-                        style={{
-                          color: "#000",
-                          fontSize: "18px",
-                          fontWeight: "600",
-                          letterSpacing: "0.01px",
-                        }}
-                      >
-                        {moment(
-                          applicationDetail?.applicationSubmittedDate
-                        ).format("DD MMMM YYYY")}
-                      </td>
-                    </tr>
-                    <tr>
-                      <td colSpan="2">&nbsp;</td>
-                    </tr>
-                    <tr>
-                      <td
-                        colSpan="2"
-                        style={{
-                          color: "#000",
-                          fontSize: "18px",
-                          fontWeight: "600",
-                          letterSpacing: "0.01px",
-                        }}
-                      >
-                        The Head - Exchange Control
-                        <br />
-                        {applicationDetail?.bankName
-                          ? applicationDetail?.bankName
-                          : ""}
-                        {applicationDetail?.bankName == null ? (
-                          <span>
-                            Reserve Bank of Zimbabwe. 80 Samora Machel Avenue,{" "}
-                            <br /> P.O. Box 1283, Harare, Zimbabwe.
-                          </span>
-                        ) : (
-                          <>
-                            <br />
-                            {applicationDetail?.bankAddress1 != null ||
-                              applicationDetail?.bankAddress1 != ""
-                              ? applicationDetail?.bankAddress1 + "," + " "
-                              : ""}
-                            <br></br>
-                            {applicationDetail?.bankAddress2 != null ||
-                              applicationDetail?.bankAddress2 != ""
-                              ? applicationDetail?.bankAddress2 + "," + " "
-                              : ""}
-                            <br></br>
-                            {applicationDetail?.bankAddress3 != null ||
-                              applicationDetail?.bankAddress3 != ""
-                              ? applicationDetail?.bankAddress3
-                              : ""}
-                            <br />
-                          </>
-                        )}
-                        {/* <span
-                            style={{
-                              borderBottom: "1px solid #000",
-                              fontWeight: "800",
-                              fontSize: "18px",
-                              letterSpacing: "0.01px"
-                            }}
-                            className="text-uppercase"
-                          >
-                            {applicationDetail?.bankCity != null ||
-                            applicationDetail?.bankCity != ""
-                              ? applicationDetail?.bankCity
-                              : ""}
-                          </span> */}
-                      </td>
-                    </tr>
-                    <tr>
-                      <td colSpan="2">&nbsp;</td>
-                    </tr>
-                    <tr>
-                      <td
-                        colSpan="2"
-                        style={{
-                          color: "#000",
-                          fontSize: "18px",
-                          fontWeight: "600",
-                          letterSpacing: "0.01px",
-                        }}
-                      >
-                        Dear{" "}
-                        {/* {applicationDetail?.applicantType == 1
-                            ? applicationDetail?.companyName
-                            : applicationDetail?.applicantType == 2
-                            ? applicationDetail?.name
-                            : applicationDetail?.applicantType == 3
-                            ? applicationDetail?.agencyName
-                            : " "} */}
-                        {applicationDetail?.companyName == null ||
-                          applicationDetail?.companyName == ""
-                          ? applicationDetail?.name
-                          : applicationDetail?.companyName}
-
-                      </td>
-                    </tr>
-                    <tr>
-                      <td colSpan="2">&nbsp;</td>
-                    </tr>
-                    <tr>
-                      <td colSpan="2">
-                        <table width="100%">
-                          <tr>
-                            <td colSpan="2">
-                              <p
-                                style={{
-                                  color: "#000",
-                                  fontSize: "18px",
-                                  fontWeight: "800",
-                                  borderBottom: "1px solid #000",
-                                  marginBottom: "0px",
-                                  letterSpacing: "0.01px",
-                                }}
-                              >
-                                RE &nbsp;:&nbsp;{" "}
-                                {applicationDetail?.applicationType}
-                              </p>
-                            </td>
-                          </tr>
-                          <tr>
-                            <td colSpan="2">&nbsp;</td>
-                          </tr>
-                          <tr>
-                            <td
-                              style={{
-                                color: "#000",
-                                fontSize: "18px",
-                                fontWeight: "400",
-                              }}
-                            >
-                              Exporter
-                            </td>
-                            <td
-                              style={{
-                                color: "#000",
-                                fontSize: "18px",
-                                fontWeight: "800",
-                                letterSpacing: "0.01px",
-                              }}
-                            >
-                              :{" "}
-                              {applicationDetail?.companyName == null ||
-                                applicationDetail?.companyName == ""
-                                ? applicationDetail?.name
-                                : applicationDetail?.companyName}
-
-                            </td>
-                          </tr>
-                          <tr>
-                            <td
-                              style={{
-                                color: "#000",
-                                fontSize: "18px",
-                                fontWeight: "400",
-                              }}
-                            >
-                              Date Submitted
-                            </td>
-                            <td
-                              style={{
-                                color: "#000",
-                                fontSize: "18px",
-                                fontWeight: "800",
-                                letterSpacing: "0.01px",
-                              }}
-                            >
-                              :{" "}
-                              {moment(
-                                applicationDetail?.applicationSubmittedDate
-                              ).format("DD MMMM  YYYY")}
-                            </td>
-                          </tr>
-                          <tr>
-                            <td
-                              style={{
-                                color: "#000",
-                                fontSize: "18px",
-                                fontWeight: "400",
-                                letterSpacing: "0.01px",
-                              }}
-                            >
-                              Currency and Amount
-                            </td>
-                            <td
-                              style={{
-                                color: "#000",
-                                fontSize: "18px",
-                                fontWeight: "800",
-                              }}
-                            >
-                              :{" "}
-                              <span
-                                style={{
-                                  minWidth: "45px",
-                                  display: "inline-block",
-                                  paddingRight: "5px",
-                                  fontWeight: "800",
-                                }}
-                              >
-                                {applicationDetail?.currencyCode}
-                              </span>
-                              <span
-                                style={{
-                                  fontSize: "18px",
-                                  fontWeight: "800",
-                                }}
-                              >
-                                {applicationDetail?.amount}
-                              </span>
-                            </td>
-                          </tr>
-                          <tr>
-                            <td
-                              style={{
-                                color: "#000",
-                                fontSize: "18px",
-                                fontWeight: "400",
-                              }}
-                            >
-                              USD &nbsp; Equivalent
-                            </td>
-                            <td
-                              style={{
-                                color: "#000",
-                                fontSize: "18px",
-                                fontWeight: "800",
-                              }}
-                            >
-                              :{" "}
-                              <span
-                                style={{
-                                  minWidth: "45px",
-                                  display: "inline-block",
-                                  paddingRight: "5px",
-                                  fontWeight: "800",
-                                }}
-                              >
-                                USD
-                              </span>
-                              <span
-                                style={{
-                                  fontSize: "18px",
-                                  fontWeight: "800",
-                                }}
-                              >
-                                {applicationDetail?.usdEquivalent}
-                              </span>
-                            </td>
-                          </tr>
-                          <tr>
-                            <td
-                              style={{
-                                color: "#000",
-                                fontSize: "18px",
-                                fontWeight: "400",
-                                letterSpacing: "0.01px",
-                              }}
-                            >
-                              Status/Decision
-                            </td>
-                            <td
-                              style={{
-                                color: "#000",
-                                fontSize: "18px",
-                                fontWeight: "800",
-                                letterSpacing: "0.01px",
-                              }}
-                            >
-                              :{" "}
-                              {applicationstaus == "10"
-                                ? "Approved"
-                                : applicationstaus == "30"
-                                  ? "Rejected"
-                                  : applicationstaus == "40"
-                                    ? "Deferred"
-                                    : applicationstaus == "25"
-                                      ? "Cancelled"
-                                      : ""}
-                              {/* {applicationDetail?.statusName} */}
-                            </td>
-                          </tr>
-                          <tr
-                            className={
-                              applicationDetail?.expiringDate == null ||
-                                applicationDetail?.expiringDate == ""
-                                ? "d-none"
-                                : ""
-                            }
-                          >
-                            <td
-                              style={{
-                                color: "#000",
-                                fontSize: "18px",
-                                fontWeight: "400",
-                                letterSpacing: "0.01px",
-                              }}
-                            >
-                              Expiry Date
-                            </td>
-                            <td
-                              style={{
-                                color: "#000",
-                                fontSize: "18px",
-                                fontWeight: "800",
-                                letterSpacing: "0.01px",
-                              }}
-                            >
-                              :{" "}
-                              {applicationDetail?.expiringDate == null ||
-                                applicationDetail?.expiringDate == "" ||
-                                applicationDetail?.expiringDate ==
-                                "0001-01-01T00:00:00"
-                                ? "N/A"
-                                : moment(
-                                  applicationDetail?.expiringDate
-                                ).format("DD MMMM YYYY")}
-                            </td>
-                          </tr>
-                          <tr
-                            className={
-                              applicationDetail?.returnFrequencyName ==
-                                null ||
-                                applicationDetail?.returnFrequencyName == ""
-                                ? "d-none"
-                                : ""
-                            }
-                          >
-                            <td
-                              style={{
-                                fontSize: "18px",
-                                fontWeight: "400",
-                                color: "#000",
-                                letterSpacing: "0.01px",
-                              }}
-                            >
-                              Returns Frequency
-                            </td>
-                            <td
-                              style={{
-                                color: "#000",
-                                fontSize: "18px",
-                                fontWeight: "800",
-                              }}
-                            >
-                              :{" "}
-                              {applicationDetail?.returnFrequencyName ==
-                                null ||
-                                applicationDetail?.returnFrequencyName == ""
-                                ? "N/A"
-                                : applicationDetail?.returnFrequencyName}
-                            </td>
-                          </tr>
-                          {applicationDetail?.returnFrequencyName ==
-                            "Once" ? (
-                            <tr>
                               <td
                                 style={{
                                   fontSize: "18px",
                                   fontWeight: "400",
                                   color: "#000",
+                                  letterSpacing: "0.01px",
                                 }}
                               >
-                                Returns Date
+                                Returns Frequency
                               </td>
                               <td
                                 style={{
@@ -9605,297 +8896,760 @@ const ExportCircularsEditForm = ({
                                 }}
                               >
                                 :{" "}
-                                {applicationDetail?.returnDate == null ||
-                                  applicationDetail?.returnDate == "" ||
-                                  applicationDetail?.returnDate ==
-                                  "0001-01-01T00:00:00"
+                                {applicationDetail?.returnFrequencyName ==
+                                  null ||
+                                  applicationDetail?.returnFrequencyName == ""
                                   ? "N/A"
-                                  : moment(
-                                    applicationDetail?.returnDate
-                                  ).format("DD MMMM  YYYY")}
+                                  : applicationDetail?.returnFrequencyName}
                               </td>
                             </tr>
-                          ) : (
-                            ""
-                          )}
-                        </table>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td colSpan="2">&nbsp;</td>
-                    </tr>
-                    <tr>
-                      <td colSpan="2">
-                        <table>
-                          <tr>
-                            <td colSpan="2">
-                              <table width="100%">
-                                <tr>
-                                  <td
-                                    style={{
-                                      color: "#000",
-                                      fontSize: "18px",
-                                      fontWeight: "400",
-                                    }}
-                                  >
-                                    <div>
-                                      <span
-                                        style={{
-                                          fontWeight: "800",
-                                          padding: "15px 0px 15px",
-                                        }}
-                                      >
-                                        Response &nbsp;/&nbsp; Conditions
-                                      </span>
-                                    </div>
-                                    <div
-                                      className="tableEditorData"
-                                      dangerouslySetInnerHTML={{
-                                        __html: Description
-                                          ? Description
-                                          : applicationDetail?.content,
-                                      }}
+                            {applicationDetail?.returnFrequencyName ==
+                              "Once" ? (
+                              <tr>
+                                <td
+                                  style={{
+                                    fontSize: "18px",
+                                    fontWeight: "400",
+                                    color: "#000",
+                                    letterSpacing: "0.01px",
+                                  }}
+                                >
+                                  Returns Date
+                                </td>
+                                <td
+                                  style={{
+                                    color: "#000",
+                                    fontSize: "18px",
+                                    fontWeight: "800",
+                                    letterSpacing: "0.01px",
+                                  }}
+                                >
+                                  :{" "}
+                                  {applicationDetail?.returnDate == null ||
+                                    applicationDetail?.returnDate == "" ||
+                                    applicationDetail?.returnDate ==
+                                    "0001-01-01T00:00:00"
+                                    ? "N/A"
+                                    : moment(
+                                      applicationDetail?.returnDate
+                                    ).format("DD MMMM YYYY")}
+                                </td>
+                              </tr>
+                            ) : (
+                              ""
+                            )}
+                          </table>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td colSpan="2">&nbsp;</td>
+                      </tr>
+                      <tr>
+                        <td colSpan="2">
+                          <table>
+                            <tr>
+                              <td colSpan="2">
+                                <table width="100%">
+                                  <tr>
+                                    <td
                                       style={{
-                                        paddingBottom: "60px",
-                                        letterSpacing: "0.01px",
+                                        color: "#000",
+                                        fontSize: "18px",
+                                        fontWeight: "400",
                                       }}
-                                    />
-                                  </td>
-                                </tr>
-                              </table>
-                            </td>
-                          </tr>
-                          <tr>
-                            <td colSpan="2">&nbsp;</td>
-                          </tr>
-                          <tr>
-                            <td
-                              colSpan="2"
-                              style={{
-                                color: "#000",
-                                fontSize: "18px",
-                                fontWeight: "400",
-                              }}
-                            >
-                              <span
+                                    >
+                                      <div>
+                                        <span
+                                          style={{
+                                            fontWeight: "800",
+                                            padding: "15px 0px 15px",
+                                            letterSpacing: "0.01px",
+                                          }}
+                                        >
+                                          Response / Conditions
+                                        </span>
+                                      </div>
+                                      <div
+                                        className="tableEditorData"
+                                        dangerouslySetInnerHTML={{
+                                          __html: Description
+                                            ? Description
+                                            : applicationDetail?.content,
+                                        }}
+                                        style={{ letterSpacing: "0.01px" }}
+                                      />
+                                    </td>
+                                  </tr>
+                                </table>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td colSpan="2">&nbsp;</td>
+                            </tr>
+                            <tr>
+                              <td
+                                colSpan="2"
                                 style={{
                                   color: "#000",
                                   fontSize: "18px",
                                   fontWeight: "400",
-                                  display: "inline-block",
                                 }}
                               >
-                                {" "}
-                                Yours Sincerely,
-                              </span>
-                              <img
-                                src={
-                                  applicationDetail?.getUserData?.filePath
-                                    ? applicationDetail?.getUserData.filePath
-                                    : NoSign
-                                }
-                                alt="Signature"
+                                <span
+                                  style={{
+                                    color: "#000",
+                                    fontSize: "18px",
+                                    fontWeight: "400",
+                                    display: "inline-block",
+                                    letterSpacing: "0.01px",
+                                  }}
+                                >
+                                  {" "}
+                                  Yours Sincerely,
+                                </span>
+                                <img
+                                  src={
+                                    applicationDetail?.getUserData?.filePath
+                                      ? applicationDetail?.getUserData.filePath
+                                      : NoSign
+                                  }
+                                  alt="Signature"
+                                  style={{
+                                    width: "120px",
+                                    height: "50px",
+                                    display: "block",
+                                    objectFit: "contain",
+                                  }}
+                                />
+                                <p
+                                  style={{
+                                    marginBottom: "0px",
+                                    color: "#000",
+                                    fontSize: "14px",
+                                    fontWeight: "400",
+                                    padding: "15px 0px 3px",
+                                    lineHeight: "13px",
+                                    letterSpacing: "0.01px",
+                                  }}
+                                >
+                                  {PdfUsername
+                                    ? PdfUsername.replace(/"/g, "")
+                                    : "N/A"}
+                                </p>
+                                <p
+                                  style={{
+                                    marginBottom: "0px",
+                                    color: "#000",
+                                    fontSize: "14px",
+                                    fontWeight: "400",
+                                    padding: "5px 0px",
+                                    lineHeight: "13px",
+                                    letterSpacing: "0.01px",
+                                  }}
+                                >
+                                  {PdfRolename
+                                    ? PdfRolename.replace(/"/g, "")
+                                    : "N/A"}
+                                </p>
+                                <h3
+                                  style={{
+                                    color: "#000",
+                                    fontSize: "18px",
+                                    fontWeight: "800",
+                                  }}
+                                >
+                                  EXCHANGE &nbsp; CONTROL
+                                </h3>
+                                <div
+                                  style={{
+                                    marginBottom: "0px",
+                                    color: "#000",
+                                    fontSize: "18px",
+                                    fontWeight: "400",
+                                    padding: "25px 0px 5px",
+                                    lineHeight: "13px",
+                                    display: "flex",
+                                  }}
+                                >
+                                  {applicationDetail?.copiedResponses?.length >
+                                    0 ? (
+                                    <>
+                                      <p
+                                        style={{
+                                          marginBottom: "0px",
+                                          fontSize: "18px",
+                                          fontWeight: "400",
+                                          paddingRight: "10px",
+                                        }}
+                                      >
+                                        CC:
+                                      </p>
+                                      <div>
+                                        {selectedBanks.map((item) => {
+                                          return (
+                                            <p
+                                              style={{
+                                                marginBottom: "3px",
+                                                letterSpacing: "0.01px",
+                                                fontSize: "18px",
+                                                fontWeight: "400",
+                                              }}
+                                            >
+                                              {item.name}
+                                            </p>
+                                          );
+                                        })}
+                                      </div>
+                                    </>
+                                  ) : (
+                                    ""
+                                  )}
+                                </div>
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                    </table>
+                  </div>
+                </div>
+              </div>
+              {/* pdf-preview data end */}
+
+              {/* Supervisor level final close application Arun Verma */}
+              <div className="login_inner" style={{ display: "none" }}>
+                <div className="login_form_panel" style={{ display: "none" }}>
+                  <div
+                    ref={CoverigLetterRef}
+                    className="p-5"
+                    style={{ position: "relative" }}
+                  >
+                    <table width="100%">
+                      <tr>
+                        <td
+                          style={{
+                            marginBottom: "0px",
+                            color: "#000",
+                            fontSize: "18px",
+                            fontWeight: "800",
+                          }}
+                        >
+                          Exchange &nbsp; Control &nbsp; Ref
+                          <br />
+                          Previous &nbsp; Exchange &nbsp; Control &nbsp; Ref
+                        </td>
+                        <td>
+                          <p
+                            style={{
+                              marginBottom: "0px",
+                              color: "#000",
+                              fontSize: "18px",
+                              textAlign: "left",
+                              fontWeight: "800",
+                              letterSpacing: "0.01px",
+                            }}
+                          >
+                            : {applicationDetail?.rbzReferenceNumber}
+                            <br />: N/A
+                          </p>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td colSpan="2">&nbsp;</td>
+                      </tr>
+                      <tr>
+                        <td
+                          colSpan="2"
+                          style={{
+                            color: "#000",
+                            fontSize: "18px",
+                            fontWeight: "600",
+                            letterSpacing: "0.01px",
+                          }}
+                        >
+                          {moment(
+                            applicationDetail?.applicationSubmittedDate
+                          ).format("DD MMMM YYYY")}
+                        </td>
+                      </tr>
+                      <tr>
+                        <td colSpan="2">&nbsp;</td>
+                      </tr>
+                      <tr>
+                        <td
+                          colSpan="2"
+                          style={{
+                            color: "#000",
+                            fontSize: "18px",
+                            fontWeight: "600",
+                            letterSpacing: "0.01px",
+                          }}
+                        >
+                          The Head - Exchange Control
+                          <br />
+                          {applicationDetail?.bankName}
+                          <br />
+                          {applicationDetail?.bankAddress1 != null ||
+                            applicationDetail?.bankAddress1 != ""
+                            ? applicationDetail?.bankAddress1 + "," + " "
+                            : ""}
+                          <br></br>
+                          {applicationDetail?.bankAddress2 != null ||
+                            applicationDetail?.bankAddress2 != ""
+                            ? applicationDetail?.bankAddress2 + "," + " "
+                            : ""}
+                          <br></br>
+                          {applicationDetail?.bankAddress3 != null ||
+                            applicationDetail?.bankAddress3 != ""
+                            ? applicationDetail?.bankAddress3
+                            : ""}
+                          <br />
+                        </td>
+                      </tr>
+                      <tr>
+                        <td colSpan="2">&nbsp;</td>
+                      </tr>
+                      <tr>
+                        <td
+                          colSpan="2"
+                          style={{
+                            color: "#000",
+                            fontSize: "18px",
+                            fontWeight: "600",
+                            letterSpacing: "0.01px",
+                          }}
+                        >
+                          Dear{" "}
+                          {applicationDetail?.companyName == null ||
+                            applicationDetail?.companyName == ""
+                            ? applicationDetail?.name
+                            : applicationDetail?.companyName}
+                          ,
+                        </td>
+                      </tr>
+                      <tr>
+                        <td colSpan="2">&nbsp;</td>
+                      </tr>
+                      <tr>
+                        <td colSpan="2">
+                          <table width="100%">
+                            <tr>
+                              <td colSpan="2">
+                                <p
+                                  style={{
+                                    color: "#000",
+                                    fontSize: "18px",
+                                    fontWeight: "800",
+                                    borderBottom: "1px solid #000",
+                                    marginBottom: "0px",
+                                    letterSpacing: "0.01px",
+                                  }}
+                                >
+                                  RE &nbsp;:&nbsp;{" "}
+                                  {applicationDetail?.applicationType}
+                                </p>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td colSpan="2">&nbsp;</td>
+                            </tr>
+                            <tr>
+                              <td
                                 style={{
-                                  width: "120px",
-                                  height: "50px",
-                                  display: "block",
-                                  objectFit: "contain",
-                                }}
-                              />
-                              <p
-                                style={{
-                                  marginBottom: "0px",
                                   color: "#000",
-                                  fontSize: "14px",
+                                  fontSize: "18px",
                                   fontWeight: "400",
-                                  padding: "15px 0px 3px",
-                                  lineHeight: "13px",
+                                }}
+                              >
+                                Exporter
+                              </td>
+                              <td
+                                style={{
+                                  color: "#000",
+                                  fontSize: "18px",
+                                  fontWeight: "800",
                                   letterSpacing: "0.01px",
                                 }}
                               >
-                                {PdfUsername
-                                  ? PdfUsername.replace(/"/g, "")
-                                  : "N/A"}
-                              </p>
-                              <p
+                                :{" "}
+                                {applicationDetail?.companyName == null ||
+                                  applicationDetail?.companyName == ""
+                                  ? applicationDetail?.name
+                                  : applicationDetail?.companyName}
+                              </td>
+                            </tr>
+                            <tr>
+                              <td
                                 style={{
-                                  marginBottom: "0px",
                                   color: "#000",
-                                  fontSize: "14px",
+                                  fontSize: "18px",
                                   fontWeight: "400",
-                                  padding: "5px 0px",
-                                  lineHeight: "13px",
                                   letterSpacing: "0.01px",
                                 }}
                               >
-                                {PdfRolename
-                                  ? PdfRolename.replace(/"/g, "")
-                                  : "N/A"}
-                              </p>
-                              <h3
+                                Date Submitted
+                              </td>
+                              <td
+                                style={{
+                                  color: "#000",
+                                  fontSize: "18px",
+                                  fontWeight: "800",
+                                  letterSpacing: "0.01px",
+                                }}
+                              >
+                                :{" "}
+                                {moment(
+                                  applicationDetail?.applicationSubmittedDate
+                                ).format("DD MMMM YYYY")}
+                              </td>
+                            </tr>
+                            <tr>
+                              <td
+                                style={{
+                                  color: "#000",
+                                  fontSize: "18px",
+                                  fontWeight: "400",
+                                  letterSpacing: "0.01px",
+                                }}
+                              >
+                                Currency and Amount
+                              </td>
+                              <td
                                 style={{
                                   color: "#000",
                                   fontSize: "18px",
                                   fontWeight: "800",
                                 }}
                               >
-                                EXCHANGE &nbsp; CONTROL
-                              </h3>
-                              <div
+                                :{" "}
+                                <span
+                                  style={{
+                                    minWidth: "45px",
+                                    display: "inline-block",
+                                    paddingRight: "5px",
+                                    fontWeight: "800",
+                                  }}
+                                >
+                                  {applicationDetail?.currencyCode}
+                                </span>
+                                <span
+                                  style={{
+                                    fontSize: "18px",
+                                    fontWeight: "800",
+                                  }}
+                                >
+                                  {applicationDetail?.amount}
+                                </span>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td
                                 style={{
-                                  marginBottom: "0px",
                                   color: "#000",
                                   fontSize: "18px",
                                   fontWeight: "400",
-                                  padding: "25px 0px 5px",
-                                  lineHeight: "13px",
-                                  display: "flex",
+                                  letterSpacing: "0.01px",
                                 }}
                               >
-                                {applicationDetail?.copiedResponses?.length >
-                                  0 ? (
-                                  <>
-                                    <p
+                                USD Equivalent
+                              </td>
+                              <td
+                                style={{
+                                  color: "#000",
+                                  fontSize: "18px",
+                                  fontWeight: "800",
+                                }}
+                              >
+                                :{" "}
+                                <span
+                                  style={{
+                                    minWidth: "45px",
+                                    display: "inline-block",
+                                    paddingRight: "5px",
+                                    fontWeight: "800",
+                                  }}
+                                >
+                                  USD
+                                </span>
+                                <span
+                                  style={{
+                                    fontSize: "18px",
+                                    fontWeight: "800",
+                                  }}
+                                >
+                                  {applicationDetail?.usdEquivalent}
+                                </span>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td
+                                style={{
+                                  color: "#000",
+                                  fontSize: "18px",
+                                  fontWeight: "400",
+                                  letterSpacing: "0.01px",
+                                }}
+                              >
+                                Status/Decision
+                              </td>
+                              <td
+                                style={{
+                                  color: "#000",
+                                  fontSize: "18px",
+                                  fontWeight: "800",
+                                  letterSpacing: "0.01px",
+                                }}
+                              >
+                                :{" "}
+                                {applicationstaus == "10"
+                                  ? "Approved"
+                                  : applicationstaus == "30"
+                                    ? "Rejected"
+                                    : applicationstaus == "40"
+                                      ? "Deferred"
+                                      : applicationstaus == "25"
+                                        ? "Cancelled"
+                                        : ""}
+                                {/* {applicationDetail?.statusName} */}
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td colSpan="2">&nbsp;</td>
+                      </tr>
+                      <tr>
+                        <td colSpan="2">
+                          <table>
+                            <tr>
+                              <td colSpan="2">
+                                <table width="100%">
+                                  <tr>
+                                    <td
                                       style={{
-                                        marginBottom: "0px",
+                                        color: "#000",
                                         fontSize: "18px",
                                         fontWeight: "400",
-                                        paddingRight: "10px",
-                                        letterSpacing: "0.01px",
                                       }}
                                     >
-                                      CC:
-                                    </p>
-                                    <div>
-                                      {selectedBanks.map((item) => {
-                                        return (
-                                          <p
-                                            style={{
-                                              marginBottom: "3px",
-                                              letterSpacing: "0.01px",
-                                              fontSize: "18px",
-                                              fontWeight: "400",
-                                            }}
-                                          >
-                                            {item.name}
-                                          </p>
-                                        );
-                                      })}
-                                    </div>
-                                  </>
-                                ) : (
-                                  ""
-                                )}
-                              </div>
-                            </td>
-                          </tr>
-                        </table>
-                      </td>
-                    </tr>
-                  </table>
+                                      <div>
+                                        <span
+                                          style={{
+                                            fontWeight: "800",
+                                            padding: "15px 0px 15px",
+                                            letterSpacing: "0.01px",
+                                          }}
+                                        >
+                                          Description
+                                        </span>
+                                      </div>
+                                      <div
+                                        className="tableEditorData"
+                                        dangerouslySetInnerHTML={{
+                                          __html: asignnextLeveldata
+                                            ? // ? asignnextLeveldata.Notes
+                                            Description
+                                            : "",
+                                        }}
+                                        style={{
+                                          paddingBottom: "60px",
+                                          letterSpacing: "0.01px",
+                                        }}
+                                      />
+                                    </td>
+                                  </tr>
+                                </table>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td colSpan="2">&nbsp;</td>
+                            </tr>
+                            <tr>
+                              <td
+                                colSpan="2"
+                                style={{
+                                  color: "#000",
+                                  fontSize: "18px",
+                                  fontWeight: "400",
+                                }}
+                              >
+                                <span
+                                  style={{
+                                    color: "#000",
+                                    fontSize: "18px",
+                                    fontWeight: "400",
+                                    display: "inline-block",
+                                    letterSpacing: "0.01px",
+                                  }}
+                                >
+                                  {" "}
+                                  Yours Sincerely,
+                                </span>
+                                <img
+                                  src={
+                                    applicationDetail?.getUserData?.filePath
+                                      ? applicationDetail?.getUserData.filePath
+                                      : NoSign
+                                  }
+                                  alt="Signature"
+                                  style={{
+                                    width: "120px",
+                                    height: "50px",
+                                    display: "block",
+                                    objectFit: "contain",
+                                  }}
+                                />
+                                <p
+                                  style={{
+                                    marginBottom: "0px",
+                                    color: "#000",
+                                    fontSize: "14px",
+                                    fontWeight: "400",
+                                    padding: "15px 0px 3px",
+                                    lineHeight: "13px",
+                                    letterSpacing: "0.01px",
+                                  }}
+                                >
+                                  {PdfUsername
+                                    ? PdfUsername.replace(/"/g, "")
+                                    : "N/A"}
+                                </p>
+                                <p
+                                  style={{
+                                    marginBottom: "0px",
+                                    color: "#000",
+                                    fontSize: "14px",
+                                    fontWeight: "400",
+                                    padding: "5px 0px",
+                                    lineHeight: "13px",
+                                    letterSpacing: "0.01px",
+                                  }}
+                                >
+                                  {PdfRolename
+                                    ? PdfRolename.replace(/"/g, "")
+                                    : "N/A"}
+                                </p>
+                                <h3
+                                  style={{
+                                    color: "#000",
+                                    fontSize: "18px",
+                                    fontWeight: "800",
+                                    letterSpacing: "0.01px",
+                                  }}
+                                >
+                                  {applicationDetail?.bankName}
+                                </h3>
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                    </table>
+                  </div>
                 </div>
               </div>
-            </div>
+              {/* coveri letter data end Arun Verma */}
 
-            <div className="login_inner" style={{ display: "none" }}>
-              <div className="login_form_panel" style={{ display: "none" }}>
-                <div
-                  ref={PdfPrivewsupervisorRef}
-                  className="p-5"
-                  style={{ position: "relative" }}
-                >
-                  <table width="100%">
-                    <tr>
-                      <td
-                        style={{
-                          marginBottom: "0px",
-                          color: "#000",
-                          fontSize: "18px",
-                          fontWeight: "800",
-                        }}
-                      >
-                        Exchange &nbsp; Control &nbsp; Ref
-                        <br />
-                        Previous &nbsp; Exchange &nbsp; Control &nbsp; Ref
-                      </td>
-                      <td>
-                        <p
+              <div className="login_inner" style={{ display: "none" }}>
+                <div className="login_form_panel" style={{ display: "none" }}>
+                  <div
+                    ref={PdfPrivewRef}
+                    className="p-5"
+                    style={{ position: "relative" }}
+                  >
+                    <table width="100%">
+                      <tr>
+                        <td
                           style={{
                             marginBottom: "0px",
                             color: "#000",
                             fontSize: "18px",
-                            textAlign: "left",
                             fontWeight: "800",
+                          }}
+                        >
+                          Exchange &nbsp; Control &nbsp; Ref
+                          <br />
+                          Previous &nbsp; Exchange &nbsp; Control &nbsp; Ref
+                        </td>
+                        <td>
+                          <p
+                            style={{
+                              marginBottom: "0px",
+                              color: "#000",
+                              fontSize: "18px",
+                              textAlign: "left",
+                              fontWeight: "800",
+                              letterSpacing: "0.01px",
+                            }}
+                          >
+                            : {applicationDetail?.rbzReferenceNumber}
+                            <br />: N/A
+                          </p>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td colSpan="2">&nbsp;</td>
+                      </tr>
+                      <tr>
+                        <td
+                          colSpan="2"
+                          style={{
+                            color: "#000",
+                            fontSize: "18px",
+                            fontWeight: "600",
                             letterSpacing: "0.01px",
                           }}
                         >
-                          : {applicationDetail?.rbzReferenceNumber}
-                          <br />: N/A
-                        </p>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td colSpan="2">&nbsp;</td>
-                    </tr>
-                    <tr>
-                      <td
-                        colSpan="2"
-                        style={{
-                          color: "#000",
-                          fontSize: "18px",
-                          fontWeight: "600",
-                          letterSpacing: "0.01px",
-                        }}
-                      >
-                        {moment(
-                          applicationDetail?.applicationSubmittedDate
-                        ).format("DD MMMM YYYY")}
-                      </td>
-                    </tr>
-                    <tr>
-                      <td colSpan="2">&nbsp;</td>
-                    </tr>
-                    <tr>
-                      <td
-                        colSpan="2"
-                        style={{
-                          color: "#000",
-                          fontSize: "18px",
-                          fontWeight: "600",
-                          letterSpacing: "0.01px",
-                        }}
-                      >
-                        The Head - Exchange Control
-                        <br />
-                        {applicationDetail?.bankName
-                          ? applicationDetail?.bankName
-                          : ""}
-                        {applicationDetail?.bankName == null ? (
-                          <span>
-                            Reserve Bank of Zimbabwe. 80 Samora Machel Avenue,{" "}
-                            <br /> P.O. Box 1283, Harare, Zimbabwe.
-                          </span>
-                        ) : (
-                          <>
-                            <br />
-                            {applicationDetail?.bankAddress1 != null ||
-                              applicationDetail?.bankAddress1 != ""
-                              ? applicationDetail?.bankAddress1 + "," + " "
-                              : ""}
-                            <br></br>
-                            {applicationDetail?.bankAddress2 != null ||
-                              applicationDetail?.bankAddress2 != ""
-                              ? applicationDetail?.bankAddress2 + "," + " "
-                              : ""}
-                            <br></br>
-                            {applicationDetail?.bankAddress3 != null ||
-                              applicationDetail?.bankAddress3 != ""
-                              ? applicationDetail?.bankAddress3
-                              : ""}
-                            <br />
-                          </>
-                        )}
-                        {/* <span
+                          {moment(
+                            applicationDetail?.applicationSubmittedDate
+                          ).format("DD MMMM YYYY")}
+                        </td>
+                      </tr>
+                      <tr>
+                        <td colSpan="2">&nbsp;</td>
+                      </tr>
+                      <tr>
+                        <td
+                          colSpan="2"
+                          style={{
+                            color: "#000",
+                            fontSize: "18px",
+                            fontWeight: "600",
+                            letterSpacing: "0.01px",
+                          }}
+                        >
+                          The Head - Exchange Control
+                          <br />
+                          {applicationDetail?.bankName
+                            ? applicationDetail?.bankName
+                            : ""}
+                          {applicationDetail?.bankName == null ? (
+                            <span>
+                              Reserve Bank of Zimbabwe. 80 Samora Machel Avenue,{" "}
+                              <br /> P.O. Box 1283, Harare, Zimbabwe.
+                            </span>
+                          ) : (
+                            <>
+                              <br />
+                              {applicationDetail?.bankAddress1 != null ||
+                                applicationDetail?.bankAddress1 != ""
+                                ? applicationDetail?.bankAddress1 + "," + " "
+                                : ""}
+                              <br></br>
+                              {applicationDetail?.bankAddress2 != null ||
+                                applicationDetail?.bankAddress2 != ""
+                                ? applicationDetail?.bankAddress2 + "," + " "
+                                : ""}
+                              <br></br>
+                              {applicationDetail?.bankAddress3 != null ||
+                                applicationDetail?.bankAddress3 != ""
+                                ? applicationDetail?.bankAddress3
+                                : ""}
+                              <br />
+                            </>
+                          )}
+                          {/* <span
                             style={{
                               borderBottom: "1px solid #000",
                               fontWeight: "800",
@@ -9909,63 +9663,674 @@ const ExportCircularsEditForm = ({
                               ? applicationDetail?.bankCity
                               : ""}
                           </span> */}
-                      </td>
-                    </tr>
-                    <tr>
-                      <td colSpan="2">&nbsp;</td>
-                    </tr>
-                    <tr>
-                      <td
-                        colSpan="2"
-                        style={{
-                          color: "#000",
-                          fontSize: "18px",
-                          fontWeight: "600",
-                          letterSpacing: "0.01px",
-                        }}
-                      >
-                        Dear{" "}
-                        {/* {applicationDetail?.applicantType == 1
+                        </td>
+                      </tr>
+                      <tr>
+                        <td colSpan="2">&nbsp;</td>
+                      </tr>
+                      <tr>
+                        <td
+                          colSpan="2"
+                          style={{
+                            color: "#000",
+                            fontSize: "18px",
+                            fontWeight: "600",
+                            letterSpacing: "0.01px",
+                          }}
+                        >
+                          Dear{" "}
+                          {/* {applicationDetail?.applicantType == 1
                             ? applicationDetail?.companyName
                             : applicationDetail?.applicantType == 2
                             ? applicationDetail?.name
                             : applicationDetail?.applicantType == 3
                             ? applicationDetail?.agencyName
                             : " "} */}
-                        {applicationDetail?.companyName == null ||
-                          applicationDetail?.companyName == ""
-                          ? applicationDetail?.name
-                          : applicationDetail?.companyName}
+                          {applicationDetail?.companyName == null ||
+                            applicationDetail?.companyName == ""
+                            ? applicationDetail?.name
+                            : applicationDetail?.companyName}
 
-                      </td>
-                    </tr>
-                    <tr>
-                      <td colSpan="2">&nbsp;</td>
-                    </tr>
-                    <tr>
-                      <td colSpan="2">
-                        <table width="100%">
-                          <tr>
-                            <td colSpan="2">
-                              <p
+                        </td>
+                      </tr>
+                      <tr>
+                        <td colSpan="2">&nbsp;</td>
+                      </tr>
+                      <tr>
+                        <td colSpan="2">
+                          <table width="100%">
+                            <tr>
+                              <td colSpan="2">
+                                <p
+                                  style={{
+                                    color: "#000",
+                                    fontSize: "18px",
+                                    fontWeight: "800",
+                                    borderBottom: "1px solid #000",
+                                    marginBottom: "0px",
+                                    letterSpacing: "0.01px",
+                                  }}
+                                >
+                                  RE &nbsp;:&nbsp;{" "}
+                                  {applicationDetail?.applicationType}
+                                </p>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td colSpan="2">&nbsp;</td>
+                            </tr>
+                            <tr>
+                              <td
+                                style={{
+                                  color: "#000",
+                                  fontSize: "18px",
+                                  fontWeight: "400",
+                                }}
+                              >
+                                Exporter
+                              </td>
+                              <td
                                 style={{
                                   color: "#000",
                                   fontSize: "18px",
                                   fontWeight: "800",
-                                  borderBottom: "1px solid #000",
-                                  marginBottom: "0px",
                                   letterSpacing: "0.01px",
                                 }}
                               >
-                                RE &nbsp;:&nbsp;{" "}
-                                {applicationDetail?.applicationType}
-                              </p>
-                            </td>
-                          </tr>
-                          <tr>
-                            <td colSpan="2">&nbsp;</td>
-                          </tr>
-                          {/* <tr>
+                                :{" "}
+                                {applicationDetail?.companyName == null ||
+                                  applicationDetail?.companyName == ""
+                                  ? applicationDetail?.name
+                                  : applicationDetail?.companyName}
+
+                              </td>
+                            </tr>
+                            <tr>
+                              <td
+                                style={{
+                                  color: "#000",
+                                  fontSize: "18px",
+                                  fontWeight: "400",
+                                }}
+                              >
+                                Date Submitted
+                              </td>
+                              <td
+                                style={{
+                                  color: "#000",
+                                  fontSize: "18px",
+                                  fontWeight: "800",
+                                  letterSpacing: "0.01px",
+                                }}
+                              >
+                                :{" "}
+                                {moment(
+                                  applicationDetail?.applicationSubmittedDate
+                                ).format("DD MMMM  YYYY")}
+                              </td>
+                            </tr>
+                            <tr>
+                              <td
+                                style={{
+                                  color: "#000",
+                                  fontSize: "18px",
+                                  fontWeight: "400",
+                                  letterSpacing: "0.01px",
+                                }}
+                              >
+                                Currency and Amount
+                              </td>
+                              <td
+                                style={{
+                                  color: "#000",
+                                  fontSize: "18px",
+                                  fontWeight: "800",
+                                }}
+                              >
+                                :{" "}
+                                <span
+                                  style={{
+                                    minWidth: "45px",
+                                    display: "inline-block",
+                                    paddingRight: "5px",
+                                    fontWeight: "800",
+                                  }}
+                                >
+                                  {applicationDetail?.currencyCode}
+                                </span>
+                                <span
+                                  style={{
+                                    fontSize: "18px",
+                                    fontWeight: "800",
+                                  }}
+                                >
+                                  {applicationDetail?.amount}
+                                </span>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td
+                                style={{
+                                  color: "#000",
+                                  fontSize: "18px",
+                                  fontWeight: "400",
+                                }}
+                              >
+                                USD &nbsp; Equivalent
+                              </td>
+                              <td
+                                style={{
+                                  color: "#000",
+                                  fontSize: "18px",
+                                  fontWeight: "800",
+                                }}
+                              >
+                                :{" "}
+                                <span
+                                  style={{
+                                    minWidth: "45px",
+                                    display: "inline-block",
+                                    paddingRight: "5px",
+                                    fontWeight: "800",
+                                  }}
+                                >
+                                  USD
+                                </span>
+                                <span
+                                  style={{
+                                    fontSize: "18px",
+                                    fontWeight: "800",
+                                  }}
+                                >
+                                  {applicationDetail?.usdEquivalent}
+                                </span>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td
+                                style={{
+                                  color: "#000",
+                                  fontSize: "18px",
+                                  fontWeight: "400",
+                                  letterSpacing: "0.01px",
+                                }}
+                              >
+                                Status/Decision
+                              </td>
+                              <td
+                                style={{
+                                  color: "#000",
+                                  fontSize: "18px",
+                                  fontWeight: "800",
+                                  letterSpacing: "0.01px",
+                                }}
+                              >
+                                :{" "}
+                                {applicationstaus == "10"
+                                  ? "Approved"
+                                  : applicationstaus == "30"
+                                    ? "Rejected"
+                                    : applicationstaus == "40"
+                                      ? "Deferred"
+                                      : applicationstaus == "25"
+                                        ? "Cancelled"
+                                        : ""}
+                                {/* {applicationDetail?.statusName} */}
+                              </td>
+                            </tr>
+                            <tr
+                              className={
+                                applicationDetail?.expiringDate == null ||
+                                  applicationDetail?.expiringDate == ""
+                                  ? "d-none"
+                                  : ""
+                              }
+                            >
+                              <td
+                                style={{
+                                  color: "#000",
+                                  fontSize: "18px",
+                                  fontWeight: "400",
+                                  letterSpacing: "0.01px",
+                                }}
+                              >
+                                Expiry Date
+                              </td>
+                              <td
+                                style={{
+                                  color: "#000",
+                                  fontSize: "18px",
+                                  fontWeight: "800",
+                                  letterSpacing: "0.01px",
+                                }}
+                              >
+                                :{" "}
+                                {applicationDetail?.expiringDate == null ||
+                                  applicationDetail?.expiringDate == "" ||
+                                  applicationDetail?.expiringDate ==
+                                  "0001-01-01T00:00:00"
+                                  ? "N/A"
+                                  : moment(
+                                    applicationDetail?.expiringDate
+                                  ).format("DD MMMM YYYY")}
+                              </td>
+                            </tr>
+                            <tr
+                              className={
+                                applicationDetail?.returnFrequencyName ==
+                                  null ||
+                                  applicationDetail?.returnFrequencyName == ""
+                                  ? "d-none"
+                                  : ""
+                              }
+                            >
+                              <td
+                                style={{
+                                  fontSize: "18px",
+                                  fontWeight: "400",
+                                  color: "#000",
+                                  letterSpacing: "0.01px",
+                                }}
+                              >
+                                Returns Frequency
+                              </td>
+                              <td
+                                style={{
+                                  color: "#000",
+                                  fontSize: "18px",
+                                  fontWeight: "800",
+                                }}
+                              >
+                                :{" "}
+                                {applicationDetail?.returnFrequencyName ==
+                                  null ||
+                                  applicationDetail?.returnFrequencyName == ""
+                                  ? "N/A"
+                                  : applicationDetail?.returnFrequencyName}
+                              </td>
+                            </tr>
+                            {applicationDetail?.returnFrequencyName ==
+                              "Once" ? (
+                              <tr>
+                                <td
+                                  style={{
+                                    fontSize: "18px",
+                                    fontWeight: "400",
+                                    color: "#000",
+                                  }}
+                                >
+                                  Returns Date
+                                </td>
+                                <td
+                                  style={{
+                                    color: "#000",
+                                    fontSize: "18px",
+                                    fontWeight: "800",
+                                    letterSpacing: "0.01px",
+                                  }}
+                                >
+                                  :{" "}
+                                  {applicationDetail?.returnDate == null ||
+                                    applicationDetail?.returnDate == "" ||
+                                    applicationDetail?.returnDate ==
+                                    "0001-01-01T00:00:00"
+                                    ? "N/A"
+                                    : moment(
+                                      applicationDetail?.returnDate
+                                    ).format("DD MMMM  YYYY")}
+                                </td>
+                              </tr>
+                            ) : (
+                              ""
+                            )}
+                          </table>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td colSpan="2">&nbsp;</td>
+                      </tr>
+                      <tr>
+                        <td colSpan="2">
+                          <table>
+                            <tr>
+                              <td colSpan="2">
+                                <table width="100%">
+                                  <tr>
+                                    <td
+                                      style={{
+                                        color: "#000",
+                                        fontSize: "18px",
+                                        fontWeight: "400",
+                                      }}
+                                    >
+                                      <div>
+                                        <span
+                                          style={{
+                                            fontWeight: "800",
+                                            padding: "15px 0px 15px",
+                                          }}
+                                        >
+                                          Response &nbsp;/&nbsp; Conditions
+                                        </span>
+                                      </div>
+                                      <div
+                                        className="tableEditorData"
+                                        dangerouslySetInnerHTML={{
+                                          __html: Description
+                                            ? Description
+                                            : applicationDetail?.content,
+                                        }}
+                                        style={{
+                                          paddingBottom: "60px",
+                                          letterSpacing: "0.01px",
+                                        }}
+                                      />
+                                    </td>
+                                  </tr>
+                                </table>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td colSpan="2">&nbsp;</td>
+                            </tr>
+                            <tr>
+                              <td
+                                colSpan="2"
+                                style={{
+                                  color: "#000",
+                                  fontSize: "18px",
+                                  fontWeight: "400",
+                                }}
+                              >
+                                <span
+                                  style={{
+                                    color: "#000",
+                                    fontSize: "18px",
+                                    fontWeight: "400",
+                                    display: "inline-block",
+                                  }}
+                                >
+                                  {" "}
+                                  Yours Sincerely,
+                                </span>
+                                <img
+                                  src={
+                                    applicationDetail?.getUserData?.filePath
+                                      ? applicationDetail?.getUserData.filePath
+                                      : NoSign
+                                  }
+                                  alt="Signature"
+                                  style={{
+                                    width: "120px",
+                                    height: "50px",
+                                    display: "block",
+                                    objectFit: "contain",
+                                  }}
+                                />
+                                <p
+                                  style={{
+                                    marginBottom: "0px",
+                                    color: "#000",
+                                    fontSize: "14px",
+                                    fontWeight: "400",
+                                    padding: "15px 0px 3px",
+                                    lineHeight: "13px",
+                                    letterSpacing: "0.01px",
+                                  }}
+                                >
+                                  {PdfUsername
+                                    ? PdfUsername.replace(/"/g, "")
+                                    : "N/A"}
+                                </p>
+                                <p
+                                  style={{
+                                    marginBottom: "0px",
+                                    color: "#000",
+                                    fontSize: "14px",
+                                    fontWeight: "400",
+                                    padding: "5px 0px",
+                                    lineHeight: "13px",
+                                    letterSpacing: "0.01px",
+                                  }}
+                                >
+                                  {PdfRolename
+                                    ? PdfRolename.replace(/"/g, "")
+                                    : "N/A"}
+                                </p>
+                                <h3
+                                  style={{
+                                    color: "#000",
+                                    fontSize: "18px",
+                                    fontWeight: "800",
+                                  }}
+                                >
+                                  EXCHANGE &nbsp; CONTROL
+                                </h3>
+                                <div
+                                  style={{
+                                    marginBottom: "0px",
+                                    color: "#000",
+                                    fontSize: "18px",
+                                    fontWeight: "400",
+                                    padding: "25px 0px 5px",
+                                    lineHeight: "13px",
+                                    display: "flex",
+                                  }}
+                                >
+                                  {applicationDetail?.copiedResponses?.length >
+                                    0 ? (
+                                    <>
+                                      <p
+                                        style={{
+                                          marginBottom: "0px",
+                                          fontSize: "18px",
+                                          fontWeight: "400",
+                                          paddingRight: "10px",
+                                          letterSpacing: "0.01px",
+                                        }}
+                                      >
+                                        CC:
+                                      </p>
+                                      <div>
+                                        {selectedBanks.map((item) => {
+                                          return (
+                                            <p
+                                              style={{
+                                                marginBottom: "3px",
+                                                letterSpacing: "0.01px",
+                                                fontSize: "18px",
+                                                fontWeight: "400",
+                                              }}
+                                            >
+                                              {item.name}
+                                            </p>
+                                          );
+                                        })}
+                                      </div>
+                                    </>
+                                  ) : (
+                                    ""
+                                  )}
+                                </div>
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                    </table>
+                  </div>
+                </div>
+              </div>
+
+              <div className="login_inner" style={{ display: "none" }}>
+                <div className="login_form_panel" style={{ display: "none" }}>
+                  <div
+                    ref={PdfPrivewsupervisorRef}
+                    className="p-5"
+                    style={{ position: "relative" }}
+                  >
+                    <table width="100%">
+                      <tr>
+                        <td
+                          style={{
+                            marginBottom: "0px",
+                            color: "#000",
+                            fontSize: "18px",
+                            fontWeight: "800",
+                          }}
+                        >
+                          Exchange &nbsp; Control &nbsp; Ref
+                          <br />
+                          Previous &nbsp; Exchange &nbsp; Control &nbsp; Ref
+                        </td>
+                        <td>
+                          <p
+                            style={{
+                              marginBottom: "0px",
+                              color: "#000",
+                              fontSize: "18px",
+                              textAlign: "left",
+                              fontWeight: "800",
+                              letterSpacing: "0.01px",
+                            }}
+                          >
+                            : {applicationDetail?.rbzReferenceNumber}
+                            <br />: N/A
+                          </p>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td colSpan="2">&nbsp;</td>
+                      </tr>
+                      <tr>
+                        <td
+                          colSpan="2"
+                          style={{
+                            color: "#000",
+                            fontSize: "18px",
+                            fontWeight: "600",
+                            letterSpacing: "0.01px",
+                          }}
+                        >
+                          {moment(
+                            applicationDetail?.applicationSubmittedDate
+                          ).format("DD MMMM YYYY")}
+                        </td>
+                      </tr>
+                      <tr>
+                        <td colSpan="2">&nbsp;</td>
+                      </tr>
+                      <tr>
+                        <td
+                          colSpan="2"
+                          style={{
+                            color: "#000",
+                            fontSize: "18px",
+                            fontWeight: "600",
+                            letterSpacing: "0.01px",
+                          }}
+                        >
+                          The Head - Exchange Control
+                          <br />
+                          {applicationDetail?.bankName
+                            ? applicationDetail?.bankName
+                            : ""}
+                          {applicationDetail?.bankName == null ? (
+                            <span>
+                              Reserve Bank of Zimbabwe. 80 Samora Machel Avenue,{" "}
+                              <br /> P.O. Box 1283, Harare, Zimbabwe.
+                            </span>
+                          ) : (
+                            <>
+                              <br />
+                              {applicationDetail?.bankAddress1 != null ||
+                                applicationDetail?.bankAddress1 != ""
+                                ? applicationDetail?.bankAddress1 + "," + " "
+                                : ""}
+                              <br></br>
+                              {applicationDetail?.bankAddress2 != null ||
+                                applicationDetail?.bankAddress2 != ""
+                                ? applicationDetail?.bankAddress2 + "," + " "
+                                : ""}
+                              <br></br>
+                              {applicationDetail?.bankAddress3 != null ||
+                                applicationDetail?.bankAddress3 != ""
+                                ? applicationDetail?.bankAddress3
+                                : ""}
+                              <br />
+                            </>
+                          )}
+                          {/* <span
+                            style={{
+                              borderBottom: "1px solid #000",
+                              fontWeight: "800",
+                              fontSize: "18px",
+                              letterSpacing: "0.01px"
+                            }}
+                            className="text-uppercase"
+                          >
+                            {applicationDetail?.bankCity != null ||
+                            applicationDetail?.bankCity != ""
+                              ? applicationDetail?.bankCity
+                              : ""}
+                          </span> */}
+                        </td>
+                      </tr>
+                      <tr>
+                        <td colSpan="2">&nbsp;</td>
+                      </tr>
+                      <tr>
+                        <td
+                          colSpan="2"
+                          style={{
+                            color: "#000",
+                            fontSize: "18px",
+                            fontWeight: "600",
+                            letterSpacing: "0.01px",
+                          }}
+                        >
+                          Dear{" "}
+                          {/* {applicationDetail?.applicantType == 1
+                            ? applicationDetail?.companyName
+                            : applicationDetail?.applicantType == 2
+                            ? applicationDetail?.name
+                            : applicationDetail?.applicantType == 3
+                            ? applicationDetail?.agencyName
+                            : " "} */}
+                          {applicationDetail?.companyName == null ||
+                            applicationDetail?.companyName == ""
+                            ? applicationDetail?.name
+                            : applicationDetail?.companyName}
+
+                        </td>
+                      </tr>
+                      <tr>
+                        <td colSpan="2">&nbsp;</td>
+                      </tr>
+                      <tr>
+                        <td colSpan="2">
+                          <table width="100%">
+                            <tr>
+                              <td colSpan="2">
+                                <p
+                                  style={{
+                                    color: "#000",
+                                    fontSize: "18px",
+                                    fontWeight: "800",
+                                    borderBottom: "1px solid #000",
+                                    marginBottom: "0px",
+                                    letterSpacing: "0.01px",
+                                  }}
+                                >
+                                  RE &nbsp;:&nbsp;{" "}
+                                  {applicationDetail?.applicationType}
+                                </p>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td colSpan="2">&nbsp;</td>
+                            </tr>
+                            {/* <tr>
                               <td
                                 style={{
                                   color: "#000",
@@ -9990,223 +10355,223 @@ const ExportCircularsEditForm = ({
                                  
                               </td>
                             </tr> */}
-                          <tr>
-                            <td
-                              style={{
-                                color: "#000",
-                                fontSize: "18px",
-                                fontWeight: "400",
-                              }}
-                            >
-                              Date Submitted
-                            </td>
-                            <td
-                              style={{
-                                color: "#000",
-                                fontSize: "18px",
-                                fontWeight: "800",
-                                letterSpacing: "0.01px",
-                              }}
-                            >
-                              :{" "}
-                              {moment(
-                                applicationDetail?.applicationSubmittedDate
-                              ).format("DD MMMM  YYYY")}
-                            </td>
-                          </tr>
-                        </table>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td colSpan="2">&nbsp;</td>
-                    </tr>
-                    <tr>
-                      <td colSpan="2">
-                        <table>
-                          <tr>
-                            <td colSpan="2">
-                              <table width="100%">
-                                <tr>
-                                  <td
-                                    style={{
-                                      color: "#000",
-                                      fontSize: "18px",
-                                      fontWeight: "400",
-                                    }}
-                                  >
-                                    <div>
-                                      <span
-                                        style={{
-                                          fontWeight: "800",
-                                          padding: "15px 0px 15px",
-                                        }}
-                                      >
-                                        Description
-                                      </span>
-                                    </div>
-                                    <div
-                                      className="tableEditorData"
-                                      dangerouslySetInnerHTML={{
-                                        __html: Description
-                                          ? Description
-                                          : applicationDetail?.content,
-                                      }}
-                                      style={{
-                                        paddingBottom: "60px",
-                                        letterSpacing: "0.01px",
-                                      }}
-                                    />
-                                  </td>
-                                </tr>
-                              </table>
-                            </td>
-                          </tr>
-                          <tr>
-                            <td colSpan="2">&nbsp;</td>
-                          </tr>
-                          <tr>
-                            <td
-                              colSpan="2"
-                              style={{
-                                color: "#000",
-                                fontSize: "18px",
-                                fontWeight: "400",
-                              }}
-                            >
-                              <span
+                            <tr>
+                              <td
                                 style={{
                                   color: "#000",
                                   fontSize: "18px",
                                   fontWeight: "400",
-                                  display: "inline-block",
                                 }}
                               >
-                                {" "}
-                                Yours Sincerely,
-                              </span>
-                              <img
-                                src={
-                                  applicationDetail?.getUserData?.filePath
-                                    ? applicationDetail?.getUserData.filePath
-                                    : NoSign
-                                }
-                                alt="Signature"
-                                style={{
-                                  width: "120px",
-                                  height: "50px",
-                                  display: "block",
-                                  objectFit: "contain",
-                                }}
-                              />
-                              <p
-                                style={{
-                                  marginBottom: "0px",
-                                  color: "#000",
-                                  fontSize: "14px",
-                                  fontWeight: "400",
-                                  padding: "15px 0px 3px",
-                                  lineHeight: "13px",
-                                  letterSpacing: "0.01px",
-                                }}
-                              >
-                                {PdfUsername
-                                  ? PdfUsername.replace(/"/g, "")
-                                  : "N/A"}
-                              </p>
-                              <p
-                                style={{
-                                  marginBottom: "0px",
-                                  color: "#000",
-                                  fontSize: "14px",
-                                  fontWeight: "400",
-                                  padding: "5px 0px",
-                                  lineHeight: "13px",
-                                  letterSpacing: "0.01px",
-                                }}
-                              >
-                                {PdfRolename
-                                  ? PdfRolename.replace(/"/g, "")
-                                  : "N/A"}
-                              </p>
-                              <h3
+                                Date Submitted
+                              </td>
+                              <td
                                 style={{
                                   color: "#000",
                                   fontSize: "18px",
                                   fontWeight: "800",
+                                  letterSpacing: "0.01px",
                                 }}
                               >
-                                EXCHANGE &nbsp; CONTROL
-                              </h3>
-                              <div
+                                :{" "}
+                                {moment(
+                                  applicationDetail?.applicationSubmittedDate
+                                ).format("DD MMMM  YYYY")}
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td colSpan="2">&nbsp;</td>
+                      </tr>
+                      <tr>
+                        <td colSpan="2">
+                          <table>
+                            <tr>
+                              <td colSpan="2">
+                                <table width="100%">
+                                  <tr>
+                                    <td
+                                      style={{
+                                        color: "#000",
+                                        fontSize: "18px",
+                                        fontWeight: "400",
+                                      }}
+                                    >
+                                      <div>
+                                        <span
+                                          style={{
+                                            fontWeight: "800",
+                                            padding: "15px 0px 15px",
+                                          }}
+                                        >
+                                          Description
+                                        </span>
+                                      </div>
+                                      <div
+                                        className="tableEditorData"
+                                        dangerouslySetInnerHTML={{
+                                          __html: Description
+                                            ? Description
+                                            : applicationDetail?.content,
+                                        }}
+                                        style={{
+                                          paddingBottom: "60px",
+                                          letterSpacing: "0.01px",
+                                        }}
+                                      />
+                                    </td>
+                                  </tr>
+                                </table>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td colSpan="2">&nbsp;</td>
+                            </tr>
+                            <tr>
+                              <td
+                                colSpan="2"
                                 style={{
-                                  marginBottom: "0px",
                                   color: "#000",
                                   fontSize: "18px",
                                   fontWeight: "400",
-                                  padding: "25px 0px 5px",
-                                  lineHeight: "13px",
-                                  display: "flex",
                                 }}
                               >
-                                {applicationDetail?.copiedResponses?.length >
-                                  0 ? (
-                                  <>
-                                    <p
-                                      style={{
-                                        marginBottom: "0px",
-                                        fontSize: "18px",
-                                        fontWeight: "400",
-                                        paddingRight: "10px",
-                                        letterSpacing: "0.01px",
-                                      }}
-                                    >
-                                      CC:
-                                    </p>
-                                    <div>
-                                      {selectedBanks.map((item) => {
-                                        return (
-                                          <p
-                                            style={{
-                                              marginBottom: "3px",
-                                              letterSpacing: "0.01px",
-                                              fontSize: "18px",
-                                              fontWeight: "400",
-                                            }}
-                                          >
-                                            {item.name}
-                                          </p>
-                                        );
-                                      })}
-                                    </div>
-                                  </>
-                                ) : (
-                                  ""
-                                )}
-                              </div>
-                            </td>
-                          </tr>
-                        </table>
-                      </td>
-                    </tr>
-                  </table>
+                                <span
+                                  style={{
+                                    color: "#000",
+                                    fontSize: "18px",
+                                    fontWeight: "400",
+                                    display: "inline-block",
+                                  }}
+                                >
+                                  {" "}
+                                  Yours Sincerely,
+                                </span>
+                                <img
+                                  src={
+                                    applicationDetail?.getUserData?.filePath
+                                      ? applicationDetail?.getUserData.filePath
+                                      : NoSign
+                                  }
+                                  alt="Signature"
+                                  style={{
+                                    width: "120px",
+                                    height: "50px",
+                                    display: "block",
+                                    objectFit: "contain",
+                                  }}
+                                />
+                                <p
+                                  style={{
+                                    marginBottom: "0px",
+                                    color: "#000",
+                                    fontSize: "14px",
+                                    fontWeight: "400",
+                                    padding: "15px 0px 3px",
+                                    lineHeight: "13px",
+                                    letterSpacing: "0.01px",
+                                  }}
+                                >
+                                  {PdfUsername
+                                    ? PdfUsername.replace(/"/g, "")
+                                    : "N/A"}
+                                </p>
+                                <p
+                                  style={{
+                                    marginBottom: "0px",
+                                    color: "#000",
+                                    fontSize: "14px",
+                                    fontWeight: "400",
+                                    padding: "5px 0px",
+                                    lineHeight: "13px",
+                                    letterSpacing: "0.01px",
+                                  }}
+                                >
+                                  {PdfRolename
+                                    ? PdfRolename.replace(/"/g, "")
+                                    : "N/A"}
+                                </p>
+                                <h3
+                                  style={{
+                                    color: "#000",
+                                    fontSize: "18px",
+                                    fontWeight: "800",
+                                  }}
+                                >
+                                  EXCHANGE &nbsp; CONTROL
+                                </h3>
+                                <div
+                                  style={{
+                                    marginBottom: "0px",
+                                    color: "#000",
+                                    fontSize: "18px",
+                                    fontWeight: "400",
+                                    padding: "25px 0px 5px",
+                                    lineHeight: "13px",
+                                    display: "flex",
+                                  }}
+                                >
+                                  {applicationDetail?.copiedResponses?.length >
+                                    0 ? (
+                                    <>
+                                      <p
+                                        style={{
+                                          marginBottom: "0px",
+                                          fontSize: "18px",
+                                          fontWeight: "400",
+                                          paddingRight: "10px",
+                                          letterSpacing: "0.01px",
+                                        }}
+                                      >
+                                        CC:
+                                      </p>
+                                      <div>
+                                        {selectedBanks.map((item) => {
+                                          return (
+                                            <p
+                                              style={{
+                                                marginBottom: "3px",
+                                                letterSpacing: "0.01px",
+                                                fontSize: "18px",
+                                                fontWeight: "400",
+                                              }}
+                                            >
+                                              {item.name}
+                                            </p>
+                                          );
+                                        })}
+                                      </div>
+                                    </>
+                                  ) : (
+                                    ""
+                                  )}
+                                </div>
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                    </table>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {updatepopup == true ? (
-              <UpdatePopupMessage
-                heading={heading}
-                para={para}
-                applicationNumber={applicationNumber}
-                closePopupHandle={closePopupHandle}
-              ></UpdatePopupMessage>
-            ) : (
-              ""
-            )}
-          </form>
-    </>
-  )
-}
+              {updatepopup == true ? (
+                <UpdatePopupMessage
+                  heading={heading}
+                  para={para}
+                  applicationNumber={applicationNumber}
+                  closePopupHandle={closePopupHandle}
+                ></UpdatePopupMessage>
+              ) : (
+                ""
+              )}
+            </form>
+          </>
+        )
+      }
     </>
   );
 };

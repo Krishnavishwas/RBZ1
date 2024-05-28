@@ -51,7 +51,7 @@ const FINApprovedRequestsTable = () => {
       ? `${applicationDetail?.applicationStatus}`
       : "0"
   );
-  const [IsDeferred, setIsDeferred] = useState("0")
+  const [IsDeferred, setIsDeferred] = useState("0") 
 
   const handleFormClose = () => setShowUpdateModal(false);
   const roleID = Storage.getItem("roleIDs");

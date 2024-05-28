@@ -491,7 +491,7 @@ const ImportAllRequestsTable = () => {
                     : ExportsapproveRequests
                 }
                 scrollable
-                scrollHeight="500px"
+                scrollHeight="600px"
                 // paginator={ExportsapproveRequests?.length > 10 ? true : false}
                 rowHover
                 filters={filters}

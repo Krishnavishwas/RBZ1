@@ -435,7 +435,7 @@ const ImportCancelledRequestsTable = () => {
                 className="primeDatatTable"
                 value={ExportCancelledRequests}
                 scrollable
-                scrollHeight="500px"
+                scrollHeight="600px"
                 // paginator={ExportCancelledRequests.length > 10 ? true : false}
                 filters={filters}
                 // paginatorPosition={"both"}

@@ -2710,56 +2710,11 @@ console.log("applicationDetail", applicationDetail)
       ))
     : null;
 
-  // console.log("applicationDetail--applicationDetail", applicationDetail);
-
-  // const finalArray = getBlankFile?.map((blankFile) => {
-  //   const attachedFile = applicationDetail?.attachedFiles?.find(
-  //     (file) => file.label === blankFile.name
-  //   );
-  //   if (attachedFile) {
-  //     return {
-  //       ...attachedFile,
-  //       ...blankFile,
-  //     };
-  //   } else {
-  //     return blankFile;
-  //   }
-  // });
-
-  // Combine attachedFiles and getBlankFile arrays
-
-  //   const finalArray = applicationDetail?.attachedFiles?.map(attachedFile => {
-  //     const matchingFile = getBlankFile?.find(blankFile => blankFile.name == attachedFile.label);
-
-  //     if (matchingFile) {
-  //         // Combine properties from both objects
-  //         return { ...matchingFile, ...attachedFile };
-  //     } else {
-  //         // If there's no matching file, return the attachedFile as is
-  //         return attachedFile;
-  //     }
-  // });
-
-  // const labelSet = new Set(getBlankFile?.map((item) => item.name));
-  // geninfoFile?.forEach((item) => labelSet.add(item.label));
-
+   
   // Create the finalArray by merging attachedFiles and getBlankFile based on the labelSet
 
   useEffect(() => {
-    //     const finalArray = Array.from(labelSet)?.map(label => {
-    //       const attachedFile = geninfoFile?.find(item => item.label === label);
-    //       const getBlankFileItem = getBlankFile?.find(item => item.name === label);
-    //       if (attachedFile) {
-    //           return { ...attachedFile, status: 0 };
-    //       } else if (getBlankFileItem) {
-    //           return { ...getBlankFileItem, status: 0 };
-    //       }
-    //   });
-    //   console.log("finalArray", finalArray)
-    // if(finalArray){
-    // setFiles(finalArray)
-    // }
-
+    
     let newData1 = getBlankFile?.filter((blankFile) => {
       return !geninfoFile?.some(
         (infoFile) => infoFile.label === blankFile.name
@@ -3300,6 +3255,7 @@ console.log("applicationDetail", applicationDetail)
                       ? "error"
                       : ""
                   }
+                  disabled={roleID == 2 || roleID == 3 ? false : true}
                 >
                   <option value="">Select Nature of Application</option>
                   {applicationSubType?.map((item, ind) => {
@@ -3340,6 +3296,7 @@ console.log("applicationDetail", applicationDetail)
                 }}
                 placeholder="Beneficiary Name"
                 value={applicationDetail.beneficiaryName}
+                disabled={roleID == 2 || roleID == 3 ? false : true}
               />
               <span className="sspan"></span>
               {errors.BeneficiaryName || applicationDetail.BeneficiaryName === "" ? (
@@ -3365,6 +3322,7 @@ console.log("applicationDetail", applicationDetail)
                 //     ? "error"
                 //     : ""
                 // }
+                disabled={roleID == 2 || roleID == 3 ? false : true}
               >
                  <option value="">
                  Select Beneficiary Country
