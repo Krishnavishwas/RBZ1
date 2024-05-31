@@ -276,7 +276,7 @@ const ImportDashboardTable = () => {
     // setapplicationstaus("0");
     setnextlevelvalue("");
     setreferredDataTrue(false);
-    setReferredData({})
+    setReferredData({});
   };
   const handleFormClose = () => setShowUpdateModal(false);
 
@@ -681,7 +681,7 @@ const ImportDashboardTable = () => {
           <DataTable
             value={filteredData}
             scrollable
-            scrollHeight="500px"
+            scrollHeight="650px"
             className={roleID >= 5 || roleID == 3 ? "mt-1" : "mt-1 tablehideth"}
             selection={selectedAppliation}
             onSelectionChange={(e) => setSelectedAppliation(e.value)}
@@ -889,6 +889,18 @@ const ImportDashboardTable = () => {
                                   : "d-none"
                               }
                             >
+                              <h3 className="deparment-headertooltip">
+                                <span>Response</span>{" "}
+                                <span
+                                  onClick={() =>
+                                    setreferredDataTrue(!referredDataTrue)
+                                  }
+                                  className="closedepartment_btnicn"
+                                >
+                                  <i class="bi bi-x-lg"></i>
+                                </span>{" "}
+                              </h3>
+
                               {RODLoader === true ? (
                                 <label className="outerloader2">
                                   <span className="loader"></span>
@@ -913,11 +925,11 @@ const ImportDashboardTable = () => {
                                     />
                                   </div>
                                   <div className="toolinner">
-                                    <label>Note</label>{" "}
+                                    <label>Notes</label>{" "}
                                     <p>{referredData.notes}</p>
                                   </div>
                                   <div className="toolinner">
-                                    <label>Comment</label>{" "}
+                                    <label>Comments</label>{" "}
                                     <p>{referredData.comment}</p>
                                   </div>
                                 </>

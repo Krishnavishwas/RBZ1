@@ -41,17 +41,19 @@ const INSNewRequestForm = () => {
   const applicationreferenceNumberRef = useRef(null); //delete
   const previousRBZReferenceNumberRef = useRef(null);
 
+  const roleID = Storage.getItem("roleIDs");
   const UserID = Storage.getItem("userID");
   const bankID = Storage.getItem("bankID");
   const userName = Storage.getItem("userName");
   const bankName = Storage.getItem("bankName");
   const bankidcheck = bankID !== "" ? "1" : "3";
-
+  const [getalluser, setGetalluser] = useState([]);
+  const [userRole, setUserrole] = useState([]);
   const [startDate, setStartDate] = useState(new Date());
   const [toastDisplayed, setToastDisplayed] = useState(false);
   const [getCompanyName, setgetCompanyName] = useState();
   const [getGovernment, setgetGovernment] = useState();
-
+  const [selectuserRole, setselectuserRole] = useState("");
   const [registerusertype, setregisterusertype] = useState(bankidcheck);
   const [INSForm, setINSForm] = useState({
     UserID: UserID.replace(/"/g, ""),
@@ -89,12 +91,21 @@ const INSNewRequestForm = () => {
   const [applicationSubType, setapplicationSubType] = useState([]);
   const [subsectorData, setsubsectorData] = useState([]);
   const [curRate, setCurrate] = useState();
-  const [checkSupervisor, setcheckSupervisor] = useState(false);
+  const [checkSupervisor, setcheckSupervisor] = useState(
+    roleID == 4 ? true : false
+  );
   const [attachmentData, setAttachmentData] = useState([]);
   const [otherfilesupload, setOtherfilesupload] = useState([]);
   const [inputValue, setInputValue] = useState("");
   const [options, setOptions] = useState([]);
   const [value, setValue] = useState("");
+  const [Equipment, setEquipment]= useState([])
+  const [Stationery, setStationery]= useState([])
+  const [Personnel, setPersonnel]= useState([])
+  const [Systems, setSystems]= useState([])
+  const [Organogram, setOrganogram]= useState([])
+  const [antimoney, setantimoney]= useState([])
+const [applicationsubID, setapplicationsubID]=useState([])
 
   const changeHandelForm = (e) => {
     let newErrors = {};
@@ -192,6 +203,38 @@ const INSNewRequestForm = () => {
     }
     setErrors(newErrors);
 
+    if(name == "applicationType"){
+      axios
+      .post(APIURL + "Master/GetMasterINSDataBySubApplicationTypeID")
+      .then((res) => {
+        console.log("GetMasterINSDataBySubApplicationTypeID", res)
+        if (res.data.responseCode == "200") {
+          if(res.data.responseData[0].id == 50){ 
+            setEquipment(res.data.responseData[0].subData)
+          } if(res.data.responseData[1].id == 51){ 
+            setStationery(res.data.responseData[1].subData)
+          }
+          if(res.data.responseData[2].id == 52){ 
+            setPersonnel(res.data.responseData[2].subData)
+          }
+          if(res.data.responseData[3].id == 53){ 
+            setSystems(res.data.responseData[3].subData)
+          }
+          if(res.data.responseData[4].id == 54){ 
+            setOrganogram(res.data.responseData[4].subData)
+          }
+          if(res.data.responseData[5].id == 55){ 
+            setantimoney(res.data.responseData[5].subData)
+          }
+        } else {
+         
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+    } 
+
     if (name === "sector" && value !== "") {
       axios
         .post(APIURL + "Master/GetSubSectorBySectorID", {
@@ -233,6 +276,7 @@ const INSNewRequestForm = () => {
           ApplicationSubTypeID: "0",
         })
         .then((res) => {
+          console.log("application type attachment", res);
           if (res.data.responseCode === "200") {
             setAttachmentData(res.data.responseData);
           } else {
@@ -259,14 +303,14 @@ const INSNewRequestForm = () => {
           }
         });
     }
-  };
+  }; 
 
   const convertedRate = curRate * parseFloat(INSForm.amount);
 
   const GetApplicationTypes = async () => {
     await axios
       .post(APIURL + "Master/GetApplicationTypesByDepartmentID", {
-        DepartmentID: "4",
+        DepartmentID: "5",
       })
       .then((res) => {
         if (res.data.responseCode === "200") {
@@ -280,13 +324,44 @@ const INSNewRequestForm = () => {
       });
   };
 
+  const getRoleHandle = async () => {
+    await axios
+      .post(APIURL + "Master/GetRoles", {
+        RoleID: "4",
+        Status: "35",
+      })
+      .then((res) => {
+        if (res.data.responseCode == 200) {
+          setUserrole(res.data.responseData);
+        } else {
+          setUserrole([]);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
   useEffect(() => {
     GetApplicationTypes();
+    getRoleHandle();
   }, []);
 
-  const handleUsertype = (e) => {
-    setregisterusertype(e.target.value);
+  const handleUsertype = (e) => {  
+    setregisterusertype(e.target.value);  
   };
+
+  const changeHandelApplicationSubTypeID = (e, id) => {
+    setapplicationsubID((prev) => { 
+      if (!prev.includes(id)) { 
+        return [...prev, id];
+      } else { 
+        return prev;
+      }
+    });
+  }; 
+
+  console.log("applicationsubID", applicationsubID?.join(','))
 
   const handleAddMore = (e) => {
     setOtherfiles([...otherfiles, null]);
@@ -304,6 +379,32 @@ const INSNewRequestForm = () => {
 
   const HandelSupervisorcheck = (e) => {
     setcheckSupervisor(!checkSupervisor);
+  };
+
+  const supervisorHangechangeRole = (e) => {
+    const value = e.target.value;
+    setErrors({});
+    setselectuserRole(value);
+    if (value == "") {
+      setGetalluser([]);
+    } else {
+      axios
+        .post(APIURL + "User/GetUsersByRoleID", {
+          RoleID: value,
+          DepartmentID: "2",
+          UserID: UserID.replace(/"/g, ""),
+        })
+        .then((res) => {
+          if (res.data.responseCode == "200") {
+            setGetalluser(res.data.responseData);
+          } else {
+            setGetalluser([]);
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
   };
 
   const validateForm = () => {
@@ -355,6 +456,10 @@ const INSNewRequestForm = () => {
       newErrors.subsector = "Sub sector is required";
       valid = false;
     }
+    if (checkSupervisor == true && selectuserRole == "" && roleID == 4) {
+      newErrors.selectuserRole = "Role is required";
+      valid = false;
+    }
     if (INSForm.applicantComments === "") {
       newErrors.applicantComments = "Applicant comments is required";
       valid = false;
@@ -395,14 +500,14 @@ const INSNewRequestForm = () => {
   const handleInputChangeGovernment = (input) => {
     setInputValue(input);
     if (input.length >= 3) {
-      const filteredOptions = 
-      GovernmentAgencies?.filter((governmentAgencie) =>
-      governmentAgencie?.agencyName?.toLowerCase().includes(input.toLowerCase())
-        )
-        ?.map((governmentAgencie) => ({
-          value: governmentAgencie?.id,
-          label: governmentAgencie?.agencyName,
-        }));
+      const filteredOptions = GovernmentAgencies?.filter((governmentAgencie) =>
+        governmentAgencie?.agencyName
+          ?.toLowerCase()
+          .includes(input.toLowerCase())
+      )?.map((governmentAgencie) => ({
+        value: governmentAgencie?.id,
+        label: governmentAgencie?.agencyName,
+      }));
       setOptions(filteredOptions?.length > 0 ? filteredOptions : []);
     } else {
       setOptions([]);
@@ -419,6 +524,8 @@ const INSNewRequestForm = () => {
     return Math.floor(10000 + Math.random() * 90000);
   };
 
+  console.log("INSForm", INSForm);
+
   const HandleSubmit = async (e) => {
     e.preventDefault();
     const randomNumber = generateRandomNumber();
@@ -431,7 +538,8 @@ const INSNewRequestForm = () => {
         .post(APIURL + "FINApplication/CreateFINApplication", {
           UserID: UserID.replace(/"/g, ""),
           BankID: bankID,
-          DepartmentID: "2",
+          DepartmentID: "5",
+          RoleID: roleID,
           ApplicationDate: moment(startDate).format("YYYY-MM-DD"),
           RBZReferenceNumber: generatedNumber,
           RelatedApplicationReferenceNumber:
@@ -443,8 +551,8 @@ const INSNewRequestForm = () => {
               ? getCompanyName?.value
               : "",
           ApplicantTypeID: registerusertype,
-          ApplicationTypeID: INSForm.applicationType,
-          ApplicationSubTypeID: INSForm.applicationSubType,
+          AssignedToRoleID: roleID == 2 ? 3 : selectuserRole,
+          ApplicationTypeID: INSForm.applicationType, 
           BeneficiaryName: INSForm.BeneficiaryName,
           BeneficiaryCountry: INSForm.baneficiaryCountry,
           BPNCode:
@@ -458,13 +566,20 @@ const INSNewRequestForm = () => {
           Sector: INSForm.sector,
           SubSector: INSForm.subsector,
           ApplicantComment: INSForm.applicantComments,
-          AssignedTo: checkSupervisor === true ? INSForm.bankSupervisor : "",
+          // ApplicationSubTypeID: INSForm.applicationSubType,
+          ApplicationSubTypeID:applicationsubID?.join(','),
+          AssignedTo:
+            checkSupervisor === true
+              ? INSForm.bankSupervisor
+              : roleID == 4 && INSForm.bankSupervisor == ""
+              ? UserID.replace(/"/g, "")
+              : "",
         })
         .then((res) => {
           if (res.data.responseCode === "200") {
             toast.success(res.data.responseMessage);
             setTimeout(() => {
-              navigate("/FINVDashboard");
+              navigate("/INSDashboard");
             }, 1200);
           } else {
             toast.error(res.data.responseMessage);
@@ -532,7 +647,10 @@ const INSNewRequestForm = () => {
   };
 
   const ResetHandleData = () => {
-    setgetCompanyName("");
+    setgetCompanyName(null);
+    // setGetBankID("");
+    setselectuserRole("");
+    setGetalluser([]);
     setINSForm({
       user: "",
       applicantYear: "2024",
@@ -818,8 +936,7 @@ const INSNewRequestForm = () => {
                   className="selectinput"
                 />
                 {errors.getGovernment &&
-                (getGovernment === "" ||
-                getGovernment == null) ? (
+                (getGovernment === "" || getGovernment == null) ? (
                   <small className="errormsg2">{errors.getGovernment}</small>
                 ) : (
                   ""
@@ -849,10 +966,10 @@ const INSNewRequestForm = () => {
                 }
               >
                 <option value="">Select Application Type</option>
-                {applicationType?.map((item, ind) => {
+                {applicationType?.map((item, ind) => { 
                   return (
                     <option key={item.id} value={item.id}>
-                      {item.name}
+                      {item.name} 
                     </option>
                   );
                 })}
@@ -864,16 +981,14 @@ const INSNewRequestForm = () => {
                 ""
               )}
             </label>
-            <small className="informgs">
+            <small className="informgs" style={{position:"absolute", bottom:"-10px"}}>
               Only government agencies can submit direct application to
               Inspectorate department.
             </small>
           </div>
         </div>
 
-        {INSForm.applicationType == "52" ? <>vishwas</> : ""}
-
-        {INSForm.applicationType == "53" ? (
+        {INSForm.applicationType == "54" ? (
           <div className="inner_form_new ">
             <label className="controlform">Exact Return Type</label>
             <div className="form-bx">
@@ -910,6 +1025,166 @@ const INSNewRequestForm = () => {
         ) : (
           ""
         )}
+
+        {INSForm.applicationType == "53" ? <>
+        <div className="inner_form_new ">
+            <label className="controlform">Equipment</label>
+            <div className="form-bx">
+              <label>
+                <select name="applicationsubID"  onChange={(e) => {
+                    changeHandelApplicationSubTypeID(e, 50);
+                  }}>
+                  <option value="">Select Equipment</option> 
+                  {Equipment?.map((item, ind) => {
+                    return (
+                      <option key={item.id} value={item.id}>
+                        {item.name}
+                      </option>
+                    );
+                  })}
+                </select>
+                <span className="sspan"></span>
+                {errors.Equipment && INSForm.Equipment === "" ? (
+                  <small className="errormsg">{errors.Equipment}</small>
+                ) : (
+                  ""
+                )}
+              </label>
+            </div>
+          </div>
+
+          <div className="inner_form_new ">
+            <label className="controlform">Stationery</label>
+            <div className="form-bx">
+              <label>
+                <select name="applicationsubID"  onChange={(e) => {
+                    changeHandelApplicationSubTypeID(e, 51);
+                  }} >
+                  <option value="" selected>None Select</option>
+                  {Stationery?.map((item, ind) => {
+                    return (
+                      <option key={item.id} value={item.id}>
+                        {item.name}
+                      </option>
+                    );
+                  })}
+                </select>
+                <span className="sspan"></span>
+                {errors.Stationery && INSForm.Stationery === "" ? (
+                  <small className="errormsg">{errors.Stationery}</small>
+                ) : (
+                  ""
+                )}
+              </label>
+            </div>
+          </div>
+
+          <div className="inner_form_new ">
+            <label className="controlform">Personnel</label>
+            <div className="form-bx">
+              <label>
+                <select name="applicationsubID"  onChange={(e) => {
+                    changeHandelApplicationSubTypeID(e, 52);
+                  }}>
+                  <option value="" selected>None Select</option>
+                  {Personnel?.map((item, ind) => {
+                    return (
+                      <option key={item.id} value={item.id}>
+                        {item.name}
+                      </option>
+                    );
+                  })}
+                </select>
+                <span className="sspan"></span>
+                {errors.Personnel && INSForm.Personnel === "" ? (
+                  <small className="errormsg">{errors.Personnel}</small>
+                ) : (
+                  ""
+                )}
+              </label>
+            </div>
+          </div>
+
+          <div className="inner_form_new ">
+            <label className="controlform">Systems</label>
+            <div className="form-bx">
+              <label>
+                <select  name="applicationsubID" onChange={(e) => {
+                    changeHandelApplicationSubTypeID(e, 53);
+                  }}>
+                  <option value="" selected>None Select</option>
+                  {Systems?.map((item, ind) => {
+                    return (
+                      <option key={item.id} value={item.id}>
+                        {item.name}
+                      </option>
+                    );
+                  })}
+                </select>
+                <span className="sspan"></span>
+                {errors.Systems && INSForm.Systems === "" ? (
+                  <small className="errormsg">{errors.Systems}</small>
+                ) : (
+                  ""
+                )}
+              </label>
+            </div>
+          </div>
+
+          <div className="inner_form_new ">
+            <label className="controlform">Structure/Organogram</label>
+            <div className="form-bx">
+              <label>
+                <select name="applicationsubID"  onChange={(e) => {
+                    changeHandelApplicationSubTypeID(e, 54);
+                  }}>
+                  <option value="" selected>None Selected</option>
+                  {Organogram?.map((item, ind) => {
+                    return (
+                      <option key={item.id} value={item.id}>
+                        {item.name}
+                      </option>
+                    );
+                  })}
+                </select>
+                <span className="sspan"></span>
+                {errors.Organogram && INSForm.Organogram === "" ? (
+                  <small className="errormsg">{errors.Organogram}</small>
+                ) : (
+                  ""
+                )}
+              </label>
+            </div>
+          </div>
+
+          <div className="inner_form_new ">
+            <label className="controlform">Anti-Money laundering and Combating the Financing of Terrorism program and procedures</label>
+            <div className="form-bx">
+              <label>
+                <select name="applicationsubID"  onChange={(e) => {
+                    changeHandelApplicationSubTypeID(e, 55);
+                  }}>
+                  <option value="" selected>None Selected</option>
+                  {antimoney?.map((item, ind) => {
+                    return (
+                      <option key={item.id} value={item.id}>
+                        {item.name}
+                      </option>
+                    );
+                  })}
+                </select>
+                <span className="sspan"></span>
+                {errors.antymony && INSForm.antymony === "" ? (
+                  <small className="errormsg">{errors.antymony}</small>
+                ) : (
+                  ""
+                )}
+              </label>
+            </div>
+          </div>
+
+        </> : ""}
+
         {/* end form-bx  */}
 
         <div className="inner_form_new ">
@@ -926,7 +1201,7 @@ const INSNewRequestForm = () => {
               />
               <span className="sspan"></span>
             </label>
-            <small className="informgs">
+            <small className="informgs" style={{position:"absolute", bottom:"-10px"}}>
               This information need to submit only when government agencies are
               submitting the application.
             </small>
@@ -976,7 +1251,7 @@ const INSNewRequestForm = () => {
         <div className="inner_form_new ">
           <label className="controlform">Previous RBZ Reference Number</label>
           <div className="row">
-            <div className="col-md-8">
+            <div className="col-md-12">
               <div className="d-flex">
                 <div className="form-bx">
                   <label>
@@ -1318,11 +1593,15 @@ const INSNewRequestForm = () => {
         </div>
         {/* end form-bx  */}
 
-        <div className="inner_form_new ">
-          <label className="controlform">Submit to Bank Supervisor</label>
+        <div className={roleID == 4 ? "d-none" : "inner_form_new "}>
+          {/* <label className="controlform">Submit To {roleID == 2 ? "Next Level" : "Next Level"}</label> */}
+          <label className="controlform">
+            Submit To {roleID == 2 ? "Supervisor" : "Next Level"}
+          </label>
+
           <input
             type="checkbox"
-            className="mt-4"
+            className=""
             onChange={(e) => {
               HandelSupervisorcheck(e);
             }}
@@ -1330,9 +1609,10 @@ const INSNewRequestForm = () => {
         </div>
         {/* end form-bx  */}
 
-        {checkSupervisor === true ? (
+        {checkSupervisor == true && roleID == 2 ? (
           <div className="inner_form_new ">
-            <label className="controlform">Select Bank Supervisor</label>
+            <label className="controlform">Bank Supervisor</label>
+
             <div className="form-bx">
               <label>
                 <select
@@ -1370,6 +1650,91 @@ const INSNewRequestForm = () => {
         ) : (
           ""
         )}
+        {/* end form-bx  */}
+
+        {checkSupervisor == true && roleID == 4 ? (
+          <div className="inner_form_new ">
+            <label className="controlform">RBZ Record Officer Submit to</label>
+            <div className="form-bx">
+              <label>
+                <select
+                  name="SupervisorRoleId"
+                  onChange={(e) => {
+                    supervisorHangechangeRole(e);
+                  }}
+                  // className={
+                  //   errors.assignedTo && !SupervisorRoleId
+                  //     ? "error"
+                  //     : ""
+                  // }
+                >
+                  <option value="">Select Role</option>
+                  {userRole?.map((item, index) => {
+                    return (
+                      <option key={index} value={item.id}>
+                        {item.designation}
+                      </option>
+                    );
+                  })}
+                </select>
+                <span className="sspan"></span>
+                {errors.selectuserRole && selectuserRole === "" ? (
+                  <small className="errormsg">Role is required</small>
+                ) : (
+                  ""
+                )}
+              </label>
+            </div>
+          </div>
+        ) : (
+          ""
+        )}
+        {/* end form-bx  */}
+
+        {checkSupervisor == true && roleID == 4 && selectuserRole ? (
+          <div className="w-100">
+            <div className="inner_form_new">
+              <label className="controlform">User</label>
+
+              <div className="form-bx">
+                <label>
+                  <select
+                    ref={bankSupervisorRef}
+                    name="bankSupervisor"
+                    onChange={(e) => {
+                      changeHandelForm(e);
+                    }}
+                    className={
+                      errors.bankSupervisor && INSForm.bankSupervisor === ""
+                        ? "error"
+                        : ""
+                    }
+                  >
+                    <option value="" selected>
+                      Select User
+                    </option>
+                    {getalluser?.map((item, index) => {
+                      return (
+                        <option key={index} value={item.userID}>
+                          {item.name}
+                        </option>
+                      );
+                    })}
+                  </select>
+                  <span className="sspan"></span>
+                  {errors.bankSupervisor && INSForm.bankSupervisor === "" ? (
+                    <small className="errormsg">User is required</small>
+                  ) : (
+                    ""
+                  )}
+                </label>
+              </div>
+            </div>
+          </div>
+        ) : (
+          ""
+        )}
+
         {/* end form-bx  */}
 
         <h5 className="section_top_subheading mt-3">Attachments</h5>

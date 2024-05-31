@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import ExportformDynamicField from "./ExportformDynamicField";
-import MultiSelectComponent from "./SearchUI/MultiSelectComponent";
+import ExportformDynamicField from "./ExportformDynamicField"; 
 import { Storage } from "../login/Storagesetting";
 import DatePicker from "react-datepicker";
 // import "react-datepicker/dist/react-datepicker.css";
@@ -849,11 +848,11 @@ const ExportDashboardEditDetails = ({
       StarterKit.configure({
         bulletList: {
           keepMarks: true,
-          keepAttributes: false, // TODO : Making this as `false` becase marks are not preserved when I try to preserve attrs, awaiting a bit of help
+          keepAttributes: false,
         },
         orderedList: {
           keepMarks: true,
-          keepAttributes: false, // TODO : Making this as `false` becase marks are not preserved when I try to preserve attrs, awaiting a bit of help
+          keepAttributes: false,
         },
       }),
     ],
@@ -890,11 +889,11 @@ const ExportDashboardEditDetails = ({
       StarterKit.configure({
         bulletList: {
           keepMarks: true,
-          keepAttributes: false, // TODO : Making this as `false` becase marks are not preserved when I try to preserve attrs, awaiting a bit of help
+          keepAttributes: false,
         },
         orderedList: {
           keepMarks: true,
-          keepAttributes: false, // TODO : Making this as `false` becase marks are not preserved when I try to preserve attrs, awaiting a bit of help
+          keepAttributes: false,
         },
       }),
     ],
@@ -908,7 +907,6 @@ const ExportDashboardEditDetails = ({
     const value = e.target.value;
     setSupervisorRoleId("");
     setSupervisorRoleId("");
-
     setnextlevelvalue(value);
     setAsignUser([]);
   };
@@ -958,9 +956,6 @@ const ExportDashboardEditDetails = ({
             setgetBlankFile(res.data.responseData);
           } else {
             setgetBlankFile([]);
-            // setFiles([]);
-            // setOtherfiles([]);
-            // setOtherfilesupload([]);
           }
         });
     }
@@ -1104,15 +1099,10 @@ const ExportDashboardEditDetails = ({
     const specialChars = /[!@#$%^&*(),.?":{}|<>]/;
     let newErrors = {};
     let valid = true;
-
     if (name == "applicationPurpose" && value.charAt(0) === " ") {
       newErrors.applicationPurpose = "First character cannot be a blank space";
       valid = false;
     }
-    //  else if (name == "applicationPurpose" && specialChars.test(value.charAt(0))) {
-    //   newErrors.applicationPurpose = "Special characters not allowed";
-    //   valid = false;
-    // }
     else if (name == "applicant" && value.charAt(0) === " ") {
       newErrors.applicant = "First character cannot be a blank space";
       valid = false;
@@ -1266,7 +1256,6 @@ const ExportDashboardEditDetails = ({
     const { name, value } = e.target;
     setDateExpiryOption(e.target.value);
     setdefaultnoExpiry(value);
-
     if (value == 0) {
       setDateExpirydisplay("");
       if (dateExpirydisplayRef.current) dateExpirydisplayRef.current.value = "";
@@ -1278,7 +1267,6 @@ const ExportDashboardEditDetails = ({
     const { name, value } = e.target;
     setIsReturnOption(e.target.value);
     setIsReturn(value);
-
     if (value == 0) {
       setIsReturndisplay("");
       setIsReturnExpiringDate(new Date());
@@ -1300,9 +1288,9 @@ const ExportDashboardEditDetails = ({
         });
     }
   };
+
   const SelectReturnFrequency = (e) => {
     const { name, value } = e.target;
-
     if (value == 1) {
       setGetFrequencyID(value);
       setIsReturnExpiringDate(new Date());
@@ -1348,6 +1336,7 @@ const ExportDashboardEditDetails = ({
   const clearInputFile = (index) => {
     if (fileInputRefs[index].current) fileInputRefs[index].current.value = "";
   };
+
   const clearInputFileother = (index) => {
     if (fileInputRefsother[index]?.current)
       fileInputRefsother[index].current.value = "";
@@ -1361,7 +1350,6 @@ const ExportDashboardEditDetails = ({
         format: "a4",
         unit: "pt",
       });
-
       axios
         .post(APIURL + "Admin/GetBankByID", {
           id: applicationDetail?.bankID,
@@ -1390,7 +1378,6 @@ const ExportDashboardEditDetails = ({
             } else {
               var footerImage = "";
             }
-
             const addHeader = (doc) => {
               if (roleID != 3) {
                 const pageCount = doc.internal.getNumberOfPages();
@@ -1453,7 +1440,6 @@ const ExportDashboardEditDetails = ({
                 }
               }
             };
-
             const addWaterMark = (doc) => {
               const pageCount = doc.internal.getNumberOfPages();
               for (var i = 1; i <= pageCount; i++) {
@@ -1518,7 +1504,6 @@ const ExportDashboardEditDetails = ({
     const specialCharsnote = /[!@#$%^*|<>]/;
     let newErrors = {};
     let valid = true;
-
     if (name == "Notes" && value.charAt(0) === " ") {
       newErrors.Notes = "First character cannot be a blank space";
       valid = false;
@@ -1687,6 +1672,7 @@ const ExportDashboardEditDetails = ({
         console.log(err);
       });
   };
+
   useEffect(() => {
     handleFIleview();
   }, [applicationDetail]);
@@ -1705,7 +1691,6 @@ const ExportDashboardEditDetails = ({
 
   const getNextvaluesupervisor = (e) => {
     const value = e.target.checked;
-
     if (value == false) {
       setnextlevelvalue("");
     }
@@ -1715,7 +1700,6 @@ const ExportDashboardEditDetails = ({
   const validateForm = () => {
     let valid = true;
     const newErrors = {};
-
     if (applicationDetail.applicationPurpose === "") {
       newErrors.applicationPurpose = "Purpose of the application is required";
       valid = false;
@@ -1959,24 +1943,19 @@ const ExportDashboardEditDetails = ({
     if (BeneficiaryNameRef.current) BeneficiaryNameRef.current.value = "";
     if (applicantReferenceNumberRef.current)
       applicantReferenceNumberRef.current.value = "";
-    // if(applicantYearRef.current) applicantYearRef.current.value = '';
     if (applicationTypeRef.current) applicationTypeRef.current.value = "";
     if (assignedToRef.current) assignedToRef.current.value = "";
     if (companyNameRef.current) companyNameRef.current.value = "";
     if (currencyRef.current) currencyRef.current.value = "";
     if (govtAgencieRef.current) govtAgencieRef.current.value = "";
-
     if (applicationPurposeRef.current) applicationPurposeRef.current.value = "";
     if (relatedexchangeControlNumberRef.current)
       relatedexchangeControlNumberRef.current.value = "";
     if (sectorRef.current) sectorRef.current.value = "";
     if (subsectorRef.current) subsectorRef.current.value = "";
-
     if (typeExporterRef.current) typeExporterRef.current.value = "";
     if (usdEquivalentRef.current) usdEquivalentRef.current.value = "";
-
     if (rateRef.current) rateRef.current.value = "";
-
     if (FrequencyDateRef.current) FrequencyDateRef.current.value = "";
     if (FrequencyRef.current) FrequencyRef.current.value = "";
     if(optionOtherDepartmentRef.current) optionOtherDepartmentRef.current.value = "";
@@ -2057,7 +2036,6 @@ const ExportDashboardEditDetails = ({
             (AssignUserID == "" || AssignUserID == null) &&
             roleID != 5 &&
             roleID != 2 &&
-            //roleID != 3 &&
             roleID != 4
               ? "100"
               : nextlevelvalue,
@@ -2239,6 +2217,7 @@ const ExportDashboardEditDetails = ({
                               "ApplicationID",
                               applicationDetail?.id
                             );
+                            formData.append("DepartmentID", 2)
                             formData.append("PdfData", blobPDF);
                             axios
                               .post(ImageAPI + "File/UploadPdf", formData)
@@ -2405,6 +2384,7 @@ const ExportDashboardEditDetails = ({
                                 "ApplicationID",
                                 applicationDetail?.id
                               );
+                              formData.append("DepartmentID", 2)
                               formData.append("PdfData", blobPDF);
                               await axios
                                 .post(ImageAPI + "File/UploadPdf", formData)
@@ -2559,7 +2539,6 @@ const ExportDashboardEditDetails = ({
         (infoFile) => infoFile.label === blankFile.name
       );
     });
-
     setnewData(newData1);
   }, [applicationDetail, geninfoFile, allcomment]);
 
@@ -2575,8 +2554,6 @@ const ExportDashboardEditDetails = ({
         console.log("FileRemove Error", error);
       });
   };
-
-  console.log("errors", errors);
 
   const getLastComment = async (id) => {
     await axios
@@ -2632,28 +2609,6 @@ const ExportDashboardEditDetails = ({
 
   const SubmitOtherDepartment = async () => {
     try {
-      console.log({
-        ID: applicationDetail.id,
-        RoleID: roleID,
-        UserID: UserID.replace(/"/g, ""),
-        ReferredDepartmentID: OtherDepartment,
-        AssignedToRoleID: otherDepartmentRole,
-        AssignedTo: otherDepartmentUser,
-        Comment: asignnextLeveldata.Comment,
-        Notes: asignnextLeveldata.Notes,
-        Description: Description,
-        DepartmentID: DeptID,
-          Status:
-            OtherDepartment == "2"
-              ? "275"
-              : OtherDepartment == "3"
-              ? "280"
-              : OtherDepartment == "4"
-              ? "285"
-              : OtherDepartment == "5"
-              ? "290"
-              : "",
-      });
       setOtherDepartmentLoader(true);
       await axios
         .post(APIURL + "ReferredApplication/CreateReferredApplication", {
@@ -2666,11 +2621,20 @@ const ExportDashboardEditDetails = ({
           Comment: asignnextLeveldata.Comment,
           Notes: asignnextLeveldata.Notes,
           Description: Description,
-          Status: "35",
+          DepartmentID: DeptID ,
+          Status:
+            OtherDepartment == "2"
+              ? "275"
+              : OtherDepartment == "3"
+              ? "280"
+              : OtherDepartment == "4"
+              ? "285"
+              : OtherDepartment == "5"
+              ? "290"
+              : "",
         })
         .then((res) => {
           if (res.data.responseCode == 200) {
-            console.log("vbbbbb---", res);
             setOtherDepartmentLoader(false);
             setOtherDepartmentPopup(true);
           }
@@ -2678,12 +2642,12 @@ const ExportDashboardEditDetails = ({
         .catch((error) => {
           setOtherDepartmentPopup(false);
           setOtherDepartmentLoader(false);
-          console.log("User/GetUsersByRoleID - Error", error);
+          console.log("CreateReferredApplication - Error", error);
         });
     } catch (error) {
       setOtherDepartmentPopup(false);
       setOtherDepartmentLoader(false);
-      console.log("User/GetUsersByRoleID - catch - Error", error);
+      console.log("CreateReferredApplication - catch - Error", error);
     }
   };
 
@@ -15030,7 +14994,7 @@ const ExportDashboardEditDetails = ({
                 )}
                 {nextlevelvalue == 35 ? (
                   <button
-                    className="btn btn-primary"
+                    className="login"
                     type="button"
                     disabled={
                       !otherDepartmentRole ||
@@ -15046,7 +15010,7 @@ const ExportDashboardEditDetails = ({
                     {OtherDepartmentLoader ? (
                       <span className="loaderwait">Please Wait...</span>
                     ) : (
-                      <span>Refer to Other Department</span>
+                      <span>Submit</span>
                     )}
                   </button>
                 ) : (
@@ -15097,6 +15061,7 @@ const ExportDashboardEditDetails = ({
                  )}
               </div>
             </div>
+
             {/* pdf-preview data start Arun Verma Final Pdf Generation and Preview */}
             <div className="login_inner" style={{ display: "none" }}>
               <div className="login_form_panel" style={{ display: "none" }}>
@@ -16793,20 +16758,6 @@ const ExportDashboardEditDetails = ({
                             <br />
                           </>
                         )}
-                        {/* <span
-                            style={{
-                              borderBottom: "1px solid #000",
-                              fontWeight: "800",
-                              fontSize: "18px",
-                              letterSpacing: "0.01px"
-                            }}
-                            className="text-uppercase"
-                          >
-                            {applicationDetail?.bankCity != null ||
-                            applicationDetail?.bankCity != ""
-                              ? applicationDetail?.bankCity
-                              : ""}
-                          </span> */}
                       </td>
                     </tr>
                     <tr>
@@ -16823,13 +16774,6 @@ const ExportDashboardEditDetails = ({
                         }}
                       >
                         Dear{" "}
-                        {/* {applicationDetail?.applicantType == 1
-                            ? applicationDetail?.companyName
-                            : applicationDetail?.applicantType == 2
-                            ? applicationDetail?.name
-                            : applicationDetail?.applicantType == 3
-                            ? applicationDetail?.agencyName
-                            : " "} */}
                         {applicationDetail?.companyName == null ||
                         applicationDetail?.companyName == ""
                           ? applicationDetail?.name
@@ -16863,31 +16807,6 @@ const ExportDashboardEditDetails = ({
                           <tr>
                             <td colSpan="2">&nbsp;</td>
                           </tr>
-                          {/* <tr>
-                              <td
-                                style={{
-                                  color: "#000",
-                                  fontSize: "18px",
-                                  fontWeight: "400",
-                                }}
-                              >
-                                Exporter
-                              </td>
-                              <td
-                                style={{
-                                  color: "#000",
-                                  fontSize: "18px",
-                                  fontWeight: "800",
-                                  letterSpacing: "0.01px"
-                                }}
-                              >
-                                :{" "}
-                                {applicationDetail?.companyName == null || applicationDetail?.companyName == ""
-                                  ? applicationDetail?.name
-                                  : applicationDetail?.companyName} 
-                                  {console.log(applicationDetail)}
-                              </td>
-                            </tr> */}
                           <tr>
                             <td
                               style={{
@@ -17102,7 +17021,7 @@ const ExportDashboardEditDetails = ({
               ""
             )}
 
-{OtherDepartmentPopup == true ? (
+              {OtherDepartmentPopup == true ? (
                 <UpdatePopupMessage
                   heading={heading1}
                   para={para1}

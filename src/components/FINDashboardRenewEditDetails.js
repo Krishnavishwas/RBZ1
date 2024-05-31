@@ -245,8 +245,8 @@ const [Supervisors, setSupervisors]= useState([]);
   const [SubmitBtnLoader, setSubmitBtnLoader] = useState(false);
   const [content, setEditorContent] = useState("<p></p>"); 
   const applicationNumber = applicationDetail.rbzReferenceNumber;
-  const heading = "Updated Successfully!";
-  const para = "Export request updated successfully!";
+  const heading = "Application Submitted Successfully!";
+  const para = "Foreign Investments application request submitted successfully!";
 
   const ChangeApplicationStatus = (e) => {
     const values = e.target.value;
@@ -1287,6 +1287,7 @@ useEffect(() => {
         })
         .then((res) => {
           if (res.data.responseCode === "200") {
+            console.log("getsuper",res)
             setSupervisors(res.data.responseData);
           } else {
             console.log(res.data.responseMessage);
@@ -1646,6 +1647,8 @@ console.log("applicationDetail", applicationDetail)
 
   }, []);
 
+  console.log("error", errors)
+
   const convertedRate =
     parseFloat(curRate ? curRate : ratevalue) *
     parseFloat(applicationDetail?.amount);
@@ -1890,7 +1893,7 @@ console.log("applicationDetail", applicationDetail)
     //   valid = false;
     // }
 
-    if (applicationDetail.bankSupervisor == "" && checkSupervisor == true && roleID == 2) {
+    if (AssignUserID == "" && checkSupervisor == true && roleID == 2) {
       newErrors.assignedTo = "Bank Supervisor is required";
       valid = false;
     }
@@ -2072,7 +2075,7 @@ console.log("applicationDetail", applicationDetail)
     if (validateForm()) {
       setSubmitBtnLoader(true);
       await axios
-        .post(APIURL + "FINApplication/UpdateFINApplications", {
+        .post(APIURL + "FINApplication/CreateFINApplication", {
           RBZReferenceNumber: applicationDetail?.rbzReferenceNumber,
           ID: applicationDetail?.id,
           DepartmentID: "4",
@@ -2379,6 +2382,7 @@ console.log("applicationDetail", applicationDetail)
                               "ApplicationID",
                               applicationDetail?.id
                             );
+                            formData.append("DepartmentID", 4)
                             formData.append("PdfData", blobPDF);
                             axios
                               .post(ImageAPI + "File/UploadPdf", formData)
@@ -2554,6 +2558,7 @@ console.log("applicationDetail", applicationDetail)
                                 "ApplicationID",
                                 applicationDetail?.id
                               );
+                              formData.append("DepartmentID", 4)
                               formData.append("PdfData", blobPDF);
                               await axios
                                 .post(ImageAPI + "File/UploadPdf", formData)
@@ -3754,31 +3759,33 @@ console.log("applicationDetail", applicationDetail)
             <div className="form-bx">
               <label>
                 <select
-                  ref={bankSupervisorRef}
-                  name="bankSupervisor"
-                  onChange={(e) => {
-                    changeHandelForm(e);
-                  }}
-                  className={
-                    errors.bankSupervisor && applicationDetail.bankSupervisor === ""
-                      ? "error"
-                      : ""
-                  }
+                 ref={bankSupervisorRef}
+                 name="assignedTo"
+                 onChange={supervisorHangechangeBankuser}
+                 className={
+                   errors.assignedTo && !AssignUserID ? "error" : ""
+                 } 
                 >
                   <option value="" selected>
                     Select Bank Supervisor
                   </option>
                   {Supervisors?.map((item, index) => {
                     return (
-                      <option key={index} value={item.userID}>
-                        {item.name}
-                      </option>
+                      <option
+                      key={index}
+                      value={JSON?.stringify(item)}
+                      selected={
+                        item.userID == applicationDetail?.assignedTo
+                      }
+                    >
+                      {item.name}
+                    </option>
                     );
                   })}
                 </select>
                 <span className="sspan"></span>
-                {errors.bankSupervisor && applicationDetail.bankSupervisor === "" ? (
-                  <small className="errormsg">{errors.bankSupervisor}</small>
+                {errors.assignedTo && AssignUserID === "" ? (
+                  <small className="errormsg">{errors.assignedTo}</small>
                 ) : (
                   ""
                 )}
@@ -3840,7 +3847,7 @@ console.log("applicationDetail", applicationDetail)
                     ref={bankSupervisorRef}
                     name="bankSupervisor"
                     onChange={(e) => {
-                      changeHandelForm(e);
+                      handleuserByrecordOfficer(e)
                     }}
                     className={
                       errors.bankSupervisor && applicationDetail.bankSupervisor === ""

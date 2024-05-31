@@ -11,9 +11,9 @@ import { APIURL } from "../constant";
 import { Storage } from "../login/Storagesetting";
 import { Link } from "react-router-dom";
 import Modal from "react-bootstrap/Modal";
-
+import jsPDF from "jspdf";
+import logo from "../rbz_LOGO.png";
 import ExportCircularViewDetails from '../components/ExportCircularViewDetails'
-import ExportCircularsCreateForm from '../components/ExportCircularsCreateForm'
 import ExportCircularsEditForm from '../components/ExportCircularsEditForm'
 import { TailSpin } from "react-loader-spinner";
 
@@ -23,16 +23,17 @@ const ExportCircularsTable = () => {
     const roleID = Storage.getItem("roleIDs");
     const roleName = Storage.getItem("roleName");
     const bankId = Storage.getItem("bankID")
-
+    const PdftargetRef = useRef();
+    const PdfPrivewRef = useRef();
+    const PdfPrivewsupervisorRef = useRef();
+    const CoverigLetterRef = useRef(null);
     const [CricularRequests, setCricularRequests] = useState([]);
 
     const [showEditForm, setshowEditForm] = useState(false);
     const [showUpdateModal, setShowUpdateModal] = useState(false);
     const [applicationDetail, setApplicationDetail] = useState({});
     const [applicationmessage, setApplicationmessage] = useState("");
-    const [cricularFormShow, setCricularFormShow] = useState(false);
-    const cricularFormClose = () => setCricularFormShow(false);
-    const handleCricularFormShow = () => setCricularFormShow(true);
+
     const [searchText, setSearchText] = useState("");
     const [allcomment, setallcomment] = useState([]);
     const [applicationstaus, setapplicationstaus] = useState(
@@ -97,22 +98,13 @@ const ExportCircularsTable = () => {
                         placeholder="Search"
                     />
                 </span>
-                {rollId > 4 ?
-                    <div className="form-footer mt-0 justify-content-end">
-                        <button
-                            type="button"
-                            className="login text-end"
-                            onClick={(e) => handleCricularFormShow()}
-                        >
-                            Add Circular
-                        </button>
-                    </div>
-                    : " "}
+
             </div>
         );
     };
 
     const action = (rowData) => {
+
         return (
             <>
                 <i
@@ -124,7 +116,7 @@ const ExportCircularsTable = () => {
                     }}
                     onClick={() => {
                         handleViewData(rowData.id);
-                        GetHandelDetail(rowData?.rbzReferenceNumber, rowData.id);
+                        GetHandelDetail(rowData?.circularReferenceNumber, rowData.id);
                         GetApplicationCount(rowData.id)
                     }}
                     onMouseEnter={(e) => {
@@ -134,25 +126,43 @@ const ExportCircularsTable = () => {
                         e.target.style.color = "";
                     }}
                 ></i>
+                {roleID == 2 || roleID == 3 ?
+                    <button
+                        type="button"
+                        className="login "
+                        style={{
+                            border: "unset",
+                            backgroundColor: "transparent"
+                        }}
+                        onClick={() => {
+                            GetHandelDetail(rowData?.circularReferenceNumber, rowData.id);
+                            GetHandelDetailPDF(rowData?.circularReferenceNumber)
+                        }}
 
-                <i
-                    className="pi pi-user-edit"
-                    style={{ cursor: "pointer" }}
-                    key={rowData.title}
-                    onClick={() => {
-                        handleClickEditModal(rowData.title);
-                        GetHandelDetail(rowData?.rbzReferenceNumber, rowData.id);
-                        GetRoleHandle(applicationstaus);
-                        handleData();
-                        GetApplicationCount(rowData.id)
-                    }}
-                    onMouseEnter={(e) => {
-                        e.target.style.color = "var(--primary-color)";
-                    }}
-                    onMouseLeave={(e) => {
-                        e.target.style.color = "";
-                    }}
-                ></i>
+                    >
+                        <i class="pi pi-download p-2 nav-link" style={{ padding: '12px', cursor: 'pointer' }}></i>
+                    </button> :
+                    <i
+                        className="pi pi-user-edit"
+                        style={{ cursor: "pointer" }}
+                        key={rowData.title}
+                        onClick={() => {
+                            handleClickEditModal(rowData.title);
+                            GetHandelDetail(rowData?.circularReferenceNumber, rowData.id);
+                            GetRoleHandle(applicationstaus);
+                            handleData();
+                            GetApplicationCount(rowData.id)
+                        }}
+                        onMouseEnter={(e) => {
+                            e.target.style.color = "var(--primary-color)";
+                        }}
+                        onMouseLeave={(e) => {
+                            e.target.style.color = "";
+                        }}
+                    ></i>
+
+
+                }
             </>
         );
     };
@@ -193,10 +203,18 @@ const ExportCircularsTable = () => {
             </span>
         );
     };
-    const contentData = (rowData) => {
-        return(
+
+    const statusNameData = (rowData) => {
+        return (
             <span>
-              { rowData?.content ? <span dangerouslySetInnerHTML={{ __html: rowData.content }} /> : "-"}
+                {rowData?.statusName ? rowData?.statusName : "_"}
+            </span>
+        )
+    }
+    const contentData = (rowData) => {
+        return (
+            <span>
+                {rowData?.content ? <span dangerouslySetInnerHTML={{ __html: rowData.content }} /> : "-"}
             </span>
         )
     }
@@ -258,8 +276,9 @@ const ExportCircularsTable = () => {
         }
         else {
             await axios
-                .post(APIURL + "Circular/GetCircularDataByUserID", {
+                .post(APIURL + "Circular/GetCirularApplications", {
                     UserID: useId.replace(/"/g, ""),
+                    RoleID: roleID
 
                 })
                 .then((res) => {
@@ -373,7 +392,7 @@ const ExportCircularsTable = () => {
 
     // ----- Start Code For Geting Table Data
     const GetHandelDetail = async (rbzrefnumber, id) => {
-// console.log("id----------",id);
+        // console.log("id----------", id);
         setshowdataloader(true)
         await axios
             .post(APIURL + "Circular/GetCircularDataByID", {
@@ -546,7 +565,217 @@ const ExportCircularsTable = () => {
                 console.log(err);
             });
     };
+    // pdf code start
+    console.log("applicationDetail----", applicationDetail);
+    const GetHandelDetailPDF = async (circularReferenceNumber) => {
+        console.log("applicationDetail");
+        setBtnLoader(true);
+        setTimeout(() => {
+            const doc = new jsPDF({
+                format: "a4",
+                unit: "pt",
+            });
+            const addHeader = (doc) => {
+                const pageCount = doc.internal.getNumberOfPages();
+                const headerpositionfromleft =
+                    (doc.internal.pageSize.width - 10) / 4;
+                for (var i = 1; i <= pageCount; i++) {
+                    doc.setPage(i);
+                    doc.addImage(
+                        logo,
+                        "png",
+                        70,
+                        10,
+                        80,
+                        80,
+                        "DMS-RBZ",
+                        "NONE",
+                        0
+                    );
+                    doc.setFontSize(8);
+                    doc.text(
+                        "Reserve Bank of Zimbabwe. 80 Samora Machel Avenue, P.O. Box 1283, Harare, Zimbabwe.",
+                        headerpositionfromleft + 50,
+                        40
+                    );
+                    doc.text(
+                        "Tel: 263 242 703000, 263 8677000477 | Website:www.rbz.co.zw",
+                        headerpositionfromleft + 100,
+                        50
+                    );
+                }
+            };
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(3);
+            let docWidth = doc.internal.pageSize.getWidth();
+            const refpdfview =
+                PdfPrivewsupervisorRef
+            doc.html(refpdfview.current, {
+                x: 12,
+                y: 12,
+                width: 513,
+                height: doc.internal.pageSize.getHeight(),
+                margin: [110, 80, 60, 35],
+                windowWidth: 1000,
+                pagebreak: true,
+                async callback(doc) {
+                    addHeader(doc);
 
+                    doc.setProperties({
+                        title: `${applicationDetail?.circularReferenceNumber}`,
+                    });
+                    var blob = doc.output("blob");
+                    window.open(URL.createObjectURL(blob), "_blank");
+                },
+            });
+
+            // axios
+            //     .post(APIURL + "Admin/GetBankByID", {
+            //         id: applicationDetail?.bankID,
+            //     })
+            //     .then((response) => {
+            //         if (response.data.responseCode === "200") {
+            //             if (
+            //                 response.data.responseData?.headerFooterData["0"]?.fileType ==
+            //                 "HeaderFile"
+            //             ) {
+            //                 var headerImage =
+            //                     response.data.responseData.headerFooterData["0"].filePath;
+            //                 var headerImagewidth =
+            //                     response.data.responseData.headerFooterData["0"].imageWidth;
+            //             } else {
+            //                 var headerImage = "";
+            //             }
+            //             if (
+            //                 response.data.responseData?.headerFooterData["1"]?.fileType ==
+            //                 "FooterFile"
+            //             ) {
+            //                 var footerImage =
+            //                     response.data.responseData.headerFooterData["1"].filePath;
+            //                 var footerImagewidth =
+            //                     response.data.responseData.headerFooterData["1"].imageWidth;
+            //             } else {
+            //                 var footerImage = "";
+            //             }
+
+            //             const addHeader = (doc) => {
+            //                 if (roleID != 3) {
+            //                     const pageCount = doc.internal.getNumberOfPages();
+            //                     const headerpositionfromleft =
+            //                         (doc.internal.pageSize.width - 10) / 4;
+            //                     for (var i = 1; i <= pageCount; i++) {
+            //                         doc.setPage(i);
+            //                         doc.addImage(
+            //                             logo,
+            //                             "png",
+            //                             70,
+            //                             10,
+            //                             80,
+            //                             80,
+            //                             "DMS-RBZ",
+            //                             "NONE",
+            //                             0
+            //                         );
+            //                         doc.setFontSize(8);
+            //                         doc.text(
+            //                             "Reserve Bank of Zimbabwe. 80 Samora Machel Avenue, P.O. Box 1283, Harare, Zimbabwe.",
+            //                             headerpositionfromleft + 50,
+            //                             40
+            //                         );
+            //                         doc.text(
+            //                             "Tel: 263 242 703000, 263 8677000477 | Website:www.rbz.co.zw",
+            //                             headerpositionfromleft + 100,
+            //                             50
+            //                         );
+            //                     }
+            //                 } else {
+            //                     if (headerImage != "") {
+            //                         const pageCount = doc.internal.getNumberOfPages();
+            //                         var pagewidth = doc.internal.pageSize.width;
+            //                         if (pagewidth > headerImagewidth) {
+            //                             var diff = parseInt(pagewidth) - parseInt(headerImagewidth);
+            //                             var positionLeft = parseInt(diff / 2);
+            //                         } else {
+            //                             var positionLeft = 250;
+            //                         }
+
+            //                         for (var i = 1; i <= pageCount; i++) {
+            //                             doc.setPage(i);
+            //                             doc.addImage(
+            //                                 headerImage,
+            //                                 "png",
+            //                                 positionLeft,
+            //                                 10,
+            //                                 80,
+            //                                 80,
+            //                                 "Header",
+            //                                 "NONE",
+            //                                 0
+            //                             );
+            //                         }
+            //                     } else {
+            //                         doc.setFont("helvetica", "bold");
+            //                         doc.setFontSize(20);
+            //                         doc.text("Final Letter", 250, 40);
+            //                     }
+            //                 }
+            //             };
+
+            //             const addWaterMark = (doc) => {
+            //                 const pageCount = doc.internal.getNumberOfPages();
+            //                 for (var i = 1; i <= pageCount; i++) {
+            //                     doc.setPage(i);
+            //                     doc.setTextColor("#cccaca");
+            //                     doc.saveGraphicsState();
+            //                     doc.setGState(new doc.GState({ opacity: 0.4 }));
+            //                     doc.setFont("helvetica", "normal");
+            //                     doc.setFontSize(80);
+            //                     //doc.text("PREVIEW", 50, 150, {align: 'center', baseline: 'middle'})
+            //                     doc.text(
+            //                         doc.internal.pageSize.width / 3,
+            //                         doc.internal.pageSize.height / 2,
+            //                         "Preview",
+            //                         { angle: 45 }
+            //                     );
+            //                     doc.restoreGraphicsState();
+            //                 }
+            //             };
+            //             doc.setFont("helvetica", "normal");
+            //             doc.setFontSize(3);
+            //             let docWidth = doc.internal.pageSize.getWidth();
+            //             const refpdfview =
+            //                 roleID == 3 && nextlevelvalue == 10
+            //                     ? PdfPrivewsupervisorRef
+            //                     : roleID == 3 && nextlevelvalue == ""
+            //                         ? CoverigLetterRef
+            //                         : PdfPrivewRef;
+            //             doc.html(refpdfview.current, {
+            //                 x: 12,
+            //                 y: 12,
+            //                 width: 513,
+            //                 height: doc.internal.pageSize.getHeight(),
+            //                 margin: [110, 80, 60, 35],
+            //                 windowWidth: 1000,
+            //                 pagebreak: true,
+            //                 async callback(doc) {
+            //                     addHeader(doc);
+            //                     addWaterMark(doc);
+            //                     doc.setProperties({
+            //                         title: `${applicationDetail?.rbzReferenceNumber}`,
+            //                     });
+            //                     var blob = doc.output("blob");
+            //                     window.open(URL.createObjectURL(blob), "_blank");
+            //                 },
+            //             });
+            //             setBtnLoader(false);
+            //         } else {
+            //             var headerImage = "";
+            //             var footerImage = "";
+            //         }
+            //     });
+        }, 1500);
+    };
+    // pdf code end
     useEffect(() => {
         handleData();
     }, []);
@@ -585,7 +814,7 @@ const ExportCircularsTable = () => {
             });
     };
 
-
+    console.log("data------", data);
     return (
 
         <>
@@ -638,14 +867,14 @@ const ExportCircularsTable = () => {
                             style={{ width: "220px" }}
 
                         ></Column>
-                        <Column
+                        {/* <Column
                             field="content"
                             header="Content"
                             sortable
                             body={contentData}
                             style={{ width: "220px" }}
 
-                        ></Column>
+                        ></Column> */}
                         <Column
                             field="subject"
                             header="Subject"
@@ -657,7 +886,14 @@ const ExportCircularsTable = () => {
                             header="Releasing Date"
                             sortable
                             body={releasingDate}
-                            style={{ width: "220px" }}
+                            style={{ width: "240px" }}
+                        ></Column>
+                        <Column
+                            field="statusName"
+                            header="Status"
+                            sortable
+                            body={statusNameData}
+                            style={{ width: "180px" }}
                         ></Column>
 
                         <Column
@@ -671,37 +907,7 @@ const ExportCircularsTable = () => {
                     </DataTable>
                 </div>
             )}
-            {/* circular form modal start */}
-            <Modal
-                backdrop="static"
-                className="max-width-600"
-                show={cricularFormShow}
-                onHide={cricularFormClose}>
-                <div className="application-box">
-                    <div className="login_inner">
-                        <div className="login_form ">
-                            <h5>
-                                <Modal.Header closeButton className="p-0">
-                                    <Modal.Title>
-                                        Create Export Circular Request
 
-                                    </Modal.Title>
-                                </Modal.Header>
-                            </h5>
-                        </div>
-                        <div className="login_form_panel">
-                            <Modal.Body className="p-0">
-                                <ExportCircularsCreateForm
-                                    handleFormClose={cricularFormClose}
-                                    handleCircularListData={handleData}
-                                />
-                            </Modal.Body>
-                        </div>
-                    </div>
-                </div>
-
-            </Modal>
-            {/* circular form modal end */}
             {/* circular view modal start */}
             <Modal
                 show={showUpdateModal}
@@ -800,7 +1006,398 @@ const ExportCircularsTable = () => {
                 </div>
             </Modal>
 
+            {/* pdf generate code start */}
+            <div className="login_inner" style={{ display: "none" }}>
+                <div className="login_form_panel" style={{ display: "none" }}>
+                    <div
+                        ref={PdfPrivewsupervisorRef}
+                        className="p-5"
+                        style={{ position: "relative" }}
+                    >
+                        <table width="100%">
+                            <tr>
+                                <td
+                                    style={{
+                                        marginBottom: "0px",
+                                        color: "#000",
+                                        fontSize: "18px",
+                                        fontWeight: "800",
+                                    }}
+                                >
+                                    Reference Number
+                                </td>
+                                <td>
+                                    <p
+                                        style={{
+                                            marginBottom: "0px",
+                                            color: "#000",
+                                            fontSize: "18px",
+                                            textAlign: "left",
+                                            fontWeight: "800",
+                                            letterSpacing: "0.01px",
+                                        }}
+                                    >
+                                        {applicationDetail?.circularReferenceNumber}
 
+                                    </p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colSpan="2">&nbsp;</td>
+                            </tr>
+                            <tr>
+                                <td
+
+                                    style={{
+                                        color: "#000",
+                                        fontSize: "18px",
+                                        fontWeight: "600",
+                                        letterSpacing: "0.01px",
+                                    }}
+                                >
+                                    Releasing Date
+
+
+                                </td>
+                                <td
+
+                                    style={{
+                                        color: "#000",
+                                        fontSize: "18px",
+                                        fontWeight: "600",
+                                        letterSpacing: "0.01px",
+                                    }}
+                                >
+                                    {moment(
+                                        applicationDetail?.releasingDate
+                                    ).format("DD MMMM YYYY")}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colSpan="2">&nbsp;</td>
+                            </tr>
+                            <tr>
+                                <td
+
+                                    style={{
+                                        color: "#000",
+                                        fontSize: "18px",
+                                        fontWeight: "600",
+                                        letterSpacing: "0.01px",
+                                    }}
+                                >
+                                    To
+
+                                </td>
+                                <td>
+                                    <p
+                                        style={{
+                                            color: "#000",
+                                            fontSize: "18px",
+                                            fontWeight: "800",
+
+                                            marginBottom: "0px",
+                                            letterSpacing: "0.01px",
+                                        }}
+                                    >
+                                        {applicationDetail?.bankData?.map((item) => {
+                                            return (
+                                                <span
+                                                    style={{
+                                                        marginBottom: "3px",
+                                                        letterSpacing: "0.01px",
+                                                        fontSize: "18px",
+                                                        fontWeight: "400",
+                                                        padding: "0px 5px",
+                                                        color: "#000",
+
+                                                    }}
+                                                >
+                                                    {item?.bankName},
+                                                </span>
+                                            );
+                                        })}
+
+                                    </p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colSpan="2">&nbsp;</td>
+                            </tr>
+                            <tr>
+                                <td
+
+                                    style={{
+                                        color: "#000",
+                                        fontSize: "18px",
+                                        fontWeight: "600",
+                                        letterSpacing: "0.01px",
+                                    }}
+                                >
+                                    Title
+
+                                </td>
+                                <td>
+                                    <p
+                                        style={{
+                                            color: "#000",
+                                            fontSize: "18px",
+                                            fontWeight: "800",
+
+                                            marginBottom: "0px",
+                                            letterSpacing: "0.01px",
+                                        }}
+                                    >
+                                        {applicationDetail?.name},
+                                    </p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colSpan="2">&nbsp;</td>
+                            </tr>
+                            <tr>
+                                <td
+
+                                    style={{
+                                        color: "#000",
+                                        fontSize: "18px",
+                                        fontWeight: "600",
+                                        letterSpacing: "0.01px",
+                                    }}
+                                >
+                                    Subject
+
+                                </td>
+                                <td>
+                                    <p
+                                        style={{
+                                            color: "#000",
+                                            fontSize: "18px",
+                                            fontWeight: "800",
+
+                                            marginBottom: "0px",
+                                            letterSpacing: "0.01px",
+                                        }}
+                                    >
+                                        {applicationDetail?.subject},
+                                    </p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colSpan="2">&nbsp;</td>
+                            </tr>
+                            <tr>
+                                <td colSpan="2">
+                                    <table width="100%">
+                                        <tr>
+                                            <td colSpan="2">
+                                                <table width="100%">
+                                                    <tr>
+                                                        <td
+                                                            style={{
+                                                                color: "#000",
+                                                                fontSize: "18px",
+                                                                fontWeight: "400",
+                                                            }}
+                                                        >
+                                                            <div>
+                                                                <span
+                                                                    style={{
+                                                                        fontWeight: "800",
+                                                                        padding: "15px 0px 15px",
+                                                                    }}
+                                                                >
+                                                                    Content
+                                                                </span>
+                                                            </div>
+                                                            <div
+                                                                className="tableEditorData"
+                                                                dangerouslySetInnerHTML={{
+                                                                    __html: applicationDetail?.content
+                                                                        ? applicationDetail?.content
+                                                                        : "N/A",
+                                                                }}
+                                                                style={{
+                                                                    paddingBottom: "60px",
+                                                                    letterSpacing: "0.01px",
+                                                                }}
+                                                            />
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td
+                                                            style={{
+                                                                color: "#000",
+                                                                fontSize: "18px",
+                                                                fontWeight: "400",
+                                                            }}
+                                                        >
+                                                            <div>
+                                                                <span
+                                                                    style={{
+                                                                        fontWeight: "800",
+                                                                        padding: "15px 0px 15px",
+                                                                    }}
+                                                                >
+                                                                    Attachment
+                                                                </span>
+                                                            </div>
+                                                            <div
+                                                                className="tableEditorData"
+
+                                                            >
+                                                                {applicationDetail?.attachedFiles?.map((item) => {
+                                                                    return (
+                                                                        <p
+                                                                            style={{
+                                                                                marginBottom: "3px",
+                                                                                letterSpacing: "0.01px",
+                                                                                fontSize: "18px",
+                                                                                fontWeight: "400",
+                                                                                padding: "0px 5px",
+                                                                                color: "#000",
+
+                                                                            }}
+                                                                        >
+                                                                            {item?.filePath}
+                                                                        </p>
+                                                                    );
+                                                                })}
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colSpan="2">&nbsp;</td>
+                                        </tr>
+                                        <tr>
+                                            <td
+                                                colSpan="2"
+                                                style={{
+                                                    color: "#000",
+                                                    fontSize: "18px",
+                                                    fontWeight: "400",
+                                                }}
+                                            >
+                                                <span
+                                                    style={{
+                                                        color: "#000",
+                                                        fontSize: "18px",
+                                                        fontWeight: "400",
+                                                        display: "inline-block",
+                                                    }}
+                                                >
+                                                    {" "}
+                                                    Yours Sincerely,
+                                                </span>
+                                                <img
+                                                    src={
+                                                        applicationDetail?.getUserData?.filePath
+                                                            ? applicationDetail?.getUserData.filePath
+                                                            : applicationDetail.filePath
+                                                    }
+                                                    alt="Signature"
+                                                    style={{
+                                                        width: "120px",
+                                                        height: "50px",
+                                                        display: "block",
+                                                        objectFit: "contain",
+                                                    }}
+                                                />
+                                                <p
+                                                    style={{
+                                                        marginBottom: "0px",
+                                                        color: "#000",
+                                                        fontSize: "14px",
+                                                        fontWeight: "400",
+                                                        padding: "15px 0px 3px",
+                                                        lineHeight: "13px",
+                                                        letterSpacing: "0.01px",
+                                                    }}
+                                                >
+                                                    SHreya
+                                                </p>
+                                                <p
+                                                    style={{
+                                                        marginBottom: "0px",
+                                                        color: "#000",
+                                                        fontSize: "14px",
+                                                        fontWeight: "400",
+                                                        padding: "5px 0px",
+                                                        lineHeight: "13px",
+                                                        letterSpacing: "0.01px",
+                                                    }}
+                                                >
+                                                    singh
+                                                </p>
+                                                <h3
+                                                    style={{
+                                                        color: "#000",
+                                                        fontSize: "18px",
+                                                        fontWeight: "800",
+                                                    }}
+                                                >
+                                                    EXCHANGE &nbsp; CONTROL
+                                                </h3>
+                                                <div
+                                                    style={{
+                                                        marginBottom: "0px",
+                                                        color: "#000",
+                                                        fontSize: "18px",
+                                                        fontWeight: "400",
+                                                        padding: "25px 0px 5px",
+                                                        lineHeight: "13px",
+                                                        display: "flex",
+                                                    }}
+                                                >
+                                                    {applicationDetail?.copiedResponses?.length >
+                                                        0 ? (
+                                                        <>
+                                                            <p
+                                                                style={{
+                                                                    marginBottom: "0px",
+                                                                    fontSize: "18px",
+                                                                    fontWeight: "400",
+                                                                    paddingRight: "10px",
+                                                                    letterSpacing: "0.01px",
+                                                                }}
+                                                            >
+                                                                CC:
+                                                            </p>
+                                                            <div>
+                                                                Bank
+                                                                {/* {selectedBanks.map((item) => {
+                                          return (
+                                            <p
+                                              style={{
+                                                marginBottom: "3px",
+                                                letterSpacing: "0.01px",
+                                                fontSize: "18px",
+                                                fontWeight: "400",
+                                              }}
+                                            >
+                                              {item.name}
+                                            </p>
+                                          );
+                                        })} */}
+                                                            </div>
+                                                        </>
+                                                    ) : (
+                                                        ""
+                                                    )}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            {/* pdf generate code end */}
         </>
 
     );

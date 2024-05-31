@@ -2315,6 +2315,7 @@ useEffect(() => {
                               "ApplicationID",
                               applicationDetail?.id
                             );
+                            formData.append("DepartmentID", 2)
                             formData.append("PdfData", blobPDF);
                             axios
                               .post(ImageAPI + "File/UploadPdf", formData)
@@ -2490,6 +2491,7 @@ useEffect(() => {
                                 "ApplicationID",
                                 applicationDetail?.id
                               );
+                              formData.append("DepartmentID", 2)
                               formData.append("PdfData", blobPDF);
                               await axios
                                 .post(ImageAPI + "File/UploadPdf", formData)

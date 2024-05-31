@@ -2713,7 +2713,7 @@ display: none;
   float: right;
   color: #000;
   cursor: pointer;
-  padding: 4px;
+  padding: 0px;
 }
 .btn-collapse_active{
   background: #42a5f5;
@@ -2722,6 +2722,7 @@ display: none;
 .btn-collapse_active span.btn-collapse{
   transform: rotate(180deg);
   color: #fff;
+  margin-top: -3px;
 }
 
 .tatdate {
@@ -3853,6 +3854,10 @@ margin-top: 20px;
   overflow: hidden;
   font-size: 14px;
 }
+.department-reason{
+  max-width: 210px;
+  display: inline-block;
+}
 .department-user {
   min-width: 200px;
   display: inline-block;
@@ -3887,6 +3892,7 @@ margin-top: 20px;
   padding: 4px;
   color: #000;
   font-size: 10px;
+  text-transform: capitalize;
   font-weight: bold;
 }
 
@@ -3896,6 +3902,7 @@ margin-top: 20px;
   width: calc(100% - 140px);
   font-size: 10px;
   font-weight: normal;
+  text-transform: capitalize;
 }
 
 .tooltip-bx:after {
@@ -3909,4 +3916,59 @@ margin-top: 20px;
   border-right: 12px solid transparent;
   border-bottom: 12px solid #fff;
   right: 180px;
+}
+.green-text{
+  color: #18d26e !important;
+  font-weight: bold;
+}
+.red-text{
+  color: #f00 !important;
+  font-weight: bold;
+}
+.deparment-headertooltip{
+  background: #42a5f5;
+  font-size: 14px;
+  padding: 6px 8px;
+  text-align: left;
+}
+.closedepartment_btnicn{
+  position: relative;
+  color: #fff;
+  font-size: 15px;
+  z-index: 11;
+  cursor: pointer;
+  float: right;
+}
+.heading-actingrole{
+  font-size: 16px;
+  color: #fff;
+  background: #42a5f5;
+  padding: 10px;
+  margin-top: 30px;
+}
+.activebtn-text{
+  color: #18d26e !important;
+    font-weight: bold;
+    border: 0px;
+    font-size: 24px;
+    outline: 0;
+    padding: 0 !important;
+    margin: 1px 5px; 
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+}
+.inactivebtn-text{
+  color: #f00 !important;
+  font-weight: bold;
+    border: 0px;
+    font-size: 24px;
+  border: 0px;
+  outline: 0; 
+  margin: 1px 0px; 
+  width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
 }

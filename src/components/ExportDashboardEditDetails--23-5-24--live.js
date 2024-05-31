@@ -2317,6 +2317,7 @@ const ExportDashboardEditDetails = ({
                               applicationDetail?.id
                             );
                             formData.append("PdfData", blobPDF);
+                            formData.append("DepartmentID", 2)
                             axios
                               .post(ImageAPI + "File/UploadPdf", formData)
                               .then((res) => {
@@ -2491,7 +2492,9 @@ const ExportDashboardEditDetails = ({
                                 "ApplicationID",
                                 applicationDetail?.id
                               );
+                              formData.append("DepartmentID", 2)
                               formData.append("PdfData", blobPDF);
+                              
                               await axios
                                 .post(ImageAPI + "File/UploadPdf", formData)
                                 .then(async (res) => {

@@ -460,13 +460,15 @@ const ImportOtherDepartmentEditDetails = ({
   };
 
   console.log("error", errors);
-  console.log("Actiondata - ", Actiondata);
+
+  console.log("setapplicationstaus", applicationstaus)
 
   const closePopupHandle = () => {
     handleData();
     navigate("/ReferredDashboard");
     EditModalClose();
     setupdatepopup(false);
+    setapplicationstaus("0")
     setApplicationDetail({});
     setSupervisorRoleId("");
     setAssignUserID("");
@@ -1720,7 +1722,7 @@ const ImportOtherDepartmentEditDetails = ({
               applicationDetail?.rbzReferenceNumber
             );
             formData.append("ApplicationID", applicationDetail?.id);
-            formData.append("DepartmentID", "3");
+            formData.append("DepartmentID", "6");
             formData.append("UserID", UserID.replace(/"/g, ""));
             axios
               .post(ImageAPI + "File/UploadFile", formData)
@@ -1731,18 +1733,7 @@ const ImportOtherDepartmentEditDetails = ({
                 setSubmitBtnLoader(false);
                 console.log("file Upload ", err);
               });
-            axios
-              .post(
-                APIURL + "ReferredApplication/CopyingResponsesReferred",
-                copyresponse
-              )
-              .then((resposnse) => {
-                console.log("CopyingResponses");
-              })
-              .catch((error) => {
-                setSubmitBtnLoader(false);
-                console.log("error", error);
-              });
+          
             for (let i = 0; i < sharefile?.length; i++) {
               shareformData.append("files", sharefile[i].file);
               shareformData.append("fileInfoID", sharefile[i].fileInfoID);
@@ -9317,7 +9308,7 @@ const ImportOtherDepartmentEditDetails = ({
                 Close
               </button>
 
-              <div>
+              <div>                
                 {nextlevelvalue == 35 ? (
                   <button
                     className="btn btn-primary"
@@ -9361,10 +9352,12 @@ const ImportOtherDepartmentEditDetails = ({
                       ((applicationstaus == "0" || applicationstaus == "") &&
                         roleID == 5) ||
                       SubmitBtnLoader == true ||
-                      (applicationstaus == 0 && nextlevelvalue == "")
+                      (applicationstaus == 0 && nextlevelvalue == "") ||
+                      ((asignnextLeveldata.Notes == "" || asignnextLeveldata.Comment =="")) 
                         ? true
                         : false
                     }
+                    
                   >
                     {(roleID == 8 &&
                       nextlevelvalue != "15" &&

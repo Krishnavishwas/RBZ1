@@ -43,8 +43,7 @@ import AdminNotFound from "./admin/pages/AdminNotFound";
 import ImportNewForm from "./pages/ImportNewForm";
 import ImportDashboard from "./pages/ImportDashboard";
 import ExportExpiredRequests from "./pages/ExportExpiredRequests";
-import ExportExpiringRequests from "./pages/ExportExpiringRequests";
-import CircularsRequests from "./pages/CircularsRequests";
+import ExportExpiringRequests from "./pages/ExportExpiringRequests"; 
 import CopiedResponse from "./pages/ExportCopiedResponse";
 import ImportApprovedRequests from "./pages/ImportApprovedRequests";
 import ImportDeferredRequests from "./pages/ImportDeferredRequests";
@@ -67,6 +66,12 @@ import FINVDeferredRequests from "./pages/FINVDeferredRequests"
 import FINVCancelledRequests from "./pages/FINVCancelledRequests"
 import FINVExpiredRequests from "./pages/FINVExpiredRequests"
 import FINVExpiringRequests from "./pages/FINVExpiringRequests"
+import INSNewRequest from "./pages/INSNewRequest"
+
+import CircularNewRequest from "./pages/CircularNewRequest";
+import CircularAllRequest from "./pages/CircularAllRequest";
+import CircularApproveRequest from "./pages/CircularApproveRequest";
+import CircularCancelledRequest from "./pages/CircularCancelledRequest"; 
 
 function App() {
   const loginToken = Storage.getItem("loginToken");
@@ -127,7 +132,11 @@ function App() {
             <Route path="/ImportDashboard" element={<ImportDashboard />} />
             <Route path="/FINVDashboard" element={<FINVDashboard />} />
             <Route path="/FINVNewRequest" element={<FINVNewRequest />} />
-            <Route path="/Circulars" element={<ExportCircularsRequests />}/> 
+            <Route path="/CircularDashboard" element={<ExportCircularsRequests />}/> 
+            <Route path="/NewCircular" element={<CircularNewRequest />} />
+            <Route path="/AllCircular" element={<CircularAllRequest />} />
+            <Route path="/ApprovedCircular" element={<CircularApproveRequest />} />
+            <Route path="/CancelledCircular" element={<CircularCancelledRequest />}/>
             <Route path="/Profile" element={<Profile />} />
             <Route
               path="/ExportPendingRequests"
@@ -176,8 +185,7 @@ function App() {
             <Route
               path="/ExportExpiringRequests"
               element={<ExportExpiringRequests />}
-            />
-            <Route path="/Circulars" element={<CircularsRequests />} />
+            /> 
             <Route path="/CopiedResponse" element={<CopiedResponse />} />
             <Route path="/ActingRoleDashboard" element={<ActingRoleDashboard />} />
             <Route
@@ -192,6 +200,7 @@ function App() {
             <Route path="/FINVCancelledRequests" element={<FINVCancelledRequests />} />
             <Route path="/FINVExpiredRequests" element={<FINVExpiredRequests />} />
             <Route path="/FINVExpiringRequests" element={<FINVExpiringRequests />} />
+            <Route path="/INSNewRequest" element={<INSNewRequest />} />
             <Route path="*" element={<NotFound />} />
           </>
         ) : (

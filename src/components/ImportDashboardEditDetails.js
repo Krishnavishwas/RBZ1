@@ -1606,6 +1606,7 @@ const DeptID = menuname === "Exports" ? "2" : menuname === "Imports" ? "3": menu
                               "ApplicationID",
                               applicationDetail?.id
                             );
+                            formData.append("DepartmentID", 3)
                             formData.append("PdfData", blobPDF);
                             axios
                               .post(ImageAPI + "File/UploadPdf", formData)
@@ -1767,6 +1768,7 @@ const DeptID = menuname === "Exports" ? "2" : menuname === "Imports" ? "3": menu
                                 "ApplicationID",
                                 applicationDetail?.id
                               );
+                              formData.append("DepartmentID", 3)
                               formData.append("PdfData", blobPDF);
                               await axios
                                 .post(ImageAPI + "File/UploadPdf", formData)
@@ -1824,15 +1826,15 @@ const DeptID = menuname === "Exports" ? "2" : menuname === "Imports" ? "3": menu
                 setSubmitBtnLoader(false);
                 console.log("file Upload ", err);
               });
-            axios
-              .post(APIURL + "ExportApplication/CopyingResponses", copyresponse)
-              .then((resposnse) => {
-                console.log("CopyingResponses");
-              })
-              .catch((error) => {
-                setSubmitBtnLoader(false);
-                console.log("error", error);
-              });
+            // axios
+            //   .post(APIURL + "ExportApplication/CopyingResponses", copyresponse)
+            //   .then((resposnse) => {
+            //     console.log("CopyingResponses");
+            //   })
+            //   .catch((error) => {
+            //     setSubmitBtnLoader(false);
+            //     console.log("error", error);
+            //   });
             for (let i = 0; i < sharefile?.length; i++) {
               shareformData.append("files", sharefile[i].file);
               shareformData.append("fileInfoID", sharefile[i].fileInfoID);
@@ -14430,7 +14432,10 @@ const DeptID = menuname === "Exports" ? "2" : menuname === "Imports" ? "3": menu
                       (nextlevelvalue == "" && roleID == 5) ||
                       ((applicationstaus == "0" || applicationstaus == "") &&
                         roleID == 5) ||
-                      SubmitBtnLoader == true
+                      SubmitBtnLoader == true ||
+                      (applicationstaus == "0" &&
+                      nextlevelvalue == "" &&
+                      roleID >= 5)
                         ? true
                         : false
                     }
@@ -14624,7 +14629,7 @@ const DeptID = menuname === "Exports" ? "2" : menuname === "Imports" ? "3": menu
                                   letterSpacing: "0.01px",
                                 }}
                               >
-                                Date Submitted -1
+                                Date Submitted
                               </td>
                               <td
                                 style={{
@@ -15650,7 +15655,7 @@ const DeptID = menuname === "Exports" ? "2" : menuname === "Imports" ? "3": menu
                                 fontWeight: "400",
                               }}
                             >
-                              Date Submitted -3
+                              Date Submitted
                             </td>
                             <td
                               style={{
@@ -16258,7 +16263,7 @@ const DeptID = menuname === "Exports" ? "2" : menuname === "Imports" ? "3": menu
                                 fontWeight: "400",
                               }}
                             >
-                              Date Submitted -4
+                              Date Submitted
                             </td>
                             <td
                               style={{

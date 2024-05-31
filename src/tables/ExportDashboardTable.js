@@ -199,9 +199,10 @@ const ExportDashboardTable = () => {
 
   const EditModalClose = () => {
     setshowEditForm(false);
-    // setapplicationstaus("0");
+    setreferredDataTrue(false)
     setnextlevelvalue("");
   };
+  
   const handleFormClose = () => setShowUpdateModal(false);
 
   // ----- Start Code For Open Edit Popup
@@ -286,7 +287,7 @@ const ExportDashboardTable = () => {
               ? // ? parseInt(roleID) - 1
                 value
               : roleID,
-              DepartmentID:"2",
+          DepartmentID: "2",
           UserID: useId.replace(/"/g, ""),
         })
         .then((res) => {
@@ -306,7 +307,7 @@ const ExportDashboardTable = () => {
     axios
       .post(APIURL + "User/GetUsersByRoleID", {
         RoleID: roleID,
-        DepartmentID:"2",
+        DepartmentID: "2",
         UserID: useId.replace(/"/g, ""),
       })
       .then((res) => {
@@ -344,7 +345,7 @@ const ExportDashboardTable = () => {
   // ----- Start Code For Geting Table Data
   const GetHandelDetail = async (rbzrefnumber, id) => {
     setshowdataloader(true);
-    setApplicationDetail({})
+    setApplicationDetail({});
     await axios
       .post(APIURL + "ExportApplication/GetRequestInfoByApplicationID", {
         RBZReferenceNumber: `${rbzrefnumber}`,
@@ -531,13 +532,13 @@ const ExportDashboardTable = () => {
 
   // OLD
   const [showOldModal, setShowOldModal] = useState(false);
-const [oldApplicationDetail, setOldApplicationDetail] = useState({});
-const [oldNoDataComment, setOldNoDataComment] = useState([]);
-const [oldAllcomment, setOldAllcomment] = useState([]);
-const [oldTatHistory, setOldTatHistory] = useState([]);
-const [oldActiondata, setOldActiondata] = useState([]);
-const [oldResponceCount, setOldResponceCount] = useState([]);
-const [showOldDataLoader, setShowOldDataLoader] = useState(false);
+  const [oldApplicationDetail, setOldApplicationDetail] = useState({});
+  const [oldNoDataComment, setOldNoDataComment] = useState([]);
+  const [oldAllcomment, setOldAllcomment] = useState([]);
+  const [oldTatHistory, setOldTatHistory] = useState([]);
+  const [oldActiondata, setOldActiondata] = useState([]);
+  const [oldResponceCount, setOldResponceCount] = useState([]);
+  const [showOldDataLoader, setShowOldDataLoader] = useState(false);
 
   const handleOldClose = () => setShowOldModal(false);
 
@@ -641,6 +642,36 @@ const [showOldDataLoader, setShowOldDataLoader] = useState(false);
       });
   };
 
+  //Fetch Referred to Other Department data
+  const [referredDataTrue, setreferredDataTrue] = useState(false);
+  const [RODLoader, setRODLoader] = useState(false);
+  const [referredData, setReferredData] = useState({});
+  const GetReferredData = async (id) => {
+    try {
+      setRODLoader(true);
+      await axios
+        .post(APIURL + "ReferredApplication/GetReferredApplicationDataByID", {
+          ID: id,
+        })
+        .then((res) => {
+          if (res.data.responseCode == 200) {
+            setReferredData(res.data.responseData);
+            setRODLoader(false);
+          } else {
+            setReferredData({});
+            setRODLoader(false);
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+          setRODLoader(false);
+          setreferredDataTrue(false);
+        });
+    } catch (error) {
+      console.log("GetReferredImportApplicationByID error - ", error);
+    }
+  };
+
   return (
     <>
       {loading == true ? (
@@ -654,7 +685,7 @@ const [showOldDataLoader, setShowOldDataLoader] = useState(false);
           <DataTable
             value={data}
             scrollable
-            scrollHeight="600px"
+            scrollHeight="650px"
             className={roleID >= 5 || roleID == 3 ? "mt-1" : "mt-1 tablehideth"}
             selection={selectedAppliation}
             onSelectionChange={(e) => setSelectedAppliation(e.value)}
@@ -824,29 +855,34 @@ const [showOldDataLoader, setShowOldDataLoader] = useState(false);
                     <div className="row">
                       <div
                         className={
-                          applicationDetail?.parentApplicationID == 0
+                          applicationDetail?.parentApplicationID == 0 &&
+                          applicationDetail?.referredApplicationID == 0
                             ? "col-md-12"
                             : "col-md-6"
                         }
-                        style={{alignItems : "center"}}
+                        style={{ alignItems: "center" }}
                       >
                         Edit Export Request --{" "}
                         <big>
                           {applicationDetail?.rbzReferenceNumber
                             ? applicationDetail.rbzReferenceNumber
                             : ""}
-
                         </big>
                       </div>
                       <div
                         className={
-                          applicationDetail &&   applicationDetail?.parentApplicationID == 0
+                          applicationDetail &&
+                          applicationDetail?.parentApplicationID == 0
                             ? "d-none"
                             : "col-md-6 text-center"
                         }
                       >
                         <button
-                          className={applicationDetail?.parentApplicationID ? "btn btn-light viewcopybtn" : "d-none"}
+                          className={
+                            applicationDetail?.parentApplicationID
+                              ? "btn btn-light viewcopybtn"
+                              : "d-none"
+                          }
                           onClick={() => {
                             handleOldViewData(
                               applicationDetail?.parentApplicationID
@@ -861,6 +897,79 @@ const [showOldDataLoader, setShowOldDataLoader] = useState(false);
                         >
                           View Old Application
                         </button>
+                      </div>
+                      <div
+                        className={
+                          applicationDetail &&
+                          applicationDetail?.referredApplicationID == 0
+                            ? "d-none"
+                            : "col-md-6 text-center"
+                        }
+                      >
+                        <button
+                          className={
+                            applicationDetail?.referredApplicationID
+                              ? "btn btn-light viewcopybtn"
+                              : "d-none"
+                          }
+                          onClick={() => {
+                            referredDataTrue == false &&
+                              GetReferredData(
+                                applicationDetail?.referredApplicationID
+                              );
+                            setreferredDataTrue(!referredDataTrue);
+                          }}
+                        >
+                          View Other Department Response
+                        </button>
+                        <div
+                          className={
+                            referredDataTrue == true ? "tooltip-bx" : "d-none"
+                          }
+                        >
+                          <h3 className="deparment-headertooltip">
+                            <span>Response</span>{" "}
+                            <span
+                              onClick={() =>
+                                setreferredDataTrue(!referredDataTrue)
+                              }
+                              className="closedepartment_btnicn"
+                            >
+                              <i class="bi bi-x-lg"></i>
+                            </span>{" "}
+                          </h3>
+
+                          {RODLoader === true ? (
+                            <label className="outerloader2">
+                              <span className="loader"></span>
+                              <span className="loaderwait">Please Wait...</span>
+                            </label>
+                          ) : (
+                            <>
+                              <div className="toolinner">
+                                <label>Decision</label>{" "}
+                                <p>{referredData.statusName}</p>
+                              </div>
+                              <div className="toolinner">
+                                <label>Recommendation</label>{" "}
+                                <p
+                                  dangerouslySetInnerHTML={{
+                                    __html: referredData.description
+                                      ? referredData.description
+                                      : "N/A",
+                                  }}
+                                />
+                              </div>
+                              <div className="toolinner">
+                                <label>Notes</label> <p>{referredData.notes}</p>
+                              </div>
+                              <div className="toolinner">
+                                <label>Comments</label>{" "}
+                                <p>{referredData.comment}</p>
+                              </div>
+                            </>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </Modal.Title>
