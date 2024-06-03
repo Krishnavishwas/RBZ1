@@ -10,7 +10,6 @@ import { Storage } from "../login/Storagesetting";
 import Menubar from "../navbar/Menubar";
 
 const DashboardLayout = ({ children }) => {
-  const navigation = useNavigate();
   const { token, logout } = AuthUser();
   const menuItemlocal = Menubar();
 
@@ -58,8 +57,6 @@ const DashboardLayout = ({ children }) => {
     }
   }, [menuItem]);
 
-    
-
   useEffect(() => {
     const checkInactiveTime = setInterval(() => {
       const currentTime = new Date().getTime();
@@ -83,17 +80,14 @@ const DashboardLayout = ({ children }) => {
     <>
       {menuItem == null ? (
         <label className="outerloader">
-          {" "}
           <span className="loader"></span>
           <span className="loaderwait">Please Wait...</span>
         </label>
       ) : (
         <>
-          {" "}
           <Header />
           <Sidebar />
           <main id="main" className="main">
-            {" "}
             {children}{" "}
           </main>
           <Footer />

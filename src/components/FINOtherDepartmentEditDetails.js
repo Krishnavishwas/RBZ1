@@ -110,7 +110,7 @@ const FINOtherDepartmentEditDetails = ({
   const usdEquivalentRef = useRef(null);
   const CoverigLetterRef = useRef(null);
   const FrequencyRef = useRef(null);
-  const FrequencyDateRef = useRef(null)
+  const FrequencyDateRef = useRef(null);
 
   const UserID = Storage.getItem("userID");
   const bankID = Storage.getItem("bankID");
@@ -170,7 +170,9 @@ const FINOtherDepartmentEditDetails = ({
   );
   const [deputyTab, setdeputyTab] = useState(roleID == 8 ? true : false);
   const [sharefiletab, setsharefiletab] = useState(false);
-  const [recomdAnalyst, setRecomdAnalyst] = useState(roleID == "8" ? "121" : "");
+  const [recomdAnalyst, setRecomdAnalyst] = useState(
+    roleID == "8" ? "121" : ""
+  );
   const [selectedBanks, setSelectedBanks] = useState([]);
   const [registerusertype, setregisterusertype] = useState(
     applicationDetail?.userTypeID
@@ -237,8 +239,8 @@ const FINOtherDepartmentEditDetails = ({
     setSupervisorRoleId(value);
   };
 
-  console.log("Next Action ", nextlevelvalue)
-  console.log("applicationstaus", applicationstaus)
+  console.log("Next Action ", nextlevelvalue);
+  console.log("applicationstaus", applicationstaus);
 
   useEffect(() => {
     setEditorContent(applicationDetail?.analystDescription);
@@ -7478,7 +7480,7 @@ const FINOtherDepartmentEditDetails = ({
                                 }
                               >
                                 As Recommended by Analyst
-                              </label>                             
+                              </label>
 
                               <input
                                 type="radio"
@@ -7896,102 +7898,102 @@ const FINOtherDepartmentEditDetails = ({
                         </div>
                       </div>
 
-                          <div
-                            className={
-                              (roleID == 8 && nextlevelvalue == "") ||
-                              recomdAnalyst == "121"
-                                ? "inner_form_new align-items-center"
-                                : "d-none"
-                            }
-                          >
-                            <label className="controlform">Decision</label>
-                            <div className="row">
-                              <div className="col-md-12">
-                                <div className="hidden-toggles">
-                                  <input
-                                    type="radio"
-                                    id="srcoloration-Approvedved4"
-                                    value="10"
-                                    onChange={(e) => {
-                                      ChangeApplicationStatus(e);
-                                      GetRoleHandle(10);
-                                    }}
-                                    name="applicationstausdp"
-                                    className="hidden-toggles__input"
-                                    checked={
-                                      applicationstaus == "10" ? true : false
-                                    }
-                                  />
-                                  <label
-                                    for="srcoloration-Approvedved4"
-                                    className="hidden-toggles__label"
-                                  >
-                                    Approved
-                                  </label>
+                      <div
+                        className={
+                          (roleID == 8 && nextlevelvalue == "") ||
+                          recomdAnalyst == "121"
+                            ? "inner_form_new align-items-center"
+                            : "d-none"
+                        }
+                      >
+                        <label className="controlform">Decision</label>
+                        <div className="row">
+                          <div className="col-md-12">
+                            <div className="hidden-toggles">
+                              <input
+                                type="radio"
+                                id="srcoloration-Approvedved4"
+                                value="10"
+                                onChange={(e) => {
+                                  ChangeApplicationStatus(e);
+                                  GetRoleHandle(10);
+                                }}
+                                name="applicationstausdp"
+                                className="hidden-toggles__input"
+                                checked={
+                                  applicationstaus == "10" ? true : false
+                                }
+                              />
+                              <label
+                                for="srcoloration-Approvedved4"
+                                className="hidden-toggles__label"
+                              >
+                                Approved
+                              </label>
 
-                                  <input
-                                    type="radio"
-                                    id="srcoloration-Rejected"
-                                    value="30"
-                                    onChange={(e) => {
-                                      ChangeApplicationStatus(e);
-                                    }}
-                                    name="applicationstausdp"
-                                    className="hidden-toggles__input"
-                                    checked={
-                                      applicationstaus == "30" ? true : false
-                                    }
-                                  />
-                                  <label
-                                    for="srcoloration-Rejected"
-                                    className="hidden-toggles__label"
-                                  >
-                                    Rejected
-                                  </label>
+                              <input
+                                type="radio"
+                                id="srcoloration-Rejected"
+                                value="30"
+                                onChange={(e) => {
+                                  ChangeApplicationStatus(e);
+                                }}
+                                name="applicationstausdp"
+                                className="hidden-toggles__input"
+                                checked={
+                                  applicationstaus == "30" ? true : false
+                                }
+                              />
+                              <label
+                                for="srcoloration-Rejected"
+                                className="hidden-toggles__label"
+                              >
+                                Rejected
+                              </label>
 
-                                  <input
-                                    type="radio"
-                                    id="srcoloration-Deferred"
-                                    onChange={(e) => {
-                                      ChangeApplicationStatus(e);
-                                    }}
-                                    name="applicationstausdp"
-                                    value="40"
-                                    className="hidden-toggles__input"
-                                    checked={
-                                      applicationstaus == "40" ? true : false
-                                    }
-                                  />
-                                  <label
-                                    for="srcoloration-Deferred"
-                                    className="hidden-toggles__label"
-                                  >
-                                    Deferred
-                                  </label>
+                              <input
+                                type="radio"
+                                id="srcoloration-Deferred"
+                                onChange={(e) => {
+                                  ChangeApplicationStatus(e);
+                                }}
+                                name="applicationstausdp"
+                                value="40"
+                                className="hidden-toggles__input"
+                                checked={
+                                  applicationstaus == "40" ? true : false
+                                }
+                              />
+                              <label
+                                for="srcoloration-Deferred"
+                                className="hidden-toggles__label"
+                              >
+                                Deferred
+                              </label>
 
-                                  <input
-                                    type="radio"
-                                    id="srcoloration-Cancelled"
-                                    onChange={(e) => {
-                                      ChangeApplicationStatus(e);
-                                    }}
-                                    name="applicationstausdp"
-                                    value="25"
-                                    className="hidden-toggles__input"
-                                    checked={
-                                      applicationstaus == "25" ? true : false
-                                    }
-                                  />
-                                  <label
-                                    for="srcoloration-Cancelled"
-                                    className="hidden-toggles__label"
-                                  >
-                                    Cancelled
-                                  </label>
-                                </div>
-                              </div>
+                              <input
+                                type="radio"
+                                id="srcoloration-Cancelled"
+                                onChange={(e) => {
+                                  ChangeApplicationStatus(e);
+                                }}
+                                name="applicationstausdp"
+                                value="25"
+                                className="hidden-toggles__input"
+                                checked={
+                                  applicationstaus == "25" ? true : false
+                                }
+                              />
+                              <label
+                                for="srcoloration-Cancelled"
+                                className="hidden-toggles__label"
+                              >
+                                Cancelled
+                              </label>
                             </div>
                           </div>
+                        </div>
+                      </div>
                     </div>
 
                     {allcomment?.map((cur) => {
@@ -8780,7 +8782,8 @@ const FINOtherDepartmentEditDetails = ({
                       roleID == 5) ||
                     SubmitBtnLoader == true ||
                     (applicationstaus == 0 && nextlevelvalue == "") ||
-                      ((asignnextLeveldata.Notes == "" || asignnextLeveldata.Comment =="")) 
+                    asignnextLeveldata.Notes == "" ||
+                    asignnextLeveldata.Comment == ""
                       ? true
                       : false
                   }

@@ -210,7 +210,14 @@ const [applicationsubID, setapplicationsubID]=useState([])
         console.log("GetMasterINSDataBySubApplicationTypeID", res)
         if (res.data.responseCode == "200") {
           if(res.data.responseData[0].id == 50){ 
-            setEquipment(res.data.responseData[0].subData)
+           const eq =  res.data.responseData[0].subData?.map((item)=>{
+              return{
+                   label:item.name,
+                   value:item.id
+           }
+               
+                })
+                setEquipment(eq)
           } if(res.data.responseData[1].id == 51){ 
             setStationery(res.data.responseData[1].subData)
           }
@@ -1038,7 +1045,7 @@ const [applicationsubID, setapplicationsubID]=useState([])
                   {Equipment?.map((item, ind) => {
                     return (
                       <option key={item.id} value={item.id}>
-                        {item.name}
+                        {item.label}
                       </option>
                     );
                   })}

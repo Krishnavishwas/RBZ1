@@ -18,8 +18,13 @@ const Resetpassword = ({ showUpdateModal, setShowUpdateModal }) => {
   const [errors, setErrors] = useState(false);
   const [toastDisplayed, setToastDisplayed] = useState(false);
 
-  const UpdateModalClose = () => {setShowUpdateModal(false); setemail(""); seterrormsg(""); setErrors(false)};
- 
+  const UpdateModalClose = () => {
+    setShowUpdateModal(false);
+    setemail("");
+    seterrormsg("");
+    setErrors(false);
+  };
+
   const submitForm = (e) => {
     e.preventDefault();
 
@@ -30,7 +35,7 @@ const Resetpassword = ({ showUpdateModal, setShowUpdateModal }) => {
         .then((res) => {
           if (res.data.responseCode === "200") {
             setemail("");
-            setErrors(false)
+            setErrors(false);
             seterrormsg("");
             if (emailRef.current) emailRef.current.value = "";
 
@@ -39,7 +44,7 @@ const Resetpassword = ({ showUpdateModal, setShowUpdateModal }) => {
               "resetpasswordtoken",
               res.data.responseData.token
             );
-            localStorage.setItem("userName", res.data.responseData.userName)
+            localStorage.setItem("userName", res.data.responseData.userName);
             toast.success(res.data.responseMessage);
             setToastDisplayed(false);
           } else {

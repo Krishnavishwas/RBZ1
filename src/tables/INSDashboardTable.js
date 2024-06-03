@@ -6,12 +6,6 @@ import { APIURL } from "../constant";
 import { Storage } from "../login/Storagesetting";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
-// import Modal from "react-bootstrap/Modal";
-// import ImportDashboardViewDetails from "../components/ImportDashboardViewDetails";
-// import ImportDashboardEditDetails from "../components/ImportDashboardEditDetails";
-// import { CSVLink } from "react-csv";
-// import * as FileSaver from "file-saver";
-// import * as XLSX from "xlsx";
 
 const INSDashboardTable = () => {
   const useId = Storage.getItem("userID");
@@ -24,14 +18,6 @@ const INSDashboardTable = () => {
   const [applicationmessage, setApplicationmessage] = useState("");
   const [editData, setEditdata] = useState({});
   const [searchText, setSearchText] = useState("");
-  // const EditModalClose = () => setshowEditForm(false);
-  // const handleFormClose = () => setShowUpdateModal(false);
-
-  // ----- Start Code For Open Edit Popup
-  // const handleClickEditModal = (title) => {
-  //   setshowEditForm(true);
-  // };
-  // ----- End Code For Open Edit Popup
 
   // ----- Start Code For Geting Table List Data
   const handleData = async () => {
@@ -124,8 +110,6 @@ const INSDashboardTable = () => {
         <Link
           onClick={() => {
             toast.warning("Work in Process");
-            // handleViewData(row?.id);
-            // GetHandelDetail(row?.id);
           }}
           className="mr-1"
         >
@@ -215,64 +199,6 @@ const INSDashboardTable = () => {
               </div>
             }
           />
-
-          {/* <Modal
-            show={showUpdateModal}
-            onHide={handleFormClose}
-            backdrop="static"
-            className="max-width-600"
-          >
-            <div className="application-box">
-              <div className="login_inner">
-                <div class="login_form ">
-                  <h5>
-                    <Modal.Header closeButton className="p-0">
-                      <Modal.Title>View Import Request</Modal.Title>
-                    </Modal.Header>
-                  </h5>
-                </div>
-                <div className="login_form_panel">
-                  <Modal.Body className="p-0">
-                    <ImportDashboardViewDetails
-                      applicationDetail={applicationDetail}
-                      applicationmessage={applicationmessage}
-                      handleFormClose={handleFormClose}
-                    />
-                  </Modal.Body>
-                </div>
-              </div>
-            </div>
-          </Modal>
-
-          <Modal
-            show={showEditForm}
-            onHide={EditModalClose}
-            backdrop="static"
-            className="max-width-600"
-          >
-            <div className="application-box">
-              <div className="login_inner">
-                <div class="login_form ">
-                  <h5>
-                    <Modal.Header closeButton className="p-0">
-                      <Modal.Title>Edit Import Request</Modal.Title>
-                    </Modal.Header>
-                  </h5>
-                </div>
-                <div className="login_form_panel">
-                  <Modal.Body className="p-0">
-                    <ImportDashboardEditDetails
-                      applicationDetail={applicationDetail}
-                      setApplicationDetail={setApplicationDetail}
-                      EditModalClose={EditModalClose}
-                      handleData={handleData}
-                      editData={editData}
-                    />
-                  </Modal.Body>
-                </div>
-              </div>
-            </div>
-          </Modal> */}
         </>
       )}
     </>

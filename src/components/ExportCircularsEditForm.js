@@ -109,6 +109,7 @@ const ExportCircularsEditForm = ({
   const applicantCommentsRef = useRef(null);
   const applicantReferenceNumberRef = useRef(null);
   // const applicantYearRef = useRef(null);
+
   const applicationTypeRef = useRef(null);
   const assignedToRef = useRef(null);
   const companyNameRef = useRef(null);
@@ -159,7 +160,7 @@ const ExportCircularsEditForm = ({
 
   const [recomdAnalyst, setRecomdAnalyst] = useState("121");
   const [selectedBanks, setSelectedBanks] = useState([]);
-  const [selectedDirectives, setSelectedDirectives] = useState(null);
+  const [selectedDirectives, setSelectedDirectives] = useState([]);
   const [registerusertype, setregisterusertype] = useState(
     applicationDetail?.userTypeID
   );
@@ -175,7 +176,10 @@ const ExportCircularsEditForm = ({
 
   const [sharefile, setsharefile] = useState([]);
   const [othersharefile, setOthersharefile] = useState([]);
-  const [releasingDate, setReleasingDate] = useState(new Date());
+
+
+  const [releasingDate, setReleasingDate] = useState('');
+  // const [releasingDate, setReleasingDate] = useState(new Date());
   const [errors, setErrors] = useState({});
   const [applicationType, setapplicationType] = useState([]);
   const [subsectorData, setsubsectorData] = useState([]);
@@ -1935,15 +1939,12 @@ const ExportCircularsEditForm = ({
   // Create the finalArray by merging attachedFiles and getBlankFile based on the labelSet
 
   useEffect(() => {
-
     let newData1 = getBlankFile?.filter((blankFile) => {
       return !geninfoFile?.some(
         (infoFile) => infoFile.label === blankFile.name
       );
     });
-
     setnewData(newData1);
-
     // setFiles(geninfoFile);
   }, [applicationDetail, geninfoFile, allcomment]);
 
@@ -1961,6 +1962,7 @@ const ExportCircularsEditForm = ({
   };
 
 
+  console.log("releasingDate", releasingDate);
 
   return (
     <>
@@ -2038,32 +2040,37 @@ const ExportCircularsEditForm = ({
 
                     <div
                       className={
-                        roleID == 5
+                        roleID
                           ? "inner_form_new align-items-start mt-2"
                           : "d-none"
                       }
+
                     >
                       <label className="controlform">Content</label>
-                      <div className="form-bx editorFieldBox">
-                        <div className="mt-2 py-1">
-                          <MenuBar editor={editorAnalyst} />
-                          <EditorContent editor={editorAnalyst} />
+                      <div className="form-bx editorFieldBox" >
+                        {applicationDetail?.userID == UserID.replace(/"/g, "") ?
+                          <div className="mt-2 py-1">
+                            <MenuBar editor={editorAnalyst} />
+                            <EditorContent editor={editorAnalyst} />
 
-                          <span className="sspan"></span>
-                          {(errors.Description && Description == " ") ||
-                            Description == null ||
-                            Description == "<p></p>" ||
-                            !Description ? (
-                            <small
-                              className="errormsg"
-                              style={{ bottom: "-13px" }}
-                            >
-                              {errors.Description}
-                            </small>
-                          ) : (
-                            ""
-                          )}
-                        </div>
+                            <span className="sspan"></span>
+                            {(errors.Description && Description == " ") ||
+                              Description == null ||
+                              Description == "<p></p>" ||
+                              !Description ? (
+                              <small
+                                className="errormsg"
+                                style={{ bottom: "-13px" }}
+                              >
+                                {errors.Description}
+                              </small>
+                            ) : (
+                              ""
+                            )}
+                          </div>
+                          : <div className="form-bx">
+                              <p className="showData mt-2 py-1" dangerouslySetInnerHTML={applicationDetail?.content ? { __html: applicationDetail.content } : { __html: "-" }}></p>
+                          </div>}
                       </div>
                     </div>
                     {/* end form-bx  */}
@@ -2186,7 +2193,7 @@ const ExportCircularsEditForm = ({
                     )}
                     <div className="inner_form_new">
                       <label className="controlform">Bank</label>
-                      <div className="form-bx">
+                      <div className="cccto">
                         <div className="multiselect flex justify-content-center">
                           {/* <MultiSelect
                             value={selectedBanks}
@@ -2239,8 +2246,8 @@ const ExportCircularsEditForm = ({
                     {/* end form-bx  */}
                     <div className="inner_form_new ">
                       <label className="controlform">Directives</label>
-                      <div className="form-bx">
-                        <div className="multiselect flex justify-content-center">
+                      <div className="cccto">
+                        <div className="flex justify-content-center multiSelect">
                           {/* <MultiSelect
                             value={selectedDirectives}
                             onChange={(e) => setSelectedDirectives(e.value)}
@@ -2274,16 +2281,17 @@ const ExportCircularsEditForm = ({
                       <label className="controlform">Releasing Date</label>
                       <div className="form-bx">
                         <DatePicker
+                          ref={FrequencyDateRef}
                           placeholderText="Select Releasing Date"
                           closeOnScroll={(e) => e.target === document}
-                          selected={releasingDate}
+                          selected={releasingDate ? releasingDate : applicationDetail.releasingDate}
                           onChange={(date) => setReleasingDate(date)}
                           peekNextMonth
                           showMonthDropdown
                           showYearDropdown
                           minDate={new Date()}
                           dropdownMode="select"
-                          dateFormat="dd/MMMM/yyyy"
+                          dateFormat="dd/MMM/yyyy"
                           disabled={applicationDetail?.userID !== UserID.replace(/"/g, "") ? true : false}
                         />
                         {
@@ -2294,23 +2302,31 @@ const ExportCircularsEditForm = ({
                       </div>
                     </div>
                     {/* end form-bx  */}
-                    <div className="inner_form_new ">
-                      <label className="controlform">Assign to Next Level</label>
-                      <input
-                        type="checkbox"
-                        onChange={HandelSupervisorcheck}
-                        checked={checkSupervisor}
-                        disabled={applicationDetail?.userID !== UserID.replace(/"/g, "") ? true : false}
+                    {applicationDetail?.userID == UserID.replace(/"/g, "") ?
+                      <div className="inner_form_new ">
+                        <label className="controlform">Assign to Next Level</label>
+                        <input
+                          type="checkbox"
+                          onChange={HandelSupervisorcheck}
+                          checked={checkSupervisor}
+                          disabled={applicationDetail?.userID !== UserID.replace(/"/g, "") ? true : false}
 
-                      />
-                    </div>
-                    {/* previous edit form end   */}
+                        />
+                      </div>
+                      : ""}
+
+
 
 
                     {roleID >= "5" && checkSupervisor == true ? (
                       <>
                         <div className="inner_form_new">
-                          <label className="controlform">Select Analyst</label>
+                          {/* <label className="controlform">Select Analyst</label> */}
+                          <label className="controlform">
+                            {
+                              roleID == "5" ? " Senior Analyst" : roleID == "6" ? " Principal Analyst" : roleID == "7" ? " Deputy Director" : " Director"
+                            }
+                          </label>
                           <div className="form-bx">
                             <label>
                               <select
@@ -2321,7 +2337,11 @@ const ExportCircularsEditForm = ({
                                   errors.assignedTo && !AssignUserID ? "error" : ""
                                 }
                               >
-                                <option value="">Select Analyst</option>
+                                <option value="">
+                                  {
+                                    roleID == "5" ? " Senior Analyst" : roleID == "6" ? " Principal Analyst" : roleID == "7" ? " Deputy Director" : " Director"
+                                  }
+                                </option>
                                 {Supervisors?.map((item, index) => {
                                   return (
                                     <option
@@ -2351,7 +2371,53 @@ const ExportCircularsEditForm = ({
                     ) : (
                       ""
                     )}
+                    <div
+                      class=
+                      {
+                        applicationDetail?.circularStatus == 0 ? "d-none" : "row"
+                      }
+                    >
+                      <div class="col-md-6">
+                        <div class="inner_form_new ">
+                          <label class="controlform">Assigned To Role</label>
+                          <div class="form-bx">
+                            <label>
+                              <input
+                                type="text"
+                                class=""
+                                disabled
+                                value={
+                                  applicationDetail?.assignedToRoleName
+                                    ? applicationDetail?.assignedToRoleName
+                                    : "N/A"
+                                }
+                              />
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-md-6">
+                        <div class="inner_form_new-sm ">
+                          <label class="controlform-sm">Assigned To User</label>
+                          <div class="form-bx-sm">
+                            <label>
+                              <input
+                                type="text"
+                                class=""
+                                disabled
+                                value={
+                                  applicationDetail?.assignedToName
+                                    ? applicationDetail?.assignedToName
+                                    : "N/A"
+                                }
+                              />
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
 
+                    {/* previous edit form end   */}
                     {/* upload file Data Start */}
 
 
@@ -4164,7 +4230,7 @@ const ExportCircularsEditForm = ({
                               </div>
                             </div>
 
-                            <div className={roleID == 6 ? "inner_form_new inner_form_new align-items-center" : "d-none"}>
+                            <div className={roleID == 6 ? "inner_form_new align-items-center" : "d-none"}>
                               <label className="controlform">Bank</label>
                               <div className=" cccto">
                                 <div className="flex justify-content-center multiSelect">
@@ -4184,8 +4250,8 @@ const ExportCircularsEditForm = ({
                             {/* end form-bx  */}
                             <div className={roleID == 6 ? "inner_form_new " : "d-none"}>
                               <label className="controlform">Directives</label>
-                              <div className="form-bx">
-                                <div className="multiselect flex justify-content-center">
+                              <div className="cccto">
+                                <div className="flex justify-content-center multiSelect">
                                   <DirectiveMultiSelectComponent
                                     key="multyselectprinciple"
                                     options={DirectiveOption}
@@ -4211,7 +4277,7 @@ const ExportCircularsEditForm = ({
                                 <DatePicker
                                   placeholderText="Select Releasing Date"
                                   closeOnScroll={(e) => e.target === document}
-                                  selected={releasingDate}
+                                  selected={releasingDate ? releasingDate : applicationDetail.releasingDate}
                                   onChange={(date) => setReleasingDate(date)}
                                   peekNextMonth
                                   showMonthDropdown
@@ -5384,8 +5450,8 @@ const ExportCircularsEditForm = ({
                             {/* end form-bx  */}
                             <div className={roleID == 7 ? "inner_form_new" : "d-none"}>
                               <label className="controlform">Directives</label>
-                              <div className="form-bx">
-                                <div className="multiselect flex justify-content-center">
+                              <div className="cccto">
+                                <div className="flex justify-content-center multiSelect">
                                   <DirectiveMultiSelectComponent
                                     key="multyselectprinciple"
                                     options={DirectiveOption}
@@ -5407,7 +5473,7 @@ const ExportCircularsEditForm = ({
                                 <DatePicker
                                   placeholderText="Select Releasing Date"
                                   closeOnScroll={(e) => e.target === document}
-                                  selected={releasingDate}
+                                  selected={releasingDate ? releasingDate : applicationDetail.releasingDate}
                                   onChange={(date) => setReleasingDate(date)}
                                   peekNextMonth
                                   showMonthDropdown
@@ -6593,8 +6659,8 @@ const ExportCircularsEditForm = ({
                             {/* end form-bx  */}
                             <div className={roleID == 8 ? "inner_form_new" : "d-none"}>
                               <label className="controlform">Directives</label>
-                              <div className="form-bx">
-                                <div className="multiselect flex justify-content-center">
+                              <div className="cccto">
+                                <div className="flex justify-content-center multiSelect">
                                   <DirectiveMultiSelectComponent
                                     key="multyselectprinciple"
                                     options={DirectiveOption}
@@ -6617,7 +6683,7 @@ const ExportCircularsEditForm = ({
                                 <DatePicker
                                   placeholderText="Select Releasing Date"
                                   closeOnScroll={(e) => e.target === document}
-                                  selected={releasingDate}
+                                  selected={releasingDate ? releasingDate : applicationDetail.releasingDate}
                                   onChange={(date) => setReleasingDate(date)}
                                   peekNextMonth
                                   showMonthDropdown
@@ -6711,26 +6777,26 @@ const ExportCircularsEditForm = ({
                                   Deferred
                                 </label> */}
 
-                                    {/* <input
-                                  type="radio"
-                                  id="srcoloration-Cancelled"
-                                  onChange={(e) => {
-                                    ChangeApplicationStatus(e);
-                                   
-                                  }}
-                                  name="applicationstausdp"
-                                  value="25"
-                                  className="hidden-toggles__input"
-                                  checked={
-                                    applicationstaus == "25" ? true : false
-                                  }
-                                />
-                                <label
-                                  for="srcoloration-Cancelled"
-                                  className="hidden-toggles__label"
-                                >
-                                  Cancelled
-                                </label> */}
+                                    <input
+                                      type="radio"
+                                      id="srcoloration-Cancelled"
+                                      onChange={(e) => {
+                                        ChangeApplicationStatus(e);
+
+                                      }}
+                                      name="applicationstausdp"
+                                      value="25"
+                                      className="hidden-toggles__input"
+                                      checked={
+                                        applicationstaus == "25" ? true : false
+                                      }
+                                    />
+                                    <label
+                                      for="srcoloration-Cancelled"
+                                      className="hidden-toggles__label"
+                                    >
+                                      Cancelled
+                                    </label>
                                   </div>
                                 </div>
                               </div>
@@ -7872,8 +7938,8 @@ const ExportCircularsEditForm = ({
                           {/* end form-bx  */}
                           <div className={roleID == 9 ? "inner_form_new" : "d-none"}>
                             <label className="controlform">Directives</label>
-                            <div className="form-bx">
-                              <div className="multiselect flex justify-content-center">
+                            <div className="cccto">
+                              <div className="flex justify-content-center multiSelect">
                                 <DirectiveMultiSelectComponent
                                   key="multyselectprinciple"
                                   options={DirectiveOption}
@@ -7896,7 +7962,7 @@ const ExportCircularsEditForm = ({
                               <DatePicker
                                 placeholderText="Select Releasing Date"
                                 closeOnScroll={(e) => e.target === document}
-                                selected={releasingDate}
+                                selected={releasingDate ? releasingDate : applicationDetail.releasingDate}
                                 onChange={(date) => setReleasingDate(date)}
                                 peekNextMonth
                                 showMonthDropdown
@@ -7989,26 +8055,26 @@ const ExportCircularsEditForm = ({
                                   Deferred
                                 </label> */}
 
-                                  {/* <input
-                                  type="radio"
-                                  id="srcoloration-Cancelled"
-                                  onChange={(e) => {
-                                    ChangeApplicationStatus(e);
-                                    
-                                  }}
-                                  name="applicationstausdir"
-                                  value="25"
-                                  className="hidden-toggles__input"
-                                  checked={
-                                    applicationstaus == "25" ? true : false
-                                  }
-                                />
-                                <label
-                                  for="srcoloration-Cancelled"
-                                  className="hidden-toggles__label"
-                                >
-                                  Cancelled
-                                </label> */}
+                                  <input
+                                    type="radio"
+                                    id="srcoloration-Cancelled"
+                                    onChange={(e) => {
+                                      ChangeApplicationStatus(e);
+
+                                    }}
+                                    name="applicationstausdir"
+                                    value="25"
+                                    className="hidden-toggles__input"
+                                    checked={
+                                      applicationstaus == "25" ? true : false
+                                    }
+                                  />
+                                  <label
+                                    for="srcoloration-Cancelled"
+                                    className="hidden-toggles__label"
+                                  >
+                                    Cancelled
+                                  </label>
                                 </div>
                               </div>
                             </div>
@@ -8510,9 +8576,9 @@ const ExportCircularsEditForm = ({
                     // disabled={(roleID == "6" || roleID == "7") && nextlevelvalue.length == 0 ? true : false}
                     disabled={nextlevelvalue == "" &&
                       (roleID == 6 && (applicationDetail.userID != UserID.replace(/"/g, ""))) ||
-                      (nextlevelvalue == "" && roleID == 7) ||
+                      (nextlevelvalue == "" && roleID == 7 && (applicationDetail.userID != UserID.replace(/"/g, ""))) ||
                       ((applicationstaus == "0" || applicationstaus == undefined) &&
-                        (roleID == 8) && (nextlevelvalue == "")) ||
+                        (roleID == 8) && (nextlevelvalue == "") && (applicationDetail.userID != UserID.replace(/"/g, ""))) ||
                       (SubmitBtnLoader == true) || (applicationDetail.roleID == 0 && checkSupervisor == false)
                       ? true
                       : false

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import ExportformDynamicField from "./ExportformDynamicField";
 import { Storage } from "../login/Storagesetting";
 import moment from "moment";
@@ -63,10 +63,11 @@ const ImportDashboardViewDetails = ({
               <label className="controlform">User</label>
               <div className="form-bx">
                 <label>
-                  <input value={applicationDetail?.userName} disabled />
+                  <input value={applicationDetail?.userName ? applicationDetail?.userName : "N/A"} disabled />
                 </label>
               </div>
             </div>
+
             <div className="inner_form_new ">
               <label className="controlform">Name of Bank</label>
               <div className="form-bx">
@@ -150,7 +151,7 @@ const ImportDashboardViewDetails = ({
                   <div className="form-bx">
                     <label>
                       <input
-                        value={applicationDetail?.companyName}
+                        value={applicationDetail?.companyName ? applicationDetail?.companyName : "N/A"}
                         className="text-uppercase"
                         disabled
                       />
@@ -177,7 +178,7 @@ const ImportDashboardViewDetails = ({
                   <div className="form-bx">
                     <label>
                       <input
-                        value={applicationDetail?.bpnCode}
+                        value={applicationDetail?.bpnCode ? applicationDetail?.bpnCode : "N/A"}
                         className="text-uppercase"
                         disabled
                       />
@@ -194,7 +195,7 @@ const ImportDashboardViewDetails = ({
                 <label className="controlform">Applicant</label>
                 <div className="form-bx">
                   <label>
-                    <input value={applicationDetail?.name} disabled />
+                    <input value={applicationDetail?.name ? applicationDetail?.name : "N/A"} disabled />
                   </label>
                 </div>
               </div>
@@ -206,7 +207,7 @@ const ImportDashboardViewDetails = ({
               <label className="controlform">Nature of Application</label>
               <div className="form-bx">
                 <label>
-                  <input value={applicationDetail?.applicationType} disabled />
+                  <input value={applicationDetail?.applicationType ? applicationDetail?.applicationType : "N/A"} disabled />
                 </label>
               </div>
             </div>
@@ -249,7 +250,7 @@ const ImportDashboardViewDetails = ({
                   <label className="controlform">Currency</label>
                   <div className="form-bx">
                     <label>
-                      <input value={applicationDetail?.currencyCode} disabled />
+                      <input value={applicationDetail?.currencyCode ? applicationDetail?.currencyCode : "N/A"} disabled />
                     </label>
                   </div>
                 </div>
@@ -260,7 +261,7 @@ const ImportDashboardViewDetails = ({
                   <label className="controlform-sm">Amount</label>
                   <div className="form-bx-sm">
                     <label>
-                      <input value={applicationDetail?.amount} disabled />
+                      <input value={applicationDetail?.amount ? applicationDetail?.amount : "N/A"} disabled />
                     </label>
                   </div>
                 </div>
@@ -271,7 +272,7 @@ const ImportDashboardViewDetails = ({
                   <label className="controlform-sm">Rate</label>
                   <div className="form-bx-sm">
                     <label>
-                      <input value={applicationDetail?.rate} disabled />
+                      <input value={applicationDetail?.rate ? applicationDetail?.rate : "N/A"} disabled />
                     </label>
                   </div>
                 </div>
@@ -282,7 +283,7 @@ const ImportDashboardViewDetails = ({
               <label className="controlform">USD Equivalent</label>
               <div className="form-bx">
                 <label>
-                  <input value={applicationDetail?.usdEquivalent} disabled />
+                  <input value={applicationDetail?.usdEquivalent ? applicationDetail?.usdEquivalent : "N/A"} disabled />
                   <span className="sspan"></span>
                 </label>
               </div>
@@ -292,7 +293,7 @@ const ImportDashboardViewDetails = ({
               <label className="controlform">Sector</label>
               <div className="form-bx">
                 <label>
-                  <input value={applicationDetail?.sectorName} disabled />
+                  <input value={applicationDetail?.sectorName ? applicationDetail?.sectorName : "N/A"} disabled />
                 </label>
               </div>
             </div>
@@ -319,7 +320,7 @@ const ImportDashboardViewDetails = ({
               <div className="form-bx">
                 <label>
                   <textarea
-                    value={applicationDetail?.applicantComment}
+                    value={applicationDetail?.applicantComment ? applicationDetail?.applicantComment : "N/A"}
                     disabled
                   />
                 </label>
@@ -1332,6 +1333,7 @@ const ImportDashboardViewDetails = ({
                                           </label>
                                         </div>
                                       </div>
+
                                       <div className="inner_form_new ">
                                         <label className="controlform">
                                           Comments
@@ -1352,6 +1354,7 @@ const ImportDashboardViewDetails = ({
                                           </label>
                                         </div>
                                       </div>
+
                                       <div className="inner_form_new ">
                                         <label className="controlform">
                                           Attachments
@@ -1391,6 +1394,7 @@ const ImportDashboardViewDetails = ({
                                         )}
                                         </div>
                                       </div>
+
                                       <div className="inner_form_new ">
                                         <label className="controlform">
                                           CC To
@@ -1416,6 +1420,7 @@ const ImportDashboardViewDetails = ({
                                           </label>
                                         </div>
                                       </div>
+
                                       <div class="row">
                                         <div class="col-md-12">
                                           <div class="inner_form_new ">
@@ -1444,6 +1449,7 @@ const ImportDashboardViewDetails = ({
                                           </div>
                                         </div>
                                       </div>
+
                                       <div className="inner_form_new ">
                                         <label className="controlform">
                                           Is Return Needed?
@@ -1466,6 +1472,7 @@ const ImportDashboardViewDetails = ({
                                           </label>
                                         </div>
                                       </div>
+
                                       {items.isReturnNeeded == 1 &&
                                       items?.returnFrequencyType == 1 &&
                                       items?.returnFrequencyName == "Once" ? (
@@ -1491,6 +1498,7 @@ const ImportDashboardViewDetails = ({
                                               </div>
                                             </div>
                                           </div>
+
                                           <div class="col-md-5">
                                             <div class="inner_form_new-sm">
                                               <label class="controlform-sm">
@@ -1545,6 +1553,7 @@ const ImportDashboardViewDetails = ({
                                       ) : (
                                         ""
                                       )}
+
                                       <div className="inner_form_new ">
                                         <label className="controlform">
                                           Define Expiry Date
@@ -1568,6 +1577,7 @@ const ImportDashboardViewDetails = ({
                                           </label>
                                         </div>
                                       </div>
+
                                       <div class="row">
                                         <div class="col-md-6">
                                           <div class="inner_form_new ">
@@ -1590,6 +1600,7 @@ const ImportDashboardViewDetails = ({
                                             </div>
                                           </div>
                                         </div>
+
                                         <div class="col-md-6">
                                           <div class="inner_form_new-sm ">
                                             <label class="controlform-sm">

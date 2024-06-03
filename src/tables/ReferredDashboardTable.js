@@ -39,9 +39,6 @@ const ReferredDashboardTable = () => {
       : "";
 
   const [ExportsapproveRequests, setExportsapproveRequests] = useState([]);
-  const [ExportsapproveAllRequests, setExportsapproveAllRequests] = useState(
-    []
-  );
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [showExportUpdateModal, setExportShowUpdateModal] = useState(false);
   const [showFINUpdateModal, setFINShowUpdateModal] = useState(false);
@@ -68,7 +65,6 @@ const ReferredDashboardTable = () => {
       : "0"
   );
   const [SupervisorRoleId, setSupervisorRoleId] = useState("");
-  const [loader, setLoader] = useState("");
   const [pageLoader, setPageLoader] = useState("");
   const [tabDepId, setTabDepId] = useState("");
   const [filters, setFilters] = useState({

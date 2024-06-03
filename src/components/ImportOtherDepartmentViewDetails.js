@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import ExportformDynamicField from "./ExportformDynamicField";
 import { Storage } from "../login/Storagesetting";
 import moment from "moment";
@@ -22,8 +22,6 @@ const ImportOtherDepartmentViewDetails = ({
 
   const [viewShareFile, setviewShareFile] = useState([]);
   const [geninfoTab, setgeninfoTab] = useState(true);
-  const [banksuperTab, setbanksuperTab] = useState(true);
-  const [recordTab, setrecordTab] = useState(true);
   const [analystTab, setanalystTab] = useState(true);
   const [sranalystTab, setsranalystTab] = useState(true);
   const [principalanalystTab, setprincipalanalystTab] = useState(true);
@@ -162,7 +160,11 @@ const ImportOtherDepartmentViewDetails = ({
                   <div className="form-bx">
                     <label>
                       <input
-                        value={applicationDetail?.tinNumber ? applicationDetail?.tinNumber : "N/A"}
+                        value={
+                          applicationDetail?.tinNumber
+                            ? applicationDetail?.tinNumber
+                            : "N/A"
+                        }
                         disabled
                         className="text-uppercase"
                       />
@@ -176,7 +178,7 @@ const ImportOtherDepartmentViewDetails = ({
                   <div className="form-bx">
                     <label>
                       <input
-                        value={applicationDetail?.bpnCode}
+                        value={applicationDetail?.bpnCode ? applicationDetail?.bpnCode : "N/A"}
                         className="text-uppercase"
                         disabled
                       />
@@ -193,7 +195,7 @@ const ImportOtherDepartmentViewDetails = ({
                 <label className="controlform">Applicant</label>
                 <div className="form-bx">
                   <label>
-                    <input value={applicationDetail?.name} disabled />
+                    <input value={applicationDetail?.name ? applicationDetail?.name : "N/A"} disabled />
                   </label>
                 </div>
               </div>
@@ -205,7 +207,7 @@ const ImportOtherDepartmentViewDetails = ({
               <label className="controlform">Nature of Application</label>
               <div className="form-bx">
                 <label>
-                  <input value={applicationDetail?.applicationType} disabled />
+                  <input value={applicationDetail?.applicationType ? applicationDetail?.applicationType : "N/A"} disabled />
                 </label>
               </div>
             </div>
@@ -248,7 +250,7 @@ const ImportOtherDepartmentViewDetails = ({
                   <label className="controlform">Currency</label>
                   <div className="form-bx">
                     <label>
-                      <input value={applicationDetail?.currencyCode} disabled />
+                      <input value={applicationDetail?.currencyCode ? applicationDetail?.currencyCode : "N/A"} disabled />
                     </label>
                   </div>
                 </div>
@@ -259,7 +261,7 @@ const ImportOtherDepartmentViewDetails = ({
                   <label className="controlform-sm">Amount</label>
                   <div className="form-bx-sm">
                     <label>
-                      <input value={applicationDetail?.amount} disabled />
+                      <input value={applicationDetail?.amount ? applicationDetail?.amount : "N/A"} disabled />
                     </label>
                   </div>
                 </div>
@@ -270,7 +272,7 @@ const ImportOtherDepartmentViewDetails = ({
                   <label className="controlform-sm">Rate</label>
                   <div className="form-bx-sm">
                     <label>
-                      <input value={applicationDetail?.rate} disabled />
+                      <input value={applicationDetail?.rate ? applicationDetail?.rate : "N/A"} disabled />
                     </label>
                   </div>
                 </div>
@@ -281,7 +283,7 @@ const ImportOtherDepartmentViewDetails = ({
               <label className="controlform">USD Equivalent</label>
               <div className="form-bx">
                 <label>
-                  <input value={applicationDetail?.usdEquivalent} disabled />
+                  <input value={applicationDetail?.usdEquivalent ? applicationDetail?.usdEquivalent : "N/A"} disabled />
                   <span className="sspan"></span>
                 </label>
               </div>
@@ -291,7 +293,7 @@ const ImportOtherDepartmentViewDetails = ({
               <label className="controlform">Sector</label>
               <div className="form-bx">
                 <label>
-                  <input value={applicationDetail?.sectorName} disabled />
+                  <input value={applicationDetail?.sectorName ? applicationDetail?.sectorName : "N/A"} disabled />
                 </label>
               </div>
             </div>
@@ -318,7 +320,7 @@ const ImportOtherDepartmentViewDetails = ({
               <div className="form-bx">
                 <label>
                   <textarea
-                    value={applicationDetail?.applicantComment}
+                    value={applicationDetail?.applicantComment ? applicationDetail?.applicantComment : "N/A"}
                     disabled
                   />
                 </label>
@@ -326,49 +328,49 @@ const ImportOtherDepartmentViewDetails = ({
             </div>
 
             <div
-                class={
-                  applicationDetail?.applicationStatus == 0 ? "d-none" : "row"
-                }
-              >
-                <div class="col-md-6">
-                  <div class="inner_form_new ">
-                    <label class="controlform">Assigned To Role</label>
-                    <div class="form-bx">
-                      <label>
-                        <input
-                          type="text"
-                          class=""
-                          disabled
-                          value={
-                            applicationDetail?.assignedToRoleName
-                              ? applicationDetail?.assignedToRoleName
-                              : "N/A"
-                          }
-                        />
-                      </label>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-md-6">
-                  <div class="inner_form_new-sm ">
-                    <label class="controlform-sm">Assigned To User</label>
-                    <div class="form-bx-sm">
-                      <label>
-                        <input
-                          type="text"
-                          class=""
-                          disabled
-                          value={
-                            applicationDetail?.assignedToName
-                              ? applicationDetail?.assignedToName
-                              : "N/A"
-                          }
-                        />
-                      </label>
-                    </div>
+              class={
+                applicationDetail?.applicationStatus == 0 ? "d-none" : "row"
+              }
+            >
+              <div class="col-md-6">
+                <div class="inner_form_new ">
+                  <label class="controlform">Assigned To Role</label>
+                  <div class="form-bx">
+                    <label>
+                      <input
+                        type="text"
+                        class=""
+                        disabled
+                        value={
+                          applicationDetail?.assignedToRoleName
+                            ? applicationDetail?.assignedToRoleName
+                            : "N/A"
+                        }
+                      />
+                    </label>
                   </div>
                 </div>
               </div>
+              <div class="col-md-6">
+                <div class="inner_form_new-sm ">
+                  <label class="controlform-sm">Assigned To User</label>
+                  <div class="form-bx-sm">
+                    <label>
+                      <input
+                        type="text"
+                        class=""
+                        disabled
+                        value={
+                          applicationDetail?.assignedToName
+                            ? applicationDetail?.assignedToName
+                            : "N/A"
+                        }
+                      />
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
 
             <h5 className="section_top_subheading">Attachments</h5>
             {(applicationDetail?.fileName || applicationDetail?.filePath) &&
@@ -451,593 +453,6 @@ const ImportOtherDepartmentViewDetails = ({
               <div className="text-center">File Not Found</div>
             )}
           </div>
-
-          {/* {applicationDetail?.roleID !== 4 ? (
-            <>
-              <h5
-                className={
-                  banksuperTab
-                    ? "section_top_subheading mt-3 py-3 btn-collapse_active cursorpointer"
-                    : "section_top_subheading mt-3 py-3 cursorpointer"
-                }
-                onClick={() => setbanksuperTab(!banksuperTab)}
-              >
-                Bank Supervisor{" "}
-                {responceCount?.map((item, i) => {
-                  if (item?.id == 3)
-                    return (
-                      <>
-                        {item?.count == 0 ? (
-                          ""
-                        ) : (
-                          <span className="counter-tab">{item?.count}</span>
-                        )}
-                      </>
-                    );
-                })}
-                <span className="btn-collapse">
-                  <i class="bi bi-caret-down-fill"></i>
-                </span>
-              </h5>
-              {allcomment?.map((cur, i) => {
-                if (cur.assignedToRoleID == 3) {
-                  return (
-                    <>
-                      {roleID > 3 || cur.assignedToRoleID == 3 ? (
-                        <>
-                          <div
-                            className={banksuperTab ? "customtab" : "d-none"}
-                          >
-                            <ul
-                              className={
-                                cur.applicationActivityData?.length >= 1
-                                  ? "nav nav-pills mb-3"
-                                  : "d-none"
-                              }
-                              role="tablist"
-                            >
-                              {cur?.applicationActivityData?.map(
-                                (items, index) => {
-                                  return (
-                                    <li
-                                      className="nav-item"
-                                      role="presentation"
-                                    >
-                                      <button
-                                        className={
-                                          index == 0 && tabstatus3
-                                            ? "nav-link w-100 border-radius0 active"
-                                            : "nav-link w-100 border-radius0 "
-                                        }
-                                        id={"BankSuper" + index}
-                                        data-bs-toggle="tab"
-                                        data-bs-target={
-                                          "#BankSuper-justified-home" + index
-                                        }
-                                        type="button"
-                                        role="tab"
-                                        aria-controls="home"
-                                        aria-selected="true"
-                                        onClick={() => {
-                                          index == 0
-                                            ? settabstatus3(true)
-                                            : settabstatus3(false);
-                                        }}
-                                      >
-                                        {index == 0
-                                          ? "Recent"
-                                          : `Response ${
-                                              cur?.applicationActivityData
-                                                ?.length - index
-                                            }`}{" "}
-                                      </button>
-                                    </li>
-                                  );
-                                }
-                              )}
-                            </ul>
-
-                            <div className="tab-content pt-2">
-                              {cur?.applicationActivityData
-                                ?.slice()
-                                ?.reverse()
-                                .map((items, index) => {
-                                  return (
-                                    <div
-                                      key={index}
-                                      className={
-                                        index == 0 && tabstatus3
-                                          ? "tab-pane fade show active"
-                                          : "tab-pane fade"
-                                      }
-                                      id={"BankSuper-justified-home" + index}
-                                      role="tabpanel"
-                                      aria-labelledby={"BankSuper" + index}
-                                    >
-                                      <div className="bakgroundaction">
-                                        <div className="row">
-                                          <div className="col-md-6">
-                                            <div className="inner_form_new ">
-                                              <label className="controlform">
-                                                Action Type
-                                              </label>
-                                              <div className="form-bx">
-                                                <label>
-                                                  <input
-                                                    type="text"
-                                                    className=""
-                                                    disabled
-                                                    value={
-                                                      items?.actionStatusName ==
-                                                        "Approved" ||
-                                                      items?.actionStatusName ==
-                                                        "Reject" ||
-                                                      items?.actionStatusName ==
-                                                        "Cancelled"
-                                                        ? "Assigned"
-                                                        : items?.actionStatusName
-                                                    }
-                                                  />
-                                                </label>
-                                              </div>
-                                            </div>
-                                          </div>
-
-                                          <div className="col-md-3">
-                                            <div className="inner_form_new-sm ">
-                                              <label className="controlform-sm">
-                                                User{" "}
-                                                {items?.actionRoleName !=
-                                                null ? (
-                                                  <i
-                                                    className="bi bi-info-circle icons-info"
-                                                    title={`Role : ${
-                                                      items?.actionRoleName
-                                                        ? items?.actionRoleName
-                                                        : "N/A"
-                                                    }`}
-                                                  ></i>
-                                                ) : (
-                                                  ""
-                                                )}
-                                              </label>
-                                              <div className="form-bx-sm">
-                                                <label>
-                                                  <input
-                                                    type="text"
-                                                    className=""
-                                                    disabled
-                                                    value={
-                                                      items?.actionUserName
-                                                        ? items?.actionUserName
-                                                        : "N/A"
-                                                    }
-                                                  />
-                                                </label>
-                                              </div>
-                                            </div>
-                                          </div>
-
-                                          <div className="col-md-3">
-                                            <div className="inner_form_new-sm">
-                                              <label className="controlform-sm">
-                                                {items?.actionStatusName} Date
-                                              </label>
-                                              <div className="form-bx-sm">
-                                                <label>
-                                                  <input
-                                                    type="text"
-                                                    className=""
-                                                    disabled
-                                                    value={
-                                                      items?.createdDate
-                                                        ? moment(
-                                                            items?.createdDate
-                                                          ).format(
-                                                            "DD/MMM/yyyy"
-                                                          )
-                                                        : "N/A"
-                                                    }
-                                                  />
-                                                </label>
-                                              </div>
-                                            </div>
-                                          </div>
-                                        </div>
-
-                                        <div className={items?.actionNotes ? "inner_form_new " : "d-none"}>
-                                          <label className="controlform">
-                                            Action Note
-                                          </label>
-                                          <div className="form-bx">
-                                            <label>
-                                              <textarea
-                                                type="text"
-                                                className=""
-                                                disabled
-                                                value={
-                                                  items?.actionNotes
-                                                    ? items?.actionNotes
-                                                    : "N/A"
-                                                }
-                                              />
-                                            </label>
-                                          </div>
-                                        </div>
-
-                                        <div className={items?.actionComment ? "inner_form_new " : "d-none"}>
-                                          <label className="controlform">
-                                            Action Comment
-                                          </label>
-                                          <div className="form-bx">
-                                            <label>
-                                              <textarea
-                                                type="text"
-                                                className=""
-                                                disabled
-                                                value={
-                                                  items?.actionComment
-                                                    ? items?.actionComment
-                                                    : "N/A"
-                                                }
-                                              />
-                                            </label>
-                                          </div>
-                                        </div>
-                                      </div>
-
-                                      <div className="inner_form_new ">
-                                        <label className="controlform">
-                                          Recommendation
-                                        </label>
-                                        <div className="form-bx">
-                                          <div
-                                            dangerouslySetInnerHTML={{
-                                              __html: items?.description
-                                                ? items?.description
-                                                : "N/A",
-                                            }}
-                                            className="analyst_desc"
-                                          ></div>
-                                        </div>
-                                      </div>
-
-                                      <div className="inner_form_new ">
-                                        <label className="controlform">
-                                          Notes
-                                        </label>
-                                        <div className="form-bx">
-                                          <label>
-                                            <textarea
-                                              name="Notes"
-                                              placeholder="Notes"
-                                              className=""
-                                              value={
-                                                items?.notes
-                                                  ? items?.notes
-                                                  : "N/A"
-                                              }
-                                              disabled
-                                            ></textarea>
-                                          </label>
-                                        </div>
-                                      </div>
-                                      <div className="inner_form_new ">
-                                        <label className="controlform">
-                                          Comments
-                                        </label>
-                                        <div className="form-bx">
-                                          <label>
-                                            <textarea
-                                              name="Notes"
-                                              placeholder="Notes"
-                                              className=""
-                                              value={
-                                                items?.comment
-                                                  ? items?.comment
-                                                  : "N/A"
-                                              }
-                                              disabled
-                                            ></textarea>
-                                          </label>
-                                        </div>
-                                      </div>
-
-                                      <div class="row">
-                                        <div class="col-md-12">
-                                          <div class="inner_form_new ">
-                                            <label class="controlform">
-                                              Action
-                                            </label>
-                                            <div class="form-bx">
-                                              <label>
-                                                <input
-                                                  type="text"
-                                                  class=""
-                                                  disabled
-                                                  value={
-                                                    items?.assignedAction ==
-                                                      "Approved" ||
-                                                    items?.assignedAction ==
-                                                      "Reject" ||
-                                                    items?.assignedAction ==
-                                                      "Cancelled"
-                                                      ? "Assigned"
-                                                      : items?.assignedAction
-                                                  }
-                                                />
-                                              </label>
-                                            </div>
-                                          </div>
-                                        </div>
-                                      </div>
-                                      <div class="row">
-                                        <div class="col-md-6">
-                                          <div class="inner_form_new ">
-                                            <label class="controlform">
-                                              Action
-                                            </label>
-                                            <div class="form-bx">
-                                              <label>
-                                                <input
-                                                  type="text"
-                                                  class=""
-                                                  disabled
-                                                  value={
-                                                    items?.assignedAction ==
-                                                      "Approved" ||
-                                                    items?.assignedAction ==
-                                                      "Reject" ||
-                                                    items?.assignedAction ==
-                                                      "Cancelled"
-                                                      ? "Assigned"
-                                                      : items?.assignedAction
-                                                  }
-                                                />
-                                              </label>
-                                            </div>
-                                          </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                          <div class="inner_form_new ">
-                                            <label class="controlform">
-                                              Assigned To Role
-                                            </label>
-                                            <div class="form-bx">
-                                              <label>
-                                                <input
-                                                  type="text"
-                                                  class=""
-                                                  disabled
-                                                  value={
-                                                    items?.roleName
-                                                      ? items?.roleName
-                                                      : "N/A"
-                                                  }
-                                                />
-                                              </label>
-                                            </div>
-                                          </div>
-                                        </div>
-                                      </div>
-                                    </div>
-                                  );
-                                })}
-                            </div>
-                          </div>
-                        </>
-                      ) : (
-                        ""
-                      )}
-                    </>
-                  );
-                }
-              })}
-              {noDataComment?.map((v, i) => {
-                if (v.roleID == 3 && v.isDataAvailable == 0) {
-                  return (
-                    <div className={banksuperTab ? "customtab" : "d-none"}>
-                      <div class="text-center">No Data Found</div>
-                    </div>
-                  );
-                }
-              })}
-            </>
-          ) : (
-            ""
-          )} */}
-
-          {/* {roleID >= 4 && applicationDetail?.roleID != 4 ? (
-            <>
-              <h5
-                className={
-                  recordTab
-                    ? "section_top_subheading mt-3 py-3 btn-collapse_active cursorpointer"
-                    : "section_top_subheading mt-3 py-3 cursorpointer"
-                }
-                onClick={() => setrecordTab(!recordTab)}
-              >
-                Record Officer{" "}
-                {responceCount?.map((item, i) => {
-                  if (item?.id == 4)
-                    return (
-                      <>
-                        {item?.count == 0 ? (
-                          ""
-                        ) : (
-                          <span className="counter-tab">{item?.count}</span>
-                        )}
-                      </>
-                    );
-                })}
-                <span className="btn-collapse">
-                  <i class="bi bi-caret-down-fill"></i>
-                </span>
-              </h5>
-              {allcomment?.map((cur) => {
-                if (cur.assignedToRoleID == 4) {
-                  return (
-                    <>
-                      {roleID > 4 || cur.assignedToRoleID == 4 ? (
-                        <>
-                          <div className={recordTab ? "customtab" : "d-none"}>
-                            {allcomment?.length ? (
-                              allcomment?.map((cur) => {
-                                return cur?.applicationActivityData.map(
-                                  (item, index) => {
-                                    if (cur?.assignedToRoleID == 4) {
-                                      return (
-                                        <>
-                                          <div className="inner_form_new ">
-                                            <label className="controlform">
-                                              Notes
-                                            </label>
-                                            <div className="form-bx">
-                                              <label>
-                                                <textarea
-                                                  name="Notes"
-                                                  placeholder="Notes"
-                                                  class=""
-                                                  value={
-                                                    item?.notes
-                                                      ? item?.notes
-                                                      : ""
-                                                  }
-                                                  disabled
-                                                ></textarea>
-                                              </label>
-                                            </div>
-                                          </div>
-                                          <div className="inner_form_new ">
-                                            <label className="controlform">
-                                              Comments
-                                            </label>
-                                            <div className="form-bx">
-                                              <label>
-                                                <textarea
-                                                  name="Notes"
-                                                  placeholder="Notes"
-                                                  class=""
-                                                  value={
-                                                    item?.comment
-                                                      ? item?.comment
-                                                      : ""
-                                                  }
-                                                  disabled
-                                                ></textarea>
-                                              </label>
-                                            </div>
-                                          </div>
-                                          <div class="row">
-                                            <div class="col-md-6">
-                                              <div class="inner_form_new ">
-                                                <label class="controlform">
-                                                  Assigned To Role
-                                                </label>
-                                                <div class="form-bx">
-                                                  <label>
-                                                    <input
-                                                      type="text"
-                                                      class=""
-                                                      disabled
-                                                      value={
-                                                        item?.roleName
-                                                          ? item?.roleName
-                                                          : "N/A"
-                                                      }
-                                                    />
-                                                  </label>
-                                                </div>
-                                              </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                              <div class="inner_form_new-sm ">
-                                                <label class="controlform-sm">
-                                                  Assigned To User
-                                                </label>
-                                                <div class="form-bx-sm">
-                                                  <label>
-                                                    <input
-                                                      type="text"
-                                                      class=""
-                                                      disabled
-                                                      value={
-                                                        item?.assignedToName
-                                                          ? item?.assignedToName
-                                                          : "N/A"
-                                                      }
-                                                    />
-                                                  </label>
-                                                </div>
-                                              </div>
-                                            </div>
-                                          </div>
-
-                                          <div class="row">
-                                            <div class="col-md-12">
-                                              <div class="inner_form_new ">
-                                                <label class="controlform">
-                                                  Action
-                                                </label>
-                                                <div class="form-bx">
-                                                  <label>
-                                                    <input
-                                                      type="text"
-                                                      class=""
-                                                      disabled
-                                                      value={
-                                                        item?.assignedAction ==
-                                                          "Approved" ||
-                                                        item?.assignedAction ==
-                                                          "Reject" ||
-                                                        item?.assignedAction ==
-                                                          "Cancelled"
-                                                          ? "Assigned"
-                                                          : item?.assignedAction
-                                                      }
-                                                    />
-                                                  </label>
-                                                </div>
-                                              </div>
-                                            </div>
-                                          </div>
-                                        </>
-                                      );
-                                    }
-                                  }
-                                );
-                              })
-                            ) : (
-                              <div
-                                className={
-                                  banksuperTab ? "customtab" : "d-none"
-                                }
-                              >
-                                <p className="text-center">No Record Found</p>
-                              </div>
-                            )}
-                          </div>
-                        </>
-                      ) : (
-                        ""
-                      )}
-                    </>
-                  );
-                }
-              })}
-              {noDataComment?.map((v, i) => {
-                if (v.roleID == 4 && v.isDataAvailable == 0) {
-                  return (
-                    <div className={recordTab ? "customtab" : "d-none"}>
-                      <div class="text-center">No Data Found</div>
-                    </div>
-                  );
-                }
-              })}
-            </>
-          ) : (
-            ""
-          )} */}
 
           {roleID >= 4 ? (
             <>
@@ -1351,37 +766,40 @@ const ImportOtherDepartmentViewDetails = ({
                                         <label className="controlform">
                                           Attachments
                                         </label>
-                                       <div> {items?.filesData?.length ? (
-                                          items?.filesData?.map(
-                                            (items, index) => {
-                                              return (
-                                                <div
-                                                  className="attachemt_form-bx mt-1"
-                                                  key={items.id}
-                                                >
-                                                  <label>
-                                                    {items?.fileName
-                                                      ? items?.fileName
-                                                      : `FileUpload ${index}`}
-                                                  </label>
-                                                  <span className="filename">
-                                                    <Link
-                                                      to={items?.filePath}
-                                                      target="_blank"
-                                                      className="viewbtn"
-                                                    >
-                                                      View File
-                                                    </Link>
-                                                  </span>
-                                                </div>
-                                              );
-                                            }
-                                          )
-                                        ) : (
-                                          <label className="notfound">
-                                            File Not Found
-                                          </label>
-                                        )}</div>
+                                        <div>
+                                          {" "}
+                                          {items?.filesData?.length ? (
+                                            items?.filesData?.map(
+                                              (items, index) => {
+                                                return (
+                                                  <div
+                                                    className="attachemt_form-bx mt-1"
+                                                    key={items.id}
+                                                  >
+                                                    <label>
+                                                      {items?.fileName
+                                                        ? items?.fileName
+                                                        : `FileUpload ${index}`}
+                                                    </label>
+                                                    <span className="filename">
+                                                      <Link
+                                                        to={items?.filePath}
+                                                        target="_blank"
+                                                        className="viewbtn"
+                                                      >
+                                                        View File
+                                                      </Link>
+                                                    </span>
+                                                  </div>
+                                                );
+                                              }
+                                            )
+                                          ) : (
+                                            <label className="notfound">
+                                              File Not Found
+                                            </label>
+                                          )}
+                                        </div>
                                       </div>
                                       <div className="inner_form_new ">
                                         <label className="controlform">
@@ -1938,38 +1356,40 @@ const ImportOtherDepartmentViewDetails = ({
                                         <label className="controlform">
                                           Attachments
                                         </label>
-                                        <div>{items?.filesData?.length ? (
-                                          items?.filesData?.map(
-                                            (items, index) => {
-                                              return (
-                                                <div
-                                                  className="attachemt_form-bx mt-1"
-                                                  key={items.id}
-                                                >
-                                                  <label>
-                                                    {items?.fileName
-                                                      ? items?.fileName
-                                                      : `FileUpload ${index}`}
-                                                  </label>
+                                        <div>
+                                          {items?.filesData?.length ? (
+                                            items?.filesData?.map(
+                                              (items, index) => {
+                                                return (
+                                                  <div
+                                                    className="attachemt_form-bx mt-1"
+                                                    key={items.id}
+                                                  >
+                                                    <label>
+                                                      {items?.fileName
+                                                        ? items?.fileName
+                                                        : `FileUpload ${index}`}
+                                                    </label>
 
-                                                  <span className="filename">
-                                                    <Link
-                                                      to={items?.filePath}
-                                                      target="_blank"
-                                                      className="viewbtn"
-                                                    >
-                                                      View File
-                                                    </Link>
-                                                  </span>
-                                                </div>
-                                              );
-                                            }
-                                          )
-                                        ) : (
-                                          <label className="notfound">
-                                            File Not Found
-                                          </label>
-                                        )}</div>
+                                                    <span className="filename">
+                                                      <Link
+                                                        to={items?.filePath}
+                                                        target="_blank"
+                                                        className="viewbtn"
+                                                      >
+                                                        View File
+                                                      </Link>
+                                                    </span>
+                                                  </div>
+                                                );
+                                              }
+                                            )
+                                          ) : (
+                                            <label className="notfound">
+                                              File Not Found
+                                            </label>
+                                          )}
+                                        </div>
                                       </div>
                                       <div className="inner_form_new ">
                                         <label className="controlform">
@@ -2538,38 +1958,40 @@ const ImportOtherDepartmentViewDetails = ({
                                         <label className="controlform">
                                           Attachments
                                         </label>
-                                        <div>{items?.filesData?.length ? (
-                                          items?.filesData?.map(
-                                            (items, index) => {
-                                              return (
-                                                <div
-                                                  className="attachemt_form-bx mt-1"
-                                                  key={items.id}
-                                                >
-                                                  <label>
-                                                    {items?.fileName
-                                                      ? items?.fileName
-                                                      : `FileUpload ${index}`}
-                                                  </label>
+                                        <div>
+                                          {items?.filesData?.length ? (
+                                            items?.filesData?.map(
+                                              (items, index) => {
+                                                return (
+                                                  <div
+                                                    className="attachemt_form-bx mt-1"
+                                                    key={items.id}
+                                                  >
+                                                    <label>
+                                                      {items?.fileName
+                                                        ? items?.fileName
+                                                        : `FileUpload ${index}`}
+                                                    </label>
 
-                                                  <span className="filename">
-                                                    <Link
-                                                      to={items?.filePath}
-                                                      target="_blank"
-                                                      className="viewbtn"
-                                                    >
-                                                      View File
-                                                    </Link>
-                                                  </span>
-                                                </div>
-                                              );
-                                            }
-                                          )
-                                        ) : (
-                                          <label className="notfound">
-                                            File Not Found
-                                          </label>
-                                        )}</div>
+                                                    <span className="filename">
+                                                      <Link
+                                                        to={items?.filePath}
+                                                        target="_blank"
+                                                        className="viewbtn"
+                                                      >
+                                                        View File
+                                                      </Link>
+                                                    </span>
+                                                  </div>
+                                                );
+                                              }
+                                            )
+                                          ) : (
+                                            <label className="notfound">
+                                              File Not Found
+                                            </label>
+                                          )}
+                                        </div>
                                       </div>
                                       <div className="inner_form_new ">
                                         <label className="controlform">
@@ -3135,38 +2557,40 @@ const ImportOtherDepartmentViewDetails = ({
                                         <label className="controlform">
                                           Attachments
                                         </label>
-                                        <div>{items?.filesData?.length ? (
-                                          items?.filesData?.map(
-                                            (items, index) => {
-                                              return (
-                                                <div
-                                                  className="attachemt_form-bx mt-1"
-                                                  key={items.id}
-                                                >
-                                                  <label>
-                                                    {items?.fileName
-                                                      ? items?.fileName
-                                                      : `FileUpload ${index}`}
-                                                  </label>
+                                        <div>
+                                          {items?.filesData?.length ? (
+                                            items?.filesData?.map(
+                                              (items, index) => {
+                                                return (
+                                                  <div
+                                                    className="attachemt_form-bx mt-1"
+                                                    key={items.id}
+                                                  >
+                                                    <label>
+                                                      {items?.fileName
+                                                        ? items?.fileName
+                                                        : `FileUpload ${index}`}
+                                                    </label>
 
-                                                  <span className="filename">
-                                                    <Link
-                                                      to={items?.filePath}
-                                                      target="_blank"
-                                                      className="viewbtn"
-                                                    >
-                                                      View File
-                                                    </Link>
-                                                  </span>
-                                                </div>
-                                              );
-                                            }
-                                          )
-                                        ) : (
-                                          <label className="notfound">
-                                            File Not Found
-                                          </label>
-                                        )}</div>
+                                                    <span className="filename">
+                                                      <Link
+                                                        to={items?.filePath}
+                                                        target="_blank"
+                                                        className="viewbtn"
+                                                      >
+                                                        View File
+                                                      </Link>
+                                                    </span>
+                                                  </div>
+                                                );
+                                              }
+                                            )
+                                          ) : (
+                                            <label className="notfound">
+                                              File Not Found
+                                            </label>
+                                          )}
+                                        </div>
                                       </div>
                                       <div className="inner_form_new ">
                                         <label className="controlform">
@@ -3730,38 +3154,40 @@ const ImportOtherDepartmentViewDetails = ({
                                         <label className="controlform">
                                           Attachments
                                         </label>
-                                        <div>{items?.filesData?.length ? (
-                                          items?.filesData?.map(
-                                            (items, index) => {
-                                              return (
-                                                <div
-                                                  className="attachemt_form-bx mt-1"
-                                                  key={items.id}
-                                                >
-                                                  <label>
-                                                    {items?.fileName
-                                                      ? items?.fileName
-                                                      : `FileUpload ${index}`}
-                                                  </label>
+                                        <div>
+                                          {items?.filesData?.length ? (
+                                            items?.filesData?.map(
+                                              (items, index) => {
+                                                return (
+                                                  <div
+                                                    className="attachemt_form-bx mt-1"
+                                                    key={items.id}
+                                                  >
+                                                    <label>
+                                                      {items?.fileName
+                                                        ? items?.fileName
+                                                        : `FileUpload ${index}`}
+                                                    </label>
 
-                                                  <span className="filename">
-                                                    <Link
-                                                      to={items?.filePath}
-                                                      target="_blank"
-                                                      className="viewbtn"
-                                                    >
-                                                      View File
-                                                    </Link>
-                                                  </span>
-                                                </div>
-                                              );
-                                            }
-                                          )
-                                        ) : (
-                                          <label className="notfound">
-                                            File Not Found
-                                          </label>
-                                        )}</div>
+                                                    <span className="filename">
+                                                      <Link
+                                                        to={items?.filePath}
+                                                        target="_blank"
+                                                        className="viewbtn"
+                                                      >
+                                                        View File
+                                                      </Link>
+                                                    </span>
+                                                  </div>
+                                                );
+                                              }
+                                            )
+                                          ) : (
+                                            <label className="notfound">
+                                              File Not Found
+                                            </label>
+                                          )}
+                                        </div>
                                       </div>
                                       <div className="inner_form_new ">
                                         <label className="controlform">
@@ -4011,113 +3437,118 @@ const ImportOtherDepartmentViewDetails = ({
             ""
           )}
 
-
-{roleID >= 5 ? (
-              <>  
-          <h5
-            className={
-              sharefiletab
-                ? "section_top_subheading mt-1 py-3 btn-collapse_active cursorpointer"
-                : "section_top_subheading mt-1 py-3 cursorpointer"
-            }
-            onClick={() => setsharefiletab(!sharefiletab)}
-          >
-            Share File{" "}
-            <span className="counter-tab">{viewShareFile?.length}</span>
-            <span className="btn-collapse">
-              <i className="bi bi-caret-down-fill"></i>
-            </span>
-          </h5>
-          <div className={sharefiletab ? "customtab  mt-2" : "d-none"}>
-            {viewShareFile?.length ? (
-              viewShareFile?.map((items, index) => {
-                return (
-                  <div className="attachemt_form-bx" key={items.id}>
-                    <label>
-                      {/* {items.filename} */}
-                      {items?.fileName
-                        ? items?.fileName
-                        : `FileUpload ${index}`}
-                    </label>
-                    <div
-                      className={
-                        roleID == 2 || roleID == 3 ? "browse-btn" : "d-none"
-                      }
-                    >
-                      Browse{" "}
-                    </div>
-                    <span className="filename">
-                      <Link
-                        to={items?.filePath}
-                        target="_blank"
-                        className="viewbtn"
-                      >
-                        View File
-                      </Link>
-                    </span>
-                  </div>
-                );
-              })
-            ) : (
-              <label className="notfound">File Not Found</label>
-            )}
-          </div>
-          </>
-            ) : (
-              ""
-            )}
-            
-          <>
-              <h5 className={roleID > 3 ? "section_top_subheading mt-3 py-3 btn-collapse_active " : "d-none"}>
-                Application History
+          {roleID >= 5 ? (
+            <>
+              <h5
+                className={
+                  sharefiletab
+                    ? "section_top_subheading mt-1 py-3 btn-collapse_active cursorpointer"
+                    : "section_top_subheading mt-1 py-3 cursorpointer"
+                }
+                onClick={() => setsharefiletab(!sharefiletab)}
+              >
+                Share File{" "}
+                <span className="counter-tab">{viewShareFile?.length}</span>
+                <span className="btn-collapse">
+                  <i className="bi bi-caret-down-fill"></i>
+                </span>
               </h5>
-
-              <div className={roleID > 3 ? "tab-content" : "d-none"}>
-                <div className="table-responsive">
-                  <table className="table">
-                    <thead>
-                      <tr>
-                        <th scope="col">User Type</th>
-                        <th scope="col">User Name</th>
-                        <th scope="col">Receive Date</th>
-                        <th scope="col">Submit Date</th>
-                        <th scope="col">Turn Around Days</th>
-                      </tr>
-                    </thead>
-                    <tbody className="table-group-divider">
-                      {tatHistory?.length
-                        ? tatHistory?.map((item, index) => {
-                            return (
-                              <tr key={index}>
-                                <td>{item.roleName}</td>
-                                <td>{item.name ? item.name : "--"}</td>
-                                <td>
-                                  {item.createdDate
-                                    ? moment(item.createdDate).format(
-                                        "DD/MMM/yyyy hh:mm A"
-                                      )
-                                    : "--"}
-                                </td>
-                                <td>
-                                  {item.submittedDate
-                                    ? moment(item.submittedDate).format(
-                                        "DD/MMM/yyyy hh:mm A"
-                                      )
-                                    : "--"}
-                                </td>
-                                <td>
-                                  {item.workinG_DAYS}{" "}
-                                  {item.workinG_DAYS > 1 ? "Days" : "Day"}{" "}
-                                </td>
-                              </tr>
-                            );
-                          })
-                        : "No History Found"}
-                    </tbody>
-                  </table>
-                </div>
+              <div className={sharefiletab ? "customtab  mt-2" : "d-none"}>
+                {viewShareFile?.length ? (
+                  viewShareFile?.map((items, index) => {
+                    return (
+                      <div className="attachemt_form-bx" key={items.id}>
+                        <label>
+                          {/* {items.filename} */}
+                          {items?.fileName
+                            ? items?.fileName
+                            : `FileUpload ${index}`}
+                        </label>
+                        <div
+                          className={
+                            roleID == 2 || roleID == 3 ? "browse-btn" : "d-none"
+                          }
+                        >
+                          Browse{" "}
+                        </div>
+                        <span className="filename">
+                          <Link
+                            to={items?.filePath}
+                            target="_blank"
+                            className="viewbtn"
+                          >
+                            View File
+                          </Link>
+                        </span>
+                      </div>
+                    );
+                  })
+                ) : (
+                  <label className="notfound">File Not Found</label>
+                )}
               </div>
             </>
+          ) : (
+            ""
+          )}
+
+          <>
+            <h5
+              className={
+                roleID > 3
+                  ? "section_top_subheading mt-3 py-3 btn-collapse_active "
+                  : "d-none"
+              }
+            >
+              Application History
+            </h5>
+
+            <div className={roleID > 3 ? "tab-content" : "d-none"}>
+              <div className="table-responsive">
+                <table className="table">
+                  <thead>
+                    <tr>
+                      <th scope="col">User Type</th>
+                      <th scope="col">User Name</th>
+                      <th scope="col">Receive Date</th>
+                      <th scope="col">Submit Date</th>
+                      <th scope="col">Turn Around Days</th>
+                    </tr>
+                  </thead>
+                  <tbody className="table-group-divider">
+                    {tatHistory?.length
+                      ? tatHistory?.map((item, index) => {
+                          return (
+                            <tr key={index}>
+                              <td>{item.roleName}</td>
+                              <td>{item.name ? item.name : "--"}</td>
+                              <td>
+                                {item.createdDate
+                                  ? moment(item.createdDate).format(
+                                      "DD/MMM/yyyy hh:mm A"
+                                    )
+                                  : "--"}
+                              </td>
+                              <td>
+                                {item.submittedDate
+                                  ? moment(item.submittedDate).format(
+                                      "DD/MMM/yyyy hh:mm A"
+                                    )
+                                  : "--"}
+                              </td>
+                              <td>
+                                {item.workinG_DAYS}{" "}
+                                {item.workinG_DAYS > 1 ? "Days" : "Day"}{" "}
+                              </td>
+                            </tr>
+                          );
+                        })
+                      : "No History Found"}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </>
 
           <div className="form-footer mt-5 mb-3">
             <button type="button" className="login" onClick={handleFormClose}>
