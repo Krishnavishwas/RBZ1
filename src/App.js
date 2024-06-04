@@ -73,6 +73,7 @@ import CircularAllRequest from "./pages/CircularAllRequest";
 import CircularApproveRequest from "./pages/CircularApproveRequest";
 import CircularCancelledRequest from "./pages/CircularCancelledRequest";
 import Home from "./pages/Home";
+import INSDashboard from "./pages/INSDashboard";
 
 function App() {
   const loginToken = Storage.getItem("loginToken");
@@ -251,6 +252,8 @@ function App() {
               element={<FINVExpiringRequests />}
             />
             <Route path="/INSNewRequest" element={<INSNewRequest />} />
+            <Route path="/INSDashboard" element={<INSDashboard />} />
+
             <Route path="*" element={<NotFound />} />
           </>
         ) : (

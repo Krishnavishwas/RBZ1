@@ -459,12 +459,16 @@ const ImportOtherDepartmentEditDetails = ({
     setgetCompanyName(selectedOption);
   };
 
+  console.log("error", errors);
+
+  console.log("setapplicationstaus", applicationstaus)
+
   const closePopupHandle = () => {
     handleData();
     navigate("/ReferredDashboard");
     EditModalClose();
     setupdatepopup(false);
-    setapplicationstaus("0");
+    setapplicationstaus("0")
     setApplicationDetail({});
     setSupervisorRoleId("");
     setAssignUserID("");
@@ -845,6 +849,8 @@ const ImportOtherDepartmentEditDetails = ({
           doc.setProperties({
             title: `${applicationDetail?.rbzReferenceNumber}`,
           });
+          // var blob = doc.output("blob");
+          // window.open(URL.createObjectURL(blob), "_blank");
           var string = doc.output("dataurlnewwindow");
         },
       });
@@ -1727,7 +1733,7 @@ const ImportOtherDepartmentEditDetails = ({
                 setSubmitBtnLoader(false);
                 console.log("file Upload ", err);
               });
-
+          
             for (let i = 0; i < sharefile?.length; i++) {
               shareformData.append("files", sharefile[i].file);
               shareformData.append("fileInfoID", sharefile[i].fileInfoID);
@@ -9302,7 +9308,7 @@ const ImportOtherDepartmentEditDetails = ({
                 Close
               </button>
 
-              <div>
+              <div>                
                 {nextlevelvalue == 35 ? (
                   <button
                     className="btn btn-primary"
@@ -9347,11 +9353,11 @@ const ImportOtherDepartmentEditDetails = ({
                         roleID == 5) ||
                       SubmitBtnLoader == true ||
                       (applicationstaus == 0 && nextlevelvalue == "") ||
-                      asignnextLeveldata.Notes == "" ||
-                      asignnextLeveldata.Comment == ""
+                      ((asignnextLeveldata.Notes == "" || asignnextLeveldata.Comment =="")) 
                         ? true
                         : false
                     }
+                    
                   >
                     {(roleID == 8 &&
                       nextlevelvalue != "15" &&

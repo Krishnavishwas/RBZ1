@@ -7,11 +7,11 @@ import logo from "../rbz-logo.png";
 import Menubar from "./Menubar";
 
 const Sidebar = () => {
-  
   const navigate = useNavigate();
   const menuItemlocal = Menubar();
   const menucounts = Menubar();
   const [isToggled, setIsToggled] = useState(false);
+  // const [menuCount, setmenuCount] = useState(JSON.parse(menucounts?.menucounts));
   const getmenuindex = sessionStorage.getItem("menuindex");
   const [menuindex, setmenuindex] = useState(getmenuindex ? getmenuindex : "0");
   const menuItem = JSON.parse(menuItemlocal?.menuItemlocal);
@@ -19,6 +19,7 @@ const Sidebar = () => {
   const UserID = Storage.getItem("userID");
   const RoleId = Storage.getItem("roleIDs");
   const bankId = Storage.getItem("bankID");
+  const submenuname = Storage.getItem("submenuname");
   const menuname = Storage.getItem("menuname");
   const currentUrl = window.location.href;
   const urlParts = currentUrl.split("/");
@@ -42,7 +43,9 @@ const Sidebar = () => {
       })
       .then((res) => {
         if (res.data.responseCode == 200) {
+          // setmenuCount(res.data.responseData);
           Storage.removeItem("menucounter");
+
           Storage.setItem("menucounter", JSON.stringify(res.data.responseData));
           const menucounter = Storage.getItem("menucounter");
           menuCount = JSON.parse(menucounter);
@@ -76,18 +79,27 @@ const Sidebar = () => {
     const MenuLoadAuto = () => {
       const x = 100;
       const y = 100;
+
       const event = new MouseEvent("mousemove", {
         clientX: x,
         clientY: y,
       });
+
+      // Dispatch the event
       document.dispatchEvent(event);
     };
+
     const timer = setTimeout(MenuLoadAuto, 1000);
+
     return () => clearTimeout(timer);
   }, [menuCount, menuItem]);
 
   return (
     <aside id="sidebar" className="sidebar">
+      {/* <h6 className="quicklaunch">
+        <span>QUICK LAUNCH</span>
+      </h6> */}
+
       <div className="d-flex align-items-center justify-content-between sidebar-header">
         <Link to="/dashboard" className="logo d-flex align-items-center">
           <img src={logo} alt="" />
@@ -198,6 +210,7 @@ const Sidebar = () => {
                           <i className={"bi " + submenuitem.subMenuIcon}></i>{" "}
                           <p className="sm-hide">{submenuitem.subMenuName}</p>
                         </div>
+
                         {menuCount?.map((count) => {
                           if (submenuitem.id == count.id) {
                             return (

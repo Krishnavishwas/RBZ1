@@ -1617,24 +1617,24 @@ const ExportCircularsEditForm = ({
       newErrors.assignUserID = "User is required";
       valid = false;
     }
-    if (
+     if (
       AssignUserID == "" &&
-      (nextlevelvalue == "10") &&
-      roleID == 7 &&
-      checkSupervisor == true
+      roleID > 5 &&
+      checkSupervisor == true &&
+      recomdAnalyst != "121"
     ) {
       newErrors.assignUserID = "User is required";
       valid = false;
     }
-    // if (
-    //   SupervisorRoleId == "" &&
-    //   ( nextlevelvalue == "15") &&
-    //   roleID == 6 &&
-    //   checkSupervisor == true
-    // ) {
-    //   newErrors.SupervisorRoleId = "User is required";
-    //   valid = false;
-    // }
+  
+    if (
+      SupervisorRoleId == "" &&
+      ( nextlevelvalue == "15") &&
+      checkSupervisor == true
+    ) {
+      newErrors.SupervisorRoleId = "Role is required";
+      valid = false;
+    }
     // if (applicationDetail.directiveData.length == '0') {
     //   newErrors.directiveData = "Directive is required";
     //   valid = false;
@@ -1755,6 +1755,8 @@ const ExportCircularsEditForm = ({
   const directiveSelectedID = selectedDirectives?.map((res) => res.value);
   // select BankiId & Directived Id end
 
+  // errors.assignedTo &&
+  // !SupervisorRoleId
   // Code start for save form
   const HandleSubmit = async (e) => {
     // setSubmitBtnLoader(true);
@@ -1772,7 +1774,7 @@ const ExportCircularsEditForm = ({
           // Description: Description,
           // Content: applicationDetail.content,
           Content: Description,
-          ReleasingDate: releasingDate,
+          ReleasingDate: releasingDate ? releasingDate : applicationDetail.releasingDate,
           BankID: bankSelectedID?.join(),
           DirectiveID: directiveSelectedID?.join(),
           AssignedTo: (AssignUserID == "" || AssignUserID == null) &&
@@ -1811,7 +1813,7 @@ const ExportCircularsEditForm = ({
         })
         .then((res) => {
           if (res.data.responseCode === '200') {
-
+         
             const fileupload = userfiles.length > 0 ? userfiles : files;
             for (let i = 0; i < fileupload?.length; i++) { // Corrected loop condition
               formData.append("files", fileupload[i].file);
@@ -1819,7 +1821,7 @@ const ExportCircularsEditForm = ({
             }
             formData.append("CircularID", res.data.responseData.id);
             formData.append("circularActivityID", res.data.responseData.circularActivityID);
-            formData.append("DepartmentID", "2");
+            formData.append("DepartmentID", res.data.responseData.departmentID);
             formData.append("UserID", UserID.replace(/"/g, ""));
             axios.post(ImageAPI + 'File/UploadCircularDocs', formData)
               .then((res) => {
@@ -1962,7 +1964,7 @@ const ExportCircularsEditForm = ({
   };
 
 
-  console.log("releasingDate", releasingDate);
+ 
 
   return (
     <>
@@ -2069,7 +2071,7 @@ const ExportCircularsEditForm = ({
                             )}
                           </div>
                           : <div className="form-bx">
-                              <p className="showData mt-2 py-1" dangerouslySetInnerHTML={applicationDetail?.content ? { __html: applicationDetail.content } : { __html: "-" }}></p>
+                            <p className="showData mt-2 py-1" dangerouslySetInnerHTML={applicationDetail?.content ? { __html: applicationDetail.content } : { __html: "-" }}></p>
                           </div>}
                       </div>
                     </div>
@@ -2291,7 +2293,7 @@ const ExportCircularsEditForm = ({
                           showYearDropdown
                           minDate={new Date()}
                           dropdownMode="select"
-                          dateFormat="dd/MMM/yyyy"
+                          dateFormat="dd/MMMM/yyyy"
                           disabled={applicationDetail?.userID !== UserID.replace(/"/g, "") ? true : false}
                         />
                         {
@@ -2371,52 +2373,53 @@ const ExportCircularsEditForm = ({
                     ) : (
                       ""
                     )}
-                    <div
-                      class=
-                      {
-                        applicationDetail?.circularStatus == 0 ? "d-none" : "row"
-                      }
-                    >
-                      <div class="col-md-6">
-                        <div class="inner_form_new ">
-                          <label class="controlform">Assigned To Role</label>
-                          <div class="form-bx">
-                            <label>
-                              <input
-                                type="text"
-                                class=""
-                                disabled
-                                value={
-                                  applicationDetail?.assignedToRoleName
-                                    ? applicationDetail?.assignedToRoleName
-                                    : "N/A"
-                                }
-                              />
-                            </label>
+                    {applicationDetail?.userID !== UserID.replace(/"/g, "") ?
+                      <div
+                        class=
+                        {
+                          applicationDetail?.circularStatus == 0 ? "d-none" : "row"
+                        }
+                      >
+                        <div class="col-md-6">
+                          <div class="inner_form_new ">
+                            <label class="controlform">Assigned To Role</label>
+                            <div class="form-bx">
+                              <label>
+                                <input
+                                  type="text"
+                                  class=""
+                                  disabled
+                                  value={
+                                    applicationDetail?.assignedToRoleName
+                                      ? applicationDetail?.assignedToRoleName
+                                      : "N/A"
+                                  }
+                                />
+                              </label>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-md-6">
+                          <div class="inner_form_new-sm ">
+                            <label class="controlform-sm">Assigned To User</label>
+                            <div class="form-bx-sm">
+                              <label>
+                                <input
+                                  type="text"
+                                  class=""
+                                  disabled
+                                  value={
+                                    applicationDetail?.assignedToName
+                                      ? applicationDetail?.assignedToName
+                                      : "N/A"
+                                  }
+                                />
+                              </label>
+                            </div>
                           </div>
                         </div>
                       </div>
-                      <div class="col-md-6">
-                        <div class="inner_form_new-sm ">
-                          <label class="controlform-sm">Assigned To User</label>
-                          <div class="form-bx-sm">
-                            <label>
-                              <input
-                                type="text"
-                                class=""
-                                disabled
-                                value={
-                                  applicationDetail?.assignedToName
-                                    ? applicationDetail?.assignedToName
-                                    : "N/A"
-                                }
-                              />
-                            </label>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
+                      : " "}
                     {/* previous edit form end   */}
                     {/* upload file Data Start */}
 
@@ -5078,7 +5081,7 @@ const ExportCircularsEditForm = ({
                                                 handleUserRole(e);
                                               }}
                                               className={
-                                                errors.assignedTo &&
+                                                errors.SupervisorRoleId &&
                                                   !SupervisorRoleId
                                                   ? "error"
                                                   : ""
@@ -6277,7 +6280,7 @@ const ExportCircularsEditForm = ({
                                   {checkSupervisor == true && roleID == 8 ? (
                                     <>
                                       <div className="inner_form_new">
-                                        <label className="controlform">Role</label>
+                                        <label className="controlform">Role </label>
 
                                         <div className="form-bx">
                                           <label>
@@ -6289,7 +6292,7 @@ const ExportCircularsEditForm = ({
                                                 handleUserRole(e);
                                               }}
                                               className={
-                                                errors.assignedTo &&
+                                                errors.SupervisorRoleId &&
                                                   !SupervisorRoleId
                                                   ? "error"
                                                   : ""
@@ -7552,7 +7555,7 @@ const ExportCircularsEditForm = ({
                                 {checkSupervisor == true && roleID == 9 ? (
                                   <>
                                     <div className="inner_form_new">
-                                      <label className="controlform">Role</label>
+                                      <label className="controlform">Role </label>
 
                                       <div className="form-bx">
                                         <label>
@@ -7564,7 +7567,7 @@ const ExportCircularsEditForm = ({
                                               handleUserRole(e);
                                             }}
                                             className={
-                                              errors.assignedTo &&
+                                              errors.SupervisorRoleId &&
                                                 !SupervisorRoleId
                                                 ? "error"
                                                 : ""
@@ -7583,7 +7586,7 @@ const ExportCircularsEditForm = ({
                                             })}
                                           </select>
                                           <span className="sspan"></span>
-                                          {errors.assignedTo &&
+                                          {errors.SupervisorRoleId &&
                                             !SupervisorRoleId ? (
                                             <small className="errormsg">
                                               Role is required{" "}
@@ -8579,7 +8582,8 @@ const ExportCircularsEditForm = ({
                       (nextlevelvalue == "" && roleID == 7 && (applicationDetail.userID != UserID.replace(/"/g, ""))) ||
                       ((applicationstaus == "0" || applicationstaus == undefined) &&
                         (roleID == 8) && (nextlevelvalue == "") && (applicationDetail.userID != UserID.replace(/"/g, ""))) ||
-                      (SubmitBtnLoader == true) || (applicationDetail.roleID == 0 && checkSupervisor == false)
+                      (SubmitBtnLoader == true) || (nextlevelvalue == "" && checkSupervisor == false && (applicationstaus == "0" && roleID == 9)) ||
+                      (applicationstaus == "0" && roleID == 9)
                       ? true
                       : false
                     }

@@ -12,7 +12,7 @@ const Home = () => {
     <>
       <Helmet>
         <title>
-           {menuname != null ? menuname : "Home"}{" "}
+          {menuname != null ? menuname : "Home"}{" "}
           {submenuname != null ? submenuname : "All Dashboard"}
         </title>
       </Helmet>

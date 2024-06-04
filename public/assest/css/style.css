@@ -291,6 +291,12 @@ h6 {
 # Override some default Bootstrap stylings
 --------------------------------------------------------------*/
 /* Dropdown menus */
+
+.homemenu{
+  background: #42a5f5 !important;
+                  color: #fff !important;
+                  margin: 1px 0px
+}
 .dropdown-menu {
   border-radius: 4px;
   padding: 10px 0;
@@ -1135,7 +1141,7 @@ display: none;
 }
 
 .sidebar-nav .nav-item {
-  margin-bottom: -1px;
+  margin-bottom: 0px;
 }
 
 .sidebar-nav .nav-heading {
@@ -1166,6 +1172,7 @@ display: none;
 .sidebar-nav .nav-link.collapsed {
   color: #424242;
   background: #fff;
+  margin: 0px !important;
 }
 
 .sidebar-nav .nav-link.collapsed i {
@@ -3902,7 +3909,7 @@ margin-top: 20px;
   width: calc(100% - 140px);
   font-size: 10px;
   font-weight: normal;
-  text-transform: capitalize;
+  text-transform: none !important;
 }
 
 .tooltip-bx:after {

@@ -62,6 +62,17 @@ const AllDashboardTable = () => {
                   </a>
                 </li>
               )}
+
+              {/* {v.menuName === "Circular" && (
+                <li className="nav-item">
+                  <a
+                    className={tabDepId == "9" ? "nav-link active" : "nav-link"}
+                    onClick={() => setTabDepId("9")}
+                  >
+                    {v.menuName}
+                  </a>
+                </li>
+              )} */}
             </>
           );
         })}
@@ -81,6 +92,8 @@ const AllDashboardTable = () => {
         <FINDashboardTable />
       ) : tabDepId === "5" ? (
         <INSDashboardTable />
+      ) : tabDepId === "9" ? (
+        <ExportCircularsTable />
       ) : (
         ""
       )}

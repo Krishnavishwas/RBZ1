@@ -19,12 +19,13 @@ import Text from "@tiptap/extension-text";
 import TextAlign from "@tiptap/extension-text-align";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
+import { useNavigate } from "react-router-dom";
 /* Tiptp Editor Ends */
 
 import DirectiveMultiSelectComponent from './SearchUI/DirectiveMultiSelectComponent'
 import CustomBankMultiSelect from './SearchUI/CustomBankMultiSelect'
 const ExportCircularsCreateForm = () => {
-
+const navigate = useNavigate()
   // const purposeApplicationRef = useRef(null);
   const userID = Storage.getItem("userID");
   const bankID = Storage.getItem("bankID");
@@ -80,7 +81,7 @@ const ExportCircularsCreateForm = () => {
         console.log(err);
       });
   };
-  console.log("department------", exportForm.departmentValue);
+
   //--------   department api call end
   const changeHandelForm = (e) => {
     const { name, value } = e.target;
@@ -270,7 +271,8 @@ const ExportCircularsCreateForm = () => {
       Content: Description,
       DirectiveID: directiveSelectedID.join(),
       // Description: Description,
-      AssignedTo: checkAnalyst ? exportForm.analyst : userID.replace(/"/g, ""),
+      // AssignedTo: checkAnalyst ? exportForm.analyst : userID.replace(/"/g, ""),
+      AssignedTo: checkAnalyst ? exportForm.analyst : "",
       // AssignedToRoleID: checkAnalyst ? "6" : roleID,
       AssignedToRoleID: checkAnalyst ? parseInt(roleID) + 1 : checkAnalyst != true ? "0" : roleID,
       // FutureDate: futureDate,
@@ -292,7 +294,7 @@ const ExportCircularsCreateForm = () => {
             }
             formData.append("CircularReferenceNumber", res.data.responseData.circularReferenceNumber);
             formData.append("CircularID", res.data.responseData.id);
-            formData.append("DepartmentID", "2");
+            formData.append("DepartmentID", res.data.responseData.departmentID);
             formData.append("UserID", userID.replace(/"/g, ""));
             axios.post(ImageAPI + 'File/UploadCircularDocs', formData)
               .then((res) => {
@@ -303,6 +305,7 @@ const ExportCircularsCreateForm = () => {
               })
             toast.success(res.data.responseMessage, { autoClose: 2000 })
             setTimeout(() => {
+              navigate("/CircularDashboard");
               setToastDisplayed(false)
               setExportForm({
                 name: "",
@@ -791,8 +794,7 @@ const ExportCircularsCreateForm = () => {
     }
   }, [editor]);
 
-  console.log("checkAnalyst---------", checkAnalyst == false);
-  console.log("checkAnalyst", checkAnalyst);
+
   return (
     <>
       <form className="circular-form">

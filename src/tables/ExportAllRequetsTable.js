@@ -23,10 +23,7 @@ const ExportAllRequetsTable = () => {
   const rollId = Storage.getItem("roleIDs");
   const bankID = Storage.getItem("bankID");
   const PdftargetRef = useRef();
-  const [ExportsapproveRequests, setExportsapproveRequests] = useState([]);
-  const [ExportsapproveAllRequests, setExportsapproveAllRequests] = useState(
-    []
-  );
+  const [ExportsapproveRequests, setExportsapproveRequests] = useState([]);  
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [applicationDetail, setApplicationDetail] = useState({});
   const [applicationmessage, setApplicationmessage] = useState("");

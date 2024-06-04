@@ -7,6 +7,7 @@ import "primereact/resources/themes/lara-light-cyan/theme.css";
 import { InputText } from "primereact/inputtext";
 import "primeicons/primeicons.css";
 import moment from "moment";
+import NoSign from "../NoSign.png";
 import { APIURL } from "../constant";
 import { Storage } from "../login/Storagesetting";
 import { Link } from "react-router-dom";
@@ -22,6 +23,8 @@ const CircularsCancelledTable = () => {
     const rollId = Storage.getItem("roleIDs");
     const roleID = Storage.getItem("roleIDs");
     const roleName = Storage.getItem("roleName");
+    const PdfUsername = Storage.getItem("name");
+    const PdfRolename = Storage.getItem("roleName");
     const bankId = Storage.getItem("bankID")
     const PdftargetRef = useRef();
     const PdfPrivewRef = useRef();
@@ -126,7 +129,7 @@ const CircularsCancelledTable = () => {
                         e.target.style.color = "";
                     }}
                 ></i>
-                {roleID == 2 || roleID == 3 ?
+                {rowData.status == '135' || rowData.status == '125' ?
                     <button
                         type="button"
                         className="login "
@@ -273,6 +276,7 @@ const CircularsCancelledTable = () => {
             await axios
                 .post(APIURL + "Circular/GetCircularDataByUserID", {
                     UserID: useId.replace(/"/g, ""),
+                    RoleID: roleID,
                     Status:"25"
 
                 })
@@ -561,7 +565,7 @@ const CircularsCancelledTable = () => {
             });
     };
     // pdf code start
-    console.log("applicationDetail----", applicationDetail);
+
     const GetHandelDetailPDF = async (circularReferenceNumber) => {
         console.log("applicationDetail");
         setBtnLoader(true);
@@ -617,7 +621,7 @@ const CircularsCancelledTable = () => {
                     addHeader(doc);
 
                     doc.setProperties({
-                        title: `${applicationDetail?.circularReferenceNumber}`,
+                        title: `${circularReferenceNumber}`,
                     });
                     var blob = doc.output("blob");
                     window.open(URL.createObjectURL(blob), "_blank");
@@ -1030,16 +1034,14 @@ const CircularsCancelledTable = () => {
                                     </p>
                                 </td>
                             </tr>
-                            <tr>
-                                <td colSpan="2">&nbsp;</td>
-                            </tr>
+
                             <tr>
                                 <td
 
                                     style={{
                                         color: "#000",
                                         fontSize: "18px",
-                                        fontWeight: "600",
+                                        fontWeight: "800",
                                         letterSpacing: "0.01px",
                                     }}
                                 >
@@ -1061,16 +1063,14 @@ const CircularsCancelledTable = () => {
                                     ).format("DD MMMM YYYY")}
                                 </td>
                             </tr>
-                            <tr>
-                                <td colSpan="2">&nbsp;</td>
-                            </tr>
+
                             <tr>
                                 <td
 
                                     style={{
                                         color: "#000",
                                         fontSize: "18px",
-                                        fontWeight: "600",
+                                        fontWeight: "800",
                                         letterSpacing: "0.01px",
                                     }}
                                 >
@@ -1082,8 +1082,8 @@ const CircularsCancelledTable = () => {
                                         style={{
                                             color: "#000",
                                             fontSize: "18px",
-                                            fontWeight: "800",
-
+                                            fontWeight: "600",
+                                            padding: "0px 5px 0px 0px",
                                             marginBottom: "0px",
                                             letterSpacing: "0.01px",
                                         }}
@@ -1109,16 +1109,14 @@ const CircularsCancelledTable = () => {
                                     </p>
                                 </td>
                             </tr>
-                            <tr>
-                                <td colSpan="2">&nbsp;</td>
-                            </tr>
+
                             <tr>
                                 <td
 
                                     style={{
                                         color: "#000",
                                         fontSize: "18px",
-                                        fontWeight: "600",
+                                        fontWeight: "800",
                                         letterSpacing: "0.01px",
                                     }}
                                 >
@@ -1130,7 +1128,7 @@ const CircularsCancelledTable = () => {
                                         style={{
                                             color: "#000",
                                             fontSize: "18px",
-                                            fontWeight: "800",
+                                            fontWeight: "600",
 
                                             marginBottom: "0px",
                                             letterSpacing: "0.01px",
@@ -1140,16 +1138,14 @@ const CircularsCancelledTable = () => {
                                     </p>
                                 </td>
                             </tr>
-                            <tr>
-                                <td colSpan="2">&nbsp;</td>
-                            </tr>
+
                             <tr>
                                 <td
 
                                     style={{
                                         color: "#000",
                                         fontSize: "18px",
-                                        fontWeight: "600",
+                                        fontWeight: "800",
                                         letterSpacing: "0.01px",
                                     }}
                                 >
@@ -1161,7 +1157,7 @@ const CircularsCancelledTable = () => {
                                         style={{
                                             color: "#000",
                                             fontSize: "18px",
-                                            fontWeight: "800",
+                                            fontWeight: "600",
 
                                             marginBottom: "0px",
                                             letterSpacing: "0.01px",
@@ -1171,9 +1167,7 @@ const CircularsCancelledTable = () => {
                                     </p>
                                 </td>
                             </tr>
-                            <tr>
-                                <td colSpan="2">&nbsp;</td>
-                            </tr>
+
                             <tr>
                                 <td colSpan="2">
                                     <table width="100%">
@@ -1212,7 +1206,7 @@ const CircularsCancelledTable = () => {
                                                             />
                                                         </td>
                                                     </tr>
-                                                    <tr>
+                                                    {/* <tr>
                                                         <td
                                                             style={{
                                                                 color: "#000",
@@ -1253,20 +1247,18 @@ const CircularsCancelledTable = () => {
                                                                 })}
                                                             </div>
                                                         </td>
-                                                    </tr>
+                                                    </tr> */}
                                                 </table>
                                             </td>
                                         </tr>
-                                        <tr>
-                                            <td colSpan="2">&nbsp;</td>
-                                        </tr>
+
                                         <tr>
                                             <td
                                                 colSpan="2"
                                                 style={{
                                                     color: "#000",
                                                     fontSize: "18px",
-                                                    fontWeight: "400",
+                                                    fontWeight: "800",
                                                 }}
                                             >
                                                 <span
@@ -1284,7 +1276,7 @@ const CircularsCancelledTable = () => {
                                                     src={
                                                         applicationDetail?.getUserData?.filePath
                                                             ? applicationDetail?.getUserData.filePath
-                                                            : applicationDetail.filePath
+                                                            : NoSign
                                                     }
                                                     alt="Signature"
                                                     style={{
@@ -1305,7 +1297,9 @@ const CircularsCancelledTable = () => {
                                                         letterSpacing: "0.01px",
                                                     }}
                                                 >
-                                                    SHreya
+                                                    {PdfUsername
+                                                        ? PdfUsername?.replace(/"/g, "")
+                                                        : "N/A"}
                                                 </p>
                                                 <p
                                                     style={{
@@ -1318,7 +1312,9 @@ const CircularsCancelledTable = () => {
                                                         letterSpacing: "0.01px",
                                                     }}
                                                 >
-                                                    singh
+                                                    {PdfRolename
+                                                        ? PdfRolename?.replace(/"/g, "")
+                                                        : "N/A"}
                                                 </p>
                                                 <h3
                                                     style={{
@@ -1329,53 +1325,7 @@ const CircularsCancelledTable = () => {
                                                 >
                                                     EXCHANGE &nbsp; CONTROL
                                                 </h3>
-                                                <div
-                                                    style={{
-                                                        marginBottom: "0px",
-                                                        color: "#000",
-                                                        fontSize: "18px",
-                                                        fontWeight: "400",
-                                                        padding: "25px 0px 5px",
-                                                        lineHeight: "13px",
-                                                        display: "flex",
-                                                    }}
-                                                >
-                                                    {applicationDetail?.copiedResponses?.length >
-                                                        0 ? (
-                                                        <>
-                                                            <p
-                                                                style={{
-                                                                    marginBottom: "0px",
-                                                                    fontSize: "18px",
-                                                                    fontWeight: "400",
-                                                                    paddingRight: "10px",
-                                                                    letterSpacing: "0.01px",
-                                                                }}
-                                                            >
-                                                                CC:
-                                                            </p>
-                                                            <div>
-                                                                Bank
-                                                                {/* {selectedBanks.map((item) => {
-                                          return (
-                                            <p
-                                              style={{
-                                                marginBottom: "3px",
-                                                letterSpacing: "0.01px",
-                                                fontSize: "18px",
-                                                fontWeight: "400",
-                                              }}
-                                            >
-                                              {item.name}
-                                            </p>
-                                          );
-                                        })} */}
-                                                            </div>
-                                                        </>
-                                                    ) : (
-                                                        ""
-                                                    )}
-                                                </div>
+
                                             </td>
                                         </tr>
                                     </table>

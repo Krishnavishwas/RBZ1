@@ -10,6 +10,7 @@ import moment from "moment";
 import { APIURL } from "../constant";
 import { Storage } from "../login/Storagesetting";
 import { Link } from "react-router-dom";
+import NoSign from "../NoSign.png";
 import Modal from "react-bootstrap/Modal";
 import jsPDF from "jspdf";
 import logo from "../rbz_LOGO.png";
@@ -22,6 +23,8 @@ const CircularsApprovedTable = () => {
     const rollId = Storage.getItem("roleIDs");
     const roleID = Storage.getItem("roleIDs");
     const roleName = Storage.getItem("roleName");
+    const PdfUsername = Storage.getItem("name");
+    const PdfRolename = Storage.getItem("roleName");
     const bankId = Storage.getItem("bankID")
     const PdftargetRef = useRef();
     const PdfPrivewRef = useRef();
@@ -126,7 +129,7 @@ const CircularsApprovedTable = () => {
                         e.target.style.color = "";
                     }}
                 ></i>
-                {roleID == 2 || roleID == 3 ?
+                {rowData.status == '135' || rowData.status == '125' ?
                     <button
                         type="button"
                         className="login "
@@ -212,7 +215,7 @@ const CircularsApprovedTable = () => {
             </span>
         )
     }
-   
+
     const header = renderHeader();
 
     const EditModalClose = () => {
@@ -273,7 +276,8 @@ const CircularsApprovedTable = () => {
             await axios
                 .post(APIURL + "Circular/GetCircularDataByUserID", {
                     UserID: useId.replace(/"/g, ""),
-                    Status:"10"
+                    RoleID: roleID,
+                    Status: "10"
                 })
                 .then((res) => {
                     if (res.data.responseCode === "200") {
@@ -562,7 +566,7 @@ const CircularsApprovedTable = () => {
     // pdf code start
     console.log("applicationDetail----", applicationDetail);
     const GetHandelDetailPDF = async (circularReferenceNumber) => {
-        console.log("applicationDetail");
+        console.log("applicationDetail", circularReferenceNumber);
         setBtnLoader(true);
         setTimeout(() => {
             const doc = new jsPDF({
@@ -599,8 +603,8 @@ const CircularsApprovedTable = () => {
                     );
                 }
             };
-            doc.setFont("helvetica", "normal");
-            doc.setFontSize(3);
+            // doc.setFont("helvetica", "normal");
+            // doc.setFontSize(3);
             let docWidth = doc.internal.pageSize.getWidth();
             const refpdfview =
                 PdfPrivewsupervisorRef
@@ -616,7 +620,7 @@ const CircularsApprovedTable = () => {
                     addHeader(doc);
 
                     doc.setProperties({
-                        title: `${applicationDetail?.circularReferenceNumber}`,
+                        title: `${circularReferenceNumber}`,
                     });
                     var blob = doc.output("blob");
                     window.open(URL.createObjectURL(blob), "_blank");
@@ -808,7 +812,7 @@ const CircularsApprovedTable = () => {
             });
     };
 
-    console.log("data------", data);
+    console.log("data------", applicationDetail);
     return (
 
         <>
@@ -861,7 +865,7 @@ const CircularsApprovedTable = () => {
                             style={{ width: "220px" }}
 
                         ></Column>
-                       
+
                         <Column
                             field="subject"
                             header="Subject"
@@ -933,65 +937,6 @@ const CircularsApprovedTable = () => {
             </Modal>
             {/* circular view modal close */}
 
-            <Modal
-                show={showEditForm}
-                onHide={EditModalClose}
-                backdrop="static"
-                className="max-width-600"
-            >
-                <div className="application-box">
-                    <div className="login_inner">
-                        <div className="login_form ">
-                            <h5>
-                                <Modal.Header closeButton className="p-0">
-                                    <Modal.Title>
-                                        Edit Cricular Export Request --{" "}
-                                        <big>
-                                            {applicationDetail?.circularReferenceNumber
-                                                ? applicationDetail.circularReferenceNumber
-                                                : ""}
-                                        </big>
-                                    </Modal.Title>
-                                </Modal.Header>
-                            </h5>
-                        </div>
-                        <div className="login_form_panel">
-                            <Modal.Body className="p-0">
-                                <ExportCircularsEditForm
-                                    applicationDetail={applicationDetail}
-                                    setApplicationDetail={setApplicationDetail}
-                                    EditModalClose={EditModalClose}
-                                    setCricularRequests={setCricularRequests}
-                                    handleData={handleData}
-                                    showdataLoader={showdataLoader}
-                                    allcomment={allcomment}
-                                    GetRoleHandle={GetRoleHandle}
-                                    setapplicationstaus={setapplicationstaus}
-                                    applicationstaus={applicationstaus}
-                                    setnextlevelvalue={setnextlevelvalue}
-                                    nextlevelvalue={nextlevelvalue}
-                                    asignUser={asignUser}
-                                    userRole={userRole}
-                                    responceCount={responceCount}
-                                    setAsignUser={setAsignUser}
-                                    supervisorHangechange={supervisorHangechange}
-                                    supervisorHangechangeBankuser={
-                                        supervisorHangechangeBankuser
-                                    }
-                                    tatHistory={tatHistory}
-                                    AssignUserID={AssignUserID}
-                                    setAssignUserID={setAssignUserID}
-                                    Actiondata={Actiondata}
-                                    SupervisorRoleId={SupervisorRoleId}
-                                    supervisorHangechangeRole={supervisorHangechangeRole}
-                                    setSupervisorRoleId={setSupervisorRoleId}
-                                    noDataComment={noDataComment}
-                                />
-                            </Modal.Body>
-                        </div>
-                    </div>
-                </div>
-            </Modal>
 
             {/* pdf generate code start */}
             <div className="login_inner" style={{ display: "none" }}>
@@ -1029,16 +974,14 @@ const CircularsApprovedTable = () => {
                                     </p>
                                 </td>
                             </tr>
-                            <tr>
-                                <td colSpan="2">&nbsp;</td>
-                            </tr>
+
                             <tr>
                                 <td
 
                                     style={{
                                         color: "#000",
                                         fontSize: "18px",
-                                        fontWeight: "600",
+                                        fontWeight: "800",
                                         letterSpacing: "0.01px",
                                     }}
                                 >
@@ -1060,16 +1003,14 @@ const CircularsApprovedTable = () => {
                                     ).format("DD MMMM YYYY")}
                                 </td>
                             </tr>
-                            <tr>
-                                <td colSpan="2">&nbsp;</td>
-                            </tr>
+
                             <tr>
                                 <td
 
                                     style={{
                                         color: "#000",
                                         fontSize: "18px",
-                                        fontWeight: "600",
+                                        fontWeight: "800",
                                         letterSpacing: "0.01px",
                                     }}
                                 >
@@ -1081,7 +1022,7 @@ const CircularsApprovedTable = () => {
                                         style={{
                                             color: "#000",
                                             fontSize: "18px",
-                                            fontWeight: "800",
+                                            fontWeight: "600",
 
                                             marginBottom: "0px",
                                             letterSpacing: "0.01px",
@@ -1095,7 +1036,7 @@ const CircularsApprovedTable = () => {
                                                         letterSpacing: "0.01px",
                                                         fontSize: "18px",
                                                         fontWeight: "400",
-                                                        padding: "0px 5px",
+                                                        padding: "0px 5px 0px 0px",
                                                         color: "#000",
 
                                                     }}
@@ -1108,16 +1049,14 @@ const CircularsApprovedTable = () => {
                                     </p>
                                 </td>
                             </tr>
-                            <tr>
-                                <td colSpan="2">&nbsp;</td>
-                            </tr>
+
                             <tr>
                                 <td
 
                                     style={{
                                         color: "#000",
                                         fontSize: "18px",
-                                        fontWeight: "600",
+                                        fontWeight: "800",
                                         letterSpacing: "0.01px",
                                     }}
                                 >
@@ -1129,7 +1068,7 @@ const CircularsApprovedTable = () => {
                                         style={{
                                             color: "#000",
                                             fontSize: "18px",
-                                            fontWeight: "800",
+                                            fontWeight: "600",
 
                                             marginBottom: "0px",
                                             letterSpacing: "0.01px",
@@ -1139,16 +1078,14 @@ const CircularsApprovedTable = () => {
                                     </p>
                                 </td>
                             </tr>
-                            <tr>
-                                <td colSpan="2">&nbsp;</td>
-                            </tr>
+
                             <tr>
                                 <td
 
                                     style={{
                                         color: "#000",
                                         fontSize: "18px",
-                                        fontWeight: "600",
+                                        fontWeight: "800",
                                         letterSpacing: "0.01px",
                                     }}
                                 >
@@ -1160,7 +1097,7 @@ const CircularsApprovedTable = () => {
                                         style={{
                                             color: "#000",
                                             fontSize: "18px",
-                                            fontWeight: "800",
+                                            fontWeight: "600",
 
                                             marginBottom: "0px",
                                             letterSpacing: "0.01px",
@@ -1170,9 +1107,7 @@ const CircularsApprovedTable = () => {
                                     </p>
                                 </td>
                             </tr>
-                            <tr>
-                                <td colSpan="2">&nbsp;</td>
-                            </tr>
+
                             <tr>
                                 <td colSpan="2">
                                     <table width="100%">
@@ -1211,7 +1146,7 @@ const CircularsApprovedTable = () => {
                                                             />
                                                         </td>
                                                     </tr>
-                                                    <tr>
+                                                    {/* <tr>
                                                         <td
                                                             style={{
                                                                 color: "#000",
@@ -1252,20 +1187,18 @@ const CircularsApprovedTable = () => {
                                                                 })}
                                                             </div>
                                                         </td>
-                                                    </tr>
+                                                    </tr> */}
                                                 </table>
                                             </td>
                                         </tr>
-                                        <tr>
-                                            <td colSpan="2">&nbsp;</td>
-                                        </tr>
+
                                         <tr>
                                             <td
                                                 colSpan="2"
                                                 style={{
                                                     color: "#000",
                                                     fontSize: "18px",
-                                                    fontWeight: "400",
+                                                    fontWeight: "800",
                                                 }}
                                             >
                                                 <span
@@ -1283,7 +1216,7 @@ const CircularsApprovedTable = () => {
                                                     src={
                                                         applicationDetail?.getUserData?.filePath
                                                             ? applicationDetail?.getUserData.filePath
-                                                            : applicationDetail.filePath
+                                                            : NoSign
                                                     }
                                                     alt="Signature"
                                                     style={{
@@ -1304,7 +1237,9 @@ const CircularsApprovedTable = () => {
                                                         letterSpacing: "0.01px",
                                                     }}
                                                 >
-                                                    SHreya
+                                                    {PdfUsername
+                                                        ? PdfUsername?.replace(/"/g, "")
+                                                        : "N/A"}
                                                 </p>
                                                 <p
                                                     style={{
@@ -1317,7 +1252,9 @@ const CircularsApprovedTable = () => {
                                                         letterSpacing: "0.01px",
                                                     }}
                                                 >
-                                                    singh
+                                                    {PdfRolename
+                                                        ? PdfRolename?.replace(/"/g, "")
+                                                        : "N/A"}
                                                 </p>
                                                 <h3
                                                     style={{
@@ -1328,53 +1265,7 @@ const CircularsApprovedTable = () => {
                                                 >
                                                     EXCHANGE &nbsp; CONTROL
                                                 </h3>
-                                                <div
-                                                    style={{
-                                                        marginBottom: "0px",
-                                                        color: "#000",
-                                                        fontSize: "18px",
-                                                        fontWeight: "400",
-                                                        padding: "25px 0px 5px",
-                                                        lineHeight: "13px",
-                                                        display: "flex",
-                                                    }}
-                                                >
-                                                    {applicationDetail?.copiedResponses?.length >
-                                                        0 ? (
-                                                        <>
-                                                            <p
-                                                                style={{
-                                                                    marginBottom: "0px",
-                                                                    fontSize: "18px",
-                                                                    fontWeight: "400",
-                                                                    paddingRight: "10px",
-                                                                    letterSpacing: "0.01px",
-                                                                }}
-                                                            >
-                                                                CC:
-                                                            </p>
-                                                            <div>
-                                                                Bank
-                                                                {/* {selectedBanks.map((item) => {
-                                          return (
-                                            <p
-                                              style={{
-                                                marginBottom: "3px",
-                                                letterSpacing: "0.01px",
-                                                fontSize: "18px",
-                                                fontWeight: "400",
-                                              }}
-                                            >
-                                              {item.name}
-                                            </p>
-                                          );
-                                        })} */}
-                                                            </div>
-                                                        </>
-                                                    ) : (
-                                                        ""
-                                                    )}
-                                                </div>
+
                                             </td>
                                         </tr>
                                     </table>

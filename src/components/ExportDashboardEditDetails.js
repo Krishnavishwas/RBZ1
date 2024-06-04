@@ -264,7 +264,7 @@ const ExportDashboardEditDetails = ({
   const applicationNumber = applicationDetail.rbzReferenceNumber;
   const heading = "Updated Successfully!";
   const para = "Export request updated successfully!";
-  const heading1 = "Submit Successfully";
+  const heading1 = "Submitted Successfully";
   const para1 = "Application Successfully Submitted to Other Department!";
 
   const menuname = Storage.getItem("menuname");

@@ -7,6 +7,7 @@ import { APIURL } from "../constant";
 import Select from "react-select";
 import moment from "moment";
 import { toast } from "react-toastify";
+import SectorMultiselect from "./SearchUI/SectorMultiselect";
 
 const INSNewRequestForm = () => {
   const navigate = useNavigate();
@@ -99,13 +100,20 @@ const INSNewRequestForm = () => {
   const [inputValue, setInputValue] = useState("");
   const [options, setOptions] = useState([]);
   const [value, setValue] = useState("");
-  const [Equipment, setEquipment]= useState([])
-  const [Stationery, setStationery]= useState([])
-  const [Personnel, setPersonnel]= useState([])
-  const [Systems, setSystems]= useState([])
-  const [Organogram, setOrganogram]= useState([])
-  const [antimoney, setantimoney]= useState([])
-const [applicationsubID, setapplicationsubID]=useState([])
+  const [Equipment, setEquipment] = useState([]);
+  const [Stationery, setStationery] = useState([]);
+  const [Personnel, setPersonnel] = useState([]);
+  const [Systems, setSystems] = useState([]);
+  const [Organogram, setOrganogram] = useState([]);
+  const [antimoney, setantimoney] = useState([]);
+  const [applicationsubID, setapplicationsubID] = useState([]);
+  const [selectedEquipment, setselectedEquipment] = useState([]);
+  const [selectStationery, setsetselectStationery] = useState([])
+  const [selectPersonnel, setselectPersonnel] = useState([]);
+  const [selectSystems, setselectSystems] = useState([]);
+  const [selectOrganogram, setselectOrganogram] = useState([]);
+
+const [selectAntiMone, setselectAntiMone]= useState([])
 
   const changeHandelForm = (e) => {
     let newErrors = {};
@@ -203,44 +211,80 @@ const [applicationsubID, setapplicationsubID]=useState([])
     }
     setErrors(newErrors);
 
-    if(name == "applicationType"){
+    if (name == "applicationType") {
       axios
-      .post(APIURL + "Master/GetMasterINSDataBySubApplicationTypeID")
-      .then((res) => {
-        console.log("GetMasterINSDataBySubApplicationTypeID", res)
-        if (res.data.responseCode == "200") {
-          if(res.data.responseData[0].id == 50){ 
-           const eq =  res.data.responseData[0].subData?.map((item)=>{
-              return{
-                   label:item.name,
-                   value:item.id
-           }
-               
-                })
-                setEquipment(eq)
-          } if(res.data.responseData[1].id == 51){ 
-            setStationery(res.data.responseData[1].subData)
+        .post(APIURL + "Master/GetMasterINSDataBySubApplicationTypeID")
+        .then((res) => {
+          console.log("GetMasterINSDataBySubApplicationTypeID", res);
+          if (res.data.responseCode == "200") {
+            if (res.data.responseData[0].id == 50) {
+              const eq = res.data.responseData[0].subData?.map((item) => {
+                return {
+                  label: item.name,
+                  value: item.id,
+                };
+              });
+              setEquipment(eq);
+            }
+            if (res.data.responseData[1].id == 51) {
+              // setStationery(res.data.responseData[1].subData)
+
+              const eq = res.data.responseData[1].subData?.map((item) => {
+                return {
+                  label: item.name,
+                  value: item.id,
+                };
+              });
+              setStationery(eq);
+            }
+            if (res.data.responseData[2].id == 52) {
+              // setPersonnel(res.data.responseData[2].subData)
+
+              const eq = res.data.responseData[2].subData?.map((item) => {
+                return {
+                  label: item.name,
+                  value: item.id,
+                };
+              });
+              setPersonnel(eq);
+            }
+            if (res.data.responseData[3].id == 53) {
+              // setSystems(res.data.responseData[3].subData)
+              const eq = res.data.responseData[3].subData?.map((item) => {
+                return {
+                  label: item.name,
+                  value: item.id,
+                };
+              });
+              setSystems(eq);
+            }
+            if (res.data.responseData[4].id == 54) {
+              // setOrganogram(res.data.responseData[4].subData)
+              const eq = res.data.responseData[4].subData?.map((item) => {
+                return {
+                  label: item.name,
+                  value: item.id,
+                };
+              });
+              setOrganogram(eq);
+            }
+            if (res.data.responseData[5].id == 55) {
+              // setantimoney(res.data.responseData[5].subData)
+              const eq = res.data.responseData[5].subData?.map((item) => {
+                return {
+                  label: item.name,
+                  value: item.id,
+                };
+              });
+              setantimoney(eq);
+            }
+          } else {
           }
-          if(res.data.responseData[2].id == 52){ 
-            setPersonnel(res.data.responseData[2].subData)
-          }
-          if(res.data.responseData[3].id == 53){ 
-            setSystems(res.data.responseData[3].subData)
-          }
-          if(res.data.responseData[4].id == 54){ 
-            setOrganogram(res.data.responseData[4].subData)
-          }
-          if(res.data.responseData[5].id == 55){ 
-            setantimoney(res.data.responseData[5].subData)
-          }
-        } else {
-         
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-    } 
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
 
     if (name === "sector" && value !== "") {
       axios
@@ -310,7 +354,7 @@ const [applicationsubID, setapplicationsubID]=useState([])
           }
         });
     }
-  }; 
+  };
 
   const convertedRate = curRate * parseFloat(INSForm.amount);
 
@@ -354,21 +398,21 @@ const [applicationsubID, setapplicationsubID]=useState([])
     getRoleHandle();
   }, []);
 
-  const handleUsertype = (e) => {  
-    setregisterusertype(e.target.value);  
+  const handleUsertype = (e) => {
+    setregisterusertype(e.target.value);
   };
 
   const changeHandelApplicationSubTypeID = (e, id) => {
-    setapplicationsubID((prev) => { 
-      if (!prev.includes(id)) { 
+    setapplicationsubID((prev) => {
+      if (!prev.includes(id)) {
         return [...prev, id];
-      } else { 
+      } else {
         return prev;
       }
     });
-  }; 
+  };
 
-  console.log("applicationsubID", applicationsubID?.join(','))
+  console.log("applicationsubID", applicationsubID?.join(","));
 
   const handleAddMore = (e) => {
     setOtherfiles([...otherfiles, null]);
@@ -487,6 +531,16 @@ const [applicationsubID, setapplicationsubID]=useState([])
     setgetGovernment(selectedOption);
   };
 
+  const filtertin_bpn = companies?.find((company) => {
+    if (company.id === getCompanyName?.value) {
+      return {
+        getbpn: company.bpnNumber,
+        gettin: company.tinNumber,
+      };
+    }
+  });
+  console.log("filtertin_bpn", filtertin_bpn)
+  
   const handleInputChangecompany = (input) => {
     setInputValue(input);
     if (input.length >= 3) {
@@ -503,6 +557,7 @@ const [applicationsubID, setapplicationsubID]=useState([])
       setOptions([]);
     }
   };
+ 
 
   const handleInputChangeGovernment = (input) => {
     setInputValue(input);
@@ -533,6 +588,108 @@ const [applicationsubID, setapplicationsubID]=useState([])
 
   console.log("INSForm", INSForm);
 
+  const handleChangeEquipmen = (e) => {
+    const values = e;
+    setselectedEquipment(values);
+  };
+
+  const EquipmentData = selectedEquipment?.map((item) => {
+    return {
+      value: item.label,
+      ID: item.value,
+      ApplicationSubTypeID: 50
+    };
+  });
+
+  const StationeryData = selectStationery?.map((item) => {
+    return {
+      value: item.label,
+      ID: item.value,
+      ApplicationSubTypeID: 51
+    };
+  });
+
+  const PersonnelData = selectPersonnel?.map((item) => {
+    return {
+      value: item.label,
+      ID: item.value,
+      ApplicationSubTypeID: 52
+    };
+  });
+
+  const SystemsData = selectSystems?.map((item) => {
+    return {
+      value: item.label,
+      ID: item.value,
+      ApplicationSubTypeID: 53
+    };
+  });
+
+  const OrganogramData = selectOrganogram?.map((item) => {
+    return {
+      value: item.label,
+      ID: item.value,
+      ApplicationSubTypeID: 54
+    };
+  });
+
+  const AntiMoneData = selectAntiMone?.map((item) => {
+    return {
+      value: item.label,
+      ID: item.value,
+      ApplicationSubTypeID: 55
+    };
+  });
+ 
+
+  console.log("StationeryData---", StationeryData)
+  console.log("PersonnelData---", PersonnelData)
+
+  console.log("SystemsData---", SystemsData)
+
+  console.log("OrganogramData---", OrganogramData)
+  console.log("AntiMoneData---", AntiMoneData)
+
+
+const handleChangeStationery = (e)=>{
+const value = e
+setsetselectStationery(value)
+}
+
+const handleChangePersonnel = (e)=>{
+  const value = e
+  setselectPersonnel(value)
+  }
+
+  const handleChangeSystems = (e)=>{
+    const value = e
+    setselectSystems(value)
+    }
+   
+    const handleChangeOrganogram = (e)=>{
+      const value = e
+      setselectOrganogram(value)
+      }
+
+      const handleChangeAntiMone = (e)=>{
+        const value = e
+        setselectAntiMone(value)
+      }
+  console.log("selectedEquipment", selectedEquipment);
+  console.log("selectOrganogram", selectOrganogram)
+      console.log("selectAntiMone", selectAntiMone)
+
+    //   const createSubDataSubApplicationType = (equipment, stationery, personnel, systems, organogram, antiMone) => {
+        
+    //     const allSelections = [...equipment, ...stationery, ...personnel, ...systems, ...organogram, ...antiMone ];
+         
+    //     return allSelections.map(item => item.value).join(',');
+    // };
+
+    // const SubDataSubApplicationType = createSubDataSubApplicationType(selectedEquipment, setselectStationery, selectPersonnel, selectSystems, selectOrganogram, selectAntiMone);
+
+ 
+
   const HandleSubmit = async (e) => {
     e.preventDefault();
     const randomNumber = generateRandomNumber();
@@ -542,7 +699,7 @@ const [applicationsubID, setapplicationsubID]=useState([])
 
     if (validateForm()) {
       await axios
-        .post(APIURL + "FINApplication/CreateFINApplication", {
+        .post(APIURL + "InspectorateApplication/CreateInspectorateApplication", {
           UserID: UserID.replace(/"/g, ""),
           BankID: bankID,
           DepartmentID: "5",
@@ -559,22 +716,30 @@ const [applicationsubID, setapplicationsubID]=useState([])
               : "",
           ApplicantTypeID: registerusertype,
           AssignedToRoleID: roleID == 2 ? 3 : selectuserRole,
-          ApplicationTypeID: INSForm.applicationType, 
+          ApplicationTypeID: INSForm.applicationType,
           BeneficiaryName: INSForm.BeneficiaryName,
           BeneficiaryCountry: INSForm.baneficiaryCountry,
-          BPNCode:
-            registerusertype === "1" && bankID !== "" ? INSForm.BPNCode : "",
-          TINNumber:
-            registerusertype === "1" && bankID !== "" ? INSForm.TINNumber : "",
+          BPNCode: registerusertype === "1" && bankID !== ""
+          ? filtertin_bpn?.bpnNumber?.toUpperCase() : "",
+          TINNumber:registerusertype === "1" && bankID !== ""
+          ? filtertin_bpn?.tinNumber?.toUpperCase()
+          : "",
           Currency: INSForm.currency,
           Amount: INSForm.amount,
           Rate: curRate,
           USDEquivalent: convertedRate.toFixed(2),
           Sector: INSForm.sector,
           SubSector: INSForm.subsector,
+          ApplicantType:registerusertype,
           ApplicantComment: INSForm.applicantComments,
           // ApplicationSubTypeID: INSForm.applicationSubType,
-          ApplicationSubTypeID:applicationsubID?.join(','),
+          EquipmentData:EquipmentData,
+          StationeryData:StationeryData,
+          PersonnelData:PersonnelData,
+          SystemsData:SystemsData,
+          Structure_OrganogramData:OrganogramData,
+          Anti_Money_laundering_CombatingData:AntiMoneData,
+          ApplicationSubTypeID: applicationsubID?.join(","), 
           AssignedTo:
             checkSupervisor === true
               ? INSForm.bankSupervisor
@@ -651,7 +816,7 @@ const [applicationsubID, setapplicationsubID]=useState([])
       }
       setToastDisplayed(true);
     }
-  };
+  };  
 
   const ResetHandleData = () => {
     setgetCompanyName(null);
@@ -844,9 +1009,14 @@ const [applicationsubID, setapplicationsubID]=useState([])
                       changeHandelForm(e);
                     }}
                     placeholder="TIN Number"
-                    value={INSForm.TINNumber?.trim()}
+                    value={
+                      filtertin_bpn && filtertin_bpn.tinNumber !== null
+                        ? filtertin_bpn?.tinNumber
+                        : "TIN Number"
+                    }
+                    
                     className={
-                      errors.BPNCode ? "error text-uppercase" : "text-uppercase"
+                      errors.TINNumber ? "error text-uppercase" : "text-uppercase"
                     }
                   />
                   <span className="sspan"></span>
@@ -869,7 +1039,11 @@ const [applicationsubID, setapplicationsubID]=useState([])
                     onChange={(e) => {
                       changeHandelForm(e);
                     }}
-                    value={INSForm.BPNCode?.trim()}
+                    value={
+                      filtertin_bpn && filtertin_bpn.bpnNumber !== null
+                        ? filtertin_bpn?.bpnNumber
+                        : "BPN Code"
+                    }
                     placeholder="BPN Code"
                     className={
                       errors.BPNCode ? "error text-uppercase" : "text-uppercase"
@@ -973,10 +1147,10 @@ const [applicationsubID, setapplicationsubID]=useState([])
                 }
               >
                 <option value="">Select Application Type</option>
-                {applicationType?.map((item, ind) => { 
+                {applicationType?.map((item, ind) => {
                   return (
                     <option key={item.id} value={item.id}>
-                      {item.name} 
+                      {item.name}
                     </option>
                   );
                 })}
@@ -988,7 +1162,10 @@ const [applicationsubID, setapplicationsubID]=useState([])
                 ""
               )}
             </label>
-            <small className="informgs" style={{position:"absolute", bottom:"-10px"}}>
+            <small
+              className="informgs"
+              style={{ position: "absolute", bottom: "-10px" }}
+            >
               Only government agencies can submit direct application to
               Inspectorate department.
             </small>
@@ -1033,164 +1210,245 @@ const [applicationsubID, setapplicationsubID]=useState([])
           ""
         )}
 
-        {INSForm.applicationType == "53" ? <>
-        <div className="inner_form_new ">
-            <label className="controlform">Equipment</label>
-            <div className="form-bx">
-              <label>
-                <select name="applicationsubID"  onChange={(e) => {
-                    changeHandelApplicationSubTypeID(e, 50);
-                  }}>
-                  <option value="">Select Equipment</option> 
-                  {Equipment?.map((item, ind) => {
-                    return (
-                      <option key={item.id} value={item.id}>
-                        {item.label}
-                      </option>
-                    );
-                  })}
-                </select>
-                <span className="sspan"></span>
-                {errors.Equipment && INSForm.Equipment === "" ? (
-                  <small className="errormsg">{errors.Equipment}</small>
-                ) : (
-                  ""
-                )}
-              </label>
-            </div>
-          </div>
+        {INSForm.applicationType == "53" ? (
+          <>
+            <div className="inner_form_new align-items-center ">
+              <label className="controlform">Equipment</label>
+              <div className="cccto">
+                <div className="flex justify-content-center multiSelect">
+                   
+                  <SectorMultiselect
+                    key="multyselectprinciple"
+                    options={Equipment}
+                    onChange={(e) => handleChangeEquipmen(e)}
+                    value={selectedEquipment}
+                    isSelectAll={true}
+                    menuPlacement={"bottom"}
+                  />
 
-          <div className="inner_form_new ">
-            <label className="controlform">Stationery</label>
-            <div className="form-bx">
-              <label>
-                <select name="applicationsubID"  onChange={(e) => {
-                    changeHandelApplicationSubTypeID(e, 51);
-                  }} >
-                  <option value="" selected>None Select</option>
-                  {Stationery?.map((item, ind) => {
-                    return (
-                      <option key={item.id} value={item.id}>
-                        {item.name}
-                      </option>
-                    );
-                  })}
-                </select>
-                <span className="sspan"></span>
-                {errors.Stationery && INSForm.Stationery === "" ? (
-                  <small className="errormsg">{errors.Stationery}</small>
-                ) : (
-                  ""
-                )}
-              </label>
+                  <span className="sspan"></span>
+                  {errors.Equipment && INSForm.Equipment === "" ? (
+                    <small className="errormsg">{errors.Equipment}</small>
+                  ) : (
+                    ""
+                  )}
+                </div>
+              </div>
             </div>
-          </div>
 
-          <div className="inner_form_new ">
-            <label className="controlform">Personnel</label>
-            <div className="form-bx">
-              <label>
-                <select name="applicationsubID"  onChange={(e) => {
-                    changeHandelApplicationSubTypeID(e, 52);
-                  }}>
-                  <option value="" selected>None Select</option>
-                  {Personnel?.map((item, ind) => {
-                    return (
-                      <option key={item.id} value={item.id}>
-                        {item.name}
-                      </option>
-                    );
-                  })}
-                </select>
-                <span className="sspan"></span>
-                {errors.Personnel && INSForm.Personnel === "" ? (
-                  <small className="errormsg">{errors.Personnel}</small>
-                ) : (
-                  ""
-                )}
-              </label>
+            <div className="inner_form_new align-items-center ">
+              <label className="controlform">Stationery</label>
+              <div className="cccto">
+                <div className="flex justify-content-center multiSelect">
+                  {/* <select
+                    name="applicationsubID"
+                    onChange={(e) => {
+                      changeHandelApplicationSubTypeID(e, 51);
+                    }}
+                  >
+                    <option value="" selected>
+                      None Select
+                    </option>
+                    {Stationery?.map((item, ind) => {
+                      return (
+                        <option key={item.id} value={item.id}>
+                          {item.name}
+                        </option>
+                      );
+                    })}
+                  </select> */}
+                   <SectorMultiselect
+                    key="multyselectprinciple"
+                    options={Stationery}
+                    onChange={(e) => handleChangeStationery(e)}
+                    value={selectStationery}
+                    isSelectAll={true}
+                    menuPlacement={"bottom"}
+                  />
+
+                  <span className="sspan"></span>
+                  {errors.selectStationery && INSForm.selectStationery === "" ? (
+                    <small className="errormsg">{errors.selectStationery}</small>
+                  ) : (
+                    ""
+                  )}
+                  
+                </div>
+              </div>
             </div>
-          </div>
 
-          <div className="inner_form_new ">
-            <label className="controlform">Systems</label>
-            <div className="form-bx">
-              <label>
-                <select  name="applicationsubID" onChange={(e) => {
-                    changeHandelApplicationSubTypeID(e, 53);
-                  }}>
-                  <option value="" selected>None Select</option>
-                  {Systems?.map((item, ind) => {
-                    return (
-                      <option key={item.id} value={item.id}>
-                        {item.name}
-                      </option>
-                    );
-                  })}
-                </select>
-                <span className="sspan"></span>
-                {errors.Systems && INSForm.Systems === "" ? (
-                  <small className="errormsg">{errors.Systems}</small>
-                ) : (
-                  ""
-                )}
-              </label>
+            <div className="inner_form_new align-items-center">
+              <label className="controlform">Personnel</label>
+              <div className=" cccto">
+                          <div className="flex justify-content-center multiSelect">
+                  {/* <select
+                    name="applicationsubID"
+                    onChange={(e) => {
+                      changeHandelApplicationSubTypeID(e, 52);
+                    }}
+                  >
+                    <option value="" selected>
+                      None Select
+                    </option>
+                    {Personnel?.map((item, ind) => {
+                      return (
+                        <option key={item.id} value={item.id}>
+                          {item.name}
+                        </option>
+                      );
+                    })}
+                  </select> */}
+
+<SectorMultiselect
+                    key="multyselectprinciple"
+                    options={Personnel}
+                    onChange={(e) => handleChangePersonnel(e)}
+                    value={selectPersonnel}
+                    isSelectAll={true}
+                    menuPlacement={"bottom"}
+                  />
+
+                  <span className="sspan"></span>
+                  {errors.Personnel && INSForm.Personnel === "" ? (
+                    <small className="errormsg">{errors.Personnel}</small>
+                  ) : (
+                    ""
+                  )}
+                </div>
+              </div>
             </div>
-          </div>
 
-          <div className="inner_form_new ">
-            <label className="controlform">Structure/Organogram</label>
-            <div className="form-bx">
-              <label>
-                <select name="applicationsubID"  onChange={(e) => {
-                    changeHandelApplicationSubTypeID(e, 54);
-                  }}>
-                  <option value="" selected>None Selected</option>
-                  {Organogram?.map((item, ind) => {
-                    return (
-                      <option key={item.id} value={item.id}>
-                        {item.name}
-                      </option>
-                    );
-                  })}
-                </select>
-                <span className="sspan"></span>
-                {errors.Organogram && INSForm.Organogram === "" ? (
-                  <small className="errormsg">{errors.Organogram}</small>
-                ) : (
-                  ""
-                )}
-              </label>
+            <div className="inner_form_new align-items-center">
+              <label className="controlform">Systems</label>
+              <div className=" cccto">
+                          <div className="flex justify-content-center multiSelect">
+                  {/* <select
+                    name="applicationsubID"
+                    onChange={(e) => {
+                      changeHandelApplicationSubTypeID(e, 53);
+                    }}
+                  >
+                    <option value="" selected>
+                      None Select
+                    </option>
+                    {Systems?.map((item, ind) => {
+                      return (
+                        <option key={item.id} value={item.id}>
+                          {item.name}
+                        </option>
+                      );
+                    })}
+                  </select> */}
+
+
+
+<SectorMultiselect
+                    key="multyselectprinciple"
+                    options={Systems}
+                    onChange={(e) => handleChangeSystems(e)}
+                    value={selectSystems}
+                    isSelectAll={true}
+                    menuPlacement={"bottom"}
+                  />
+
+                  <span className="sspan"></span>
+                  {errors.Systems && INSForm.Systems === "" ? (
+                    <small className="errormsg">{errors.Systems}</small>
+                  ) : (
+                    ""
+                  )}
+                </div>
+              </div>
             </div>
-          </div>
 
-          <div className="inner_form_new ">
-            <label className="controlform">Anti-Money laundering and Combating the Financing of Terrorism program and procedures</label>
-            <div className="form-bx">
-              <label>
-                <select name="applicationsubID"  onChange={(e) => {
-                    changeHandelApplicationSubTypeID(e, 55);
-                  }}>
-                  <option value="" selected>None Selected</option>
-                  {antimoney?.map((item, ind) => {
-                    return (
-                      <option key={item.id} value={item.id}>
-                        {item.name}
-                      </option>
-                    );
-                  })}
-                </select>
-                <span className="sspan"></span>
-                {errors.antymony && INSForm.antymony === "" ? (
-                  <small className="errormsg">{errors.antymony}</small>
-                ) : (
-                  ""
-                )}
-              </label>
+            <div className="inner_form_new ">
+              <label className="controlform">Structure/Organogram</label>
+              <div className=" cccto">
+                          <div className="flex justify-content-center multiSelect">
+                  {/* <select
+                    name="applicationsubID"
+                    onChange={(e) => {
+                      changeHandelApplicationSubTypeID(e, 54);
+                    }}
+                  >
+                    <option value="" selected>
+                      None Selected
+                    </option>
+                    {Organogram?.map((item, ind) => {
+                      return (
+                        <option key={item.id} value={item.id}>
+                          {item.name}
+                        </option>
+                      );
+                    })}
+                  </select> */}
+
+<SectorMultiselect
+                    key="multyselectprinciple"
+                    options={Organogram}
+                    onChange={(e) => handleChangeOrganogram(e)}
+                    value={selectOrganogram}
+                    isSelectAll={true}
+                    menuPlacement={"bottom"}
+                  />
+
+                  <span className="sspan"></span>
+                  {errors.Organogram && INSForm.Organogram === "" ? (
+                    <small className="errormsg">{errors.Organogram}</small>
+                  ) : (
+                    ""
+                  )}
+                </div>
+              </div>
             </div>
-          </div>
 
-        </> : ""}
+            <div className="inner_form_new align-items-center ">
+              <label className="controlform">
+                Anti-Money laundering and Combating the Financing of Terrorism
+                program and procedures
+              </label>
+              <div className=" cccto">
+                          <div className="flex justify-content-center multiSelect">
+                  {/* <select
+                    name="applicationsubID"
+                    onChange={(e) => {
+                      changeHandelApplicationSubTypeID(e, 55);
+                    }}
+                  >
+                    <option value="" selected>
+                      None Selected
+                    </option>
+                    {antimoney?.map((item, ind) => {
+                      return (
+                        <option key={item.id} value={item.id}>
+                          {item.name}
+                        </option>
+                      );
+                    })}
+                  </select> */}
+
+<SectorMultiselect
+                    key="multyselectprinciple"
+                    options={antimoney}
+                    onChange={(e) => handleChangeAntiMone(e)}
+                    value={selectAntiMone}
+                    isSelectAll={true}
+                    menuPlacement={"bottom"}
+                  />
+
+                  <span className="sspan"></span>
+                  {errors.antymony && INSForm.antymony === "" ? (
+                    <small className="errormsg">{errors.antymony}</small>
+                  ) : (
+                    ""
+                  )}
+                </div>
+              </div>
+            </div>
+          </>
+        ) : (
+          ""
+        )}
 
         {/* end form-bx  */}
 
@@ -1208,7 +1466,10 @@ const [applicationsubID, setapplicationsubID]=useState([])
               />
               <span className="sspan"></span>
             </label>
-            <small className="informgs" style={{position:"absolute", bottom:"-10px"}}>
+            <small
+              className="informgs"
+              style={{ position: "absolute", bottom: "-10px" }}
+            >
               This information need to submit only when government agencies are
               submitting the application.
             </small>
