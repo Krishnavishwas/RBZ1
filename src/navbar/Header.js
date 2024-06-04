@@ -18,8 +18,7 @@ const Header = () => {
   const LoginToken = Storage.getItem("loginToken");
   const RoleID = Storage.getItem("roleIDs");
   // const navigation = useNavigate();
-  const [userRole, setUserRole] = useState([]);
-  const userId = Storage.getItem("userID");
+  const [userRole, setUserRole] = useState([]); 
 
   const roleName = Storage.getItem("roleName");
 
@@ -48,10 +47,7 @@ const Header = () => {
       UserID: "",
       RoleID: "",
       ActingUserID: "",
-      ActingRoleID: "",
-      // RoleStartDate: startDate,
-      // RoleEndDate: endDate,
-      // Reason: "",
+      ActingRoleID: "", 
     },
   ]);
   const [exportuser, setexportuser] = useState([]);
@@ -60,36 +56,13 @@ const Header = () => {
   const [inspecuser, setinspecuser] = useState([]);
   const [actionHistory, setactionHistory] = useState([])
 
-  const finalActiondata = allactingdata?.map((v) => {
-    return {
-      DepartmentID: v.actingId,
-      UserID: v.UserID,
-      RoleID: v.RoleID,
-      ActingUserID: v.ActingUserID,
-      ActingRoleID: v.ActingRoleID,
-      RoleStartDate: startDate,
-      RoleEndDate: endDate,
-      Reason: reasontext,
-    };
-  });
-
-  console.log("finalActiondata", finalActiondata)
- 
-
-  // const handleToggle = () => {
-  //   setIsToggled((prevState) => !prevState);
-  //   if (!isToggled) {
-  //     document.body.classList.add("toggle-sidebar");
-  //   } else {
-  //     document.body.classList.remove("toggle-sidebar");
-  //   }
-  // };
+   
 
   const hanldeSetactiondata = (e, index, id) => {
     const name = e.target.name;
     const value = e.target.value;
 
-    if (name === "users" && value != "") {
+    if (name === "users" && value !== "") {
       const { userID, roleID } = JSON.parse(value);
 
       setallactingdata((prevState) => {
@@ -107,23 +80,38 @@ const Header = () => {
     } else {
       setallactingdata((prevState) => {
         const updatedList = [...prevState];
-        const removeIndex = updatedList.findIndex(
+        const removeIndex = updatedList?.findIndex(
           (item) => item.actingId === id
         );
         if (removeIndex !== -1) {
           updatedList.splice(removeIndex, 1);
         }
-        return updatedList;
+        return updatedList.filter(item => item !== null);  
       });
     }
   };
 
+  const finalActiondata = allactingdata
+    .filter(v => v && v.UserID !== "")  
+    .map(v => {
+      return {
+        DepartmentID: v.actingId,
+        UserID: v.UserID,
+        RoleID: v.RoleID,
+        ActingUserID: v.ActingUserID,
+        ActingRoleID: v.ActingRoleID,
+        RoleStartDate: startDate,
+        RoleEndDate: endDate,
+        Reason: reasontext || "",  
+      };
+    });
+ 
+
   const handleActionghistor=()=>{
     axios.post(APIURL + "User/GetActingRoleByUserID",{
-      UserID:userId.replace(/"/g, "")
+      UserID:UserID.replace(/"/g, "")
     })
-    .then((res)=>{
-      console.log("getactiong history",res)
+    .then((res)=>{ 
       if(res.data.responseCode == "200"){
         setactionHistory(res.data.responseData)
       }
@@ -135,17 +123,14 @@ const Header = () => {
 
   useEffect(()=>{
     handleActionghistor()
-  },[])
-
-  console.log("allactingdata", allactingdata);
+  },[]) 
 
   const UserRole = async () => {
     await axios
       .post(APIURL + "User/GetRolesByUserID", {
-        UserID: userId?.replace(/"/g, ""),
+        UserID: UserID?.replace(/"/g, ""),
       })
-      .then((res) => {
-        // console.log("res----------SHREYA", res.data.responseData);
+      .then((res) => { 
         setUserRole(res.data.responseData);
       });
   };
@@ -203,8 +188,7 @@ const Header = () => {
         BankID: bankId,
       })
       .then((res) => {
-        if (res.data.responseCode == 200) {
-          console.log("count", res);
+        if (res.data.responseCode == 200) { 
           // setmenuCount(res.data.responseData);
 
           Storage.setItem("menucounter", JSON.stringify(res.data.responseData));
@@ -237,7 +221,7 @@ const Header = () => {
       .post(APIURL + "User/GetUsersByRoleID", {
         RoleID: roleIDs - 1,
         DepartmentID: 2,
-        UserID: userId?.replace(/"/g, ""),
+        UserID: UserID?.replace(/"/g, ""),
       })
       .then((res) => {
         if (res.data.responseCode == 200) {
@@ -251,7 +235,7 @@ const Header = () => {
       .post(APIURL + "User/GetUsersByRoleID", {
         RoleID: roleIDs - 1,
         DepartmentID: 3,
-        UserID: userId?.replace(/"/g, ""),
+        UserID: UserID?.replace(/"/g, ""),
       })
       .then((res) => {
         if (res.data.responseCode == 200) {
@@ -265,7 +249,7 @@ const Header = () => {
       .post(APIURL + "User/GetUsersByRoleID", {
         RoleID: roleIDs - 1,
         DepartmentID: 4,
-        UserID: userId?.replace(/"/g, ""),
+        UserID: UserID?.replace(/"/g, ""),
       })
       .then((res) => {
         if (res.data.responseCode == 200) {
@@ -279,7 +263,7 @@ const Header = () => {
       .post(APIURL + "User/GetUsersByRoleID", {
         RoleID: roleIDs - 1,
         DepartmentID: 5,
-        UserID: userId?.replace(/"/g, ""),
+        UserID: UserID?.replace(/"/g, ""),
       })
       .then((res) => { 
         if (res.data.responseCode == 200) {
@@ -296,8 +280,7 @@ const Header = () => {
         UserID: UserID.replace(/"/g, ""),
         RoleID: RoleId.replace(/"/g, ""),
       })
-      .then((res) => {
-        console.log("---11", res);
+      .then((res) => { 
         if (res.data.responseCode == 200) {
           setactinglist(res.data.responseData);
         } else {
@@ -312,8 +295,7 @@ const Header = () => {
   const handleActingRole = async () => {
     axios
       .post(APIURL + "User/AddActingRole", finalActiondata)
-      .then((res) => {
-        console.log(res);
+      .then((res) => { 
         if(res.data.responseCode == 200){
           toast.success(res.data.responseMessage);
           EditModalClose();
@@ -325,7 +307,8 @@ const Header = () => {
             RoleID: "",
             ActingUserID: "",
             ActingRoleID: "", 
-          }])
+          }]) 
+          handleActionghistor()
         }else{
           toast.warning(res.data.responseMessage);
         }
@@ -354,6 +337,20 @@ const Header = () => {
       ActingRoleID: "", 
     }]) 
   };
+
+const handleChangeActionStatuschange = (id, statuscode)=>{
+  axios.post(APIURL + "User/UpdateActingRoleStatus",{
+    ID:id,
+    Status: statuscode == 1 ? "0" : "1"
+  })
+  .then((res)=>{
+    handleActionghistor() 
+    toast.success(res.data.responseMessage)
+  })
+  .catch((err)=>{
+    console.log(err)
+  })
+}
 
   useEffect(() => {
     const menucounter = Storage.getItem("menucounter");
@@ -387,8 +384,8 @@ const Header = () => {
 
         <div className="pagetitle">
           <h1>
-            <span>{menuname ? menuname : "Exports"}</span>{" "}
-            {submenuname ? submenuname : "Dashboard"}{" "}
+            <span>{menuname ? menuname : "Home"}</span>{" "}
+            {submenuname ? submenuname : "All Dashboard"}{" "}
           </h1>
         </div>
 
@@ -616,141 +613,73 @@ const Header = () => {
                           />
                         </div>
                       
-                  </div>
+                  </div> 
 
-                        <table className="table"> 
-
-                          {actinglist?.length
-                            ? actinglist?.map((list, index) => {
-                                return (
-                                  <>
-                                    <tr>
-                                      <td
-                                        style={{
-                                          width: "120px",
-                                          paddingRight: "10px",
-                                        }}
-                                      >
-                                        {" "}
-                                        <label className="labelacting">
-                                          {/* <div className="checkbox-wrapper-15">
-                                            <input
-                                              className="inp-cbx"
-                                              id={"cbx-15" + list.id}
-                                              value={list.id}
-                                              onClick={(e) =>
-                                                UserRoleList(
-                                                  e,
-                                                  e.target.checked
-                                                )
-                                              }
-                                              type="checkbox"
-                                              style={{ display: "none" }}
-                                            />
-                                            <label
-                                              className="cbx"
-                                              for={"cbx-15" + list.id}
-                                            >
-                                              <span>
-                                                <svg
-                                                  width="12px"
-                                                  height="9px"
-                                                  viewbox="0 0 12 9"
-                                                >
-                                                  <polyline points="1 5 4 8 11 1"></polyline>
-                                                </svg>
-                                              </span>
-                                            </label>
-                                          </div>{" "} */}
-                                          {list.menuName}
-                                        </label>
-                                      </td>
-
-                                      <td>
-                                        <div className="acting_form_new">
-                                          <div className="form-bxact">
-                                            <label>
-                                              <select
-                                                name="users"
-                                                onChange={(e) => {
-                                                  hanldeSetactiondata(
-                                                    e,
-                                                    index,
-                                                    list.id
-                                                  );
-                                                }}
-                                              >
-                                                <option value="">
-                                                  Select user
-                                                </option>
-                                                {list.id == 2
-                                                  ? exportuser?.map(
-                                                      (userlist, ind) => {
-                                                        return (
-                                                          <option
-                                                            value={JSON?.stringify(
-                                                              userlist
-                                                            )}
-                                                          >
-                                                            {userlist.name}
-                                                          </option>
-                                                        );
-                                                      }
-                                                    )
-                                                  : list.id == 3
-                                                  ? importuser?.map(
-                                                      (userlist, ind) => {
-                                                        return (
-                                                          <option
-                                                            value={JSON?.stringify(
-                                                              userlist
-                                                            )}
-                                                          >
-                                                            {userlist.name}
-                                                          </option>
-                                                        );
-                                                      }
-                                                    )
-                                                  : list.id == 4
-                                                  ? fibuser?.map(
-                                                      (userlist, ind) => {
-                                                        return (
-                                                          <option
-                                                            value={JSON?.stringify(
-                                                              userlist
-                                                            )}
-                                                          >
-                                                            {userlist.name}
-                                                          </option>
-                                                        );
-                                                      }
-                                                    )
-                                                  : list.id == 5
-                                                  ? inspecuser?.map(
-                                                      (userlist, ind) => {
-                                                        return (
-                                                          <option
-                                                            value={JSON?.stringify(
-                                                              userlist
-                                                            )}
-                                                          >
-                                                            {userlist.name}
-                                                          </option>
-                                                        );
-                                                      }
-                                                    )
-                                                  : ""}
-                                              </select>
-                                            </label>
-                                          </div>
-                                        </div>
-                                      </td>
-                                    </tr>
-                                  </>
-                                );
-                              })
-                            : ""}
-                        </table>
+                  <table className="table">
+          {actinglist?.length
+            ? actinglist?.map((list, index) => {
+                return (
+                  <tr key={index}>
+                    <td style={{ width: "120px", paddingRight: "10px" }}>
+                      <label className="labelacting">{list.menuName}</label>
+                    </td>
+                    <td>
+                      <div className="acting_form_new">
+                        <div className="form-bxact">
+                          <label>
+                            <select
+                              name="users"
+                              onChange={(e) => {
+                                hanldeSetactiondata(e, index, list.id);
+                              }}
+                            >
+                              <option value="">Select user</option>
+                              {list.id === 2 &&
+                                exportuser?.map((userlist, ind) => (
+                                  <option
+                                    value={JSON.stringify(userlist)}
+                                    key={ind}
+                                  >
+                                    {userlist.name}
+                                  </option>
+                                ))}
+                              {list.id === 3 &&
+                                importuser?.map((userlist, ind) => (
+                                  <option
+                                    value={JSON.stringify(userlist)}
+                                    key={ind}
+                                  >
+                                    {userlist.name}
+                                  </option>
+                                ))}
+                              {list.id === 4 &&
+                                fibuser?.map((userlist, ind) => (
+                                  <option
+                                    value={JSON.stringify(userlist)}
+                                    key={ind}
+                                  >
+                                    {userlist.name}
+                                  </option>
+                                ))}
+                              {list.id === 5 &&
+                                inspecuser?.map((userlist, ind) => (
+                                  <option
+                                    value={JSON.stringify(userlist)}
+                                    key={ind}
+                                  >
+                                    {userlist.name}
+                                  </option>
+                                ))}
+                            </select>
+                          </label>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })
+            : ""}
+        </table>
                       
                         <div className="action_form_new">
                           <label class="actioncontrolform">Reason</label>
@@ -768,6 +697,8 @@ const Header = () => {
 
                       </div>
 
+                      <h5 className="heading-actingrole">ACTING ROLE HISTORY</h5>
+
 <div className="responsive-table">
 <table className="table table-custom">
 <tr>
@@ -776,6 +707,7 @@ const Header = () => {
   <th>Reason</th>
   <th>Department/ User</th>
   <th>Status</th> 
+  <th>Action</th>
 </tr>
 {
     actionHistory?.length && actionHistory?.map((item, index)=>{
@@ -783,9 +715,15 @@ const Header = () => {
         <tr>
           <td>{moment(item?.assignedDate).format("DD/MMM/YYYY")}</td>
           <td>{moment(item?.roleEndDate).format("DD/MMM/YYYY")}</td>
-          <td>{item?.reason}</td>
+          <td><span className="department-reason">{item?.reason}</span></td>
           <td><span className="department-user">{item?.departmentName} / {item.userName}</span></td>
-          <td>{"--"}</td>
+          <td><span className={item.statusName == "Active" ? "green-text" : "red-text"}>{item.statusName}</span></td>
+          <td><button className={item.statusName == "Active" ? "activebtn-text" : "inactivebtn-text"} onClick={(e)=> handleChangeActionStatuschange(item.id, item.status)}>
+           {
+           item.statusName == "Active" ? <i class="bi bi-toggle2-on"></i> :  <i class="bi bi-toggle2-off"></i>
+           }
+            
+            </button></td>
         </tr>
       )
     })

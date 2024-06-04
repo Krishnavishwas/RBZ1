@@ -19,11 +19,13 @@ import Text from "@tiptap/extension-text";
 import TextAlign from "@tiptap/extension-text-align";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-
+import { useNavigate } from "react-router-dom";
 /* Tiptp Editor Ends */
 
-const ExportCircularsCreateForm = ({ handleFormClose, handleCircularListData }) => {
-
+import DirectiveMultiSelectComponent from './SearchUI/DirectiveMultiSelectComponent'
+import CustomBankMultiSelect from './SearchUI/CustomBankMultiSelect'
+const ExportCircularsCreateForm = () => {
+const navigate = useNavigate()
   // const purposeApplicationRef = useRef(null);
   const userID = Storage.getItem("userID");
   const bankID = Storage.getItem("bankID");
@@ -33,10 +35,16 @@ const ExportCircularsCreateForm = ({ handleFormClose, handleCircularListData }) 
   const [errors, setErrors] = useState({});
   const [checkAnalyst, setAnalyst] = useState(false);
   const [selectedBankOption, setSelectedBankOption] = useState([]);
+  const [selectedBanks, setSelectedBanks] = useState([]);
+  const [selectedDirectives, setSelectedDirectives] = useState([]);
+  const [circularAttachmentData, setCircularAttachmentData] = useState([
+    { filename: "File Upload", upload: "" },
+  ]);
   const [otherfilesupload, setOtherfilesupload] = useState([]);
-  const [selectedDirectivesOpt, setSelectedDirectivesOpt] = useState(null);
+  const [selectedDirectivesOpt, setSelectedDirectivesOpt] = useState([]);
   const [analystUser, setAnalystUser] = useState([]);
   const [files, setFiles] = useState([]);
+  const [department, setDepartment] = useState([]);
   const [otherfiles, setOtherfiles] = useState([]);
   const [Description, setDescription] = useState("");
   const [releasingDate, setReleasingDate] = useState(new Date());
@@ -44,18 +52,40 @@ const ExportCircularsCreateForm = ({ handleFormClose, handleCircularListData }) 
     name: "",
     subject: "",
     content: "",
-    circularReference: "",
+    departmentValue: "",
     directiveSelectValue: [],
     bankSelectValue: [],
     analyst: "",
   });
+  const applicationTypeRef = useRef(null);
+  const fileInputRefsother = [useRef(null), useRef(null), useRef(null), useRef(null), useRef(null), useRef(null), useRef(null), useRef(null), useRef(null), useRef(null)];
   const [content, setEditorContent] = useState("<p></p>");
   const handelAnalystCheck = () => {
     setAnalyst(!checkAnalyst)
   }
+  //--------   department api call start
+  const GetDepartment = async () => {
+    await axios
+      .post(APIURL + "User/GetDepartmentByUserID", {
+        UserID: userID.replace(/"/g, ""),
+        RoleID: roleID
+      })
+      .then((res) => {
+        if (res.data.responseCode === "200") {
+          setDepartment(res.data.responseData);
+        } else {
+          console.log(res.data.responseMessage);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
 
+  //--------   department api call end
   const changeHandelForm = (e) => {
     const { name, value } = e.target;
+
     let newErrors = {};
 
     // const specialChars = /[!@#$%^&*(),.?":{}|<>`~]/;
@@ -89,6 +119,14 @@ const ExportCircularsCreateForm = ({ handleFormClose, handleCircularListData }) 
 
       })
   }
+  const vOption = selectedBankOption?.map((res) => ({
+    label: res.bankName,
+    value: res.id,
+  }));
+  const handleChangeBank = (e) => {
+    const values = e;
+    setSelectedBanks(values);
+  };
 
   const panelFooterTemplate = () => {
     const length = exportForm.bankSelectValue ? exportForm.bankSelectValue.length : 0;
@@ -119,6 +157,16 @@ const ExportCircularsCreateForm = ({ handleFormClose, handleCircularListData }) 
 
       })
   }
+
+  const DirectiveOption = selectedDirectivesOpt?.map((res) => ({
+    label: res.directiveName,
+    value: res.id,
+  }));
+
+  const handleChangeDirective = (e) => {
+    const values = e;
+    setSelectedDirectives(values);
+  };
   //---------director end
   //--------analyst user api start
   const analystUserFun = async () => {
@@ -176,16 +224,16 @@ const ExportCircularsCreateForm = ({ handleFormClose, handleCircularListData }) 
       newErrors.subject = "Subject is required";
       valid = false;
     }
-    // if (exportForm.content === "") {
-    //   newErrors.content = "Content is required";
-    //   valid = false;
-    // }
-
-    if (exportForm.directiveSelectValue.length == '0') {
-      newErrors.directiveSelectValue = "Directive is required";
+    if (exportForm.departmentValue == "") {
+      newErrors.departmentValue = "Department is required";
       valid = false;
-    } if (exportForm.bankSelectValue.length == '0') {
-      newErrors.bankSelectValue = "Bank is required";
+    }
+
+    if (selectedDirectives.length == '0') {
+      newErrors.selectedDirectives = "Directive is required";
+      valid = false;
+    } if (selectedBanks.length == '0') {
+      newErrors.selectedBanks = "Bank is required";
       valid = false;
     }
     if (releasingDate == null) {
@@ -205,9 +253,8 @@ const ExportCircularsCreateForm = ({ handleFormClose, handleCircularListData }) 
 
 
   //---------- End Code For Check Validation for Form Field
-  const bankSelectedID = exportForm?.bankSelectValue.map((res) => res.id);
-  const directiveSelectedID = exportForm?.directiveSelectValue.map((res) => res.directiveID);
-
+  const bankSelectedID = selectedBanks.map((res) => res.value);
+  const directiveSelectedID = selectedDirectives.map((res) => res.value);
 
   const HandleSubmit = async (e) => {
     e.preventDefault();
@@ -215,7 +262,7 @@ const ExportCircularsCreateForm = ({ handleFormClose, handleCircularListData }) 
 
     const data = {
       UserID: userID.replace(/"/g, ""),
-      RoleID: roleID,
+      RoleID: checkAnalyst != true ? "0" : roleID,
       Name: exportForm.name,
       // BankID: '"'+bankSelectedID.join()+'"',
       BankID: bankSelectedID.join(),
@@ -224,12 +271,13 @@ const ExportCircularsCreateForm = ({ handleFormClose, handleCircularListData }) 
       Content: Description,
       DirectiveID: directiveSelectedID.join(),
       // Description: Description,
-      AssignedTo: checkAnalyst ? exportForm.analyst : userID.replace(/"/g, ""),
+      // AssignedTo: checkAnalyst ? exportForm.analyst : userID.replace(/"/g, ""),
+      AssignedTo: checkAnalyst ? exportForm.analyst : "",
       // AssignedToRoleID: checkAnalyst ? "6" : roleID,
-      AssignedToRoleID: checkAnalyst ? parseInt(roleID) + 1 : roleID,
+      AssignedToRoleID: checkAnalyst ? parseInt(roleID) + 1 : checkAnalyst != true ? "0" : roleID,
       // FutureDate: futureDate,
       ReleasingDate: releasingDate,
-      DepartmentID: "2"
+      DepartmentID: exportForm.departmentValue
 
     }
 
@@ -246,29 +294,28 @@ const ExportCircularsCreateForm = ({ handleFormClose, handleCircularListData }) 
             }
             formData.append("CircularReferenceNumber", res.data.responseData.circularReferenceNumber);
             formData.append("CircularID", res.data.responseData.id);
-            formData.append("DepartmentID", "2");
+            formData.append("DepartmentID", res.data.responseData.departmentID);
             formData.append("UserID", userID.replace(/"/g, ""));
             axios.post(ImageAPI + 'File/UploadCircularDocs', formData)
               .then((res) => {
-
+                setDescription("");
               })
               .catch((err) => {
                 console.log("file Upload ", err)
               })
             toast.success(res.data.responseMessage, { autoClose: 2000 })
             setTimeout(() => {
+              navigate("/CircularDashboard");
               setToastDisplayed(false)
-              handleFormClose();
-              handleCircularListData();
               setExportForm({
                 name: "",
                 subject: "",
-                content: "",
-                circularReference: "",
-                directiveSelectValue: [],
-                bankSelectValue: [],
-                analyst: "",
               })
+              setDescription("");
+              setSelectedBanks([]);
+              setSelectedDirectives([]);
+              setFiles([]);
+
             }, 2500)
 
           } else {
@@ -289,6 +336,18 @@ const ExportCircularsCreateForm = ({ handleFormClose, handleCircularListData }) 
       setToastDisplayed(true);
     }
   };
+  const removeUserImage = (label) => {
+    const updatedUserFile = files?.filter((item) => item.label !== label);
+    setFiles(updatedUserFile);
+  };
+  const removeImage = (index, label) => {
+    const updatedFile = files?.filter((item) => item.label !== label);
+    setFiles(updatedFile);
+  };
+  
+  const clearInputFileother = (index) => {
+    if (fileInputRefsother[index]?.current) fileInputRefsother[index].current.value = "";
+  }
 
   const ResetHandleData = () => {
     setExportForm({
@@ -309,6 +368,7 @@ const ExportCircularsCreateForm = ({ handleFormClose, handleCircularListData }) 
     bankData();
     directivesData();
     analystUserFun();
+    GetDepartment();
   }, [toastDisplayed]);
 
   // ----- End Code For Geting Table Data
@@ -734,7 +794,7 @@ const ExportCircularsCreateForm = ({ handleFormClose, handleCircularListData }) 
     }
   }, [editor]);
 
- console.log("exportForm.analyst",exportForm.analyst);
+
   return (
     <>
       <form className="circular-form">
@@ -796,18 +856,18 @@ const ExportCircularsCreateForm = ({ handleFormClose, handleCircularListData }) 
 
               <span className="sspan"></span>
               {/* {(errors.Description && Description == " ") ||
-                              Description == null ||
-                              Description == "<p></p>" ||
-                              !Description ? (
-                              <small
-                                className="errormsg"
-                                style={{ bottom: "-13px" }}
-                              >
-                                {errors.Description}
-                              </small>
-                            ) : (
-                              ""
-                            )} */}
+                Description == null ||
+                Description == "<p></p>" ||
+                !Description ? (
+                <small
+                  className="errormsg"
+                  style={{ bottom: "-13px" }}
+                >
+                  {errors.Description}
+                </small>
+              ) : (
+                ""
+              )} */}
             </div>
           </div>
         </div>
@@ -815,9 +875,9 @@ const ExportCircularsCreateForm = ({ handleFormClose, handleCircularListData }) 
 
         <div className="inner_form_new ">
           <label className="controlform">Bank</label>
-          <div className="form-bx">
+          <div className="cccto position-relative">
             <div className="multiselect flex justify-content-center">
-              <MultiSelect
+              {/* <MultiSelect
                 value={exportForm.bankSelectValue}
                 options={selectedBankOption}
                 onChange={(e) => {
@@ -829,10 +889,18 @@ const ExportCircularsCreateForm = ({ handleFormClose, handleCircularListData }) 
                 panelFooterTemplate={panelFooterTemplate}
                 display="chip"
                 onShow={onShow}
+              /> */}
+              <CustomBankMultiSelect
+                key="multyselectprinciple"
+                options={vOption}
+                onChange={(e) => handleChangeBank(e)}
+                value={selectedBanks}
+                isSelectAll={true}
+                menuPlacement={"bottom"}
               />
-              {errors?.bankSelectValue ? (
+              {errors?.selectedBanks ? (
                 <span className="errormsg">
-                  {errors?.bankSelectValue}
+                  {errors?.selectedBanks}
                 </span>
               ) : ""}
             </div>
@@ -865,23 +933,30 @@ const ExportCircularsCreateForm = ({ handleFormClose, handleCircularListData }) 
 
         <div className="inner_form_new ">
           <label className="controlform">Directives</label>
-          <div className="form-bx">
+          <div className="cccto position-relative">
             <div className="multiselect flex justify-content-center">
-              <MultiSelect
+              {/* <MultiSelect
                 value={exportForm.directiveSelectValue}
                 onChange={(e) => {
                   changeHandelForm(e);
                 }}
                 options={selectedDirectivesOpt}
                 optionLabel="directiveName"
-                // filter
+          
                 name="directiveSelectValue"
                 placeholder="Select Directives"
                 display="chip"
-              // maxSelectedLabels={3}
+              /> */}
+              <DirectiveMultiSelectComponent
+                key="multyselectprinciple"
+                options={DirectiveOption}
+                onChange={(e) => handleChangeDirective(e)}
+                value={selectedDirectives}
+                isSelectAll={true}
+                menuPlacement={"bottom"}
               />
-              {errors?.directiveSelectValue ? (
-                <small className="errormsg">{errors.directiveSelectValue}</small>
+              {errors?.selectedDirectives ? (
+                <small className="errormsg">{errors.selectedDirectives}</small>
               ) : (
                 ""
               )}
@@ -889,6 +964,41 @@ const ExportCircularsCreateForm = ({ handleFormClose, handleCircularListData }) 
           </div>
         </div>
         {/* end form-bx  */}
+        <div className="inner_form_new ">
+          <label className="controlform">Select Department</label>
+          <div className="form-bx">
+            <label>
+              <select
+                ref={applicationTypeRef}
+                name="departmentValue"
+                onChange={(e) => {
+                  changeHandelForm(e);
+                }}
+                className={
+                  errors.departmentValue && exportForm.departmentValue === ""
+                    ? "error"
+                    : ""
+                }
+              >
+                <option value="">Select Department</option>
+                {department?.map((item, ind) => {
+                  return (
+                    <option key={item.id} value={item.id}>
+                      {item.menuName}
+                    </option>
+                  );
+                })}
+              </select>
+              <span className="sspan"></span>
+              {errors.departmentValue && exportForm.departmentValue === "" ? (
+                <small className="errormsg">{errors.departmentValue}</small>
+              ) : (
+                ""
+              )}
+            </label>
+          </div>
+        </div>
+        {/* end form-bx */}
         <div className="inner_form_new ">
           <label className="controlform">Releasing Date</label>
           <div className="form-bx">
@@ -946,7 +1056,7 @@ const ExportCircularsCreateForm = ({ handleFormClose, handleCircularListData }) 
         {/* end form-bx  */}
         {checkAnalyst == true ?
           <div className="inner_form_new ">
-            <label className="controlform">Select  {
+            <label className="controlform"> {
               roleID == "5" ? " Senior Analyst" : roleID == "6" ? " Principal Analyst" : roleID == "7" ? " Deputy Director" : " Director"
             }</label>
 
@@ -960,7 +1070,7 @@ const ExportCircularsCreateForm = ({ handleFormClose, handleCircularListData }) 
                   value={exportForm.analyst}
                 >
                   <option value="" selected>
-                    Select  {
+                    {
                       roleID == "5" ? " Senior Analyst" : roleID == "6" ? " Principal Analyst" : roleID == "7" ? " Deputy Director" : " Director"
                     }
                   </option>
@@ -983,7 +1093,7 @@ const ExportCircularsCreateForm = ({ handleFormClose, handleCircularListData }) 
         {/* upload file start */}
         <h5 className="section_top_subheading mt-3">Attachments</h5>
 
-        <div className="attachemt_form-bx" >
+        {/* <div className="attachemt_form-bx" >
           <label>
             <i className="bi bi-forward"></i>
             File
@@ -1001,8 +1111,57 @@ const ExportCircularsCreateForm = ({ handleFormClose, handleCircularListData }) 
 
           </span>
 
+      
+        </div> */}
+        {
+          circularAttachmentData?.map((items, index) => {
+            return (
+              <div className="attachemt_form-bx  mt-2" key={items.id}>
+                <label
+                  style={{
+                    background: "#d9edf7",
+                    padding: "9px 3px",
+                    border: "0px",
+                  }}
+                >
+                  <span style={{ fontWeight: "500" }}>
+                    {items.filename}
+                  </span>
+                </label>
+                <div className="browse-btn">
+                  Browse
+                  <input
+                    type="file"
+                    onChange={(e) =>
+                      handleFileChange(e, `file ${index}`)
+                    }
+                  />
+                </div>
+                <span className="filename">
+                  {files?.find((f) => f.label === `file ${index}`)
+                    ?.file?.name || "No file chosen"}
+                </span>
 
-        </div>
+                {files?.length &&
+                  files?.find((f) => f.label === `file ${index}`)
+                    ?.file?.name ? (
+                  <button
+                    type="button"
+                    className="remove-file"
+                    onClick={() =>
+                      removeImage(index, `file ${index}`)
+                    }
+                  >
+                    Remove
+                  </button>
+                ) : (
+                  ""
+                )}
+              </div>
+            );
+          })
+        }
+
         {/* other file start */}
         {otherfiles.map((file, index) => (
           <div key={"other" + (index + 1)} className="attachemt_form-bx">
@@ -1024,7 +1183,19 @@ const ExportCircularsCreateForm = ({ handleFormClose, handleCircularListData }) 
                 "No file chosen"}
             </span>
 
-
+            {files?.length &&
+              files?.find((f) => f.label === "other" + (index + 1))?.file
+                ?.name ? (
+              <button
+                type="button"
+                className="remove-file"
+                onClick={() => { removeUserImage("other" + (index + 1)); clearInputFileother(index) }}
+              >
+                Remove
+              </button>
+            ) : (
+              ""
+            )}
 
           </div>
         ))}
@@ -1054,7 +1225,7 @@ const ExportCircularsCreateForm = ({ handleFormClose, handleCircularListData }) 
               HandleSubmit(e);
             }}
             className="login"
-            disabled={toastDisplayed ? true : false}
+            disabled={(roleID > 5 && checkAnalyst == false) || toastDisplayed ? true : false}
           >
             Submit
           </button>

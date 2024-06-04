@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import ExportformDynamicField from "./ExportformDynamicField";
-import MultiSelectComponent from "./SearchUI/MultiSelectComponent";
+import ExportformDynamicField from "./ExportformDynamicField"; 
 import { Storage } from "../login/Storagesetting";
 import DatePicker from "react-datepicker";
 // import "react-datepicker/dist/react-datepicker.css";
@@ -107,6 +106,7 @@ const ExportDashboardEditDetails = ({
   const BeneficiaryNameRef = useRef(null);
   const applicantCommentsRef = useRef(null);
   const applicantReferenceNumberRef = useRef(null);
+  // const applicantYearRef = useRef(null);
   const applicationTypeRef = useRef(null);
   const assignedToRef = useRef(null);
   const companyNameRef = useRef(null);
@@ -134,19 +134,8 @@ const ExportDashboardEditDetails = ({
   const PdfRolename = Storage.getItem("roleName");
   const bankidcheck = bankID !== "" ? "1" : "3";
   const roleID = Storage.getItem("roleIDs");
-  const userSign = Storage.getItem("signImageURL");
-  const menuname = Storage.getItem("menuname");
 
-  const DeptID =
-    menuname === "Exports"
-      ? "2"
-      : menuname === "Imports"
-      ? "3"
-      : menuname === "Foreign Investments"
-      ? "4"
-      : menuname === "Inspectorate"
-      ? "5"
-      : "";
+  const userSign = Storage.getItem("signImageURL");
 
   const navigate = useNavigate();
 
@@ -202,18 +191,25 @@ const ExportDashboardEditDetails = ({
   const [deputyTab, setdeputyTab] = useState(roleID == 8 ? true : false);
   const [director, setdirector] = useState(roleID == 9 ? true : false);
   const [sharefiletab, setsharefiletab] = useState(false);
+
   const [recomdAnalyst, setRecomdAnalyst] = useState("121");
   const [selectedBanks, setSelectedBanks] = useState([]);
   const [registerusertype, setregisterusertype] = useState(
     applicationDetail?.userTypeID
   );
   const [supervisordecision, setsupervisordecision] = useState(false);
+
   const [files, setFiles] = useState([]);
+
   const [otherfiles, setOtherfiles] = useState([]);
+
   const [userfiles, setuserFiles] = useState([]);
+
   const [otheruserfiles, setOtheruserfiles] = useState([]);
+
   const [sharefile, setsharefile] = useState([]);
   const [othersharefile, setOthersharefile] = useState([]);
+
   const [errors, setErrors] = useState({});
   const [applicationType, setapplicationType] = useState([]);
   const [subsectorData, setsubsectorData] = useState([]);
@@ -235,6 +231,7 @@ const ExportDashboardEditDetails = ({
   });
   const [DateExpiryOption, setDateExpiryOption] = useState("");
   const [defaultnoExpiry, setdefaultnoExpiry] = useState("0");
+
   const [IsReturnOption, setIsReturnOption] = useState("");
   const [AllFrequency, setAllFrequency] = useState([]);
   const [getFrequencyID, setGetFrequencyID] = useState("0");
@@ -243,15 +240,18 @@ const ExportDashboardEditDetails = ({
   const [IsReturnExpiringDate, setIsReturnExpiringDate] = useState(new Date());
   const [DateExpirydisplay, setDateExpirydisplay] = useState("");
   const [curRate, setCurrate] = useState();
+
   const [userRoleRecordofficer, setuserRoleRecordofficer] = useState([]);
   const [selectuserRoleRecordofficer, setselectuserRoleRecordofficer] =
     useState("");
   const [getalluser, setGetalluser] = useState([]);
+
   const [getBlankFile, setgetBlankFile] = useState([]);
   const [viewShareFile, setviewShareFile] = useState([]);
   const [geninfoFile, setgeninfoFile] = useState([]);
   const [newData, setnewData] = useState([]);
   const [SubmitBtnLoader, setSubmitBtnLoader] = useState(false);
+
   const [OtherDepartment, setOtherDepartment] = useState("");
   const [otherDepartmentRole, setOtherDepartmentRole] = useState("");
   const [otherDepartmentRoles, setOtherDepartmentRoles] = useState([]);
@@ -264,8 +264,21 @@ const ExportDashboardEditDetails = ({
   const applicationNumber = applicationDetail.rbzReferenceNumber;
   const heading = "Updated Successfully!";
   const para = "Export request updated successfully!";
-  const heading1 = "Submit Successfully";
+  const heading1 = "Submitted Successfully";
   const para1 = "Application Successfully Submitted to Other Department!";
+
+  const menuname = Storage.getItem("menuname");
+
+  const DeptID =
+    menuname === "Exports"
+      ? "2"
+      : menuname === "Imports"
+      ? "3"
+      : menuname === "Foreign Investments"
+      ? "4"
+      : menuname === "Inspectorate"
+      ? "5"
+      : "";
 
   const ChangeApplicationStatus = (e) => {
     const values = e.target.value;
@@ -835,11 +848,11 @@ const ExportDashboardEditDetails = ({
       StarterKit.configure({
         bulletList: {
           keepMarks: true,
-          keepAttributes: false, // TODO : Making this as `false` becase marks are not preserved when I try to preserve attrs, awaiting a bit of help
+          keepAttributes: false,
         },
         orderedList: {
           keepMarks: true,
-          keepAttributes: false, // TODO : Making this as `false` becase marks are not preserved when I try to preserve attrs, awaiting a bit of help
+          keepAttributes: false,
         },
       }),
     ],
@@ -876,11 +889,11 @@ const ExportDashboardEditDetails = ({
       StarterKit.configure({
         bulletList: {
           keepMarks: true,
-          keepAttributes: false, // TODO : Making this as `false` becase marks are not preserved when I try to preserve attrs, awaiting a bit of help
+          keepAttributes: false,
         },
         orderedList: {
           keepMarks: true,
-          keepAttributes: false, // TODO : Making this as `false` becase marks are not preserved when I try to preserve attrs, awaiting a bit of help
+          keepAttributes: false,
         },
       }),
     ],
@@ -894,7 +907,6 @@ const ExportDashboardEditDetails = ({
     const value = e.target.value;
     setSupervisorRoleId("");
     setSupervisorRoleId("");
-
     setnextlevelvalue(value);
     setAsignUser([]);
   };
@@ -944,9 +956,6 @@ const ExportDashboardEditDetails = ({
             setgetBlankFile(res.data.responseData);
           } else {
             setgetBlankFile([]);
-            // setFiles([]);
-            // setOtherfiles([]);
-            // setOtherfilesupload([]);
           }
         });
     }
@@ -1090,15 +1099,10 @@ const ExportDashboardEditDetails = ({
     const specialChars = /[!@#$%^&*(),.?":{}|<>]/;
     let newErrors = {};
     let valid = true;
-
     if (name == "applicationPurpose" && value.charAt(0) === " ") {
       newErrors.applicationPurpose = "First character cannot be a blank space";
       valid = false;
     }
-    //  else if (name == "applicationPurpose" && specialChars.test(value.charAt(0))) {
-    //   newErrors.applicationPurpose = "Special characters not allowed";
-    //   valid = false;
-    // }
     else if (name == "applicant" && value.charAt(0) === " ") {
       newErrors.applicant = "First character cannot be a blank space";
       valid = false;
@@ -1252,7 +1256,6 @@ const ExportDashboardEditDetails = ({
     const { name, value } = e.target;
     setDateExpiryOption(e.target.value);
     setdefaultnoExpiry(value);
-
     if (value == 0) {
       setDateExpirydisplay("");
       if (dateExpirydisplayRef.current) dateExpirydisplayRef.current.value = "";
@@ -1264,7 +1267,6 @@ const ExportDashboardEditDetails = ({
     const { name, value } = e.target;
     setIsReturnOption(e.target.value);
     setIsReturn(value);
-
     if (value == 0) {
       setIsReturndisplay("");
       setIsReturnExpiringDate(new Date());
@@ -1286,9 +1288,9 @@ const ExportDashboardEditDetails = ({
         });
     }
   };
+
   const SelectReturnFrequency = (e) => {
     const { name, value } = e.target;
-
     if (value == 1) {
       setGetFrequencyID(value);
       setIsReturnExpiringDate(new Date());
@@ -1340,6 +1342,7 @@ const ExportDashboardEditDetails = ({
       fileInputRefsother[index].current.value = "";
   };
 
+  /* PDF Preview code starts */
   const GetHandelDetailPDF = async () => {
     setBtnLoader(true);
     setTimeout(() => {
@@ -1347,7 +1350,6 @@ const ExportDashboardEditDetails = ({
         format: "a4",
         unit: "pt",
       });
-
       axios
         .post(APIURL + "Admin/GetBankByID", {
           id: applicationDetail?.bankID,
@@ -1376,7 +1378,6 @@ const ExportDashboardEditDetails = ({
             } else {
               var footerImage = "";
             }
-
             const addHeader = (doc) => {
               if (roleID != 3) {
                 const pageCount = doc.internal.getNumberOfPages();
@@ -1439,7 +1440,6 @@ const ExportDashboardEditDetails = ({
                 }
               }
             };
-
             const addWaterMark = (doc) => {
               const pageCount = doc.internal.getNumberOfPages();
               for (var i = 1; i <= pageCount; i++) {
@@ -1495,6 +1495,7 @@ const ExportDashboardEditDetails = ({
         });
     }, 1500);
   };
+  /* Ends Here */
 
   const HandleNextleveldata = (e) => {
     const name = e.target.name;
@@ -1503,7 +1504,6 @@ const ExportDashboardEditDetails = ({
     const specialCharsnote = /[!@#$%^*|<>]/;
     let newErrors = {};
     let valid = true;
-
     if (name == "Notes" && value.charAt(0) === " ") {
       newErrors.Notes = "First character cannot be a blank space";
       valid = false;
@@ -1691,7 +1691,6 @@ const ExportDashboardEditDetails = ({
 
   const getNextvaluesupervisor = (e) => {
     const value = e.target.checked;
-
     if (value == false) {
       setnextlevelvalue("");
     }
@@ -1701,7 +1700,6 @@ const ExportDashboardEditDetails = ({
   const validateForm = () => {
     let valid = true;
     const newErrors = {};
-
     if (applicationDetail.applicationPurpose === "") {
       newErrors.applicationPurpose = "Purpose of the application is required";
       valid = false;
@@ -1945,29 +1943,25 @@ const ExportDashboardEditDetails = ({
     if (BeneficiaryNameRef.current) BeneficiaryNameRef.current.value = "";
     if (applicantReferenceNumberRef.current)
       applicantReferenceNumberRef.current.value = "";
-    // if(applicantYearRef.current) applicantYearRef.current.value = '';
     if (applicationTypeRef.current) applicationTypeRef.current.value = "";
     if (assignedToRef.current) assignedToRef.current.value = "";
     if (companyNameRef.current) companyNameRef.current.value = "";
     if (currencyRef.current) currencyRef.current.value = "";
     if (govtAgencieRef.current) govtAgencieRef.current.value = "";
-
     if (applicationPurposeRef.current) applicationPurposeRef.current.value = "";
     if (relatedexchangeControlNumberRef.current)
       relatedexchangeControlNumberRef.current.value = "";
     if (sectorRef.current) sectorRef.current.value = "";
     if (subsectorRef.current) subsectorRef.current.value = "";
-
     if (typeExporterRef.current) typeExporterRef.current.value = "";
     if (usdEquivalentRef.current) usdEquivalentRef.current.value = "";
-
     if (rateRef.current) rateRef.current.value = "";
-
     if (FrequencyDateRef.current) FrequencyDateRef.current.value = "";
     if (FrequencyRef.current) FrequencyRef.current.value = "";
     if(optionOtherDepartmentRef.current) optionOtherDepartmentRef.current.value = "";
   };
 
+  // Code start for save form
   const HandleSubmit = async (e) => {
     e.preventDefault();
     let formData = new FormData();
@@ -2042,7 +2036,6 @@ const ExportDashboardEditDetails = ({
             (AssignUserID == "" || AssignUserID == null) &&
             roleID != 5 &&
             roleID != 2 &&
-            //roleID != 3 &&
             roleID != 4
               ? "100"
               : nextlevelvalue,
@@ -2224,6 +2217,7 @@ const ExportDashboardEditDetails = ({
                               "ApplicationID",
                               applicationDetail?.id
                             );
+                            formData.append("DepartmentID", 2)
                             formData.append("PdfData", blobPDF);
                             axios
                               .post(ImageAPI + "File/UploadPdf", formData)
@@ -2390,6 +2384,7 @@ const ExportDashboardEditDetails = ({
                                 "ApplicationID",
                                 applicationDetail?.id
                               );
+                              formData.append("DepartmentID", 2)
                               formData.append("PdfData", blobPDF);
                               await axios
                                 .post(ImageAPI + "File/UploadPdf", formData)
@@ -2491,6 +2486,7 @@ const ExportDashboardEditDetails = ({
       setToastDisplayed(true);
     }
   };
+  // End code for save form
 
   useEffect(() => {
     handleData();
@@ -2543,7 +2539,6 @@ const ExportDashboardEditDetails = ({
         (infoFile) => infoFile.label === blankFile.name
       );
     });
-
     setnewData(newData1);
   }, [applicationDetail, geninfoFile, allcomment]);
 
@@ -2626,7 +2621,7 @@ const ExportDashboardEditDetails = ({
           Comment: asignnextLeveldata.Comment,
           Notes: asignnextLeveldata.Notes,
           Description: Description,
-          DepartmentID: DeptID,
+          DepartmentID: DeptID ,
           Status:
             OtherDepartment == "2"
               ? "275"
@@ -2640,7 +2635,6 @@ const ExportDashboardEditDetails = ({
         })
         .then((res) => {
           if (res.data.responseCode == 200) {
-            console.log("vbbbbb---", res);
             setOtherDepartmentLoader(false);
             setOtherDepartmentPopup(true);
           }
@@ -2648,12 +2642,12 @@ const ExportDashboardEditDetails = ({
         .catch((error) => {
           setOtherDepartmentPopup(false);
           setOtherDepartmentLoader(false);
-          console.log("User/GetUsersByRoleID - Error", error);
+          console.log("CreateReferredApplication - Error", error);
         });
     } catch (error) {
       setOtherDepartmentPopup(false);
       setOtherDepartmentLoader(false);
-      console.log("User/GetUsersByRoleID - catch - Error", error);
+      console.log("CreateReferredApplication - catch - Error", error);
     }
   };
 
@@ -3836,6 +3830,12 @@ const ExportDashboardEditDetails = ({
                                     aria-controls="home"
                                     aria-selected="true"
                                   >
+                                    {/* {index == 0
+                ? "Recent"
+                : `Response ${
+                    cur?.applicationActivityData.length -
+                    index
+                  }`} */}
                                     Response{" "}
                                     {cur?.applicationActivityData?.length -
                                       index}
@@ -3873,10 +3873,13 @@ const ExportDashboardEditDetails = ({
                       role="tabpanel"
                       aria-labelledby="banksupervisrotab"
                     >
+                      {/* Edit bank supervisor */}
                       <>
                         {Actiondata?.map((cur) => {
-                          const firstItem = cur?.applicationActivityData?.[0];
+                          const firstItem = cur?.applicationActivityData?.[0]; // Accessing the first element directly
+
                           if (cur?.assignedToRoleID === 3 && firstItem) {
+                            // Check if firstItem exists
                             return (
                               <div className="bakgroundaction">
                                 <div key={firstItem.actionID}>
@@ -4023,6 +4026,14 @@ const ExportDashboardEditDetails = ({
                               }
                             >
                               <label className="controlform">Next Action</label>
+
+                              {/* <input
+         type="checkbox"
+         onChange={HandelSupervisorcheckSelect}
+         checked={checkSupervisor}
+         style={{ width: "18px" }}
+       /> */}
+
                               <div className="row">
                                 <div className="col-md-12  position-relative">
                                   <div className="hidden-toggles">
@@ -4285,6 +4296,7 @@ const ExportDashboardEditDetails = ({
                         ) : (
                           ""
                         )}
+                        {/* ENDS HERE */}
 
                         <div
                           className={
@@ -4303,6 +4315,46 @@ const ExportDashboardEditDetails = ({
                             <div className="mt-2 py-1">
                               <MenuBar editor={editor} />
                               <EditorContent editor={editor} />
+
+                              {/*<SunEditor
+         setContents={
+           Description
+             ? Description
+             : applicationDetail?.analystDescription
+         }
+         onChange={(newcomment) => setDescription(newcomment)}
+         setOptions={{
+           buttonList: [
+             ["undo", "redo"],
+             ["fontSize"],
+             [
+               "bold",
+               "underline",
+               "italic",
+               "strike",
+               "subscript",
+               "superscript",
+             ],
+             ["fontColor", "hiliteColor"],
+             ["align", "list", "lineHeight"],
+             ["outdent", "indent"],
+
+             [
+               "table",
+               "horizontalRule",
+               "link",
+               "image",
+               "video",
+             ],
+             ["preview", "print"],
+             ["removeFormat"],
+           ],
+           defaultTag: "div",
+           minHeight: "120px",
+           showPathLabel: false,
+         }}
+	 />*/}
+
                               <span className="sspan"></span>
                               {(errors.Description && Description == " ") ||
                               Description == null ||
@@ -4649,6 +4701,27 @@ const ExportDashboardEditDetails = ({
                                         </div>
                                       </div>
                                     </div>
+                                    {/* <div class="col-md-6">
+                                            <div class="inner_form_new-sm ">
+                                              <label class="controlform-sm">
+                                                Assigned To User
+                                              </label>
+                                              <div class="form-bx-sm">
+                                                <label>
+                                                  <input
+                                                    type="text"
+                                                    class=""
+                                                    disabled
+                                                    value={
+                                                      items?.assignedToName
+                                                        ? items?.assignedToName
+                                                        : "N/A"
+                                                    }
+                                                  />
+                                                </label>
+                                              </div>
+                                            </div>
+                                          </div> */}
                                   </div>
                                 </div>
                               </>
@@ -14921,7 +14994,7 @@ const ExportDashboardEditDetails = ({
                 )}
                 {nextlevelvalue == 35 ? (
                   <button
-                    className="btn btn-primary"
+                    className="login"
                     type="button"
                     disabled={
                       !otherDepartmentRole ||
@@ -14937,7 +15010,7 @@ const ExportDashboardEditDetails = ({
                     {OtherDepartmentLoader ? (
                       <span className="loaderwait">Please Wait...</span>
                     ) : (
-                      <span>Refer to Other Department</span>
+                      <span>Submit</span>
                     )}
                   </button>
                 ) : (
@@ -14988,6 +15061,7 @@ const ExportDashboardEditDetails = ({
                  )}
               </div>
             </div>
+
             {/* pdf-preview data start Arun Verma Final Pdf Generation and Preview */}
             <div className="login_inner" style={{ display: "none" }}>
               <div className="login_form_panel" style={{ display: "none" }}>
@@ -16684,20 +16758,6 @@ const ExportDashboardEditDetails = ({
                             <br />
                           </>
                         )}
-                        {/* <span
-                            style={{
-                              borderBottom: "1px solid #000",
-                              fontWeight: "800",
-                              fontSize: "18px",
-                              letterSpacing: "0.01px"
-                            }}
-                            className="text-uppercase"
-                          >
-                            {applicationDetail?.bankCity != null ||
-                            applicationDetail?.bankCity != ""
-                              ? applicationDetail?.bankCity
-                              : ""}
-                          </span> */}
                       </td>
                     </tr>
                     <tr>
@@ -16714,13 +16774,6 @@ const ExportDashboardEditDetails = ({
                         }}
                       >
                         Dear{" "}
-                        {/* {applicationDetail?.applicantType == 1
-                            ? applicationDetail?.companyName
-                            : applicationDetail?.applicantType == 2
-                            ? applicationDetail?.name
-                            : applicationDetail?.applicantType == 3
-                            ? applicationDetail?.agencyName
-                            : " "} */}
                         {applicationDetail?.companyName == null ||
                         applicationDetail?.companyName == ""
                           ? applicationDetail?.name
@@ -16754,31 +16807,6 @@ const ExportDashboardEditDetails = ({
                           <tr>
                             <td colSpan="2">&nbsp;</td>
                           </tr>
-                          {/* <tr>
-                              <td
-                                style={{
-                                  color: "#000",
-                                  fontSize: "18px",
-                                  fontWeight: "400",
-                                }}
-                              >
-                                Exporter
-                              </td>
-                              <td
-                                style={{
-                                  color: "#000",
-                                  fontSize: "18px",
-                                  fontWeight: "800",
-                                  letterSpacing: "0.01px"
-                                }}
-                              >
-                                :{" "}
-                                {applicationDetail?.companyName == null || applicationDetail?.companyName == ""
-                                  ? applicationDetail?.name
-                                  : applicationDetail?.companyName} 
-                                  {console.log(applicationDetail)}
-                              </td>
-                            </tr> */}
                           <tr>
                             <td
                               style={{
@@ -16993,7 +17021,7 @@ const ExportDashboardEditDetails = ({
               ""
             )}
 
-{OtherDepartmentPopup == true ? (
+              {OtherDepartmentPopup == true ? (
                 <UpdatePopupMessage
                   heading={heading1}
                   para={para1}

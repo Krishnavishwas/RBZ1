@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Routes, Route, useNavigate } from "react-router-dom";
-import Home from "./pages/Home";
+import BankADLADashboard from "./pages/BankADLADashboard";
 import TemplatePagePDF from "./pages/TemplatePagePDF";
 import Login from "./login/Login";
 import UserType from "./login/UserType";
@@ -44,29 +44,36 @@ import ImportNewForm from "./pages/ImportNewForm";
 import ImportDashboard from "./pages/ImportDashboard";
 import ExportExpiredRequests from "./pages/ExportExpiredRequests";
 import ExportExpiringRequests from "./pages/ExportExpiringRequests";
-import CircularsRequests from "./pages/CircularsRequests";
 import CopiedResponse from "./pages/ExportCopiedResponse";
 import ImportApprovedRequests from "./pages/ImportApprovedRequests";
 import ImportDeferredRequests from "./pages/ImportDeferredRequests";
 import ImportPendingRequests from "./pages/ImportPendingRequests";
 import ImportRejectedRequests from "./pages/ImportRejectedRequests";
-import ImportSubmittedRequests from "./pages/ImportSubmittedRequests"; 
-import ActingRoleDashboard from "./pages/ActingRoleDashboard"
+import ImportSubmittedRequests from "./pages/ImportSubmittedRequests";
+import ActingRoleDashboard from "./pages/ActingRoleDashboard";
 import ImportCancelledRequests from "./pages/ImportCancelledRequests";
 import ImportsExpiredRequests from "./pages/ImportsExpiredRequests";
 import ImportsExpiringRequests from "./pages/ImportsExpiringRequests";
 import ImpersonateUser from "./admin/pages/ImpersonateUser";
-import ExportCircularsRequests from "./pages/ExportCircularsRequests"
+import ExportCircularsRequests from "./pages/ExportCircularsRequests";
 import ReferredDashboard from "./pages/ReferredDashboard";
-import FINVSubmittedRequests from "./pages/FINVSubmittedRequests"
+import FINVSubmittedRequests from "./pages/FINVSubmittedRequests";
 import Search from "./pages/Search";
-import FINVPendingRequests from "./pages/FINVPendingRequests"
-import FINVApprovedRequests from "./pages/FINVApprovedRequests"
-import FINVRejectedRequests from "./pages/FINVRejectedRequests"
-import FINVDeferredRequests from "./pages/FINVDeferredRequests"
-import FINVCancelledRequests from "./pages/FINVCancelledRequests"
-import FINVExpiredRequests from "./pages/FINVExpiredRequests"
-import FINVExpiringRequests from "./pages/FINVExpiringRequests"
+import FINVPendingRequests from "./pages/FINVPendingRequests";
+import FINVApprovedRequests from "./pages/FINVApprovedRequests";
+import FINVRejectedRequests from "./pages/FINVRejectedRequests";
+import FINVDeferredRequests from "./pages/FINVDeferredRequests";
+import FINVCancelledRequests from "./pages/FINVCancelledRequests";
+import FINVExpiredRequests from "./pages/FINVExpiredRequests";
+import FINVExpiringRequests from "./pages/FINVExpiringRequests";
+import INSNewRequest from "./pages/INSNewRequest";
+
+import CircularNewRequest from "./pages/CircularNewRequest";
+import CircularAllRequest from "./pages/CircularAllRequest";
+import CircularApproveRequest from "./pages/CircularApproveRequest";
+import CircularCancelledRequest from "./pages/CircularCancelledRequest";
+import Home from "./pages/Home";
+import INSDashboard from "./pages/INSDashboard";
 
 function App() {
   const loginToken = Storage.getItem("loginToken");
@@ -120,14 +127,28 @@ function App() {
           ipAddress != undefined &&
           rollId != 1 ? (
           <>
-            <Route path="/BankADLADashboard" element={<Home />} />
+            <Route path="/AllDashboard" element={<Home />} />
+            <Route path="/BankADLADashboard" element={<BankADLADashboard />} />
             <Route path="/ExportNewRequest" element={<ExportNewRequest />} />
             <Route path="/ImportNewForm" element={<ImportNewForm />} />
             <Route path="/template" element={<TemplatePagePDF />} />
             <Route path="/ImportDashboard" element={<ImportDashboard />} />
             <Route path="/FINVDashboard" element={<FINVDashboard />} />
             <Route path="/FINVNewRequest" element={<FINVNewRequest />} />
-            <Route path="/Circulars" element={<ExportCircularsRequests />}/> 
+            <Route
+              path="/CircularDashboard"
+              element={<ExportCircularsRequests />}
+            />
+            <Route path="/NewCircular" element={<CircularNewRequest />} />
+            <Route path="/AllCircular" element={<CircularAllRequest />} />
+            <Route
+              path="/ApprovedCircular"
+              element={<CircularApproveRequest />}
+            />
+            <Route
+              path="/CancelledCircular"
+              element={<CircularCancelledRequest />}
+            />
             <Route path="/Profile" element={<Profile />} />
             <Route
               path="/ExportPendingRequests"
@@ -167,31 +188,72 @@ function App() {
             />
 
             <Route path="/ExportExpired" element={<ExportExpiredRequests />} />
-            <Route path="/ImportApprovedRequests" element={<ImportApprovedRequests />} />
-            <Route path="/ImportDeferredRequests" element={<ImportDeferredRequests />} />
-            <Route path="/ImportPendingRequests" element={<ImportPendingRequests />} />
-            <Route path="/ImportRejectedRequests" element={<ImportRejectedRequests />} />
-            <Route path="/ImportSubmittedRequests" element={<ImportSubmittedRequests />} />
+            <Route
+              path="/ImportApprovedRequests"
+              element={<ImportApprovedRequests />}
+            />
+            <Route
+              path="/ImportDeferredRequests"
+              element={<ImportDeferredRequests />}
+            />
+            <Route
+              path="/ImportPendingRequests"
+              element={<ImportPendingRequests />}
+            />
+            <Route
+              path="/ImportRejectedRequests"
+              element={<ImportRejectedRequests />}
+            />
+            <Route
+              path="/ImportSubmittedRequests"
+              element={<ImportSubmittedRequests />}
+            />
             <Route path="/Search" element={<Search />} />
             <Route
               path="/ExportExpiringRequests"
               element={<ExportExpiringRequests />}
             />
-            <Route path="/Circulars" element={<CircularsRequests />} />
             <Route path="/CopiedResponse" element={<CopiedResponse />} />
-            <Route path="/ActingRoleDashboard" element={<ActingRoleDashboard />} />
             <Route
-              path="/ReferredDashboard"
-              element={<ReferredDashboard />}
+              path="/ActingRoleDashboard"
+              element={<ActingRoleDashboard />}
             />
-            <Route path="/FINVSubmittedRequests" element={<FINVSubmittedRequests />} />
-            <Route path="/FINVPendingRequests" element={<FINVPendingRequests />} />
-            <Route path="/FINVApprovedRequests" element={<FINVApprovedRequests />} />
-            <Route path="/FINVRejectedRequests" element={<FINVRejectedRequests />} />
-            <Route path="/FINVDeferredRequests" element={<FINVDeferredRequests />} />
-            <Route path="/FINVCancelledRequests" element={<FINVCancelledRequests />} />
-            <Route path="/FINVExpiredRequests" element={<FINVExpiredRequests />} />
-            <Route path="/FINVExpiringRequests" element={<FINVExpiringRequests />} />
+            <Route path="/ReferredDashboard" element={<ReferredDashboard />} />
+            <Route
+              path="/FINVSubmittedRequests"
+              element={<FINVSubmittedRequests />}
+            />
+            <Route
+              path="/FINVPendingRequests"
+              element={<FINVPendingRequests />}
+            />
+            <Route
+              path="/FINVApprovedRequests"
+              element={<FINVApprovedRequests />}
+            />
+            <Route
+              path="/FINVRejectedRequests"
+              element={<FINVRejectedRequests />}
+            />
+            <Route
+              path="/FINVDeferredRequests"
+              element={<FINVDeferredRequests />}
+            />
+            <Route
+              path="/FINVCancelledRequests"
+              element={<FINVCancelledRequests />}
+            />
+            <Route
+              path="/FINVExpiredRequests"
+              element={<FINVExpiredRequests />}
+            />
+            <Route
+              path="/FINVExpiringRequests"
+              element={<FINVExpiringRequests />}
+            />
+            <Route path="/INSNewRequest" element={<INSNewRequest />} />
+            <Route path="/INSDashboard" element={<INSDashboard />} />
+
             <Route path="*" element={<NotFound />} />
           </>
         ) : (

@@ -1032,3 +1032,32 @@ ul.labelbx li {
 
     text-align: center;
 }
+
+
+.genInfoBox .form-bx label .showData {
+    cursor: no-drop;
+    color: #8d8c8c;
+    font-size: 14px;
+  }
+  
+  
+  .showData{
+    cursor: no-drop;
+    color: #8d8c8c;
+    font-size: 14px;
+  }
+  
+  
+  .exportViewCircular .nalist li {
+      cursor: no-drop;
+      color: #8d8c8c;
+      font-size: 14px;
+  }
+  
+  .circularEdiorDisData p {
+    margin-bottom: 0;
+    cursor: no-drop;
+    color: #8d8c8c;
+    font-size: 14px;
+  }
+  

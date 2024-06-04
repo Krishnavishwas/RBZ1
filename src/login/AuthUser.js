@@ -58,7 +58,7 @@ export default function AuthUser(){
         setToken(loginToken);
         setUser(userType);
         if(roleIDs != 1){
-          navigate('/BankADLADashboard');
+          navigate('/AllDashboard');
         }else{
           // navigate('/');
           navigate('/PendingUser')
