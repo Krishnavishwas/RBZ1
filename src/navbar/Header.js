@@ -18,7 +18,7 @@ const Header = () => {
   const LoginToken = Storage.getItem("loginToken");
   const RoleID = Storage.getItem("roleIDs");
   // const navigation = useNavigate();
-  const [userRole, setUserRole] = useState([]); 
+  const [userRole, setUserRole] = useState([]);
 
   const roleName = Storage.getItem("roleName");
 
@@ -47,16 +47,14 @@ const Header = () => {
       UserID: "",
       RoleID: "",
       ActingUserID: "",
-      ActingRoleID: "", 
+      ActingRoleID: "",
     },
   ]);
   const [exportuser, setexportuser] = useState([]);
   const [importuser, setimportuser] = useState([]);
   const [fibuser, setfib] = useState([]);
   const [inspecuser, setinspecuser] = useState([]);
-  const [actionHistory, setactionHistory] = useState([])
-
-   
+  const [actionHistory, setactionHistory] = useState([]);
 
   const hanldeSetactiondata = (e, index, id) => {
     const name = e.target.name;
@@ -86,14 +84,14 @@ const Header = () => {
         if (removeIndex !== -1) {
           updatedList.splice(removeIndex, 1);
         }
-        return updatedList.filter(item => item !== null);  
+        return updatedList.filter((item) => item !== null);
       });
     }
   };
 
   const finalActiondata = allactingdata
-    .filter(v => v && v.UserID !== "")  
-    .map(v => {
+    .filter((v) => v && v.UserID !== "")
+    .map((v) => {
       return {
         DepartmentID: v.actingId,
         UserID: v.UserID,
@@ -102,35 +100,35 @@ const Header = () => {
         ActingRoleID: v.ActingRoleID,
         RoleStartDate: startDate,
         RoleEndDate: endDate,
-        Reason: reasontext || "",  
+        Reason: reasontext || "",
       };
     });
- 
 
-  const handleActionghistor=()=>{
-    axios.post(APIURL + "User/GetActingRoleByUserID",{
-      UserID:UserID.replace(/"/g, "")
-    })
-    .then((res)=>{ 
-      if(res.data.responseCode == "200"){
-        setactionHistory(res.data.responseData)
-      }
-    })
-    .catch((err)=>{
-      console.log(err)
-    })
-  }
+  const handleActionghistor = () => {
+    axios
+      .post(APIURL + "User/GetActingRoleByUserID", {
+        UserID: UserID.replace(/"/g, ""),
+      })
+      .then((res) => {
+        if (res.data.responseCode == "200") {
+          setactionHistory(res.data.responseData);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
 
-  useEffect(()=>{
-    handleActionghistor()
-  },[]) 
+  useEffect(() => {
+    handleActionghistor();
+  }, []);
 
   const UserRole = async () => {
     await axios
       .post(APIURL + "User/GetRolesByUserID", {
         UserID: UserID?.replace(/"/g, ""),
       })
-      .then((res) => { 
+      .then((res) => {
         setUserRole(res.data.responseData);
       });
   };
@@ -162,7 +160,7 @@ const Header = () => {
         Storage.removeItem("menuitem");
         sessionStorage.setItem("submenuname", "Dashboard");
 
-        if (res.data.responseCode == 200) { 
+        if (res.data.responseCode == 200) {
           // setmenuCount(res.data.responseData);
           Storage.setItem("menuitem", JSON.stringify(res.data.responseData));
           const firstMenuItem = res.data.responseData[1];
@@ -188,7 +186,7 @@ const Header = () => {
         BankID: bankId,
       })
       .then((res) => {
-        if (res.data.responseCode == 200) { 
+        if (res.data.responseCode == 200) {
           // setmenuCount(res.data.responseData);
 
           Storage.setItem("menucounter", JSON.stringify(res.data.responseData));
@@ -212,7 +210,6 @@ const Header = () => {
     setUserRoleName(name);
   };
   // Role click Function end
-  
 
   const UserRoleList = () => {
     const roleIDs = RoleId?.replace(/"/g, "");
@@ -265,7 +262,7 @@ const Header = () => {
         DepartmentID: 5,
         UserID: UserID?.replace(/"/g, ""),
       })
-      .then((res) => { 
+      .then((res) => {
         if (res.data.responseCode == 200) {
           setinspecuser(res.data.responseData);
         } else {
@@ -280,7 +277,7 @@ const Header = () => {
         UserID: UserID.replace(/"/g, ""),
         RoleID: RoleId.replace(/"/g, ""),
       })
-      .then((res) => { 
+      .then((res) => {
         if (res.data.responseCode == 200) {
           setactinglist(res.data.responseData);
         } else {
@@ -295,24 +292,25 @@ const Header = () => {
   const handleActingRole = async () => {
     axios
       .post(APIURL + "User/AddActingRole", finalActiondata)
-      .then((res) => { 
-        if(res.data.responseCode == 200){
+      .then((res) => {
+        if (res.data.responseCode == 200) {
           toast.success(res.data.responseMessage);
           EditModalClose();
-          setStartDate("")
-          setendDate("")
-          setallactingdata([ {
-            actingId: "",
-            UserID: "",
-            RoleID: "",
-            ActingUserID: "",
-            ActingRoleID: "", 
-          }]) 
-          handleActionghistor()
-        }else{
+          setStartDate("");
+          setendDate("");
+          setallactingdata([
+            {
+              actingId: "",
+              UserID: "",
+              RoleID: "",
+              ActingUserID: "",
+              ActingRoleID: "",
+            },
+          ]);
+          handleActionghistor();
+        } else {
           toast.warning(res.data.responseMessage);
         }
-        
       })
       .catch((error) => {
         console.log(error);
@@ -327,30 +325,33 @@ const Header = () => {
 
   const EditModalClose = () => {
     setshowEditForm(false);
-    setStartDate("")
-    setendDate("")
-    setallactingdata([ {
-      actingId: "",
-      UserID: "",
-      RoleID: "",
-      ActingUserID: "",
-      ActingRoleID: "", 
-    }]) 
+    setStartDate("");
+    setendDate("");
+    setallactingdata([
+      {
+        actingId: "",
+        UserID: "",
+        RoleID: "",
+        ActingUserID: "",
+        ActingRoleID: "",
+      },
+    ]);
   };
 
-const handleChangeActionStatuschange = (id, statuscode)=>{
-  axios.post(APIURL + "User/UpdateActingRoleStatus",{
-    ID:id,
-    Status: statuscode == 1 ? "0" : "1"
-  })
-  .then((res)=>{
-    handleActionghistor() 
-    toast.success(res.data.responseMessage)
-  })
-  .catch((err)=>{
-    console.log(err)
-  })
-}
+  const handleChangeActionStatuschange = (id, statuscode) => {
+    axios
+      .post(APIURL + "User/UpdateActingRoleStatus", {
+        ID: id,
+        Status: statuscode == 1 ? "0" : "1",
+      })
+      .then((res) => {
+        handleActionghistor();
+        toast.success(res.data.responseMessage);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
 
   useEffect(() => {
     const menucounter = Storage.getItem("menucounter");
@@ -552,8 +553,6 @@ const handleChangeActionStatuschange = (id, statuscode)=>{
 
                   <div className="row">
                     <div className="col-md-12">
-                  
-                       
                       <div className="action_form_new">
                         <label className="actioncontrolform">Date</label>
                         <div className="acting-date">
@@ -612,130 +611,192 @@ const handleChangeActionStatuschange = (id, statuscode)=>{
                             disabled={!startDate}
                           />
                         </div>
-                      
-                  </div> 
+                      </div>
 
-                  <table className="table">
-          {actinglist?.length
-            ? actinglist?.map((list, index) => {
-                return (
-                  <tr key={index}>
-                    <td style={{ width: "120px", paddingRight: "10px" }}>
-                      <label className="labelacting">{list.menuName}</label>
-                    </td>
-                    <td>
-                      <div className="acting_form_new">
-                        <div className="form-bxact">
+                      <table className="table">
+                        {actinglist?.length
+                          ? actinglist?.map((list, index) => {
+                              return (
+                                <tr key={index}>
+                                  <td
+                                    style={{
+                                      width: "120px",
+                                      paddingRight: "10px",
+                                    }}
+                                  >
+                                    <label className="labelacting">
+                                      {list.menuName}
+                                    </label>
+                                  </td>
+                                  <td>
+                                    <div className="acting_form_new">
+                                      <div className="form-bxact">
+                                        <label>
+                                          <select
+                                            name="users"
+                                            onChange={(e) => {
+                                              hanldeSetactiondata(
+                                                e,
+                                                index,
+                                                list.id
+                                              );
+                                            }}
+                                          >
+                                            <option value="">
+                                              Select user
+                                            </option>
+                                            {list.id === 2 &&
+                                              exportuser?.map(
+                                                (userlist, ind) => (
+                                                  <option
+                                                    value={JSON.stringify(
+                                                      userlist
+                                                    )}
+                                                    key={ind}
+                                                  >
+                                                    {userlist.name}
+                                                  </option>
+                                                )
+                                              )}
+                                            {list.id === 3 &&
+                                              importuser?.map(
+                                                (userlist, ind) => (
+                                                  <option
+                                                    value={JSON.stringify(
+                                                      userlist
+                                                    )}
+                                                    key={ind}
+                                                  >
+                                                    {userlist.name}
+                                                  </option>
+                                                )
+                                              )}
+                                            {list.id === 4 &&
+                                              fibuser?.map((userlist, ind) => (
+                                                <option
+                                                  value={JSON.stringify(
+                                                    userlist
+                                                  )}
+                                                  key={ind}
+                                                >
+                                                  {userlist.name}
+                                                </option>
+                                              ))}
+                                            {list.id === 5 &&
+                                              inspecuser?.map(
+                                                (userlist, ind) => (
+                                                  <option
+                                                    value={JSON.stringify(
+                                                      userlist
+                                                    )}
+                                                    key={ind}
+                                                  >
+                                                    {userlist.name}
+                                                  </option>
+                                                )
+                                              )}
+                                          </select>
+                                        </label>
+                                      </div>
+                                    </div>
+                                  </td>
+                                </tr>
+                              );
+                            })
+                          : ""}
+                      </table>
+
+                      <div className="action_form_new">
+                        <label class="actioncontrolform">Reason</label>
+                        <div className="form-bx-action">
                           <label>
-                            <select
-                              name="users"
-                              onChange={(e) => {
-                                hanldeSetactiondata(e, index, list.id);
-                              }}
-                            >
-                              <option value="">Select user</option>
-                              {list.id === 2 &&
-                                exportuser?.map((userlist, ind) => (
-                                  <option
-                                    value={JSON.stringify(userlist)}
-                                    key={ind}
-                                  >
-                                    {userlist.name}
-                                  </option>
-                                ))}
-                              {list.id === 3 &&
-                                importuser?.map((userlist, ind) => (
-                                  <option
-                                    value={JSON.stringify(userlist)}
-                                    key={ind}
-                                  >
-                                    {userlist.name}
-                                  </option>
-                                ))}
-                              {list.id === 4 &&
-                                fibuser?.map((userlist, ind) => (
-                                  <option
-                                    value={JSON.stringify(userlist)}
-                                    key={ind}
-                                  >
-                                    {userlist.name}
-                                  </option>
-                                ))}
-                              {list.id === 5 &&
-                                inspecuser?.map((userlist, ind) => (
-                                  <option
-                                    value={JSON.stringify(userlist)}
-                                    key={ind}
-                                  >
-                                    {userlist.name}
-                                  </option>
-                                ))}
-                            </select>
+                            <textarea
+                              name="Reason"
+                              onChange={(e) => setreasontext(e.target.value)}
+                              placeholder="Reason"
+                            ></textarea>
+                            <span className="sspan"></span>
                           </label>
                         </div>
                       </div>
-                    </td>
-                  </tr>
-                );
-              })
-            : ""}
-        </table>
-                      
-                        <div className="action_form_new">
-                          <label class="actioncontrolform">Reason</label>
-                          <div className="form-bx-action">
-                            <label>
-                              <textarea
-                                name="Reason"
-                                onChange={(e) => setreasontext(e.target.value)}
-                                placeholder="Reason"
-                              ></textarea>
-                              <span className="sspan"></span>
-                            </label>
-                          </div>
-                       
 
+                      <h5 className="heading-actingrole">
+                        ACTING ROLE HISTORY
+                      </h5>
+
+                      <div className="responsive-table">
+                        <table className="table table-custom">
+                          <tr>
+                            <th>Start Date</th>
+                            <th>End Date</th>
+                            <th>Reason</th>
+                            <th>Department/ User</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                          </tr>
+                          {actionHistory?.length &&
+                            actionHistory?.map((item, index) => {
+                              return (
+                                <tr>
+                                  <td>
+                                    {moment(item?.assignedDate).format(
+                                      "DD/MMM/YYYY"
+                                    )}
+                                  </td>
+                                  <td>
+                                    {moment(item?.roleEndDate).format(
+                                      "DD/MMM/YYYY"
+                                    )}
+                                  </td>
+                                  <td>
+                                    <span className="department-reason">
+                                      {item?.reason}
+                                    </span>
+                                  </td>
+                                  <td>
+                                    <span className="department-user">
+                                      {item?.departmentName} / {item.userName}
+                                    </span>
+                                  </td>
+                                  <td>
+                                    <span
+                                      className={
+                                        item.statusName == "Active"
+                                          ? "green-text"
+                                          : "red-text"
+                                      }
+                                    >
+                                      {item.statusName}
+                                    </span>
+                                  </td>
+                                  <td>
+                                    <button
+                                      className={
+                                        item.statusName == "Active"
+                                          ? "activebtn-text"
+                                          : "inactivebtn-text"
+                                      }
+                                      onClick={(e) =>
+                                        handleChangeActionStatuschange(
+                                          item.id,
+                                          item.status
+                                        )
+                                      }
+                                    >
+                                      {item.statusName == "Active" ? (
+                                        <i class="bi bi-toggle2-on"></i>
+                                      ) : (
+                                        <i class="bi bi-toggle2-off"></i>
+                                      )}
+                                    </button>
+                                  </td>
+                                </tr>
+                              );
+                            })}
+                        </table>
                       </div>
-
-                      <h5 className="heading-actingrole">ACTING ROLE HISTORY</h5>
-
-<div className="responsive-table">
-<table className="table table-custom">
-<tr>
-  <th>Start Date</th>
-  <th>End Date</th>
-  <th>Reason</th>
-  <th>Department/ User</th>
-  <th>Status</th> 
-  <th>Action</th>
-</tr>
-{
-    actionHistory?.length && actionHistory?.map((item, index)=>{
-      return(
-        <tr>
-          <td>{moment(item?.assignedDate).format("DD/MMM/YYYY")}</td>
-          <td>{moment(item?.roleEndDate).format("DD/MMM/YYYY")}</td>
-          <td><span className="department-reason">{item?.reason}</span></td>
-          <td><span className="department-user">{item?.departmentName} / {item.userName}</span></td>
-          <td><span className={item.statusName == "Active" ? "green-text" : "red-text"}>{item.statusName}</span></td>
-          <td><button className={item.statusName == "Active" ? "activebtn-text" : "inactivebtn-text"} onClick={(e)=> handleChangeActionStatuschange(item.id, item.status)}>
-           {
-           item.statusName == "Active" ? <i class="bi bi-toggle2-on"></i> :  <i class="bi bi-toggle2-off"></i>
-           }
-            
-            </button></td>
-        </tr>
-      )
-    })
-  }
-</table>
-</div>
-
                     </div>
                   </div>
-
-                 
-
                 </div>
 
                 <div className="form-footer mt-5 mb-3 flex-row-reverse">

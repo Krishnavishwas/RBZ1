@@ -7,6 +7,7 @@ import "primereact/resources/themes/lara-light-cyan/theme.css";
 import { InputText } from "primereact/inputtext";
 import "primeicons/primeicons.css";
 import moment from "moment";
+import NoSign from "../NoSign.png";
 import { APIURL } from "../constant";
 import { Storage } from "../login/Storagesetting";
 import { Link } from "react-router-dom";
@@ -22,6 +23,8 @@ const ExportCircularsTable = () => {
     const rollId = Storage.getItem("roleIDs");
     const roleID = Storage.getItem("roleIDs");
     const roleName = Storage.getItem("roleName");
+    const PdfUsername = Storage.getItem("name");
+    const PdfRolename = Storage.getItem("roleName");
     const bankId = Storage.getItem("bankID")
     const PdftargetRef = useRef();
     const PdfPrivewRef = useRef();
@@ -126,7 +129,7 @@ const ExportCircularsTable = () => {
                         e.target.style.color = "";
                     }}
                 ></i>
-                {roleID == 2 || roleID == 3 ?
+                {rowData.status == '135' || rowData.status == '125' ?
                     <button
                         type="button"
                         className="login "
@@ -141,59 +144,15 @@ const ExportCircularsTable = () => {
 
                     >
                         <i class="pi pi-download p-2 nav-link" style={{ padding: '12px', cursor: 'pointer' }}></i>
-                    </button> :
-                    <i
-                        className="pi pi-user-edit"
-                        style={{ cursor: "pointer" }}
-                        key={rowData.title}
-                        onClick={() => {
-                            handleClickEditModal(rowData.title);
-                            GetHandelDetail(rowData?.circularReferenceNumber, rowData.id);
-                            GetRoleHandle(applicationstaus);
-                            handleData();
-                            GetApplicationCount(rowData.id)
-                        }}
-                        onMouseEnter={(e) => {
-                            e.target.style.color = "var(--primary-color)";
-                        }}
-                        onMouseLeave={(e) => {
-                            e.target.style.color = "";
-                        }}
-                    ></i>
+                    </button>
 
+                    : ""
 
                 }
             </>
         );
     };
 
-    const applicantName = (rowData) => {
-        return (
-            <>
-                {rowData.applicantType === 1 || rowData.userTypeID === 1 ? (
-                    <span>
-                        <i className="bi bi-c-circle-fill text-primary"></i>
-                        &nbsp;&nbsp;{rowData.companyName}
-                    </span>
-                ) : rowData.applicantType === 2 || rowData.userTypeID == 2 ? (
-                    <span>
-                        <i className="bi bi-person-circle"></i>
-                        &nbsp;&nbsp;{rowData.name}
-                    </span>
-                ) : (
-                    ""
-                )}
-            </>
-        );
-    };
-
-    const amountwithCurrency = (rowData) => {
-        return (
-            <span>
-                {rowData.currencyCode}&nbsp;{rowData.amount?.toLocaleString()}
-            </span>
-        );
-    };
 
 
     const releasingDate = (rowData) => {
@@ -211,74 +170,29 @@ const ExportCircularsTable = () => {
             </span>
         )
     }
-    const contentData = (rowData) => {
-        return (
-            <span>
-                {rowData?.content ? <span dangerouslySetInnerHTML={{ __html: rowData.content }} /> : "-"}
-            </span>
-        )
-    }
+  
     const header = renderHeader();
 
-    const EditModalClose = () => {
-        setshowEditForm(false);
-        // setapplicationstaus("0");
-        setnextlevelvalue("");
-    };
+ 
     const handleFormClose = () => {
         setShowUpdateModal(false)
     }
 
-    // ----- Start Code For Open Edit Popup
-    const handleClickEditModal = () => {
-        setAssignUserID(null)
-        setshowEditForm(true);
-    };
-    // ----- End Code For Open Edit Popup
 
-    // ----- Start Code For Open delegate Popup
-    const handleClickDelegateModal = () => {
-        setshowDelegateModal(true);
-    };
-    const DelegateModalClose = () => {
-        setshowDelegateModal(false);
-        // setapplicationstaus("0");
-        setnextlevelvalue("");
-        setDelegateAsignUser([]);
-        setDelegateComment("");
-        setDelegateNote("");
-        setSelectedAppliation(null);
-    };
-    // ----- End Code For Open delegate Popup
 
     // ----- Start Code For Geting Table List Data
     const handleData = async () => {
         // setshowdataloader(true) 
         setLoading(true);
-        if (roleID == 2 || roleID == 3) {
+       
+       
             await axios
-                .post(APIURL + "Circular/GetCircularDataByBankID", {
+                // .post(APIURL + "Circular/GetCirularApplications", {
                     // UserID: useId.replace(/"/g, ""),
+                    // RoleID: roleID,
+                    .post(APIURL + "Circular/GetCircularDataByBankID", {
                     BankID: bankId,
-                })
-                .then((res) => {
-                    if (res.data.responseCode === "200") {
-                        setLoading(false);
-                        setData(res.data.responseData);
-
-
-                    } else {
-                        setData([]);
-                        setLoading(false);
-
-                    }
-                });
-        }
-        else {
-            await axios
-                .post(APIURL + "Circular/GetCirularApplications", {
-                    UserID: useId.replace(/"/g, ""),
-                    RoleID: roleID
+                    DepartmentID:"2"
 
                 })
                 .then((res) => {
@@ -298,91 +212,12 @@ const ExportCircularsTable = () => {
                         // setshowdataloader(false)
                     }
                 });
-        }
+       
     };
     // ----- End Code For Geting Table List Data
 
-    const supervisorHangechangeBankuser = (e) => {
-        const { value } = e.target;
-        if (value == "") {
-            setAssignUserID("");
-            setSupervisorRoleId("");
-        } else {
-            const { userID, roleID } = JSON?.parse(value);
-            setAssignUserID(userID);
-            setSupervisorRoleId(roleID);
-        }
-    };
 
-    const supervisorHangechangeRole = (e) => {
-        const { name, value } = e.target;
-        if (value == "90A" || value == "") {
-            setAssignUserID("");
-            setSupervisorRoleId("");
-            setAsignUser([]);
-        } else {
-            // setSupervisorRoleId(value);
-            axios
-                .post(APIURL + "User/GetUsersByRoleID", {
-                    RoleID:
-                        value == "10" || value == "40" || value == "25" || value == "30"
-                            ? parseInt(roleID) + 1
-                            : value == "15" ||
-                                value == "5" ||
-                                value == "6" ||
-                                value == "7" ||
-                                value == "8"
-                                ? // ? parseInt(roleID) - 1
-                                value
-                                : roleID,
-                    UserID: useId.replace(/"/g, ""),
-                    DepartmentID: "2"
-                })
-                .then((res) => {
-                    if (res.data.responseCode == 200) {
-                        setAsignUser(res.data.responseData);
-                    } else {
-                        setSupervisorRoleId("");
-                    }
-                })
-                .catch((err) => {
-                    console.log(err);
-                });
-        }
-    };
-
-    const delegatechangeRole = () => {
-        axios
-            .post(APIURL + "User/GetUsersByRoleID", {
-                RoleID: roleID,
-                UserID: useId.replace(/"/g, ""),
-            })
-            .then((res) => {
-                if (res.data.responseCode == 200) {
-                    setDelegateAsignUser(res.data.responseData);
-                }
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-    };
-
-    useEffect(() => {
-        delegatechangeRole();
-    }, [checkdeligateuser]);
-
-    const supervisorHangechange = (e) => {
-        const { name, value } = e.target;
-
-        if (value == "") {
-            setAssignUserID(null);
-        } else {
-            setAssignUserID(value);
-        }
-    };
-    // ---- start API code for Comment
-
-    //---end API code for Comment
+  
 
     // ----- Start Code For Open Poup
     const handleViewData = (id) => {
@@ -547,28 +382,10 @@ const ExportCircularsTable = () => {
         );
     }, [applicationDetail]);
 
-    const GetRoleHandle = async (id) => {
-        setUserrole([]);
-        await axios
-            .post(APIURL + "Master/GetRoles", {
-                RoleID: roleID,
-                Status: `${id}`,
-            })
-            .then((res) => {
-                if (res.data.responseCode == 200) {
-                    setUserrole(res.data.responseData);
-                } else {
-                    setUserrole([]);
-                }
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-    };
-    // pdf code start
-    console.log("applicationDetail----", applicationDetail);
+ 
+
     const GetHandelDetailPDF = async (circularReferenceNumber) => {
-        console.log("applicationDetail");
+        console.log("applicationDetail", circularReferenceNumber);
         setBtnLoader(true);
         setTimeout(() => {
             const doc = new jsPDF({
@@ -605,8 +422,8 @@ const ExportCircularsTable = () => {
                     );
                 }
             };
-            doc.setFont("helvetica", "normal");
-            doc.setFontSize(3);
+            // doc.setFont("helvetica", "normal");
+            // doc.setFontSize(3);
             let docWidth = doc.internal.pageSize.getWidth();
             const refpdfview =
                 PdfPrivewsupervisorRef
@@ -622,7 +439,7 @@ const ExportCircularsTable = () => {
                     addHeader(doc);
 
                     doc.setProperties({
-                        title: `${applicationDetail?.circularReferenceNumber}`,
+                        title: `${circularReferenceNumber}`,
                     });
                     var blob = doc.output("blob");
                     window.open(URL.createObjectURL(blob), "_blank");
@@ -780,41 +597,7 @@ const ExportCircularsTable = () => {
         handleData();
     }, []);
 
-    const delegateValues = selectedAppliation?.map((v) => {
-        return {
-            ApplicationID: v.id,
-            status: v.status,
-            AssignedTo: delegateUserID,
-            RoleID: roleID,
-            AssignedToRoleID: roleID,
-            Notes: delegateNote,
-            Comment: delegateComment,
-            CreatedBy: useId.replace(/"/g, ""),
-        };
-    });
 
-    const delegateSubmit = (e) => {
-        e.preventDefault();
-        setBtnLoader(true);
-        axios
-            .post(APIURL + "ExportApplication/BulkDelegate", delegateValues)
-            .then((res) => {
-                if (res.data.responseCode == 200) {
-                    setBtnLoader(false);
-                    DelegateModalClose();
-                    handleData();
-                    setDelegateAsignUser([]);
-                    setDelegateComment("");
-                    setDelegateNote("");
-                    setSelectedAppliation(null);
-                }
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-    };
-
-    console.log("data------", data);
     return (
 
         <>
@@ -921,7 +704,7 @@ const ExportCircularsTable = () => {
                             <h5>
                                 <Modal.Header closeButton className="p-0">
                                     <Modal.Title>
-                                        View Export Request --{" "}
+                                        View Circular --{" "}
                                         <big>{applicationDetail?.circularReferenceNumber}</big>
                                     </Modal.Title>
                                 </Modal.Header>
@@ -946,65 +729,7 @@ const ExportCircularsTable = () => {
             </Modal>
             {/* circular view modal close */}
 
-            <Modal
-                show={showEditForm}
-                onHide={EditModalClose}
-                backdrop="static"
-                className="max-width-600"
-            >
-                <div className="application-box">
-                    <div className="login_inner">
-                        <div className="login_form ">
-                            <h5>
-                                <Modal.Header closeButton className="p-0">
-                                    <Modal.Title>
-                                        Edit Cricular Export Request --{" "}
-                                        <big>
-                                            {applicationDetail?.circularReferenceNumber
-                                                ? applicationDetail.circularReferenceNumber
-                                                : ""}
-                                        </big>
-                                    </Modal.Title>
-                                </Modal.Header>
-                            </h5>
-                        </div>
-                        <div className="login_form_panel">
-                            <Modal.Body className="p-0">
-                                <ExportCircularsEditForm
-                                    applicationDetail={applicationDetail}
-                                    setApplicationDetail={setApplicationDetail}
-                                    EditModalClose={EditModalClose}
-                                    setCricularRequests={setCricularRequests}
-                                    handleData={handleData}
-                                    showdataLoader={showdataLoader}
-                                    allcomment={allcomment}
-                                    GetRoleHandle={GetRoleHandle}
-                                    setapplicationstaus={setapplicationstaus}
-                                    applicationstaus={applicationstaus}
-                                    setnextlevelvalue={setnextlevelvalue}
-                                    nextlevelvalue={nextlevelvalue}
-                                    asignUser={asignUser}
-                                    userRole={userRole}
-                                    responceCount={responceCount}
-                                    setAsignUser={setAsignUser}
-                                    supervisorHangechange={supervisorHangechange}
-                                    supervisorHangechangeBankuser={
-                                        supervisorHangechangeBankuser
-                                    }
-                                    tatHistory={tatHistory}
-                                    AssignUserID={AssignUserID}
-                                    setAssignUserID={setAssignUserID}
-                                    Actiondata={Actiondata}
-                                    SupervisorRoleId={SupervisorRoleId}
-                                    supervisorHangechangeRole={supervisorHangechangeRole}
-                                    setSupervisorRoleId={setSupervisorRoleId}
-                                    noDataComment={noDataComment}
-                                />
-                            </Modal.Body>
-                        </div>
-                    </div>
-                </div>
-            </Modal>
+
 
             {/* pdf generate code start */}
             <div className="login_inner" style={{ display: "none" }}>
@@ -1042,16 +767,14 @@ const ExportCircularsTable = () => {
                                     </p>
                                 </td>
                             </tr>
-                            <tr>
-                                <td colSpan="2">&nbsp;</td>
-                            </tr>
+
                             <tr>
                                 <td
 
                                     style={{
                                         color: "#000",
                                         fontSize: "18px",
-                                        fontWeight: "600",
+                                        fontWeight: "800",
                                         letterSpacing: "0.01px",
                                     }}
                                 >
@@ -1073,16 +796,14 @@ const ExportCircularsTable = () => {
                                     ).format("DD MMMM YYYY")}
                                 </td>
                             </tr>
-                            <tr>
-                                <td colSpan="2">&nbsp;</td>
-                            </tr>
+
                             <tr>
                                 <td
 
                                     style={{
                                         color: "#000",
                                         fontSize: "18px",
-                                        fontWeight: "600",
+                                        fontWeight: "800",
                                         letterSpacing: "0.01px",
                                     }}
                                 >
@@ -1094,7 +815,7 @@ const ExportCircularsTable = () => {
                                         style={{
                                             color: "#000",
                                             fontSize: "18px",
-                                            fontWeight: "800",
+                                            fontWeight: "600",
 
                                             marginBottom: "0px",
                                             letterSpacing: "0.01px",
@@ -1108,7 +829,7 @@ const ExportCircularsTable = () => {
                                                         letterSpacing: "0.01px",
                                                         fontSize: "18px",
                                                         fontWeight: "400",
-                                                        padding: "0px 5px",
+                                                        padding: "0px 5px 0px 0px",
                                                         color: "#000",
 
                                                     }}
@@ -1121,16 +842,14 @@ const ExportCircularsTable = () => {
                                     </p>
                                 </td>
                             </tr>
-                            <tr>
-                                <td colSpan="2">&nbsp;</td>
-                            </tr>
+
                             <tr>
                                 <td
 
                                     style={{
                                         color: "#000",
                                         fontSize: "18px",
-                                        fontWeight: "600",
+                                        fontWeight: "800",
                                         letterSpacing: "0.01px",
                                     }}
                                 >
@@ -1142,7 +861,7 @@ const ExportCircularsTable = () => {
                                         style={{
                                             color: "#000",
                                             fontSize: "18px",
-                                            fontWeight: "800",
+                                            fontWeight: "600",
 
                                             marginBottom: "0px",
                                             letterSpacing: "0.01px",
@@ -1152,16 +871,14 @@ const ExportCircularsTable = () => {
                                     </p>
                                 </td>
                             </tr>
-                            <tr>
-                                <td colSpan="2">&nbsp;</td>
-                            </tr>
+
                             <tr>
                                 <td
 
                                     style={{
                                         color: "#000",
                                         fontSize: "18px",
-                                        fontWeight: "600",
+                                        fontWeight: "800",
                                         letterSpacing: "0.01px",
                                     }}
                                 >
@@ -1173,7 +890,7 @@ const ExportCircularsTable = () => {
                                         style={{
                                             color: "#000",
                                             fontSize: "18px",
-                                            fontWeight: "800",
+                                            fontWeight: "600",
 
                                             marginBottom: "0px",
                                             letterSpacing: "0.01px",
@@ -1183,9 +900,7 @@ const ExportCircularsTable = () => {
                                     </p>
                                 </td>
                             </tr>
-                            <tr>
-                                <td colSpan="2">&nbsp;</td>
-                            </tr>
+
                             <tr>
                                 <td colSpan="2">
                                     <table width="100%">
@@ -1224,7 +939,7 @@ const ExportCircularsTable = () => {
                                                             />
                                                         </td>
                                                     </tr>
-                                                    <tr>
+                                                    {/* <tr>
                                                         <td
                                                             style={{
                                                                 color: "#000",
@@ -1265,20 +980,18 @@ const ExportCircularsTable = () => {
                                                                 })}
                                                             </div>
                                                         </td>
-                                                    </tr>
+                                                    </tr> */}
                                                 </table>
                                             </td>
                                         </tr>
-                                        <tr>
-                                            <td colSpan="2">&nbsp;</td>
-                                        </tr>
+
                                         <tr>
                                             <td
                                                 colSpan="2"
                                                 style={{
                                                     color: "#000",
                                                     fontSize: "18px",
-                                                    fontWeight: "400",
+                                                    fontWeight: "800",
                                                 }}
                                             >
                                                 <span
@@ -1296,7 +1009,7 @@ const ExportCircularsTable = () => {
                                                     src={
                                                         applicationDetail?.getUserData?.filePath
                                                             ? applicationDetail?.getUserData.filePath
-                                                            : applicationDetail.filePath
+                                                            : NoSign
                                                     }
                                                     alt="Signature"
                                                     style={{
@@ -1317,7 +1030,9 @@ const ExportCircularsTable = () => {
                                                         letterSpacing: "0.01px",
                                                     }}
                                                 >
-                                                    SHreya
+                                                    {PdfUsername
+                                                        ? PdfUsername?.replace(/"/g, "")
+                                                        : "N/A"}
                                                 </p>
                                                 <p
                                                     style={{
@@ -1330,7 +1045,9 @@ const ExportCircularsTable = () => {
                                                         letterSpacing: "0.01px",
                                                     }}
                                                 >
-                                                    singh
+                                                    {PdfRolename
+                                                        ? PdfRolename?.replace(/"/g, "")
+                                                        : "N/A"}
                                                 </p>
                                                 <h3
                                                     style={{
@@ -1341,53 +1058,7 @@ const ExportCircularsTable = () => {
                                                 >
                                                     EXCHANGE &nbsp; CONTROL
                                                 </h3>
-                                                <div
-                                                    style={{
-                                                        marginBottom: "0px",
-                                                        color: "#000",
-                                                        fontSize: "18px",
-                                                        fontWeight: "400",
-                                                        padding: "25px 0px 5px",
-                                                        lineHeight: "13px",
-                                                        display: "flex",
-                                                    }}
-                                                >
-                                                    {applicationDetail?.copiedResponses?.length >
-                                                        0 ? (
-                                                        <>
-                                                            <p
-                                                                style={{
-                                                                    marginBottom: "0px",
-                                                                    fontSize: "18px",
-                                                                    fontWeight: "400",
-                                                                    paddingRight: "10px",
-                                                                    letterSpacing: "0.01px",
-                                                                }}
-                                                            >
-                                                                CC:
-                                                            </p>
-                                                            <div>
-                                                                Bank
-                                                                {/* {selectedBanks.map((item) => {
-                                          return (
-                                            <p
-                                              style={{
-                                                marginBottom: "3px",
-                                                letterSpacing: "0.01px",
-                                                fontSize: "18px",
-                                                fontWeight: "400",
-                                              }}
-                                            >
-                                              {item.name}
-                                            </p>
-                                          );
-                                        })} */}
-                                                            </div>
-                                                        </>
-                                                    ) : (
-                                                        ""
-                                                    )}
-                                                </div>
+
                                             </td>
                                         </tr>
                                     </table>

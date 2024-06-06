@@ -7,7 +7,7 @@ import { Storage } from "../login/Storagesetting";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import Modal from "react-bootstrap/Modal";
-import ImportDashboardViewDetails from "../components/ImportDashboardViewDetails";
+import INSDashboardViewDetails from "../components/INSDashboardViewDetails";
 import ImportDashboardEditDetails from "../components/ImportDashboardEditDetails";
 import { Column } from "primereact/column";
 import { TailSpin } from "react-loader-spinner";
@@ -249,7 +249,7 @@ const INSDashboardTable = () => {
   // ----- Start Code For Geting Table List Data
   const handleData = async () => {
     await axios
-      .post(APIURL + "InspectorateApplication/GetInspectorateApplications", {
+      .post(APIURL + "InspectorateApplication/GetINSApplications", {
         UserID: useId.replace(/"/g, ""),
         RoleID: rollId,
       })
@@ -290,7 +290,7 @@ const INSDashboardTable = () => {
   const GetHandelDetail = async (id) => {
     setshowdataloader(true);
     await axios
-      .post(APIURL + "ImportApplication/GetImportRequestInfoByApplicationID", {
+      .post(APIURL + "InspectorateApplication/GetINSRequestInfoByApplicationID", {
         ID: `${id}`,
       })
       .then((res) => {
@@ -309,7 +309,7 @@ const INSDashboardTable = () => {
       });
 
     await axios
-      .post(APIURL + "ImportApplication/GetImportApplicationHistory", {
+      .post(APIURL + "InspectorateApplication/GetINSApplicationHistory", {
         ID: id,
       })
       .then((res) => {
@@ -324,7 +324,7 @@ const INSDashboardTable = () => {
       });
 
     await axios
-      .post(APIURL + "ImportApplication/GetImportCommentsInfoByRoleID", {
+      .post(APIURL + "InspectorateApplication/GetINSCommentsInfoByRoleID", {
         ApplicationID: id,
       })
       .then((res) => {
@@ -339,7 +339,7 @@ const INSDashboardTable = () => {
       });
 
     await axios
-      .post(APIURL + "ImportApplication/GetNewCommentsImport", {
+      .post(APIURL + "InspectorateApplication/GetNewCommentsINS", {
         ID: id,
       })
       .then((res) => {
@@ -354,7 +354,7 @@ const INSDashboardTable = () => {
       });
 
     await axios
-      .post(APIURL + "ImportApplication/GetActionsByApplicationID", {
+      .post(APIURL + "InspectorateApplication/GetINSApplicationActionsByApplicationID", {
         ID: id,
       })
       .then((res) => {
@@ -545,7 +545,7 @@ const INSDashboardTable = () => {
   const GetOldHandelDetail = async (id) => {
     setShowOldDataLoader(true);
     await axios
-      .post(APIURL + "ImportApplication/GetImportRequestInfoByApplicationID", {
+      .post(APIURL + "InspectorateApplication/GetINSRequestInfoByApplicationID", {
         ID: id,
       })
       .then((res) => {
@@ -561,7 +561,7 @@ const INSDashboardTable = () => {
       });
 
     await axios
-      .post(APIURL + "ImportApplication/GetImportCommentsInfoByRoleID", {
+      .post(APIURL + "InspectorateApplication/GetINSCommentsInfoByRoleID", {
         ApplicationID: id,
       })
       .then((res) => {
@@ -576,7 +576,7 @@ const INSDashboardTable = () => {
       });
 
     await axios
-      .post(APIURL + "ImportApplication/GetNewCommentsImport", {
+      .post(APIURL + "InspectorateApplication/GetNewCommentsINS", {
         ID: id,
       })
       .then((res) => {
@@ -606,7 +606,7 @@ const INSDashboardTable = () => {
       });
 
     await axios
-      .post(APIURL + "ImportApplication/GetActionsByApplicationID", {
+      .post(APIURL + "InspectorateApplication/GetINSApplicationActionsByApplicationID", {
         ID: id,
       })
       .then((res) => {
@@ -775,7 +775,7 @@ const INSDashboardTable = () => {
                   <h5>
                     <Modal.Header closeButton className="p-0">
                       <Modal.Title>
-                        View Import Request --{" "}
+                        View Inspectorate Request --{" "}
                         <big>{applicationDetail?.rbzReferenceNumber}</big>
                       </Modal.Title>
                     </Modal.Header>
@@ -783,7 +783,7 @@ const INSDashboardTable = () => {
                 </div>
                 <div className="login_form_panel">
                   <Modal.Body className="p-0">
-                    <ImportDashboardViewDetails
+                    <INSDashboardViewDetails
                       applicationDetail={applicationDetail}
                       applicationmessage={applicationmessage}
                       handleFormClose={handleFormClose}
@@ -822,7 +822,7 @@ const INSDashboardTable = () => {
                             }
                             style={{ alignItems: "center" }}
                           >
-                            Edit Import Request --{" "}
+                            Edit Inspectorate Request --{" "}
                             <big>
                               {applicationDetail?.rbzReferenceNumber
                                 ? applicationDetail.rbzReferenceNumber
@@ -999,7 +999,7 @@ const INSDashboardTable = () => {
                 </div>
                 <div className="login_form_panel">
                   <Modal.Body className="p-0">
-                    <ImportDashboardViewDetails
+                    <INSDashboardViewDetails
                       applicationDetail={oldApplicationDetail}
                       handleFormClose={handleOldClose}
                       allcomment={oldAllcomment}

@@ -16,14 +16,13 @@ import ExportDashboardEditDetails from "../components/ExportDashboardEditDetails
 import { TailSpin } from "react-loader-spinner";
 import ExportDashboardEditDetailsActing from "../components/ExportDashboardEditDetailsActing";
 
-const ExportActingroleTable = ({userselect, actionUserList}) => {
+const ExportActingroleTable = ({ userselect, actionUserList }) => {
   const useId = Storage.getItem("userID");
   const rollId = Storage.getItem("roleIDs");
   const roleIDs = Storage.getItem("roleIDs");
   const roleID = parseInt(roleIDs) + 1;
   // const roleID = Storage.getItem("roleIDs");
   const roleName = Storage.getItem("roleName");
-  
 
   const [exportdata, setexportdata] = useState([]);
   const [showEditForm, setshowEditForm] = useState(false);
@@ -53,12 +52,12 @@ const ExportActingroleTable = ({userselect, actionUserList}) => {
   const [globalFilterValue, setGlobalFilterValue] = useState("");
   const [checkdeligateuser, setcheckdeligateuser] = useState(0);
   const [data, setData] = useState([]);
-  
+
   const [delegateAsignUser, setDelegateAsignUser] = useState([]);
   const [noDataComment, setNoDataComment] = useState([]);
   const [showdataLoader, setshowdataloader] = useState(false);
   const [responceCount, setresponceCount] = useState([]);
- 
+
   const [filters, setFilters] = useState({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
     companyName: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
@@ -87,16 +86,16 @@ const ExportActingroleTable = ({userselect, actionUserList}) => {
   const renderHeader = () => {
     return (
       <>
-      <div className="d-flex  align-items-center coumgap-20">
-        <span className="p-input-icon-left">
-          <i className="pi pi-search" />
-          <InputText
-            value={globalFilterValue}
-            onChange={onGlobalFilterChange}
-            placeholder="Search"
-          />
-        </span>
-        {/* {roleID >= 5 || roleID == 3 ? (
+        <div className="d-flex  align-items-center coumgap-20">
+          <span className="p-input-icon-left">
+            <i className="pi pi-search" />
+            <InputText
+              value={globalFilterValue}
+              onChange={onGlobalFilterChange}
+              placeholder="Search"
+            />
+          </span>
+          {/* {roleID >= 5 || roleID == 3 ? (
           <div
             className="form-footer mt-0 d-block text-end bulkdelegateBtn"
             style={{ float: "left", marginLeft: "20px" }}
@@ -116,16 +115,13 @@ const ExportActingroleTable = ({userselect, actionUserList}) => {
           </div>
         ) : (
           ""
-        )} */} 
-      </div>
-       
+        )} */}
+        </div>
       </>
     );
   };
 
- 
-
-  console.log("userselect", userselect)
+  console.log("userselect", userselect);
 
   const action = (rowData) => {
     return (
@@ -207,13 +203,13 @@ const ExportActingroleTable = ({userselect, actionUserList}) => {
       </span>
     );
   };
-  const updatedDate = (rowData) =>{
-    return(
+  const updatedDate = (rowData) => {
+    return (
       <span>
         {moment(rowData.applicationUpdatedDate).format("DD MMM YYYY")}
       </span>
-    )
-  }
+    );
+  };
 
   const header = renderHeader();
 
@@ -228,19 +224,19 @@ const ExportActingroleTable = ({userselect, actionUserList}) => {
   const handleClickEditModal = () => {
     setshowEditForm(true);
   };
-    
+
   // ----- Start Code For Geting Table List Data
   const handleData = async () => {
     // setshowdataloader(true)
     setLoading(true);
     await axios
       .post(APIURL + "ExportApplication/GetActingDashboardData", {
-        DepartmentID:"2",
+        DepartmentID: "2",
         UserID: useId.replace(/"/g, ""),
         RoleID: rollId,
-        DataType:userselect ? userselect : actionUserList[0]?.userID
+        DataType: userselect ? userselect : actionUserList[0]?.userID,
       })
-      .then((res) => { 
+      .then((res) => {
         if (res.data.responseCode === "200") {
           setLoading(false);
           setData(res.data.responseData);
@@ -292,7 +288,7 @@ const ExportActingroleTable = ({userselect, actionUserList}) => {
               ? // ? parseInt(roleID) - 1
                 value
               : roleID,
-              DepartmentID:"2",
+          DepartmentID: "2",
           UserID: useId.replace(/"/g, ""),
         })
         .then((res) => {
@@ -308,13 +304,11 @@ const ExportActingroleTable = ({userselect, actionUserList}) => {
     }
   };
 
- 
-
   const delegatechangeRole = () => {
     axios
       .post(APIURL + "User/GetUsersByRoleID", {
         RoleID: roleID,
-        DepartmentID:"2",
+        DepartmentID: "2",
         UserID: useId.replace(/"/g, ""),
       })
       .then((res) => {
@@ -515,8 +509,6 @@ const ExportActingroleTable = ({userselect, actionUserList}) => {
     };
   });
 
-   
- 
   return (
     <>
       {loading == true ? (
@@ -554,7 +546,6 @@ const ExportActingroleTable = ({userselect, actionUserList}) => {
             emptyMessage="No Data found."
             header={header}
           >
-             
             <Column
               field="rbzReferenceNumber"
               header="RBZ Reference Number"
@@ -588,7 +579,7 @@ const ExportActingroleTable = ({userselect, actionUserList}) => {
               body={amountwithCurrency}
               style={{ width: "150px" }}
             ></Column>
-              <Column
+            <Column
               field="applicationUpdatedDate"
               header="Updated Date"
               sortable
@@ -648,8 +639,6 @@ const ExportActingroleTable = ({userselect, actionUserList}) => {
         </div>
       </Modal>
 
-     
-
       <Modal
         show={showEditForm}
         onHide={EditModalClose}
@@ -669,17 +658,15 @@ const ExportActingroleTable = ({userselect, actionUserList}) => {
                             ? "col-md-12"
                             : "col-md-6"
                         }
-                        style={{alignItems : "center"}}
+                        style={{ alignItems: "center" }}
                       >
                         Edit Export Request --{" "}
                         <big>
                           {applicationDetail?.rbzReferenceNumber
                             ? applicationDetail.rbzReferenceNumber
                             : ""}
-
                         </big>
                       </div>
-                      
                     </div>
                   </Modal.Title>
                 </Modal.Header>
@@ -720,8 +707,6 @@ const ExportActingroleTable = ({userselect, actionUserList}) => {
           </div>
         </div>
       </Modal>
-
-     
     </>
   );
 };

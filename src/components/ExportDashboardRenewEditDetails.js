@@ -10,16 +10,10 @@ import moment from "moment";
 import { toast } from "react-toastify";
 import Select from "react-select";
 import UpdatePopupMessage from "./UpdatePopupMessage";
-import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
-import generatePDF, { Resolution, Margin } from "react-to-pdf";
 import logo from "../rbz_LOGO.png";
-import dummysign from "../dummy_sign.png";
 import Modal from "react-bootstrap/Modal";
-import SunEditor from "suneditor-react";
 import "suneditor/dist/css/suneditor.min.css";
-import NoSign from "../NoSign.png";
-import { MultiSelect } from "primereact/multiselect";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { TailSpin } from "react-loader-spinner";
@@ -57,6 +51,29 @@ const ExportDashboardRenewEditDetails = ({
   IsDeferred,
 }) => {
   const ratevalue = applicationDetail?.rate;
+
+  const fileInputRefs = [
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
+  ];
 
   const {
     currency,
@@ -96,14 +113,10 @@ const ExportDashboardRenewEditDetails = ({
   const bankSupervisorRef = useRef(null);
   const UserID = Storage.getItem("userID");
   const bankID = Storage.getItem("bankID");
-  const userName = Storage.getItem("userName");
   const bankName = Storage.getItem("bankName");
-  const PdfUsername = Storage.getItem("name");
-  const PdfRolename = Storage.getItem("roleName");
-  const bankidcheck = bankID !== "" ? "1" : "3";
   const roleID = Storage.getItem("roleIDs");
-
-  const userSign = Storage.getItem("signImageURL");
+  const menuname = Storage.getItem("menuname");
+  const submenuname = Storage.getItem("submenuname");
 
   const navigate = useNavigate();
 
@@ -113,32 +126,25 @@ const ExportDashboardRenewEditDetails = ({
   const [checksectorchange, setchecksectorchange] = useState(false);
   const [btnLoader, setBtnLoader] = useState(false);
   const [geninfoTab, setgeninfoTab] = useState(true);
-  const [banksuperTab, setbanksuperTab] = useState(roleID == 3 ? true : false);
-  const [recordTab, setrecordTab] = useState(roleID == 4 ? true : false);
-  const [analystTab, setanalystTab] = useState(roleID == 5 ? true : false);
-  const [sranalystTab, setsranalystTab] = useState(roleID == 6 ? true : false);
-  const [principalanalystTab, setprincipalanalystTab] = useState(
-    roleID == 7 ? true : false
-  );
-  const [deputyTab, setdeputyTab] = useState(roleID == 8 ? true : false);
-  const [director, setdirector] = useState(roleID == 9 ? true : false);
-  const [sharefiletab, setsharefiletab] = useState(false);
   const [recomdAnalyst, setRecomdAnalyst] = useState("121");
   const [selectedBanks, setSelectedBanks] = useState(null);
   const [registerusertype, setregisterusertype] = useState(
     applicationDetail?.userTypeID
   );
   const [files, setFiles] = useState([]);
-  const [otherfiles, setOtherfiles] = useState([]);
+  const [otherfiles, setOtherfiles] = useState([
+    { filename: "File Upload", upload: "" },
+  ]);
   const [userfiles, setuserFiles] = useState([]);
   const [otheruserfiles, setOtheruserfiles] = useState([]);
   const [sharefile, setsharefile] = useState([]);
-  const [othersharefile, setOthersharefile] = useState([]);
   const [errors, setErrors] = useState({});
   const [ValidateShow, setValidateShow] = useState(false);
   const [applicationType, setapplicationType] = useState([]);
   const [subsectorData, setsubsectorData] = useState([]);
-  const [checkSupervisor, setcheckSupervisor] = useState(roleID == 4 ? true : false);
+  const [checkSupervisor, setcheckSupervisor] = useState(
+    roleID == 4 ? true : false
+  );
   const [attachmentData, setAttachmentData] = useState([
     { filename: "File Upload", upload: "" },
   ]);
@@ -161,7 +167,6 @@ const ExportDashboardRenewEditDetails = ({
   const [getFrequencyID, setGetFrequencyID] = useState("0");
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [IsReturn, setIsReturn] = useState("0");
-  const [IsReturndisplay, setIsReturndisplay] = useState("");
   const [IsReturnExpiringDate, setIsReturnExpiringDate] = useState(new Date());
   const [DateExpirydisplay, setDateExpirydisplay] = useState("");
   const [curRate, setCurrate] = useState();
@@ -182,6 +187,8 @@ const ExportDashboardRenewEditDetails = ({
   const [tatHistoryRenew, setTatHistory] = useState([]);
   const [noDataCommentRenew, setNoDataComment] = useState([]);
   const [responceCountRenew, setresponceCount] = useState([]);
+  const [PendingReturnComment, setPendingReturnComment] = useState("");
+  const [PendingReturnNote, setPendingReturnNote] = useState("");
   const [ValidateChange, setValidateChange] = useState({
     relatedexchangeControlNumber: "",
   });
@@ -226,24 +233,6 @@ const ExportDashboardRenewEditDetails = ({
         });
     }
   }, [applicationDetail]);
-
-  const modules = {
-    toolbar: [
-      [{ header: [1, 2, 3, 4, 5, 6] }],
-      [{ font: [] }],
-      [{ size: ["small", "large", "huge"] }],
-      [{ color: [] }],
-      [{ background: [] }],
-      [{ script: "sub" }, { script: "super" }],
-      ["bold", "italic", "underline"],
-      [
-        { list: "ordered" },
-        { list: "bullet" },
-        { indent: "+1" },
-        { indent: "-1" },
-      ],
-    ],
-  };
 
   const GetApplicationTypes = async () => {
     await axios
@@ -507,7 +496,7 @@ const ExportDashboardRenewEditDetails = ({
     }
   };
 
-  const HandleDateCurrRate = (e) => { 
+  const HandleDateCurrRate = (e) => {
     axios
       .post(APIURL + "Master/GetRateByCurrencyID", {
         Id: applicationDetail.currency,
@@ -522,92 +511,20 @@ const ExportDashboardRenewEditDetails = ({
       })
       .catch((err) => {
         console.log(err);
-      }); 
-};
-useEffect(()=>{
-  HandleDateCurrRate()
-},[curRate])
- 
+      });
+  };
 
-  // const HandleDateExpiryOption = (e) => {
-  //   const { name, value } = e.target;
-  //   setDateExpiryOption(e.target.value);
-  //   setdefaultnoExpiry(value);
-  //   if (value == 0) {
-  //     setDateExpirydisplay("");
-  //     if (dateExpirydisplayRef.current) dateExpirydisplayRef.current.value = "";
-  //     if (optionExpirydisplayRef.current) optionExpirydisplayRef.current = "";
-  //   }
-  // };
-
-  // const HandleIsReturnOption = (e) => {
-  //   const { name, value } = e.target;
-  //   setIsReturnOption(e.target.value);
-  //   setIsReturn(value);
-  //   if (value == 0) {
-  //     setIsReturndisplay("");
-  //     setIsReturnExpiringDate(new Date());
-  //     setGetFrequencyID("");
-  //     if (FrequencyRef.current) FrequencyRef.current.value = "";
-  //     if (FrequencyDateRef.current) FrequencyDateRef.current = "";
-  //   } else {
-  //     axios
-  //       .post(APIURL + "Master/GetAllFrequencies")
-  //       .then((res) => {
-  //         if (res.data.responseCode == 200) {
-  //           setAllFrequency(res.data.responseData);
-  //         } else {
-  //           setAllFrequency([]);
-  //         }
-  //       })
-  //       .catch((err) => {
-  //         console.log(err);
-  //       });
-  //   }
-  // };
-
-  // const SelectReturnFrequency = (e) => {
-  //   const { name, value } = e.target;
-  //   if (value == 1) {
-  //     setGetFrequencyID(value);
-  //     setIsReturnExpiringDate(new Date());
-  //   } else {
-  //     setGetFrequencyID(value);
-  //     setIsReturnExpiringDate(new Date());
-  //   }
-  // };
-
-  // const handleshareFileChange = (e, id) => {
-  //   const file = e.target.files[0];
-  //   const index = userfiles?.findIndex((item) => item.id === id);
-  //   if (index !== -1) {
-  //     setsharefile((prevFiles) => {
-  //       const newFiles = [...prevFiles];
-  //       newFiles[index] = { file, id };
-  //       return newFiles;
-  //     });
-  //   } else {
-  //     setsharefile((prevFiles) => [...prevFiles, { file, id }]);
-  //   }
-  // };
-
-  // const handlesharefileAddMore = (e) => {
-  //   setOthersharefile([...othersharefile, null]);
-  // };
-
-  // const removeshareImage = (index, id) => {
-  //   const updatedShareFile = sharefile?.filter((item) => item.id !== id);
-  //   setsharefile(updatedShareFile);
-  // };
-
-  // const removeUserImage = (index, id) => {
-  //   const updatedUserFile = userfiles?.filter((item) => item.id !== id);
-  //   setuserFiles(updatedUserFile);
-  // };
+  useEffect(() => {
+    HandleDateCurrRate();
+  }, [curRate]);
 
   const removefileImage = (label) => {
     const updatedUserFile = files?.filter((item, i) => item?.label != label);
     setFiles(updatedUserFile);
+  };
+
+  const clearInputFile = (index) => {
+    if (fileInputRefs[index].current) fileInputRefs[index].current.value = "";
   };
 
   const action = (rowData) => {
@@ -946,7 +863,7 @@ useEffect(()=>{
     setErrors({});
     setselectuserRoleRecordofficer(value);
     setAssignUserID("");
-    setSupervisorRoleId(""); 
+    setSupervisorRoleId("");
     if (bankSupervisorRef.current) bankSupervisorRef.current.value = "";
     if (value == "") {
       setGetalluser([]);
@@ -1206,20 +1123,6 @@ useEffect(()=>{
     return valid;
   };
 
-  const onShow = () => {
-    setTimeout(() => {
-      let selectAllCheckbox = document.querySelector(
-        ".p-multiselect-header > .p-multiselect-select-all"
-      );
-      if (selectAllCheckbox) {
-        let selectAllSpan = document.createElement("span");
-        selectAllSpan.className = "select_all";
-        selectAllSpan.textContent = "Select All";
-        selectAllCheckbox.after(selectAllSpan);
-      }
-    }, 0);
-  };
-
   const filtertin_bpn = companies?.find((company) => {
     if (company.id === getCompanyName?.value) {
       return {
@@ -1237,7 +1140,11 @@ useEffect(()=>{
   const PdftargetRef = useRef();
 
   const closePopupHandle = () => {
-    navigate("/BankADLADashboard");
+    if (menuname === "Exports" && submenuname === "Pending Returns") {
+      navigate("/PendingReturns");
+    } else {
+      navigate("/BankADLADashboard");
+    }
     EditModalClose();
     handleData();
     setupdatepopup(false);
@@ -1457,6 +1364,68 @@ useEffect(()=>{
     }
   };
 
+  const HandleSubmitPendingReturns = async (e) => {
+    try {
+      e.preventDefault();
+      let formData = new FormData();
+      setSubmitBtnLoader(true);
+      await axios
+        .post(APIURL + "ReturnApplication/CreateReturnApplication", {
+          ID: applicationDetail?.id,
+          RoleID: roleID,
+          UserID: UserID.replace(/"/g, ""),
+          DepartmentID: "2",
+          Status: "300",
+          AssignedToRoleID: SupervisorRoleId
+            ? SupervisorRoleId
+            : AssignUserID && SupervisorRoleId == "" && nextlevelvalue != "20"
+            ? parseInt(roleID) + 1
+            : roleID,
+          AssignedTo:
+            roleID >= 3 && AssignUserID == ""
+              ? ""
+              : AssignUserID
+              ? AssignUserID
+              : UserID.replace(/"/g, ""),
+          Comment: PendingReturnComment,
+          Notes: PendingReturnNote,
+        })
+        .then((res) => {
+          for (let i = 0; i < files?.length; i++) {
+            formData.append("files", files[i].file);
+            formData.append("Label", files[i].label);
+          }
+          formData.append(
+            "ApplicationActivityID",
+            res.data.responseData?.applicationActivityID
+          );
+          formData.append(
+            "RBZReferenceNumber",
+            applicationDetail?.rbzReferenceNumber
+          );
+          formData.append("ApplicationID", res.data.responseData?.id);
+          formData.append("DepartmentID", "7");
+          formData.append("UserID", UserID.replace(/"/g, ""));
+          axios
+            .post(ImageAPI + "File/UploadFile", formData)
+            .then((res) => {
+              console.log("success");
+            })
+            .catch((err) => {
+              console.log("file Upload ", err);
+            });
+          handleData();
+          setSupervisorRoleId("");
+          setupdatepopup(true);
+          setSubmitBtnLoader(false);
+          setAssignUserID("");
+          setselectuserRoleRecordofficer("");
+        });
+    } catch (error) {
+      console.log("CreateReturnApplication - error --", error);
+    }
+  };
+
   useEffect(() => {
     handleData();
   }, []);
@@ -1598,7 +1567,13 @@ useEffect(()=>{
                       placeholder="Purpose of the Application"
                       className={errors.applicationPurpose ? "error" : ""}
                       value={applicationDetail.applicationPurpose}
-                      disabled={roleID == 2 || roleID == 4 ? false : true}
+                      disabled={
+                        (roleID == 2 || roleID == 4) &&
+                        menuname === "Exports" &&
+                        submenuname !== "Pending Returns"
+                          ? false
+                          : true
+                      }
                     />
                     <span className="sspan"></span>
                     {errors.applicationPurpose ? (
@@ -1622,7 +1597,11 @@ useEffect(()=>{
                         applicationDetail?.applicantType === 1 ? true : false
                       }
                       disabled={
-                        applicationDetail?.applicantType === 1 ? false : true
+                        applicationDetail?.applicantType === 1 &&
+                        menuname === "Exports" &&
+                        submenuname !== "Pending Returns"
+                          ? false
+                          : true
                       }
                     />{" "}
                     <span>Corporate</span>
@@ -1634,7 +1613,11 @@ useEffect(()=>{
                         applicationDetail?.applicantType === 2 ? true : false
                       }
                       disabled={
-                        applicationDetail?.applicantType === 2 ? false : true
+                        applicationDetail?.applicantType === 2 &&
+                        menuname === "Exports" &&
+                        submenuname !== "Pending Returns"
+                          ? false
+                          : true
                       }
                     />{" "}
                     <span>Individual</span>
@@ -1677,7 +1660,13 @@ useEffect(()=>{
                         }
                         onMenuClose={handleClear}
                         className="selectinput"
-                        isDisabled={roleID == 2 || roleID == 4 ? false : true}
+                        isDisabled={
+                          (roleID == 2 || roleID == 4) &&
+                          menuname === "Exports" &&
+                          submenuname !== "Pending Returns"
+                            ? false
+                            : true
+                        }
                       />
 
                       {errors.companyName ? (
@@ -1744,7 +1733,13 @@ useEffect(()=>{
                               ? "error"
                               : ""
                           }
-                          disabled={roleID == 2 || roleID == 4 ? false : true}
+                          disabled={
+                            (roleID == 2 || roleID == 4) &&
+                            menuname === "Exports" &&
+                            submenuname !== "Pending Returns"
+                              ? false
+                              : true
+                          }
                         />
                         <span className="sspan"></span>
                         {errors.applicant && applicationDetail.name === "" ? (
@@ -1818,7 +1813,13 @@ useEffect(()=>{
                             ? "error"
                             : ""
                         }
-                        disabled={roleID == 2 || roleID == 4 ? false : true}
+                        disabled={
+                          (roleID == 2 || roleID == 4) &&
+                          menuname === "Exports" &&
+                          submenuname !== "Pending Returns"
+                            ? false
+                            : true
+                        }
                       >
                         <option value="">
                           Select Government Agencies Name
@@ -1870,7 +1871,13 @@ useEffect(()=>{
                           ? applicationDetail?.applicantReferenceNumber
                           : ""
                       }
-                      disabled={roleID == 2 || roleID == 4 ? false : true}
+                      disabled={
+                        (roleID == 2 || roleID == 4) &&
+                        menuname === "Exports" &&
+                        submenuname !== "Pending Returns"
+                          ? false
+                          : true
+                      }
                     />
                     <span className="sspan"></span>
                     {errors.applicantReferenceNumber ? (
@@ -1888,7 +1895,6 @@ useEffect(()=>{
                 <label className="controlform">Application Date</label>
 
                 <div className="form-bx">
-                  {/* <label> */}
                   <DatePicker
                     closeOnScroll={(e) => e.target === document}
                     selected={
@@ -1902,10 +1908,16 @@ useEffect(()=>{
                     showYearDropdown
                     dropdownMode="select"
                     dateFormat="dd/MMM/yyyy"
-                    disabled={roleID == 2 || roleID == 4 ? false : true}
+                    disabled={
+                      (roleID == 2 || roleID == 4) &&
+                      menuname === "Exports" &&
+                      submenuname !== "Pending Returns"
+                        ? false
+                        : true
+                    }
                     onKeyDown={(e) => {
                       const key = e.key;
-                      const allowedKeys = /[0-9\/]/; // Allow numbers and '/'
+                      const allowedKeys = /[0-9\/]/;
                       if (
                         !allowedKeys.test(key) &&
                         key !== "Backspace" &&
@@ -1917,7 +1929,6 @@ useEffect(()=>{
                   />
 
                   <span className="sspan"></span>
-                  {/* </label> */}
                 </div>
               </div>
 
@@ -1933,7 +1944,13 @@ useEffect(()=>{
                         changeHandelForm(e);
                       }}
                       className={errors.applicationTypeID ? "error" : ""}
-                      disabled={roleID == 2 || roleID == 4 ? false : true}
+                      disabled={
+                        (roleID == 2 || roleID == 4) &&
+                        menuname === "Exports" &&
+                        submenuname !== "Pending Returns"
+                          ? false
+                          : true
+                      }
                     >
                       <option value="">Select Application Type</option>
                       {applicationType?.map((item, ind) => {
@@ -1981,7 +1998,13 @@ useEffect(()=>{
                               ? "error"
                               : ""
                           }
-                          disabled={roleID == 2 || roleID == 4 ? false : true}
+                          disabled={
+                            (roleID == 2 || roleID == 4) &&
+                            menuname === "Exports" &&
+                            submenuname !== "Pending Returns"
+                              ? false
+                              : true
+                          }
                         >
                           <option value="">Select Currency</option>
                           {currency?.map((cur, ind) => {
@@ -2006,13 +2029,11 @@ useEffect(()=>{
                       </label>
                     </div>
                   </div>
-                  {/* end form-bx  */}
                 </div>
 
                 <div className="col-md-3">
                   <div className="inner_form_new-sm">
                     <label className="controlform-sm">Amount</label>
-
                     <div className="form-bx-sm">
                       <label>
                         <input
@@ -2030,7 +2051,13 @@ useEffect(()=>{
                               ? "error"
                               : ""
                           }
-                          disabled={roleID == 2 || roleID == 4 ? false : true}
+                          disabled={
+                            (roleID == 2 || roleID == 4) &&
+                            menuname === "Exports" &&
+                            submenuname !== "Pending Returns"
+                              ? false
+                              : true
+                          }
                         />
                         <span className="sspan"></span>
                         {errors.amount && applicationDetail?.amount === "" ? (
@@ -2041,13 +2068,11 @@ useEffect(()=>{
                       </label>
                     </div>
                   </div>
-                  {/* end form-bx  */}
                 </div>
 
                 <div className="col-md-3">
                   <div className="inner_form_new-sm">
                     <label className="controlform-sm">Rate</label>
-
                     <div className="form-bx-sm">
                       <label>
                         <input
@@ -2055,13 +2080,6 @@ useEffect(()=>{
                           type="text"
                           name="rate"
                           value={curRate}
-                          // value={
-                          //   applicationDetail?.currency
-                          //     ? curRate
-                          //       ? curRate
-                          //       : applicationDetail.rate
-                          //     : "Rate"
-                          // }
                           onChange={(e) => {
                             changeHandelForm(e);
                           }}
@@ -2072,13 +2090,11 @@ useEffect(()=>{
                       </label>
                     </div>
                   </div>
-                  {/* end form-bx  */}
                 </div>
               </div>
 
               <div className="inner_form_new ">
                 <label className="controlform">USD Equivalent</label>
-
                 <div className="form-bx">
                   <label>
                     <input
@@ -2126,7 +2142,6 @@ useEffect(()=>{
                             }
                             defaultValue={applicationDetail?.rbzReferenceNumber}
                             onChange={(e) => {
-                              // changeHandelForm(e);
                               changeHandelFormValidate(e);
                             }}
                             placeholder="Related Exchange Control Reference Number"
@@ -2135,7 +2150,13 @@ useEffect(()=>{
                                 ? "error text-uppercase"
                                 : "text-uppercase"
                             }
-                            disabled={roleID == 2 || roleID == 4 ? false : true}
+                            disabled={
+                              (roleID == 2 || roleID == 4) &&
+                              menuname === "Exports" &&
+                              submenuname !== "Pending Returns"
+                                ? false
+                                : true
+                            }
                           />
                           <span className="sspan"></span>
                           {errors.relatedexchangeControlNumber ? (
@@ -2242,6 +2263,12 @@ useEffect(()=>{
                         type="button"
                         className="primrybtn v-button"
                         onClick={(e) => handleValidateRBZ(e)}
+                        disabled={
+                          menuname === "Exports" &&
+                          submenuname === "Pending Returns"
+                            ? true
+                            : false
+                        }
                       >
                         Validate
                       </button>
@@ -2265,7 +2292,13 @@ useEffect(()=>{
                           ? "error"
                           : ""
                       }
-                      disabled={roleID == 2 || roleID == 4 ? false : true}
+                      disabled={
+                        (roleID == 2 || roleID == 4) &&
+                        menuname === "Exports" &&
+                        submenuname !== "Pending Returns"
+                          ? false
+                          : true
+                      }
                     >
                       <option value="">Select Sector</option>
                       {sectorData?.map((item, ind) => {
@@ -2302,9 +2335,11 @@ useEffect(()=>{
                       }}
                       disabled={
                         applicationDetail.sector === "" ||
-                        (roleID == 2 || roleID == 4 ? false : true)
-                          ? true
-                          : false
+                        ((roleID == 2 || roleID == 4) &&
+                          menuname === "Exports" &&
+                          submenuname !== "Pending Returns")
+                          ? false
+                          : true
                       }
                       className={errors.subSector ? "error" : ""}
                     >
@@ -2344,7 +2379,13 @@ useEffect(()=>{
                       placeholder="Applicant Comments"
                       className={errors.applicantComment ? "error" : ""}
                       value={applicationDetail.applicantComment}
-                      disabled={roleID == 2 || roleID == 4 ? false : true}
+                      disabled={
+                        (roleID == 2 || roleID == 4) &&
+                        menuname === "Exports" &&
+                        submenuname !== "Pending Returns"
+                          ? false
+                          : true
+                      }
                     />
                     <span className="sspan"></span>
                     {errors.applicantComment ? (
@@ -2359,16 +2400,16 @@ useEffect(()=>{
               </div>
 
               <div className={roleID == 4 ? "d-none" : "inner_form_new "}>
-                  <label className="controlform">Submit To Next Level </label>
-                  <input
-                    type="checkbox"
-                    onChange={HandelSupervisorcheck}
-                    checked={checkSupervisor}
-                    disabled={roleID == 2 ? false : true}
-                  />
-                </div> 
+                <label className="controlform">Submit To Next Level </label>
+                <input
+                  type="checkbox"
+                  onChange={HandelSupervisorcheck}
+                  checked={checkSupervisor}
+                  disabled={roleID == 2 ? false : true}
+                />
+              </div>
 
-              {checkSupervisor === true && roleID == 2  ? (
+              {checkSupervisor === true && roleID == 2 ? (
                 <div className="inner_form_new ">
                   <label className="controlform">Bank Supervisor</label>
                   <div className="form-bx">
@@ -2412,87 +2453,86 @@ useEffect(()=>{
                 ""
               )}
 
-{checkSupervisor == true && roleID == 4 ? (
-          <div className="inner_form_new ">
-            <label className="controlform">RBZ Record Officer Submit to</label>
-            <div className="form-bx">
-              <label>
-                <select
-                  name="SupervisorRoleId"
-                  onChange={(e) => {
-                    supervisorHangechangeRoleRecordofficer(e);
-                  }}
-                  // className={
-                  //   errors.assignedTo && !SupervisorRoleId
-                  //     ? "error"
-                  //     : ""
-                  // }
-                >
-                  <option value="">Select Role</option>
-                  {userRole?.map((item, index) => {
-                    return (
-                      <option key={index} value={item.id}>
-                        {item.designation}
-                      </option>
-                    );
-                  })}
-                </select>
-                <span className="sspan"></span>
-                {errors.selectuserRoleRecordofficer && selectuserRoleRecordofficer === "" ? (
-                  <small className="errormsg">Role is required</small>
-                ) : (
-                  ""
-                )}
-              </label>
-            </div>
-          </div>
-        ) : (
-          ""
-        )}
+              {checkSupervisor == true && roleID == 4 ? (
+                <div className="inner_form_new ">
+                  <label className="controlform">
+                    RBZ Record Officer Submit to
+                  </label>
+                  <div className="form-bx">
+                    <label>
+                      <select
+                        name="SupervisorRoleId"
+                        onChange={(e) => {
+                          supervisorHangechangeRoleRecordofficer(e);
+                        }}
+                      >
+                        <option value="">Select Role</option>
+                        {userRole?.map((item, index) => {
+                          return (
+                            <option key={index} value={item.id}>
+                              {item.designation}
+                            </option>
+                          );
+                        })}
+                      </select>
+                      <span className="sspan"></span>
+                      {errors.selectuserRoleRecordofficer &&
+                      selectuserRoleRecordofficer === "" ? (
+                        <small className="errormsg">Role is required</small>
+                      ) : (
+                        ""
+                      )}
+                    </label>
+                  </div>
+                </div>
+              ) : (
+                ""
+              )}
 
-{checkSupervisor == true && roleID == 4 && getalluser?.length ? (
-          <div className="w-100">
-            <div className="inner_form_new">
-              <label className="controlform">User</label>
-
-              <div className="form-bx">
-                <label>
-                  <select
-                    ref={bankSupervisorRef}
-                    name="bankSupervisor"
-                    onChange={(e) => {
-                      handleuserByrecordOfficer(e);
-                    }}
-                    className={
-                      errors.bankSupervisor && applicationDetail.bankSupervisor === ""
-                        ? "error"
-                        : ""
-                    }
-                  >
-                    <option value="" selected>
-                      Select User
-                    </option>
-                    {getalluser?.map((item, index) => {
-                      return (
-                        <option key={item.id} value={item.userID}>
-                          {item.name}
-                        </option>
-                      );
-                    })}
-                  </select>
-                  <span className="sspan"></span>
-                  {errors.bankSupervisor && applicationDetail.bankSupervisor === "" ? (
-                    <small className="errormsg">User is required</small>
-                  ) : (
-                    ""
-                  )}
-                </label>
-              </div>
-            </div>
-          </div>
-        ) : (
-          ""
-        )}
+              {checkSupervisor == true && roleID == 4 && getalluser?.length ? (
+                <div className="w-100">
+                  <div className="inner_form_new">
+                    <label className="controlform">User</label>
+                    <div className="form-bx">
+                      <label>
+                        <select
+                          ref={bankSupervisorRef}
+                          name="bankSupervisor"
+                          onChange={(e) => {
+                            handleuserByrecordOfficer(e);
+                          }}
+                          className={
+                            errors.bankSupervisor &&
+                            applicationDetail.bankSupervisor === ""
+                              ? "error"
+                              : ""
+                          }
+                        >
+                          <option value="" selected>
+                            Select User
+                          </option>
+                          {getalluser?.map((item, index) => {
+                            return (
+                              <option key={item.id} value={item.userID}>
+                                {item.name}
+                              </option>
+                            );
+                          })}
+                        </select>
+                        <span className="sspan"></span>
+                        {errors.bankSupervisor &&
+                        applicationDetail.bankSupervisor === "" ? (
+                          <small className="errormsg">User is required</small>
+                        ) : (
+                          ""
+                        )}
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                ""
+              )}
 
               <h5 className="section_top_subheading mt-2">Attachments</h5>
 
@@ -2561,7 +2601,9 @@ useEffect(()=>{
                         </Link>
                       </span>
 
-                      {roleID == 2 || roleID == 4 ? (
+                      {(roleID == 2 || roleID == 4) &&
+                      menuname === "Exports" &&
+                      submenuname !== "Pending Returns" ? (
                         <button
                           type="button"
                           onClick={(e) => handleRemovfile(items?.id)}
@@ -2582,9 +2624,62 @@ useEffect(()=>{
                 <div className="text-center">File Not Found</div>
               )}
 
-              {getBlankFile?.map((items, index) => {
-                return (
-                  <div className="attachemt_form-bx" key={items.id}>
+              {menuname === "Exports" &&
+                submenuname !== "Pending Returns" &&
+                getBlankFile?.map((items, index) => {
+                  return (
+                    <div className="attachemt_form-bx" key={items.id}>
+                      <label
+                        style={{
+                          background: "#d9edf7",
+                          padding: "9px 3px",
+                          border: "0px",
+                        }}
+                      >
+                        <span style={{ fontWeight: "500" }}>
+                          {" "}
+                          {items.name}{" "}
+                        </span>
+                      </label>
+                      <div className="browse-btn">
+                        Browse{" "}
+                        <input
+                          type="file"
+                          onChange={(e) =>
+                            HandleFileUpload(
+                              e,
+                              items.label ? items.label : items.name
+                            )
+                          }
+                        />
+                      </div>
+                      <span className="filename">
+                        {files.find((f) => f.label === items?.name)?.file
+                          ?.name || "No file chosen"}
+                      </span>
+
+                      {files?.length &&
+                      files?.find((f) => f.label === items.name)?.file?.name ? (
+                        <button
+                          type="button"
+                          className="remove-file"
+                          onClick={() => removefileImage(items?.name)}
+                        >
+                          Remove
+                        </button>
+                      ) : (
+                        ""
+                      )}
+                    </div>
+                  );
+                })}
+              {menuname === "Exports" &&
+                submenuname !== "Pending Returns" &&
+                otherfiles.map((file, index) => (
+                  <div
+                    key={"other" + (index + 1)}
+                    className="attachemt_form-bx"
+                  >
                     <label
                       style={{
                         background: "#d9edf7",
@@ -2592,32 +2687,32 @@ useEffect(()=>{
                         border: "0px",
                       }}
                     >
-                      {/* <i className="bi bi-forward"></i> */}
-                      <span style={{ fontWeight: "500" }}> {items.name} </span>
+                      <span style={{ fontWeight: "500" }}>
+                        {" "}
+                        Other File {index + 1}{" "}
+                      </span>
                     </label>
                     <div className="browse-btn">
                       Browse{" "}
                       <input
                         type="file"
-                        onChange={(e) =>
-                          HandleFileUpload(
-                            e,
-                            items.label ? items.label : items.name
-                          )
-                        }
+                        onChange={(e) => {
+                          handleFileChange(e, "other" + (index + 1));
+                        }}
                       />
                     </div>
                     <span className="filename">
-                      {files.find((f) => f.label === items?.name)?.file?.name ||
-                        "No file chosen"}
+                      {files.find((f) => f.label === "other" + (index + 1))
+                        ?.file?.name || "No file chosen"}
                     </span>
 
                     {files?.length &&
-                    files?.find((f) => f.label === items.name)?.file?.name ? (
+                    files?.find((f) => f.label == "other" + (index + 1))?.file
+                      ?.name ? (
                       <button
                         type="button"
                         className="remove-file"
-                        onClick={() => removefileImage(items?.name)}
+                        onClick={() => removefileImage("other" + (index + 1))}
                       >
                         Remove
                       </button>
@@ -2625,53 +2720,10 @@ useEffect(()=>{
                       ""
                     )}
                   </div>
-                );
-              })}
-
-              {otherfiles.map((file, index) => (
-                <div key={"other" + (index + 1)} className="attachemt_form-bx">
-                  <label
-                    style={{
-                      background: "#d9edf7",
-                      padding: "9px 3px",
-                      border: "0px",
-                    }}
-                  >
-                    <span style={{ fontWeight: "500" }}>
-                      {" "}
-                      Other File {index + 1}{" "}
-                    </span>
-                  </label>
-                  <div className="browse-btn">
-                    Browse{" "}
-                    <input
-                      type="file"
-                      onChange={(e) => {
-                        handleFileChange(e, "other" + (index + 1));
-                      }}
-                    />
-                  </div>
-                  <span className="filename">
-                    {files.find((f) => f.label === "other" + (index + 1))?.file
-                      ?.name || "No file chosen"}
-                  </span>
-
-                  {files?.length &&
-                  files?.find((f) => f.label == "other" + (index + 1))?.file
-                    ?.name ? (
-                    <button
-                      type="button"
-                      className="remove-file"
-                      onClick={() => removefileImage("other" + (index + 1))}
-                    >
-                      Remove
-                    </button>
-                  ) : (
-                    ""
-                  )}
-                </div>
-              ))}
-              {files?.length ? (
+                ))}
+              {menuname === "Exports" &&
+              submenuname !== "Pending Returns" &&
+              files?.length ? (
                 <button
                   type="button"
                   className="addmore-btn mb-2"
@@ -2680,6 +2732,127 @@ useEffect(()=>{
                   {" "}
                   Add More File{" "}
                 </button>
+              ) : (
+                ""
+              )}
+
+              <h5 className="section_top_subheading mt-2">Pending Returns</h5>
+              {menuname === "Exports" && submenuname === "Pending Returns" ? (
+                <>
+                  <div className="inner_form_new ">
+                    <label className="controlform">Pending Returns Notes</label>
+                    <div className="form-bx">
+                      <label>
+                        <textarea
+                          ref={applicantCommentsRef}
+                          name="applicantComment"
+                          onChange={(e) => {
+                            setPendingReturnNote(e.target.value);
+                          }}
+                          placeholder="Pending Returns Notes"
+                          value={PendingReturnNote}
+                          disabled={roleID == 2 ? false : true}
+                        />
+                        <span className="sspan"></span>
+                      </label>
+                    </div>
+                  </div>
+                  <div className="inner_form_new ">
+                    <label className="controlform">
+                      Pending Returns Comments
+                    </label>
+                    <div className="form-bx">
+                      <label>
+                        <textarea
+                          ref={applicantCommentsRef}
+                          name="applicantComment"
+                          onChange={(e) => {
+                            setPendingReturnComment(e.target.value);
+                          }}
+                          placeholder="Pending Returns Comments"
+                          value={PendingReturnComment}
+                          disabled={roleID == 2 ? false : true}
+                        />
+                        <span className="sspan"></span>
+                      </label>
+                    </div>
+                  </div>
+
+                  {otherfiles.map((file, index) => (
+                    <div
+                      key={index == "0" ? "Attachment" : `Other File ${index}`}
+                      className="attachemt_form-bx"
+                    >
+                      <label
+                        style={{
+                          background: "#d9edf7",
+                          padding: "9px 3px",
+                          border: "0px",
+                        }}
+                      >
+                        <span style={{ fontWeight: "500" }}>
+                          {index == "0" ? "Attachment" : `Other File ${index}`}
+                        </span>
+                      </label>
+                      <div className="browse-btn">
+                        Browse{" "}
+                        <input
+                          type="file"
+                          ref={fileInputRefs[index]}
+                          onChange={(e) => {
+                            handleFileChange(
+                              e,
+                              index == "0"
+                                ? "Attachment"
+                                : `Other File ${index}`
+                            );
+                          }}
+                        />
+                      </div>
+                      <span className="filename">
+                        {files.find(
+                          (f) =>
+                            f.label ===
+                            (index == "0"
+                              ? "Attachment"
+                              : `Other File ${index}`)
+                        )?.file?.name || "No file chosen"}
+                      </span>
+
+                      {files?.length &&
+                      files?.find(
+                        (f) =>
+                          f.label ===
+                          (index == "0" ? "Attachment" : `Other File ${index}`)
+                      )?.file?.name ? (
+                        <button
+                          type="button"
+                          className="remove-file"
+                          onClick={() => {
+                            removefileImage(
+                              index == "0"
+                                ? "Attachment"
+                                : `Other File ${index}`
+                            );
+                            clearInputFile(index);
+                          }}
+                        >
+                          Remove
+                        </button>
+                      ) : (
+                        ""
+                      )}
+                    </div>
+                  ))}
+
+                  <button
+                    type="button"
+                    className="addmore-btn mb-2"
+                    onClick={(e) => handleAddMore(e)}
+                  >
+                    Add More File{" "}
+                  </button>
+                </>
               ) : (
                 ""
               )}
@@ -2716,22 +2889,45 @@ useEffect(()=>{
                   ""
                 )}
 
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    HandleSubmit(e);
-                  }}
-                  disabled={
-                    (!checkSupervisor && roleID == 4) ||
-                    (checkSupervisor && !AssignUserID && roleID == 4)
-                      ? true
-                      : false
-                  }
-                  className="login"
-                >
-                  {" "}
-                  Submit{" "}
-                </button>
+                {menuname === "Exports" && submenuname === "Pending Returns" ? (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      HandleSubmitPendingReturns(e);
+                    }}
+                    disabled={
+                      (!checkSupervisor && roleID == 2) ||
+                      (checkSupervisor && !AssignUserID && roleID == 4) ||
+                      (menuname === "Exports" &&
+                        submenuname === "Pending Returns" &&
+                        !PendingReturnComment) ||
+                      (menuname === "Exports" &&
+                        submenuname === "Pending Returns" &&
+                        !PendingReturnNote) || !files.length
+                        ? true
+                        : false
+                    }
+                    className="login"
+                  >
+                    Submit
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      HandleSubmit(e);
+                    }}
+                    disabled={
+                      (!checkSupervisor && roleID == 2) ||
+                      (checkSupervisor && !AssignUserID && roleID == 4)
+                        ? true
+                        : false
+                    }
+                    className="login"
+                  >
+                    Submit{" "}
+                  </button>
+                )}
               </div>
             </div>
 

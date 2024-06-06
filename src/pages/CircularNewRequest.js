@@ -21,9 +21,9 @@ const CircularNewRequest = () => {
         <nav>
           <ol className="breadcrumb">
             <li className="breadcrumb-item">
-              <Link to="/BankADLADashboard">Circular</Link>
+              <Link to="/BankADLADashboard">Circulars</Link>
             </li>
-            <li className="breadcrumb-item active">New Circular</li>
+            <li className="breadcrumb-item active">New Circulars</li>
           </ol>
         </nav>
 
@@ -31,7 +31,7 @@ const CircularNewRequest = () => {
           <div className="row">
             <div className="col-md-12">
               <div className="datatable">
-                <h4 className="section_top_heading">NEW CIRCULAR</h4>
+                <h4 className="section_top_heading">NEW CIRCULARS</h4>
 
                 <h5 className="section_top_subheading">Circular Info</h5>
 
