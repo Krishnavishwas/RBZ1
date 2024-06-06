@@ -1107,7 +1107,6 @@ const ExportDashboardTable = () => {
                 <div className="form-footer mt-0 justify-content-center">
                   <button
                     type="submit"
-                    // onClick={() => delegateSubmit()}
                     className="login"
                     disabled={delegateUserID !== "" ? false : true}
                   >

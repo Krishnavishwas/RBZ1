@@ -19,7 +19,7 @@ const CircularApproveRequest = () => {
         <nav>
           <ol className="breadcrumb">
             <li className="breadcrumb-item">
-              <Link to="">Circular</Link>
+              <Link to="">Circulars</Link>
             </li>
             <li className="breadcrumb-item active">Approved</li>
           </ol>
@@ -29,7 +29,7 @@ const CircularApproveRequest = () => {
           <div className="row">
             <div className="col-md-12">
               <div className="datatable">
-                <h4 className="section_top_heading">APPROVED CIRCULAR</h4>
+                <h4 className="section_top_heading">APPROVED CIRCULARS</h4>
         
                <CircularsApprovedTable />
               </div>

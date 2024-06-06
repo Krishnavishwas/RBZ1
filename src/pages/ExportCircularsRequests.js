@@ -18,9 +18,9 @@ const ExportCircularsRequests = () => {
         <nav>
           <ol className="breadcrumb">
             <li className="breadcrumb-item">
-              <Link to="">Circular</Link>
+              <Link to="">Exports</Link>
             </li>
-            <li className="breadcrumb-item active">Dashboard</li>
+            <li className="breadcrumb-item active">Published Circulars</li>
           </ol>
         </nav>
 
@@ -28,7 +28,7 @@ const ExportCircularsRequests = () => {
           <div className="row">
             <div className="col-md-12">
               <div className="datatable">
-                <h4 className="section_top_heading">CIRCULARS</h4>
+                <h4 className="section_top_heading">PUBLISHED CIRCULARS</h4>
         
                 <ExportCircularsTable />
               </div>

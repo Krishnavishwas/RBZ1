@@ -5662,7 +5662,7 @@ const ExportCircularsEditForm = ({
 
                                     <div className="inner_form_new">
                                       <label className="controlform">
-                                        Recommendation hey
+                                        Recommendation
                                       </label>
                                       <div className="form-bx">
                                         <label>

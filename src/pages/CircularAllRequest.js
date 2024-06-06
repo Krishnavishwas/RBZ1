@@ -18,7 +18,7 @@ const CircularAllRequest = () => {
         <nav>
           <ol className="breadcrumb">
             <li className="breadcrumb-item">
-              <Link to="">Circular</Link>
+              <Link to="">Circulars</Link>
             </li>
             <li className="breadcrumb-item active">All Circulars</li>
           </ol>

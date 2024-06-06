@@ -262,7 +262,7 @@ const FINDashboardEditDetails = ({
 
   const applicationNumber = applicationDetail.rbzReferenceNumber;
   const heading = "Updated Successfully!";
-  const para = "Export request updated successfully!";
+  const para = "Foreign Investment application request updated successfully!";
 
   const heading1 = "Submitted  Successfully";
   const para1 = "Application successfully submitted to other department!";
@@ -743,11 +743,11 @@ const FINDashboardEditDetails = ({
       StarterKit.configure({
         bulletList: {
           keepMarks: true,
-          keepAttributes: false, // TODO : Making this as `false` becase marks are not preserved when I try to preserve attrs, awaiting a bit of help
+          keepAttributes: false,
         },
         orderedList: {
           keepMarks: true,
-          keepAttributes: false, // TODO : Making this as `false` becase marks are not preserved when I try to preserve attrs, awaiting a bit of help
+          keepAttributes: false,
         },
       }),
     ],
@@ -977,7 +977,6 @@ const FINDashboardEditDetails = ({
     const value = e.target.value;
     setSupervisorRoleId("");
     setSupervisorRoleId("");
-
     setnextlevelvalue(value);
     setAsignUser([]);
   };
@@ -1382,7 +1381,7 @@ const FINDashboardEditDetails = ({
   const changeHandelFormSubtype = (e) => {
     setapplicationSubTypeValue(e.target.value);
   };
-  console.log("applicationDetail", applicationDetail);
+
   const HandleDateExpiryOption = (e) => {
     const { name, value } = e.target;
     setDateExpiryOption(e.target.value);
@@ -2861,7 +2860,7 @@ const FINDashboardEditDetails = ({
                 </div> */}
 
               <div className="inner_form_new ">
-                <label className="controlform">Type of Exporter</label>
+                <label className="controlform">Type of Applicant</label>
                 <div className="form-bx-radio mt-4">
                   <label>
                     <input
@@ -2899,8 +2898,6 @@ const FINDashboardEditDetails = ({
                     />{" "}
                     <span>Government Agencies</span>
                   </label>
-
-                  {/* {errors.niu && bankData.ApplicantType === '' ? <small className='errormsg'>{errors.ApplicantType}</small> : ""} */}
                 </div>
               </div>
 
@@ -15412,7 +15409,7 @@ const FINDashboardEditDetails = ({
                                 fontWeight: "400",
                               }}
                             >
-                              Exporter
+                              Foreign Investor
                             </td>
                             <td
                               style={{
@@ -15991,7 +15988,7 @@ const FINDashboardEditDetails = ({
                                 fontWeight: "400",
                               }}
                             >
-                              Exporter
+                              Foreign Investor
                             </td>
                             <td
                               style={{
@@ -16456,7 +16453,7 @@ const FINDashboardEditDetails = ({
                                 fontWeight: "400",
                               }}
                             >
-                              Exporter
+                              Foreign Investor
                             </td>
                             <td
                               style={{
@@ -17054,31 +17051,6 @@ const FINDashboardEditDetails = ({
                           <tr>
                             <td colSpan="2">&nbsp;</td>
                           </tr>
-                          {/* <tr>
-                              <td
-                                style={{
-                                  color: "#000",
-                                  fontSize: "18px",
-                                  fontWeight: "400",
-                                }}
-                              >
-                                Exporter
-                              </td>
-                              <td
-                                style={{
-                                  color: "#000",
-                                  fontSize: "18px",
-                                  fontWeight: "800",
-                                  letterSpacing: "0.01px"
-                                }}
-                              >
-                                :{" "}
-                                {applicationDetail?.companyName == null || applicationDetail?.companyName == ""
-                                  ? applicationDetail?.name
-                                  : applicationDetail?.companyName} 
-                                  {console.log(applicationDetail)}
-                              </td>
-                            </tr> */}
                           <tr>
                             <td
                               style={{

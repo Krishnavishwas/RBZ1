@@ -18,7 +18,7 @@ const CircularCancelledRequest = () => {
         <nav>
           <ol className="breadcrumb">
             <li className="breadcrumb-item">
-              <Link to="">Circular</Link>
+              <Link to="">Circulars</Link>
             </li>
             <li className="breadcrumb-item active">Cancelled</li>
           </ol>
@@ -28,7 +28,7 @@ const CircularCancelledRequest = () => {
           <div className="row">
             <div className="col-md-12">
               <div className="datatable">
-                <h4 className="section_top_heading">CANCELLED CIRCULAR</h4>
+                <h4 className="section_top_heading">CANCELLED CIRCULARS</h4>
         
                 <CircularsCancelledTable />
               </div>

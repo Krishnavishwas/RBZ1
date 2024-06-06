@@ -23,7 +23,7 @@ const FINVNewRequestForm = () => {
     companies,
     GovernmentAgencies,
     applicantTypes,
-    sectorData, 
+    sectorData,
     masterBank,
     countries,
   } = ExportformDynamicField();
@@ -94,7 +94,7 @@ const FINVNewRequestForm = () => {
     bankSupervisor: "",
   });
   const heading = "Application Submitted Successfully!";
-  const para = "Export application request submitted successfully!";
+  const para = "Foreign Investment application request submitted successfully!";
   const [files, setFiles] = useState([]);
   const [otherfiles, setOtherfiles] = useState([]);
   const [errors, setErrors] = useState({});
@@ -102,13 +102,15 @@ const FINVNewRequestForm = () => {
   const [applicationSubType, setapplicationSubType] = useState([]);
   const [subsectorData, setsubsectorData] = useState([]);
   const [curRate, setCurrate] = useState();
-  const [checkSupervisor, setcheckSupervisor] = useState(roleID == 4 ? true : false);
+  const [checkSupervisor, setcheckSupervisor] = useState(
+    roleID == 4 ? true : false
+  );
   const [attachmentData, setAttachmentData] = useState([]);
   const [otherfilesupload, setOtherfilesupload] = useState([]);
   const [inputValue, setInputValue] = useState("");
   const [options, setOptions] = useState([]);
   const [value, setValue] = useState("");
-  const [applicationSubTypeValue, setapplicationSubTypeValue]= useState('');
+  const [applicationSubTypeValue, setapplicationSubTypeValue] = useState("");
   const [ValidateRBZ, setValidateRBZ] = useState([]);
   const [loader, setLoader] = useState(false);
   const [ValidateShow, setValidateShow] = useState(false);
@@ -117,7 +119,7 @@ const FINVNewRequestForm = () => {
   });
 
   const [getBankID, setGetBankID] = useState("");
-const [Supervisors, setSupervisors] = useState([])
+  const [Supervisors, setSupervisors] = useState([]);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [loading, setLoading] = useState(false);
   const [applicationDetail, setApplicationDetail] = useState({});
@@ -163,29 +165,25 @@ const [Supervisors, setSupervisors] = useState([])
   ];
   const relatedexchangeControlNumberRef = useRef(null);
 
-
-  const handeSupervisor = async ()=>{
-
+  const handeSupervisor = async () => {
     await axios
       .post(APIURL + "User/GetSupervisors", {
         BankID: bankID,
         UserID: UserID,
-        DepartmentID:"4",
+        DepartmentID: "4",
         RoleID: roleID,
       })
       .then((res) => {
         if (res.data.responseCode === "200") {
           setSupervisors(res.data.responseData);
         } else {
-          console.log(res.data.responseMessage);
           setSupervisors([]);
         }
       })
       .catch((err) => {
         console.log(err);
       });
-
-  }
+  };
 
   const validatePECANForm = () => {
     let valid = true;
@@ -221,27 +219,27 @@ const [Supervisors, setSupervisors] = useState([])
     setErrors(newErrors);
   };
 
-  const changeHandelFormSubtype = (e)=>{
-    const value = e.target.value
-    setapplicationSubTypeValue(e.target.value)
+  const changeHandelFormSubtype = (e) => {
+    const value = e.target.value;
+    setapplicationSubTypeValue(e.target.value);
 
     axios
-    .post(APIURL + "Master/GetAttachmentData", {
-      ApplicationTypeID:  FINForm.applicationType !== "" ?  FINForm.applicationType : -1,
-      ApplicationSubTypeID: value ? value : "0",
-    })
-    .then((res) => {
-      if (res.data.responseCode === "200") {
-        setAttachmentData(res.data.responseData);
-      } else {
-        setAttachmentData([]);
-        setFiles([]);
-        setOtherfiles([]);
-        setOtherfilesupload([]);
-      }
-    });
-
-  }
+      .post(APIURL + "Master/GetAttachmentData", {
+        ApplicationTypeID:
+          FINForm.applicationType !== "" ? FINForm.applicationType : -1,
+        ApplicationSubTypeID: value ? value : "0",
+      })
+      .then((res) => {
+        if (res.data.responseCode === "200") {
+          setAttachmentData(res.data.responseData);
+        } else {
+          setAttachmentData([]);
+          setFiles([]);
+          setOtherfiles([]);
+          setOtherfilesupload([]);
+        }
+      });
+  };
 
   const changeHandelForm = (e) => {
     let newErrors = {};
@@ -359,7 +357,6 @@ const [Supervisors, setSupervisors] = useState([])
             setsubsectorData(res.data.responseData);
           } else {
             setsubsectorData([]);
-            console.log(res.data.responseMessage);
           }
         })
         .catch((err) => {
@@ -383,20 +380,20 @@ const [Supervisors, setSupervisors] = useState([])
           console.log(err);
         });
     }
-    
+
     if (name === "applicationType") {
       axios
         .post(APIURL + "Admin/GetSubApplicationTypeByApplicationTypeID", {
           ID: value,
         })
-        .then((res) => { 
+        .then((res) => {
           if (res.data.responseCode === "200") {
             setapplicationSubType(res.data.responseData);
-            setAttachmentData([])
+            setAttachmentData([]);
           } else {
             setAttachmentData([]);
             setFiles([]);
-            setAttachmentData([])
+            setAttachmentData([]);
             setOtherfiles([]);
             setOtherfilesupload([]);
           }
@@ -485,16 +482,15 @@ const [Supervisors, setSupervisors] = useState([])
     setFiles(updatedUserFile);
   };
 
-   
-  const clearInputFile = (index) => { 
-    
+  const clearInputFile = (index) => {
     if (fileInputRefs[index]?.current) fileInputRefs[index].current.value = "";
   };
 
-  const clearInputFileother = (index) =>{
-    if (fileInputRefsother[index]?.current) fileInputRefsother[index].current.value = "";
-   }
-   
+  const clearInputFileother = (index) => {
+    if (fileInputRefsother[index]?.current)
+      fileInputRefsother[index].current.value = "";
+  };
+
   const getRoleHandle = async () => {
     await axios
       .post(APIURL + "Master/GetRoles", {
@@ -772,7 +768,7 @@ const [Supervisors, setSupervisors] = useState([])
       newErrors.currency = "Currency is required";
       valid = false;
     }
-    if(applicationSubTypeValue == ""){
+    if (applicationSubTypeValue == "") {
       newErrors.applicationSubTypeValue = "Nature of application is required";
       valid = false;
     }
@@ -842,8 +838,6 @@ const [Supervisors, setSupervisors] = useState([])
       };
     }
   });
-
-  console.log("filtertin_bpn", filtertin_bpn);
 
   const handleClear = () => {
     setValue(null);
@@ -938,8 +932,6 @@ const [Supervisors, setSupervisors] = useState([])
               "generatedNumber",
               res.data.responseData.rbzReferenceNumber
             );
-
-             
           } else {
             toast.error(res.data.responseMessage);
             setsubmitbuttonhide(false);
@@ -1162,59 +1154,59 @@ const [Supervisors, setSupervisors] = useState([])
           </div>
         </div> */}
 
-<div className="inner_form_new ">
-            <label className="controlform">Name of Bank</label>
-            {roleID == 4 ? (
-              <div className="form-bx">
-                <label>
-                  <select
-                    ref={banknameRef}
-                    className={
-                      errors?.getBankID && getBankID == "" ? "error" : ""
-                    }
-                    name="BankID"
-                    onChange={(e) => {
-                      SelectBankRecordOfficer(e);
-                    }}
-                  >
-                    <option value="">Select Bank/ADLA Name</option>
-                    {masterBank?.map((item, index) => {
-                      return (
-                        <>
-                          <option value={item?.id} key={index}>
-                            {item?.bankName}
-                          </option>
-                        </>
-                      );
-                    })}
-                  </select>
-                  <span className="sspan"></span>
-                  {errors?.getBankID && getBankID == "" ? (
-                    <small className="errormsg">{errors.getBankID}</small>
-                  ) : (
-                    ""
-                  )}
-                </label>
-              </div>
-            ) : (
-              <div className="form-bx">
-                <label>
-                  <input
-                    type="text"
-                    value={bankName.replace(/"/g, "")}
-                    disabled
-                  />
-                  <span className="sspan"></span>
-                </label>
-              </div>
-            )}
-          </div>
+        <div className="inner_form_new ">
+          <label className="controlform">Name of Bank</label>
+          {roleID == 4 ? (
+            <div className="form-bx">
+              <label>
+                <select
+                  ref={banknameRef}
+                  className={
+                    errors?.getBankID && getBankID == "" ? "error" : ""
+                  }
+                  name="BankID"
+                  onChange={(e) => {
+                    SelectBankRecordOfficer(e);
+                  }}
+                >
+                  <option value="">Select Bank/ADLA Name</option>
+                  {masterBank?.map((item, index) => {
+                    return (
+                      <>
+                        <option value={item?.id} key={index}>
+                          {item?.bankName}
+                        </option>
+                      </>
+                    );
+                  })}
+                </select>
+                <span className="sspan"></span>
+                {errors?.getBankID && getBankID == "" ? (
+                  <small className="errormsg">{errors.getBankID}</small>
+                ) : (
+                  ""
+                )}
+              </label>
+            </div>
+          ) : (
+            <div className="form-bx">
+              <label>
+                <input
+                  type="text"
+                  value={bankName.replace(/"/g, "")}
+                  disabled
+                />
+                <span className="sspan"></span>
+              </label>
+            </div>
+          )}
+        </div>
         {/* end form-bx  */}
 
         {/* end form-bx  */}
 
         <div className="inner_form_new ">
-          <label className="controlform">Type of Importer</label>
+          <label className="controlform">Type of Applicant</label>
           <div className="form-bx-radio">
             {applicantTypes.map((item, index) => {
               return (
@@ -1437,7 +1429,8 @@ const [Supervisors, setSupervisors] = useState([])
                 ref={applicationTypeRef}
                 name="applicationType"
                 onChange={(e) => {
-                  changeHandelForm(e); setapplicationSubTypeValue('')
+                  changeHandelForm(e);
+                  setapplicationSubTypeValue("");
                 }}
                 className={
                   errors.applicationType && FINForm.applicationType === ""
@@ -1449,7 +1442,7 @@ const [Supervisors, setSupervisors] = useState([])
                 {applicationType?.map((item, ind) => {
                   return (
                     <option key={item.id} value={item.id}>
-                      {item.name} 
+                      {item.name}
                     </option>
                   );
                 })}
@@ -1968,13 +1961,14 @@ const [Supervisors, setSupervisors] = useState([])
         </div>
         {/* end form-bx  */}
 
-        <div  className={roleID == 4 ? "d-none" : "inner_form_new "}>
+        <div className={roleID == 4 ? "d-none" : "inner_form_new "}>
           <label className="controlform">Submit to Bank Supervisor</label>
           <input
             type="checkbox"
             className=""
             onChange={(e) => {
-              HandelSupervisorcheck(e); handeSupervisor()
+              HandelSupervisorcheck(e);
+              handeSupervisor();
             }}
           />
         </div>
@@ -2104,7 +2098,6 @@ const [Supervisors, setSupervisors] = useState([])
         ) : (
           ""
         )}
-        {console.log("errors", errors)}
 
         <h5 className="section_top_subheading mt-3">Attachments</h5>
 
@@ -2230,7 +2223,6 @@ const [Supervisors, setSupervisors] = useState([])
         ) : (
           ""
         )}
-        
       </form>
 
       {/* view model start */}

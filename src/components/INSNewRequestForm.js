@@ -8,6 +8,7 @@ import Select from "react-select";
 import moment from "moment";
 import { toast } from "react-toastify";
 import SectorMultiselect from "./SearchUI/SectorMultiselect";
+import UpdatePopupMessage from "./UpdatePopupMessage";
 
 const INSNewRequestForm = () => {
   const navigate = useNavigate();
@@ -41,7 +42,7 @@ const INSNewRequestForm = () => {
   const usdEquivalentRef = useRef(null);
   const applicationreferenceNumberRef = useRef(null); //delete
   const previousRBZReferenceNumberRef = useRef(null);
-
+  const Navigate = useNavigate();
   const roleID = Storage.getItem("roleIDs");
   const UserID = Storage.getItem("userID");
   const bankID = Storage.getItem("bankID");
@@ -56,6 +57,7 @@ const INSNewRequestForm = () => {
   const [getGovernment, setgetGovernment] = useState();
   const [selectuserRole, setselectuserRole] = useState("");
   const [registerusertype, setregisterusertype] = useState(bankidcheck);
+  const [updatepopup, setupdatepopup] = useState(false);
   const [INSForm, setINSForm] = useState({
     UserID: UserID.replace(/"/g, ""),
     user: "",
@@ -108,12 +110,15 @@ const INSNewRequestForm = () => {
   const [antimoney, setantimoney] = useState([]);
   const [applicationsubID, setapplicationsubID] = useState([]);
   const [selectedEquipment, setselectedEquipment] = useState([]);
-  const [selectStationery, setsetselectStationery] = useState([])
+  const [selectStationery, setsetselectStationery] = useState([]);
   const [selectPersonnel, setselectPersonnel] = useState([]);
   const [selectSystems, setselectSystems] = useState([]);
   const [selectOrganogram, setselectOrganogram] = useState([]);
 
-const [selectAntiMone, setselectAntiMone]= useState([])
+  const [selectAntiMone, setselectAntiMone] = useState([]);
+
+  const heading = "Application Submitted Successfully!";
+  const para = "Foreign Investment application request submitted successfully!";
 
   const changeHandelForm = (e) => {
     let newErrors = {};
@@ -214,8 +219,7 @@ const [selectAntiMone, setselectAntiMone]= useState([])
     if (name == "applicationType") {
       axios
         .post(APIURL + "Master/GetMasterINSDataBySubApplicationTypeID")
-        .then((res) => {
-          console.log("GetMasterINSDataBySubApplicationTypeID", res);
+        .then((res) => { 
           if (res.data.responseCode == "200") {
             if (res.data.responseData[0].id == 50) {
               const eq = res.data.responseData[0].subData?.map((item) => {
@@ -326,8 +330,7 @@ const [selectAntiMone, setselectAntiMone]= useState([])
           ApplicationTypeID: value !== "" ? value : -1,
           ApplicationSubTypeID: "0",
         })
-        .then((res) => {
-          console.log("application type attachment", res);
+        .then((res) => { 
           if (res.data.responseCode === "200") {
             setAttachmentData(res.data.responseData);
           } else {
@@ -411,8 +414,7 @@ const [selectAntiMone, setselectAntiMone]= useState([])
       }
     });
   };
-
-  console.log("applicationsubID", applicationsubID?.join(","));
+ 
 
   const handleAddMore = (e) => {
     setOtherfiles([...otherfiles, null]);
@@ -486,15 +488,43 @@ const [selectAntiMone, setselectAntiMone]= useState([])
       newErrors.applicant = "Applicant name is required";
       valid = false;
     }
-    if (INSForm.applicationreferenceNumber === "") {
-      newErrors.applicationreferenceNumber =
-        "Application Reference Number is required";
-      valid = false;
-    }
+    // if (INSForm.applicationreferenceNumber === "") {
+    //   newErrors.applicationreferenceNumber =
+    //     "Application Reference Number is required";
+    //   valid = false;
+    // }
     if (INSForm.currency === "") {
       newErrors.currency = "Currency is required";
       valid = false;
     }
+    if (selectedEquipment.length <= 0 && INSForm.applicationType == "53") {
+      newErrors.Equipment = "Equipment is required";
+      valid = false;
+    }
+
+    if (selectStationery.length <= 0 && INSForm.applicationType == "53") {
+      newErrors.selectStationery = "Stationery is required";
+      valid = false;
+    }
+
+    if (selectPersonnel.length <= 0 && INSForm.applicationType == "53") {
+      newErrors.selectPersonnel = "Personnel is required";
+      valid = false;
+    }
+    if (selectSystems.length <= 0 && INSForm.applicationType == "53") {
+      newErrors.selectSystems = "Systems is required";
+      valid = false;
+    }
+    if (selectOrganogram.length <= 0 && INSForm.applicationType == "53") {
+      newErrors.selectOrganogram = "Organogram is required";
+      valid = false;
+    }
+    if (selectAntiMone.length <= 0 && INSForm.applicationType == "53") {
+      newErrors.selectAntiMone =
+        "Anti-Money laundering and Combating the Financing of Terrorism program and procedures is required";
+      valid = false;
+    }
+
     if (INSForm.amount === "") {
       newErrors.amount = "Amount is required";
       valid = false;
@@ -538,9 +568,8 @@ const [selectAntiMone, setselectAntiMone]= useState([])
         gettin: company.tinNumber,
       };
     }
-  });
-  console.log("filtertin_bpn", filtertin_bpn)
-  
+  }); 
+
   const handleInputChangecompany = (input) => {
     setInputValue(input);
     if (input.length >= 3) {
@@ -557,7 +586,6 @@ const [selectAntiMone, setselectAntiMone]= useState([])
       setOptions([]);
     }
   };
- 
 
   const handleInputChangeGovernment = (input) => {
     setInputValue(input);
@@ -585,8 +613,7 @@ const [selectAntiMone, setselectAntiMone]= useState([])
   const generateRandomNumber = () => {
     return Math.floor(10000 + Math.random() * 90000);
   };
-
-  console.log("INSForm", INSForm);
+ 
 
   const handleChangeEquipmen = (e) => {
     const values = e;
@@ -597,7 +624,7 @@ const [selectAntiMone, setselectAntiMone]= useState([])
     return {
       value: item.label,
       ID: item.value,
-      ApplicationSubTypeID: 50
+      ApplicationSubTypeID: 50,
     };
   });
 
@@ -605,7 +632,7 @@ const [selectAntiMone, setselectAntiMone]= useState([])
     return {
       value: item.label,
       ID: item.value,
-      ApplicationSubTypeID: 51
+      ApplicationSubTypeID: 51,
     };
   });
 
@@ -613,7 +640,7 @@ const [selectAntiMone, setselectAntiMone]= useState([])
     return {
       value: item.label,
       ID: item.value,
-      ApplicationSubTypeID: 52
+      ApplicationSubTypeID: 52,
     };
   });
 
@@ -621,7 +648,7 @@ const [selectAntiMone, setselectAntiMone]= useState([])
     return {
       value: item.label,
       ID: item.value,
-      ApplicationSubTypeID: 53
+      ApplicationSubTypeID: 53,
     };
   });
 
@@ -629,7 +656,7 @@ const [selectAntiMone, setselectAntiMone]= useState([])
     return {
       value: item.label,
       ID: item.value,
-      ApplicationSubTypeID: 54
+      ApplicationSubTypeID: 54,
     };
   });
 
@@ -637,58 +664,34 @@ const [selectAntiMone, setselectAntiMone]= useState([])
     return {
       value: item.label,
       ID: item.value,
-      ApplicationSubTypeID: 55
+      ApplicationSubTypeID: 55,
     };
-  });
- 
+  }); 
 
-  console.log("StationeryData---", StationeryData)
-  console.log("PersonnelData---", PersonnelData)
+  const handleChangeStationery = (e) => {
+    const value = e;
+    setsetselectStationery(value);
+  };
 
-  console.log("SystemsData---", SystemsData)
+  const handleChangePersonnel = (e) => {
+    const value = e;
+    setselectPersonnel(value);
+  };
 
-  console.log("OrganogramData---", OrganogramData)
-  console.log("AntiMoneData---", AntiMoneData)
+  const handleChangeSystems = (e) => {
+    const value = e;
+    setselectSystems(value);
+  };
 
+  const handleChangeOrganogram = (e) => {
+    const value = e;
+    setselectOrganogram(value);
+  };
 
-const handleChangeStationery = (e)=>{
-const value = e
-setsetselectStationery(value)
-}
-
-const handleChangePersonnel = (e)=>{
-  const value = e
-  setselectPersonnel(value)
-  }
-
-  const handleChangeSystems = (e)=>{
-    const value = e
-    setselectSystems(value)
-    }
-   
-    const handleChangeOrganogram = (e)=>{
-      const value = e
-      setselectOrganogram(value)
-      }
-
-      const handleChangeAntiMone = (e)=>{
-        const value = e
-        setselectAntiMone(value)
-      }
-  console.log("selectedEquipment", selectedEquipment);
-  console.log("selectOrganogram", selectOrganogram)
-      console.log("selectAntiMone", selectAntiMone)
-
-    //   const createSubDataSubApplicationType = (equipment, stationery, personnel, systems, organogram, antiMone) => {
-        
-    //     const allSelections = [...equipment, ...stationery, ...personnel, ...systems, ...organogram, ...antiMone ];
-         
-    //     return allSelections.map(item => item.value).join(',');
-    // };
-
-    // const SubDataSubApplicationType = createSubDataSubApplicationType(selectedEquipment, setselectStationery, selectPersonnel, selectSystems, selectOrganogram, selectAntiMone);
-
- 
+  const handleChangeAntiMone = (e) => {
+    const value = e;
+    setselectAntiMone(value);
+  };  
 
   const HandleSubmit = async (e) => {
     e.preventDefault();
@@ -699,56 +702,65 @@ const handleChangePersonnel = (e)=>{
 
     if (validateForm()) {
       await axios
-        .post(APIURL + "InspectorateApplication/CreateInspectorateApplication", {
-          UserID: UserID.replace(/"/g, ""),
-          BankID: bankID,
-          DepartmentID: "5",
-          RoleID: roleID,
-          ApplicationDate: moment(startDate).format("YYYY-MM-DD"),
-          RBZReferenceNumber: generatedNumber,
-          RelatedApplicationReferenceNumber:
-            INSForm.relatedapplicationreferenceNumber,
-          Name:
-            registerusertype === "2" && bankID !== "" ? INSForm.applicant : "",
-          CompanyID:
-            registerusertype === "1" && bankID !== ""
-              ? getCompanyName?.value
-              : "",
-          ApplicantTypeID: registerusertype,
-          AssignedToRoleID: roleID == 2 ? 3 : selectuserRole,
-          ApplicationTypeID: INSForm.applicationType,
-          BeneficiaryName: INSForm.BeneficiaryName,
-          BeneficiaryCountry: INSForm.baneficiaryCountry,
-          BPNCode: registerusertype === "1" && bankID !== ""
-          ? filtertin_bpn?.bpnNumber?.toUpperCase() : "",
-          TINNumber:registerusertype === "1" && bankID !== ""
-          ? filtertin_bpn?.tinNumber?.toUpperCase()
-          : "",
-          Currency: INSForm.currency,
-          Amount: INSForm.amount,
-          Rate: curRate,
-          USDEquivalent: convertedRate.toFixed(2),
-          Sector: INSForm.sector,
-          SubSector: INSForm.subsector,
-          ApplicantType:registerusertype,
-          ApplicantComment: INSForm.applicantComments,
-          // ApplicationSubTypeID: INSForm.applicationSubType,
-          EquipmentData:EquipmentData,
-          StationeryData:StationeryData,
-          PersonnelData:PersonnelData,
-          SystemsData:SystemsData,
-          Structure_OrganogramData:OrganogramData,
-          Anti_Money_laundering_CombatingData:AntiMoneData,
-          ApplicationSubTypeID: applicationsubID?.join(","), 
-          AssignedTo:
-            checkSupervisor === true
-              ? INSForm.bankSupervisor
-              : roleID == 4 && INSForm.bankSupervisor == ""
-              ? UserID.replace(/"/g, "")
-              : "",
-        })
+        .post(
+          APIURL + "InspectorateApplication/CreateInspectorateApplication",
+          {
+            UserID: UserID.replace(/"/g, ""),
+            BankID: bankID,
+            DepartmentID: "5",
+            RoleID: roleID,
+            ApplicationDate: moment(startDate).format("YYYY-MM-DD"),
+            RBZReferenceNumber: generatedNumber,
+            RelatedApplicationReferenceNumber:
+              INSForm.relatedapplicationreferenceNumber,
+            Name:
+              registerusertype === "2" && bankID !== ""
+                ? INSForm.applicant
+                : "",
+            CompanyID:
+              registerusertype === "1" && bankID !== ""
+                ? getCompanyName?.value
+                : "",
+            ApplicantTypeID: registerusertype,
+            AssignedToRoleID: roleID == 2 ? 3 : selectuserRole,
+            ApplicationTypeID: INSForm.applicationType,
+            BeneficiaryName: INSForm.BeneficiaryName,
+            BeneficiaryCountry: INSForm.baneficiaryCountry,
+            BPNCode:
+              registerusertype === "1" && bankID !== ""
+                ? filtertin_bpn?.bpnNumber?.toUpperCase()
+                : "",
+            TINNumber:
+              registerusertype === "1" && bankID !== ""
+                ? filtertin_bpn?.tinNumber?.toUpperCase()
+                : "",
+            Currency: INSForm.currency,
+            Amount: INSForm.amount,
+            Rate: curRate,
+            USDEquivalent: convertedRate.toFixed(2),
+            Sector: INSForm.sector,
+            SubSector: INSForm.subsector,
+            ApplicantType: registerusertype,
+            ApplicantComment: INSForm.applicantComments,
+            // ApplicationSubTypeID: INSForm.applicationSubType,
+            EquipmentData: EquipmentData,
+            StationeryData: StationeryData,
+            PersonnelData: PersonnelData,
+            SystemsData: SystemsData,
+            Structure_OrganogramData: OrganogramData,
+            Anti_Money_laundering_CombatingData: AntiMoneData,
+            ApplicationSubTypeID: applicationsubID?.join(","),
+            AssignedTo:
+              checkSupervisor === true
+                ? INSForm.bankSupervisor
+                : roleID == 4 && INSForm.bankSupervisor == ""
+                ? UserID.replace(/"/g, "")
+                : "",
+          }
+        )
         .then((res) => {
-          if (res.data.responseCode === "200") {
+          if (res.data.responseCode === "200") { 
+            setupdatepopup(true);
             toast.success(res.data.responseMessage);
             setTimeout(() => {
               navigate("/INSDashboard");
@@ -816,7 +828,38 @@ const handleChangePersonnel = (e)=>{
       }
       setToastDisplayed(true);
     }
-  };  
+  };
+
+  const closePopupHandle = () => {
+    Navigate("/INSDashboard");
+    setupdatepopup(false); 
+    
+    if (applicantRef.current) applicantRef.current.value = "";
+    if (BeneficiaryNameRef.current) BeneficiaryNameRef.current.value = "";
+    if (BPNCodeRef.current) BPNCodeRef.current.value = "";
+    if (TINRef.current) TINRef.current.value = "";
+    if (amountRef.current) amountRef.current.value = "";
+    if (applicantRef.current) applicantRef.current.value = "";
+    if (applicantCommentsRef.current) applicantCommentsRef.current.value = "";
+    if (BeneficiaryNameRef.current) BeneficiaryNameRef.current.value = "";
+    if (applicantReferenceNumberRef.current)
+      applicantReferenceNumberRef.current.value = "";
+    // if(applicantYearRef.current) applicantYearRef.current.value = '';
+    if (applicationTypeRef.current) applicationTypeRef.current.value = "";
+    if (bankSupervisorRef.current) bankSupervisorRef.current.value = "";
+    if (companyNameRef.current) companyNameRef.current.value = "";
+    if (currencyRef.current) currencyRef.current.value = "";
+    if (govtAgencieRef.current) govtAgencieRef.current.value = "";
+ 
+    if (sectorRef.current) sectorRef.current.value = "";
+    if (subsectorRef.current) subsectorRef.current.value = "";
+
+    if (typeExporterRef.current) typeExporterRef.current.value = "";
+    if (usdEquivalentRef.current) usdEquivalentRef.current.value = "";
+
+    if (rateRef.current) rateRef.current.value = ""; 
+  };
+
 
   const ResetHandleData = () => {
     setgetCompanyName(null);
@@ -1009,14 +1052,16 @@ const handleChangePersonnel = (e)=>{
                       changeHandelForm(e);
                     }}
                     placeholder="TIN Number"
+                    disabled
                     value={
                       filtertin_bpn && filtertin_bpn.tinNumber !== null
                         ? filtertin_bpn?.tinNumber
                         : "TIN Number"
                     }
-                    
                     className={
-                      errors.TINNumber ? "error text-uppercase" : "text-uppercase"
+                      errors.TINNumber
+                        ? "error text-uppercase"
+                        : "text-uppercase"
                     }
                   />
                   <span className="sspan"></span>
@@ -1036,6 +1081,7 @@ const handleChangePersonnel = (e)=>{
                     ref={BPNCodeRef}
                     type="text"
                     name="BPNCode"
+                    disabled
                     onChange={(e) => {
                       changeHandelForm(e);
                     }}
@@ -1156,16 +1202,16 @@ const handleChangePersonnel = (e)=>{
                 })}
               </select>
               <span className="sspan"></span>
-              {errors.applicationType && INSForm.applicationType === "" ? (
-                <small className="errormsg">{errors.applicationType}</small>
-              ) : (
-                ""
-              )}
             </label>
             <small
               className="informgs"
               style={{ position: "absolute", bottom: "-10px" }}
             >
+              {errors.applicationType && INSForm.applicationType === "" ? (
+                <small className="errormsg2">{errors.applicationType}</small>
+              ) : (
+                ""
+              )}{" "}
               Only government agencies can submit direct application to
               Inspectorate department.
             </small>
@@ -1209,14 +1255,13 @@ const handleChangePersonnel = (e)=>{
         ) : (
           ""
         )}
-
+ 
         {INSForm.applicationType == "53" ? (
           <>
             <div className="inner_form_new align-items-center ">
               <label className="controlform">Equipment</label>
               <div className="cccto">
                 <div className="flex justify-content-center multiSelect">
-                   
                   <SectorMultiselect
                     key="multyselectprinciple"
                     options={Equipment}
@@ -1224,10 +1269,11 @@ const handleChangePersonnel = (e)=>{
                     value={selectedEquipment}
                     isSelectAll={true}
                     menuPlacement={"bottom"}
+                    className={errors.selectAntiMone && selectedEquipment.length <= 0 ? "errorborder" : ""}
                   />
 
                   <span className="sspan"></span>
-                  {errors.Equipment && INSForm.Equipment === "" ? (
+                  {errors.Equipment && selectedEquipment.length <= 0 ? (
                     <small className="errormsg">{errors.Equipment}</small>
                   ) : (
                     ""
@@ -1240,39 +1286,24 @@ const handleChangePersonnel = (e)=>{
               <label className="controlform">Stationery</label>
               <div className="cccto">
                 <div className="flex justify-content-center multiSelect">
-                  {/* <select
-                    name="applicationsubID"
-                    onChange={(e) => {
-                      changeHandelApplicationSubTypeID(e, 51);
-                    }}
-                  >
-                    <option value="" selected>
-                      None Select
-                    </option>
-                    {Stationery?.map((item, ind) => {
-                      return (
-                        <option key={item.id} value={item.id}>
-                          {item.name}
-                        </option>
-                      );
-                    })}
-                  </select> */}
-                   <SectorMultiselect
+                  <SectorMultiselect
                     key="multyselectprinciple"
                     options={Stationery}
                     onChange={(e) => handleChangeStationery(e)}
                     value={selectStationery}
                     isSelectAll={true}
                     menuPlacement={"bottom"}
+                    className={errors.selectAntiMone && selectStationery.length <= 0 ? "errorborder" : ""}
                   />
 
                   <span className="sspan"></span>
-                  {errors.selectStationery && INSForm.selectStationery === "" ? (
-                    <small className="errormsg">{errors.selectStationery}</small>
+                  {errors.selectStationery && selectStationery.length <= 0 ? (
+                    <small className="errormsg">
+                      {errors.selectStationery}
+                    </small>
                   ) : (
                     ""
                   )}
-                  
                 </div>
               </div>
             </div>
@@ -1280,37 +1311,20 @@ const handleChangePersonnel = (e)=>{
             <div className="inner_form_new align-items-center">
               <label className="controlform">Personnel</label>
               <div className=" cccto">
-                          <div className="flex justify-content-center multiSelect">
-                  {/* <select
-                    name="applicationsubID"
-                    onChange={(e) => {
-                      changeHandelApplicationSubTypeID(e, 52);
-                    }}
-                  >
-                    <option value="" selected>
-                      None Select
-                    </option>
-                    {Personnel?.map((item, ind) => {
-                      return (
-                        <option key={item.id} value={item.id}>
-                          {item.name}
-                        </option>
-                      );
-                    })}
-                  </select> */}
-
-<SectorMultiselect
+                <div className="flex justify-content-center multiSelect">
+                  <SectorMultiselect
                     key="multyselectprinciple"
                     options={Personnel}
                     onChange={(e) => handleChangePersonnel(e)}
                     value={selectPersonnel}
                     isSelectAll={true}
                     menuPlacement={"bottom"}
+                    className={errors.selectPersonnel && selectPersonnel.length <=0 ? "errorborder" : ""}
                   />
 
                   <span className="sspan"></span>
-                  {errors.Personnel && INSForm.Personnel === "" ? (
-                    <small className="errormsg">{errors.Personnel}</small>
+                  {errors.selectPersonnel && selectPersonnel.length <=0 ? (
+                    <small className="errormsg">{errors.selectPersonnel}</small>
                   ) : (
                     ""
                   )}
@@ -1321,39 +1335,20 @@ const handleChangePersonnel = (e)=>{
             <div className="inner_form_new align-items-center">
               <label className="controlform">Systems</label>
               <div className=" cccto">
-                          <div className="flex justify-content-center multiSelect">
-                  {/* <select
-                    name="applicationsubID"
-                    onChange={(e) => {
-                      changeHandelApplicationSubTypeID(e, 53);
-                    }}
-                  >
-                    <option value="" selected>
-                      None Select
-                    </option>
-                    {Systems?.map((item, ind) => {
-                      return (
-                        <option key={item.id} value={item.id}>
-                          {item.name}
-                        </option>
-                      );
-                    })}
-                  </select> */}
-
-
-
-<SectorMultiselect
+                <div className="flex justify-content-center multiSelect">
+                  <SectorMultiselect
                     key="multyselectprinciple"
                     options={Systems}
                     onChange={(e) => handleChangeSystems(e)}
                     value={selectSystems}
                     isSelectAll={true}
                     menuPlacement={"bottom"}
+                    className={errors.selectSystems && selectSystems.length <= 0 ? "errorborder" : ""}
                   />
 
                   <span className="sspan"></span>
-                  {errors.Systems && INSForm.Systems === "" ? (
-                    <small className="errormsg">{errors.Systems}</small>
+                  {errors.selectSystems && selectSystems.length <= 0 ? (
+                    <small className="errormsg">{errors.selectSystems}</small>
                   ) : (
                     ""
                   )}
@@ -1364,37 +1359,22 @@ const handleChangePersonnel = (e)=>{
             <div className="inner_form_new ">
               <label className="controlform">Structure/Organogram</label>
               <div className=" cccto">
-                          <div className="flex justify-content-center multiSelect">
-                  {/* <select
-                    name="applicationsubID"
-                    onChange={(e) => {
-                      changeHandelApplicationSubTypeID(e, 54);
-                    }}
-                  >
-                    <option value="" selected>
-                      None Selected
-                    </option>
-                    {Organogram?.map((item, ind) => {
-                      return (
-                        <option key={item.id} value={item.id}>
-                          {item.name}
-                        </option>
-                      );
-                    })}
-                  </select> */}
-
-<SectorMultiselect
+                <div className="flex justify-content-center multiSelect">
+                  <SectorMultiselect
                     key="multyselectprinciple"
                     options={Organogram}
                     onChange={(e) => handleChangeOrganogram(e)}
                     value={selectOrganogram}
                     isSelectAll={true}
                     menuPlacement={"bottom"}
+                    className={errors.selectAntiMone && selectOrganogram.length <=0 ? "errorborder" : ""}
                   />
 
                   <span className="sspan"></span>
-                  {errors.Organogram && INSForm.Organogram === "" ? (
-                    <small className="errormsg">{errors.Organogram}</small>
+                  {errors.selectOrganogram  && selectOrganogram.length <=0 ? (
+                    <small className="errormsg">
+                      {errors.selectOrganogram}
+                    </small>
                   ) : (
                     ""
                   )}
@@ -1408,37 +1388,20 @@ const handleChangePersonnel = (e)=>{
                 program and procedures
               </label>
               <div className=" cccto">
-                          <div className="flex justify-content-center multiSelect">
-                  {/* <select
-                    name="applicationsubID"
-                    onChange={(e) => {
-                      changeHandelApplicationSubTypeID(e, 55);
-                    }}
-                  >
-                    <option value="" selected>
-                      None Selected
-                    </option>
-                    {antimoney?.map((item, ind) => {
-                      return (
-                        <option key={item.id} value={item.id}>
-                          {item.name}
-                        </option>
-                      );
-                    })}
-                  </select> */}
-
-<SectorMultiselect
+                <div className="flex justify-content-center multiSelect">
+                  <SectorMultiselect
                     key="multyselectprinciple"
                     options={antimoney}
                     onChange={(e) => handleChangeAntiMone(e)}
                     value={selectAntiMone}
                     isSelectAll={true}
                     menuPlacement={"bottom"}
+                    className={errors.selectAntiMone && selectAntiMone.length <=0 ? "errorborder" : ""}
                   />
 
                   <span className="sspan"></span>
-                  {errors.antymony && INSForm.antymony === "" ? (
-                    <small className="errormsg">{errors.antymony}</small>
+                  {errors.selectAntiMone && selectAntiMone.length <=0 ? (
+                    <small className="errormsg">{errors.selectAntiMone}</small>
                   ) : (
                     ""
                   )}
@@ -2083,6 +2046,17 @@ const handleChangePersonnel = (e)=>{
             Submit
           </button>
         </div>
+
+        {updatepopup == true ? (
+          <UpdatePopupMessage
+            heading={heading}
+            para={para}
+            closePopupHandle={closePopupHandle}
+          ></UpdatePopupMessage>
+        ) : (
+          ""
+        )}
+        
       </form>
     </>
   );

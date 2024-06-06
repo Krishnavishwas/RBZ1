@@ -564,7 +564,7 @@ const CircularsApprovedTable = () => {
             });
     };
     // pdf code start
-    console.log("applicationDetail----", applicationDetail);
+
     const GetHandelDetailPDF = async (circularReferenceNumber) => {
         console.log("applicationDetail", circularReferenceNumber);
         setBtnLoader(true);
