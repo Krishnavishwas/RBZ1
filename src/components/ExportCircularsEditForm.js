@@ -1964,7 +1964,7 @@ const ExportCircularsEditForm = ({
   };
 
 
- 
+
 
   return (
     <>
@@ -2070,14 +2070,14 @@ const ExportCircularsEditForm = ({
                               ""
                             )}
                           </div>
-                          : <div className="form-bx">
-                            <p className="showData mt-2 py-1" dangerouslySetInnerHTML={applicationDetail?.content ? { __html: applicationDetail.content } : { __html: "-" }}></p>
+                          : <div className="form-bxx ">
+                            <p className="showData analyst_desc mt-2 py-1" dangerouslySetInnerHTML={applicationDetail?.content ? { __html: applicationDetail.content } : { __html: "-" }}></p>
                           </div>}
                       </div>
                     </div>
                     {/* end form-bx  */}
 
-                    {attachmentData?.map((items, index) => {
+                    {/* {attachmentData?.map((items, index) => {
                       return (
                         <div
                           className="attachemt_form-bx  mt-2"
@@ -2126,7 +2126,7 @@ const ExportCircularsEditForm = ({
                           )}
                         </div>
                       );
-                    })}
+                    })} */}
 
                     {otheruserfiles.map((file, index) => (
                       <div
@@ -2445,7 +2445,8 @@ const ExportCircularsEditForm = ({
                             >
                               {item?.fileName ? (
                                 <span style={{ fontWeight: "500" }}>
-                                  {item?.fileName}
+                                  {/* {item?.fileName}  */}
+                                  {item?.label ? item?.label : item?.fileName}
                                 </span>
                               ) : (
                                 <span style={{ fontWeight: "500" }}>Cover Letter</span>

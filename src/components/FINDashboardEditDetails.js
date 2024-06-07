@@ -2146,14 +2146,13 @@ const FINDashboardEditDetails = ({
           Name: applicationDetail?.name,
           BeneficiaryName: applicationDetail?.beneficiaryName,
           BeneficiaryCountry: applicationDetail?.beneficiaryCountry,
-          BPNCode:
-            filtertin_bpn || filtertin_bpn != undefined
-              ? filtertin_bpn?.bpnNumber?.toUpperCase()
-              : applicationDetail?.bpnCode,
-          TINNumber:
-            filtertin_bpn || filtertin_bpn != undefined
-              ? filtertin_bpn?.tinNumber?.toUpperCase()
-              : applicationDetail?.tinNumber,
+          BPNCode:filtertin_bpn != undefined && filtertin_bpn?.bpnNumber && filtertin_bpn?.bpnNumber != null
+          ? filtertin_bpn?.bpnNumber
+          : filtertin_bpn?.bpnNumber == null && filtertin_bpn != undefined ? "" : applicationDetail?.bpnCode ,
+          TINNumber: filtertin_bpn != undefined && filtertin_bpn?.tinNumber && filtertin_bpn?.tinNumber != null
+          ? filtertin_bpn?.tinNumber?.toUpperCase()
+          : filtertin_bpn?.tinNumber == null && filtertin_bpn != undefined ? "" : applicationDetail?.tinNumber ,
+
           ApplicantReferenceNumber:
             applicationDetail?.applicantReferenceNumber?.toUpperCase(),
           ApplicationTypeID: applicationDetail?.applicationTypeID,
@@ -2400,6 +2399,7 @@ const FINDashboardEditDetails = ({
                             formData.append("UserID", UserID.replace(/"/g, ""));
                             formData.append("FileType", "FinalResponsePDF");
                             formData.append("Label", "Final Response");
+                            formData.append("DepartmentID", "4");
                             formData.append(
                               "RBZReferenceNumber",
                               applicationDetail?.rbzReferenceNumber
@@ -2565,6 +2565,7 @@ const FINDashboardEditDetails = ({
                               );
                               formData.append("FileType", "LetterHeadPDF");
                               formData.append("Label", "CoverLetter");
+                              formData.append("DepartmentID", "4");
                               formData.append(
                                 "RBZReferenceNumber",
                                 applicationDetail?.rbzReferenceNumber
@@ -2942,7 +2943,7 @@ const FINDashboardEditDetails = ({
                       </small>
                     </div>
                   </div>
-
+{console.log("filtertin_bpn",filtertin_bpn)}
                   <div className="inner_form_new ">
                     <label className="controlform">TIN Number</label>
                     <div className="form-bx">
@@ -2955,9 +2956,9 @@ const FINDashboardEditDetails = ({
                           }}
                           placeholder="TIN Number"
                           value={
-                            filtertin_bpn?.tinNumber
+                            filtertin_bpn != undefined && filtertin_bpn?.tinNumber && filtertin_bpn?.tinNumber != null
                               ? filtertin_bpn?.tinNumber
-                              : applicationDetail?.tinNumber
+                              : filtertin_bpn?.tinNumber == null && filtertin_bpn != undefined ? "" : applicationDetail?.tinNumber 
                           }
                           className="text-uppercase"
                           disabled
@@ -3023,9 +3024,9 @@ const FINDashboardEditDetails = ({
                         min={0}
                         name="bpnCode"
                         value={
-                          filtertin_bpn?.bpnNumber
-                            ? filtertin_bpn?.bpnNumber?.trim()
-                            : applicationDetail?.bpnCode
+                          filtertin_bpn != undefined && filtertin_bpn?.bpnNumber && filtertin_bpn?.bpnNumber != null
+                              ? filtertin_bpn?.bpnNumber
+                              : filtertin_bpn?.bpnNumber == null && filtertin_bpn != undefined ? "" : applicationDetail?.bpnCode 
                         }
                         onChange={(e) => {
                           changeHandelForm(e);
@@ -3100,7 +3101,7 @@ const FINDashboardEditDetails = ({
 
               {/* end form-bx  */}
 
-              {/* <div className="inner_form_new ">
+              <div className="inner_form_new ">
                   <label className="controlform">
                     Applicant Reference Number
                   </label>
@@ -3137,7 +3138,7 @@ const FINDashboardEditDetails = ({
                       )}
                     </label>
                   </div>
-                </div> */}
+                </div>
               {/* end form-bx  */}
 
               <div className="inner_form_new ">
@@ -3289,12 +3290,16 @@ const FINDashboardEditDetails = ({
                         changeHandelForm(e);
                       }}
                       placeholder="Beneficiary Name"
-                      value={applicationDetail.beneficiaryName}
+                      value={
+                        applicationDetail?.beneficiaryName
+                          ? applicationDetail?.beneficiaryName
+                          : "N/A"
+                      }
                       disabled={roleID == 2 || roleID == 3 ? false : true}
                     />
                     <span className="sspan"></span>
                     {errors.BeneficiaryName ||
-                    applicationDetail.BeneficiaryName === "" ? (
+                    applicationDetail?.beneficiaryName === "" ? (
                       <small className="errormsg">
                         {errors.BeneficiaryName}
                       </small>

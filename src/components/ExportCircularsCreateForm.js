@@ -6,7 +6,10 @@ import DatePicker from "react-datepicker";
 import { APIURL, ImageAPI } from "../constant";
 import { toast } from "react-toastify";
 import { MultiSelect } from 'primereact/multiselect';
-
+import jsPDF from "jspdf";
+import moment from "moment";
+import logo from "../rbz_LOGO.png";
+import NoSign from "../NoSign.png";
 /* Tiptp Editor Starts */
 import Table from "@tiptap/extension-table";
 import TableCell from "@tiptap/extension-table-cell";
@@ -24,25 +27,32 @@ import { useNavigate } from "react-router-dom";
 
 import DirectiveMultiSelectComponent from './SearchUI/DirectiveMultiSelectComponent'
 import CustomBankMultiSelect from './SearchUI/CustomBankMultiSelect'
+import { generate } from "shortid";
 const ExportCircularsCreateForm = () => {
-const navigate = useNavigate()
+  const navigate = useNavigate()
   // const purposeApplicationRef = useRef(null);
+  const PdfPrivewsupervisorRef = useRef();
   const userID = Storage.getItem("userID");
   const bankID = Storage.getItem("bankID");
   const roleID = Storage.getItem("roleIDs");
   const bankidcheck = bankID !== "" ? "1" : "3";
   const [toastDisplayed, setToastDisplayed] = useState(false);
+  const PdfUsername = Storage.getItem("name");
+  const PdfRolename = Storage.getItem("roleName");
   const [errors, setErrors] = useState({});
   const [checkAnalyst, setAnalyst] = useState(false);
+  const [checkDecision, setCheckDecision] = useState(false);
   const [selectedBankOption, setSelectedBankOption] = useState([]);
   const [selectedBanks, setSelectedBanks] = useState([]);
   const [selectedDirectives, setSelectedDirectives] = useState([]);
+  const [applicationDetail, setApplicationDetail] = useState({});
   const [circularAttachmentData, setCircularAttachmentData] = useState([
     { filename: "File Upload", upload: "" },
   ]);
   const [otherfilesupload, setOtherfilesupload] = useState([]);
   const [selectedDirectivesOpt, setSelectedDirectivesOpt] = useState([]);
   const [analystUser, setAnalystUser] = useState([]);
+  const [applicationstaus, setapplicationstaus] = useState("0");
   const [files, setFiles] = useState([]);
   const [department, setDepartment] = useState([]);
   const [otherfiles, setOtherfiles] = useState([]);
@@ -61,7 +71,9 @@ const navigate = useNavigate()
   const fileInputRefsother = [useRef(null), useRef(null), useRef(null), useRef(null), useRef(null), useRef(null), useRef(null), useRef(null), useRef(null), useRef(null)];
   const [content, setEditorContent] = useState("<p></p>");
   const handelAnalystCheck = () => {
-    setAnalyst(!checkAnalyst)
+    setAnalyst(!checkAnalyst);
+    setCheckDecision(!checkDecision);
+
   }
   //--------   department api call start
   const GetDepartment = async () => {
@@ -109,7 +121,12 @@ const navigate = useNavigate()
     setErrors(newErrors);
   };
   //---------- End form fill data handle
-
+  const ChangeApplicationStatus = (e) => {
+    const values = e.target.value;
+    setapplicationstaus(values);
+    // setAsignUser([]);
+    // setAssignUserID("");
+  };
   //---bank data start
   const bankData = async () => {
     await axios
@@ -189,6 +206,7 @@ const navigate = useNavigate()
   // }
 
   const handleFileChange = (e, label) => {
+    // console.log("label",label);
     const file = e.target.files[0];
     const index = files.findIndex(item => item.label === label);
     if (index !== -1) {
@@ -262,7 +280,7 @@ const navigate = useNavigate()
 
     const data = {
       UserID: userID.replace(/"/g, ""),
-      RoleID: checkAnalyst != true ? "0" : roleID,
+      RoleID: (checkAnalyst != true && checkDecision != true) ? "0" : roleID,
       Name: exportForm.name,
       // BankID: '"'+bankSelectedID.join()+'"',
       BankID: bankSelectedID.join(),
@@ -274,10 +292,20 @@ const navigate = useNavigate()
       // AssignedTo: checkAnalyst ? exportForm.analyst : userID.replace(/"/g, ""),
       AssignedTo: checkAnalyst ? exportForm.analyst : "",
       // AssignedToRoleID: checkAnalyst ? "6" : roleID,
-      AssignedToRoleID: checkAnalyst ? parseInt(roleID) + 1 : checkAnalyst != true ? "0" : roleID,
+      AssignedToRoleID: checkAnalyst ? parseInt(roleID) + 1 : (checkAnalyst != true && checkDecision != true) ? "0" : roleID,
       // FutureDate: futureDate,
       ReleasingDate: releasingDate,
-      DepartmentID: exportForm.departmentValue
+      DepartmentID: exportForm.departmentValue,
+      CircularStatus:
+        (roleID == 8 || roleID == 9)
+          ? applicationstaus
+          : "0",
+
+
+      ActionStatus:
+        ((roleID == 8 && applicationstaus !== "0") || (roleID == 8 && applicationstaus !== "0"))
+          ? "100"
+          : "0"
 
     }
 
@@ -286,7 +314,7 @@ const navigate = useNavigate()
       await axios
         .post(APIURL + "Circular/CreateCircular", data)
         .then((res) => {
-
+          setApplicationDetail(res.data.responseData)
           if (res.data.responseCode === '200') {
             for (let i = 0; i < files?.length; i++) { // Corrected loop condition
               formData.append("files", files[i].file);
@@ -303,6 +331,235 @@ const navigate = useNavigate()
               .catch((err) => {
                 console.log("file Upload ", err)
               })
+
+            // pdf generate code
+            setTimeout(() => {
+              const doc = new jsPDF({
+                format: "a4",
+                unit: "pt",
+              });
+              const addHeader = (doc) => {
+                const pageCount = doc.internal.getNumberOfPages();
+                const headerpositionfromleft =
+                  (doc.internal.pageSize.width - 10) / 4;
+                for (var i = 1; i <= pageCount; i++) {
+                  doc.setPage(i);
+                  doc.addImage(
+                    logo,
+                    "png",
+                    70,
+                    10,
+                    80,
+                    80,
+                    "DMS-RBZ",
+                    "NONE",
+                    0
+                  );
+                  doc.setFontSize(8);
+                  doc.text(
+                    "Reserve Bank of Zimbabwe. 80 Samora Machel Avenue, P.O. Box 1283, Harare, Zimbabwe.",
+                    headerpositionfromleft + 50,
+                    40
+                  );
+                  doc.text(
+                    "Tel: 263 242 703000, 263 8677000477 | Website:www.rbz.co.zw",
+                    headerpositionfromleft + 100,
+                    50
+                  );
+                }
+              };
+              // doc.setFont("helvetica", "normal");
+              // doc.setFontSize(3);
+              let docWidth = doc.internal.pageSize.getWidth();
+              const refpdfview =
+                PdfPrivewsupervisorRef
+              doc.html(refpdfview.current, {
+                x: 12,
+                y: 12,
+                width: 513,
+                height: doc.internal.pageSize.getHeight(),
+                margin: [110, 80, 60, 35],
+                windowWidth: 1000,
+                pagebreak: true,
+                async callback(doc) {
+                  addHeader(doc);
+
+
+                  const blobPDF = doc.output("datauristring");
+                  let formData = new FormData();
+                  formData.append(
+                    "UserID",
+                    userID.replace(/"/g, "")
+                  );
+                  formData.append("FileType", "LetterHeadPDF");
+                  formData.append("Label", "CoverLetter");
+                 
+                  formData.append(
+                    "CircularID",
+                    res.data.responseData.id
+                  );
+                  formData.append("DepartmentID",res.data.responseData.departmentID)
+                  formData.append("PdfData", blobPDF);
+                  await axios
+                    .post(ImageAPI + "File/UploadPdf", formData)
+                    .then(async (res) => {
+                      if (res.data.responseCode == "Success") {
+                        console.log("success Pdf");
+                      } else {
+                        console.log("Not Create pdf");
+                      }
+                    })
+                    .catch((error) =>
+                      console.log("DATA SAVE ERROR--", error)
+                    );
+                },
+              });
+
+              // axios
+              //     .post(APIURL + "Admin/GetBankByID", {
+              //         id: applicationDetail?.bankID,
+              //     })
+              //     .then((response) => {
+              //         if (response.data.responseCode === "200") {
+              //             if (
+              //                 response.data.responseData?.headerFooterData["0"]?.fileType ==
+              //                 "HeaderFile"
+              //             ) {
+              //                 var headerImage =
+              //                     response.data.responseData.headerFooterData["0"].filePath;
+              //                 var headerImagewidth =
+              //                     response.data.responseData.headerFooterData["0"].imageWidth;
+              //             } else {
+              //                 var headerImage = "";
+              //             }
+              //             if (
+              //                 response.data.responseData?.headerFooterData["1"]?.fileType ==
+              //                 "FooterFile"
+              //             ) {
+              //                 var footerImage =
+              //                     response.data.responseData.headerFooterData["1"].filePath;
+              //                 var footerImagewidth =
+              //                     response.data.responseData.headerFooterData["1"].imageWidth;
+              //             } else {
+              //                 var footerImage = "";
+              //             }
+
+              //             const addHeader = (doc) => {
+              //                 if (roleID != 3) {
+              //                     const pageCount = doc.internal.getNumberOfPages();
+              //                     const headerpositionfromleft =
+              //                         (doc.internal.pageSize.width - 10) / 4;
+              //                     for (var i = 1; i <= pageCount; i++) {
+              //                         doc.setPage(i);
+              //                         doc.addImage(
+              //                             logo,
+              //                             "png",
+              //                             70,
+              //                             10,
+              //                             80,
+              //                             80,
+              //                             "DMS-RBZ",
+              //                             "NONE",
+              //                             0
+              //                         );
+              //                         doc.setFontSize(8);
+              //                         doc.text(
+              //                             "Reserve Bank of Zimbabwe. 80 Samora Machel Avenue, P.O. Box 1283, Harare, Zimbabwe.",
+              //                             headerpositionfromleft + 50,
+              //                             40
+              //                         );
+              //                         doc.text(
+              //                             "Tel: 263 242 703000, 263 8677000477 | Website:www.rbz.co.zw",
+              //                             headerpositionfromleft + 100,
+              //                             50
+              //                         );
+              //                     }
+              //                 } else {
+              //                     if (headerImage != "") {
+              //                         const pageCount = doc.internal.getNumberOfPages();
+              //                         var pagewidth = doc.internal.pageSize.width;
+              //                         if (pagewidth > headerImagewidth) {
+              //                             var diff = parseInt(pagewidth) - parseInt(headerImagewidth);
+              //                             var positionLeft = parseInt(diff / 2);
+              //                         } else {
+              //                             var positionLeft = 250;
+              //                         }
+
+              //                         for (var i = 1; i <= pageCount; i++) {
+              //                             doc.setPage(i);
+              //                             doc.addImage(
+              //                                 headerImage,
+              //                                 "png",
+              //                                 positionLeft,
+              //                                 10,
+              //                                 80,
+              //                                 80,
+              //                                 "Header",
+              //                                 "NONE",
+              //                                 0
+              //                             );
+              //                         }
+              //                     } else {
+              //                         doc.setFont("helvetica", "bold");
+              //                         doc.setFontSize(20);
+              //                         doc.text("Final Letter", 250, 40);
+              //                     }
+              //                 }
+              //             };
+
+              //             const addWaterMark = (doc) => {
+              //                 const pageCount = doc.internal.getNumberOfPages();
+              //                 for (var i = 1; i <= pageCount; i++) {
+              //                     doc.setPage(i);
+              //                     doc.setTextColor("#cccaca");
+              //                     doc.saveGraphicsState();
+              //                     doc.setGState(new doc.GState({ opacity: 0.4 }));
+              //                     doc.setFont("helvetica", "normal");
+              //                     doc.setFontSize(80);
+              //                     //doc.text("PREVIEW", 50, 150, {align: 'center', baseline: 'middle'})
+              //                     doc.text(
+              //                         doc.internal.pageSize.width / 3,
+              //                         doc.internal.pageSize.height / 2,
+              //                         "Preview",
+              //                         { angle: 45 }
+              //                     );
+              //                     doc.restoreGraphicsState();
+              //                 }
+              //             };
+              //             doc.setFont("helvetica", "normal");
+              //             doc.setFontSize(3);
+              //             let docWidth = doc.internal.pageSize.getWidth();
+              //             const refpdfview =
+              //                 roleID == 3 && nextlevelvalue == 10
+              //                     ? PdfPrivewsupervisorRef
+              //                     : roleID == 3 && nextlevelvalue == ""
+              //                         ? CoverigLetterRef
+              //                         : PdfPrivewRef;
+              //             doc.html(refpdfview.current, {
+              //                 x: 12,
+              //                 y: 12,
+              //                 width: 513,
+              //                 height: doc.internal.pageSize.getHeight(),
+              //                 margin: [110, 80, 60, 35],
+              //                 windowWidth: 1000,
+              //                 pagebreak: true,
+              //                 async callback(doc) {
+              //                     addHeader(doc);
+              //                     addWaterMark(doc);
+              //                     doc.setProperties({
+              //                         title: `${applicationDetail?.rbzReferenceNumber}`,
+              //                     });
+              //                     var blob = doc.output("blob");
+              //                     window.open(URL.createObjectURL(blob), "_blank");
+              //                 },
+              //             });
+              //             setBtnLoader(false);
+              //         } else {
+              //             var headerImage = "";
+              //             var footerImage = "";
+              //         }
+              //     });
+            }, 1500);
             toast.success(res.data.responseMessage, { autoClose: 2000 })
             setTimeout(() => {
               navigate("/CircularDashboard");
@@ -344,7 +601,7 @@ const navigate = useNavigate()
     const updatedFile = files?.filter((item) => item.label !== label);
     setFiles(updatedFile);
   };
-  
+
   const clearInputFileother = (index) => {
     if (fileInputRefsother[index]?.current) fileInputRefsother[index].current.value = "";
   }
@@ -794,7 +1051,7 @@ const navigate = useNavigate()
     }
   }, [editor]);
 
-
+  
   return (
     <>
       <form className="circular-form">
@@ -1040,24 +1297,28 @@ const navigate = useNavigate()
           </div>
         </div> */}
         {/* end form-bx  */}
-        <div className="inner_form_new ">
+        <div className={roleID == 9 ? "d-none" : "inner_form_new align-items-center"
+        }>
           <label className="controlform">Assign to
             {
-              roleID == "5" ? " Senior Analyst" : roleID == "6" ? " Principal Analyst" : roleID == "7" ? " Deputy Director" : " Director"
+              roleID == "5" ? " Analyst" : roleID == "6" ? " Principal Analyst" : roleID == "7" ? " Deputy Director" : " Director"
             }
           </label>
           <input
             type="checkbox"
             onChange={(e) => {
               handelAnalystCheck(e);
+
             }}
           />
         </div>
+
+
         {/* end form-bx  */}
         {checkAnalyst == true ?
           <div className="inner_form_new ">
             <label className="controlform"> {
-              roleID == "5" ? " Senior Analyst" : roleID == "6" ? " Principal Analyst" : roleID == "7" ? " Deputy Director" : " Director"
+              roleID == "5" ? " Analyst" : roleID == "6" ? " Principal Analyst" : roleID == "7" ? " Deputy Director" : " Director"
             }</label>
 
             <div className="form-bx">
@@ -1069,9 +1330,9 @@ const navigate = useNavigate()
                   }}
                   value={exportForm.analyst}
                 >
-                  <option value="" selected>
+                  <option disabled value="">
                     {
-                      roleID == "5" ? " Senior Analyst" : roleID == "6" ? " Principal Analyst" : roleID == "7" ? " Deputy Director" : " Director"
+                      roleID == "5" ? " Analyst" : roleID == "6" ? " Principal Analyst" : roleID == "7" ? " Deputy Director" : " Director"
                     }
                   </option>
                   {
@@ -1091,6 +1352,67 @@ const navigate = useNavigate()
           </div>
           : " "}
         {/* upload file start */}
+        <div
+          className={
+            ((roleID == 8 && checkAnalyst == false) || (roleID == 9 && checkAnalyst == false))
+              ? "inner_form_new align-items-center"
+              : "d-none"
+          }
+        >
+          <label className="controlform">Decision</label>
+          <div className="row">
+            <div className="col-md-12">
+              <div className="hidden-toggles">
+                <input
+                  type="radio"
+                  id="srcoloration-Approvedved4"
+                  value="10"
+                  onChange={(e) => {
+                    ChangeApplicationStatus(e);
+                    setCheckDecision(true)
+
+                  }}
+                  name="applicationstausdp"
+                  className="hidden-toggles__input"
+                  checked={
+                    applicationstaus == "10" ? true : false
+                  }
+                />
+                <label
+                  for="srcoloration-Approvedved4"
+                  className="hidden-toggles__label"
+                >
+                  Approved
+                </label>
+
+
+
+                <input
+                  type="radio"
+                  id="srcoloration-Cancelled"
+                  onChange={(e) => {
+                    ChangeApplicationStatus(e);
+                    setCheckDecision(true)
+
+
+                  }}
+                  name="applicationstausdp"
+                  value="25"
+                  className="hidden-toggles__input"
+                  checked={
+                    applicationstaus == "25" ? true : false
+                  }
+                />
+                <label
+                  for="srcoloration-Cancelled"
+                  className="hidden-toggles__label"
+                >
+                  Cancelled
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
         <h5 className="section_top_subheading mt-3">Attachments</h5>
 
         {/* <div className="attachemt_form-bx" >
@@ -1133,23 +1455,23 @@ const navigate = useNavigate()
                   <input
                     type="file"
                     onChange={(e) =>
-                      handleFileChange(e, `file ${index}`)
+                      handleFileChange(e, `file ${(index + 1)}`)
                     }
                   />
                 </div>
                 <span className="filename">
-                  {files?.find((f) => f.label === `file ${index}`)
+                  {files?.find((f) => f.label === `file ${(index + 1)}`)
                     ?.file?.name || "No file chosen"}
                 </span>
 
                 {files?.length &&
-                  files?.find((f) => f.label === `file ${index}`)
+                  files?.find((f) => f.label === `file ${(index + 1)}`)
                     ?.file?.name ? (
                   <button
                     type="button"
                     className="remove-file"
                     onClick={() =>
-                      removeImage(index, `file ${index}`)
+                      removeImage(index, `file ${(index + 1)}`)
                     }
                   >
                     Remove
@@ -1225,12 +1547,348 @@ const navigate = useNavigate()
               HandleSubmit(e);
             }}
             className="login"
-            disabled={(roleID > 5 && checkAnalyst == false) || toastDisplayed ? true : false}
+            disabled={((roleID > 5 && checkAnalyst == false && checkDecision == false)) || (toastDisplayed ? true : false) || (roleID > 5 && checkDecision == false && applicationstaus == "0")}
           >
             Submit
           </button>
         </div>
+        {/* generate pdf code start */}
+        <div className="login_inner" style={{ display: "none" }}>
+          <div className="login_form_panel" style={{ display: "none" }}>
+            <div
+              ref={PdfPrivewsupervisorRef}
+              className="p-5"
+              style={{ position: "relative" }}
+            >
+              <table width="100%">
+                <tr>
+                  <td
+                    style={{
+                      marginBottom: "0px",
+                      color: "#000",
+                      fontSize: "18px",
+                      fontWeight: "800",
+                    }}
+                  >
+                    Reference Number
+                  </td>
+                  <td>
+                    <p
+                      style={{
+                        marginBottom: "0px",
+                        color: "#000",
+                        fontSize: "18px",
+                        textAlign: "left",
+                        fontWeight: "800",
+                        letterSpacing: "0.01px",
+                      }}
+                    >
+                      : {applicationDetail?.circularReferenceNumber}
 
+                    </p>
+                  </td>
+                </tr>
+                <tr>
+                  <td colSpan="2">&nbsp;</td>
+                </tr>
+                <tr>
+                  <td
+                    colSpan="2"
+                    style={{
+                      color: "#000",
+                      fontSize: "18px",
+                      fontWeight: "600",
+                      letterSpacing: "0.01px",
+                    }}
+                  >
+                    {moment(
+                      applicationDetail?.releasingDate
+                    ).format("DD MMMM YYYY")}
+                  </td>
+                </tr>
+                <tr>
+                  <td colSpan="2">&nbsp;</td>
+                </tr>
+                <tr>
+                  <td
+                    colSpan="2"
+                    style={{
+                      color: "#000",
+                      fontSize: "18px",
+                      fontWeight: "600",
+                      letterSpacing: "0.01px",
+                    }}
+                  >
+                    Dear{" "}
+                    {applicationDetail?.name}
+                    ,
+                  </td>
+                </tr>
+
+                <tr>
+                  <td colSpan="2">
+                    <table width="100%">
+                      <tr>
+                        <td colSpan="2">&nbsp;</td>
+                      </tr>
+                      <tr>
+                        <td
+                          style={{
+                            color: "#000",
+                            fontSize: "18px",
+                            fontWeight: "400",
+                          }}
+                        >
+                          Name
+                        </td>
+                        <td
+                          style={{
+                            color: "#000",
+                            fontSize: "18px",
+                            fontWeight: "800",
+                            letterSpacing: "0.01px",
+                          }}
+                        >
+                          :{" "}
+                          {exportForm.name}
+                        </td>
+                      </tr>
+                      <tr>
+                        <td
+                          style={{
+                            color: "#000",
+                            fontSize: "18px",
+                            fontWeight: "400",
+                            letterSpacing: "0.01px",
+                          }}
+                        >
+                          Releasing Date
+                        </td>
+                        <td
+                          style={{
+                            color: "#000",
+                            fontSize: "18px",
+                            fontWeight: "800",
+                            letterSpacing: "0.01px",
+                          }}
+                        >
+                          :{" "}
+                          {moment(
+                            applicationDetail?.releasingDate
+                          ).format("DD MMMM YYYY")}
+                        </td>
+                      </tr>
+                      <tr>
+                        <td
+                          style={{
+                            color: "#000",
+                            fontSize: "18px",
+                            fontWeight: "400",
+                            letterSpacing: "0.01px",
+                          }}
+                        >
+                          Subject
+                        </td>
+                        <td
+                          style={{
+                            color: "#000",
+                            fontSize: "18px",
+                            fontWeight: "800",
+                          }}
+                        >
+                          :{" "}
+                          <span
+                            style={{
+                              minWidth: "45px",
+                              display: "inline-block",
+                              paddingRight: "5px",
+                              fontWeight: "800",
+                            }}
+                          >
+                            {applicationDetail?.subject}
+                          </span>
+
+                        </td>
+                      </tr>
+
+
+                    </table>
+                  </td>
+                </tr>
+                <tr>
+                  <td colSpan="2">&nbsp;</td>
+                </tr>
+                <tr>
+                  <td colSpan="2">
+                    <table>
+                      <tr>
+                        <td colSpan="2">
+                          <table width="100%">
+                            <tr>
+                              <td
+                                style={{
+                                  color: "#000",
+                                  fontSize: "18px",
+                                  fontWeight: "400",
+                                }}
+                              >
+                                <div>
+                                  <span
+                                    style={{
+                                      fontWeight: "800",
+                                      padding: "15px 0px 15px",
+                                      letterSpacing: "0.01px",
+                                    }}
+                                  >
+                                    Description
+                                  </span>
+                                </div>
+                                <div
+                                  className="tableEditorData"
+                                  dangerouslySetInnerHTML={{
+                                    __html: applicationDetail?.content
+                                      ?
+                                      applicationDetail?.content
+                                      : "",
+                                  }}
+
+                                  style={{
+                                    paddingBottom: "60px",
+                                    letterSpacing: "0.01px",
+                                  }}
+                                />
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td colSpan="2">&nbsp;</td>
+                      </tr>
+                      <tr>
+                        <td
+                          colSpan="2"
+                          style={{
+                            color: "#000",
+                            fontSize: "18px",
+                            fontWeight: "400",
+                          }}
+                        >
+                          <span
+                            style={{
+                              color: "#000",
+                              fontSize: "18px",
+                              fontWeight: "400",
+                              display: "inline-block",
+                              letterSpacing: "0.01px",
+                            }}
+                          >
+                            {" "}
+                            Yours Sincerely,
+                          </span>
+                          <img
+                            src={
+                              applicationDetail?.getUserData?.filePath
+                                ? applicationDetail?.getUserData.filePath
+                                : NoSign
+                            }
+                            alt="Signature"
+                            style={{
+                              width: "120px",
+                              height: "50px",
+                              display: "block",
+                              objectFit: "contain",
+                            }}
+                          />
+                          <p
+                            style={{
+                              marginBottom: "0px",
+                              color: "#000",
+                              fontSize: "16px",
+                              fontWeight: "400",
+                              padding: "15px 0px 3px",
+                              lineHeight: "13px",
+                              letterSpacing: "0.01px",
+                            }}
+                          >
+                            {PdfUsername
+                              ? PdfUsername?.replace(/"/g, "")
+                              : "N/A"}
+                          </p>
+                          <p
+                            style={{
+                              marginBottom: "0px",
+                              color: "#000",
+                              fontSize: "16px",
+                              fontWeight: "400",
+                              padding: "5px 0px",
+                              lineHeight: "13px",
+                              letterSpacing: "0.01px",
+                            }}
+                          >
+                            {PdfRolename
+                              ? PdfRolename?.replace(/"/g, "")
+                              : "N/A"}
+                          </p>
+
+                          <div
+                            style={{
+                              marginBottom: "0px",
+                              color: "#000",
+                              fontSize: "18px",
+                              fontWeight: "400",
+                              padding: "25px 0px 5px",
+                              lineHeight: "13px",
+                              display: "flex",
+                            }}
+                          >
+                            {
+                              applicationDetail?.bankData?.length > 0 ? (
+                                <>
+                                  <p
+                                    style={{
+                                      marginBottom: "0px",
+                                      fontSize: "18px",
+                                      fontWeight: "400",
+                                      paddingRight: "10px",
+                                      letterSpacing: "0.01px",
+                                    }}
+                                  >
+                                    TO:
+                                  </p>
+                                  <div>
+                                    {applicationDetail?.bankData.map((item) => {
+                                      return (
+                                        <p
+                                          style={{
+                                            marginBottom: "3px",
+                                            letterSpacing: "0.01px",
+                                            fontSize: "18px",
+                                            fontWeight: "400",
+                                          }}
+                                        >
+                                          {item.bankName}
+                                        </p>
+                                      );
+                                    })}
+                                  </div>
+                                </>
+                              ) : (
+                                ""
+                              )
+                            }
+                          </div>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+           
+            </div>
+          </div>
+        </div>
+        {/* generate pdf coed end */}
       </form>
 
     </>

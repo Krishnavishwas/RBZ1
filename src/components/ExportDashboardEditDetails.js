@@ -1994,14 +1994,12 @@ const ExportDashboardEditDetails = ({
           UserTypeID: applicationDetail?.userTypeID,
           Name: applicationDetail?.name,
           BeneficiaryName: applicationDetail?.beneficiaryName,
-          BPNCode:
-            filtertin_bpn || filtertin_bpn != undefined
-              ? filtertin_bpn?.bpnNumber?.toUpperCase()
-              : applicationDetail?.bpnCode,
-          TINNumber:
-            filtertin_bpn || filtertin_bpn != undefined
-              ? filtertin_bpn?.tinNumber?.toUpperCase()
-              : applicationDetail?.tinNumber,
+          BPNCode:filtertin_bpn != undefined && filtertin_bpn?.bpnNumber && filtertin_bpn?.bpnNumber != null
+          ? filtertin_bpn?.bpnNumber
+          : filtertin_bpn?.bpnNumber == null && filtertin_bpn != undefined ? "" : applicationDetail?.bpnCode,
+          TINNumber:filtertin_bpn != undefined && filtertin_bpn?.tinNumber && filtertin_bpn?.tinNumber != null
+          ? filtertin_bpn?.tinNumber?.toUpperCase()
+          : filtertin_bpn?.tinNumber == null && filtertin_bpn != undefined ? "" : applicationDetail?.tinNumber,
           ApplicantReferenceNumber:
             applicationDetail?.applicantReferenceNumber?.toUpperCase(),
           ApplicationTypeID: applicationDetail?.applicationTypeID,
@@ -2895,6 +2893,8 @@ const ExportDashboardEditDetails = ({
               ) : (
                 ""
               )}
+
+{console.log("filtertin_bpn", filtertin_bpn)}
 
               {/* end form-bx  */}
 

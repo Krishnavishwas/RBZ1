@@ -8,7 +8,7 @@ import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import Modal from "react-bootstrap/Modal";
 import INSDashboardViewDetails from "../components/INSDashboardViewDetails";
-import ImportDashboardEditDetails from "../components/ImportDashboardEditDetails";
+import INSDashboardEditDetails from "../components/INSDashboardEditDetails";
 import { Column } from "primereact/column";
 import { TailSpin } from "react-loader-spinner";
 import { FilterMatchMode, FilterService } from "primereact/api";
@@ -591,7 +591,7 @@ const INSDashboardTable = () => {
       });
 
     await axios
-      .post(APIURL + "ImportApplication/GetImportApplicationHistory", {
+      .post(APIURL + "InspectorateApplication/GetINSApplicationHistory", {
         ID: id,
       })
       .then((res) => {
@@ -943,7 +943,7 @@ const INSDashboardTable = () => {
                 </div>
                 <div className="login_form_panel">
                   <Modal.Body className="p-0">
-                    <ImportDashboardEditDetails
+                    <INSDashboardEditDetails
                       applicationDetail={applicationDetail}
                       setApplicationDetail={setApplicationDetail}
                       EditModalClose={EditModalClose}

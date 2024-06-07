@@ -1360,10 +1360,9 @@ const DeptID = menuname === "Exports" ? "2" : menuname === "Imports" ? "3": menu
           Name: applicationDetail?.name,
           BeneficiaryName: applicationDetail?.beneficiaryName,
           PECANumber: applicationDetail.pecaNumber,
-          BPNCode:
-            filtertin_bpn || filtertin_bpn != undefined
-              ? filtertin_bpn?.bpnNumber?.toUpperCase()
-              : applicationDetail?.bpnCode,
+          BPNCode:filtertin_bpn != undefined && filtertin_bpn?.bpnNumber && filtertin_bpn?.bpnNumber != null
+          ? filtertin_bpn?.bpnNumber
+          : filtertin_bpn?.bpnNumber == null && filtertin_bpn != undefined ? "" : applicationDetail?.bpnCode,
           ApplicationTypeID: applicationDetail?.applicationTypeID,
           Currency: applicationDetail?.currency,
           Amount: applicationDetail?.amount,
@@ -1377,10 +1376,9 @@ const DeptID = menuname === "Exports" ? "2" : menuname === "Imports" ? "3": menu
           ApplicationDate: startDate
             ? startDate
             : applicationDetail?.applicationDate,
-          TINNumber:
-            filtertin_bpn || filtertin_bpn != undefined
-              ? filtertin_bpn?.tinNumber?.toUpperCase()
-              : applicationDetail?.tinNumber,
+          TINNumber:filtertin_bpn != undefined && filtertin_bpn?.tinNumber && filtertin_bpn?.tinNumber != null
+          ? filtertin_bpn?.tinNumber?.toUpperCase()
+          : filtertin_bpn?.tinNumber == null && filtertin_bpn != undefined ? "" : applicationDetail?.tinNumber,
           BeneficiaryCountry: applicationDetail?.beneficiaryCountry,
           UserID: UserID.replace(/"/g, ""),
           RoleID: roleID,
@@ -2882,7 +2880,7 @@ const DeptID = menuname === "Exports" ? "2" : menuname === "Imports" ? "3": menu
                       </small>
                     </div>
                   </div>
-
+                      {console.log("filtertin_bpn", filtertin_bpn)}
                   <div className="inner_form_new ">
                     <label className="controlform">TIN Number</label>
                     <div className="form-bx">
@@ -2895,13 +2893,18 @@ const DeptID = menuname === "Exports" ? "2" : menuname === "Imports" ? "3": menu
                             changeHandelForm(e);
                           }}
                           disabled
+                          // value={
+                          //   ImportForm.TINNumber
+                          //     ? ImportForm.TINNumber?.trim()
+                          //     : "N/A"
+                          // }
                           value={
-                            ImportForm.TINNumber
-                              ? ImportForm.TINNumber?.trim()
-                              : "N/A"
+                            filtertin_bpn != undefined && filtertin_bpn?.tinNumber && filtertin_bpn?.tinNumber != null
+                              ? filtertin_bpn?.tinNumber
+                              : filtertin_bpn?.tinNumber == null && filtertin_bpn != undefined ? "" : applicationDetail?.tinNumber
                           }
                           className={
-                            errors.BPNCode
+                            errors.TINNumber
                               ? "error text-uppercase"
                               : "text-uppercase"
                           }
@@ -2927,7 +2930,12 @@ const DeptID = menuname === "Exports" ? "2" : menuname === "Imports" ? "3": menu
                             changeHandelForm(e);
                           }}
                           disabled
-                          value={ImportForm.BPNCode?.trim()}
+                          // value={ImportForm.BPNCode?.trim()}
+                          value={ 
+                              filtertin_bpn != undefined && filtertin_bpn?.bpnNumber && filtertin_bpn?.bpnNumber != null
+                              ? filtertin_bpn?.bpnNumber
+                              : filtertin_bpn?.bpnNumber == null && filtertin_bpn != undefined ? "" : applicationDetail?.bpnCode 
+                          }
                           placeholder={
                             applicationDetail?.bpnCode
                               ? applicationDetail?.bpnCode

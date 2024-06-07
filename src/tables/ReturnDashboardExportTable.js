@@ -32,7 +32,7 @@ const ReturnDashboardExportTable = () => {
       ? `${applicationDetail?.analystRecommendation}`
       : "0"
   );
-  const [nextlevelvalue, setnextlevelvalue] = useState("");
+  const [nextlevelvalue, setnextlevelvalue] = useState(roleID < 5 ? "10" : "");
   const [userRole, setUserrole] = useState([]);
   const [tatHistory, setTatHistory] = useState([]);
   const [asignUser, setAsignUser] = useState([]);

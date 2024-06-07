@@ -1,14 +1,19 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import ExportformDynamicField from "./ExportformDynamicField";
 import { Storage } from "../login/Storagesetting";
 import axios from "axios";
-import { APIURL } from "../constant";
+import { APIURL, ImageAPI } from "../constant";
 import Select from "react-select";
 import moment from "moment";
 import { toast } from "react-toastify";
 import SectorMultiselect from "./SearchUI/SectorMultiselect";
 import UpdatePopupMessage from "./UpdatePopupMessage";
+import { DataTable } from "primereact/datatable";
+import { Column } from "primereact/column";
+import { TailSpin } from "react-loader-spinner";
+
+
 
 const INSNewRequestForm = () => {
   const navigate = useNavigate();
@@ -71,8 +76,9 @@ const INSNewRequestForm = () => {
     BPNCode: "",
     TINNumber: "",
     previousRBZReferenceNumber: "",
+    previousRBZReferenceNumber:"",
     applicant: "",
-    applicantReferenceNumber: "",
+    applicantReferenceNumber: "", 
     applicationType: "",
     applicationSubType: "",
     exporterType: registerusertype,
@@ -116,9 +122,24 @@ const INSNewRequestForm = () => {
   const [selectOrganogram, setselectOrganogram] = useState([]);
 
   const [selectAntiMone, setselectAntiMone] = useState([]);
+  const [exactReturnType, setexactReturnType] = useState('')
+  const [ValidateRBZ, setValidateRBZ] = useState([]);
+  const [loader, setLoader] = useState(false);
+  const [ValidateShow, setValidateShow] = useState(false);
+  const [ValidateChange, setValidateChange] = useState({
+    previousRBZReferenceNumber: "",
+  });
+
+  
+const [noDataComment, setNoDataComment] = useState([]);
+const [tatHistory, setTatHistory] = useState([]);
+const [allcomment, setallcomment] = useState([]); 
+const [applicationDetail, setApplicationDetail] = useState({});
+const [showUpdateModal, setShowUpdateModal] = useState(false);
+const [responceCount, setresponceCount] = useState([]);
 
   const heading = "Application Submitted Successfully!";
-  const para = "Foreign Investment application request submitted successfully!";
+  const para = "Inspectorate application request submitted successfully!";
 
   const changeHandelForm = (e) => {
     let newErrors = {};
@@ -130,14 +151,16 @@ const INSNewRequestForm = () => {
     } else if (
       name === "TINNumber" &&
       (specialChars.test(value) ||
-        value?.includes("_") ||
-        value?.includes("+") ||
-        value?.includes("=") ||
-        value?.includes("'") ||
-        value?.includes(";") ||
-        value?.includes("[") ||
-        value?.includes("]") ||
-        value?.includes("]"))
+      value?.includes("_") ||
+      value?.includes("+") ||
+      value?.includes("=") ||
+      value?.includes("'") ||
+      value?.includes(";") ||
+      value?.includes("[") ||
+      value?.includes("]") ||
+      value?.includes("`") ||
+      value?.includes("~") ||
+      value?.includes("]"))
     ) {
       newErrors.TINNumber = "special characters not allowed";
     } else if (
@@ -217,6 +240,8 @@ const INSNewRequestForm = () => {
     setErrors(newErrors);
 
     if (name == "applicationType") {
+
+      setexactReturnType('')
       axios
         .post(APIURL + "Master/GetMasterINSDataBySubApplicationTypeID")
         .then((res) => { 
@@ -290,23 +315,23 @@ const INSNewRequestForm = () => {
         });
     }
 
-    if (name === "sector" && value !== "") {
-      axios
-        .post(APIURL + "Master/GetSubSectorBySectorID", {
-          SectorID: value,
-        })
-        .then((res) => {
-          if (res.data.responseCode === "200") {
-            setsubsectorData(res.data.responseData);
-          } else {
-            setsubsectorData([]);
-            console.log(res.data.responseMessage);
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    }
+    // if (name === "sector" && value !== "") {
+    //   axios
+    //     .post(APIURL + "Master/GetSubSectorBySectorID", {
+    //       SectorID: value,
+    //     })
+    //     .then((res) => {
+    //       if (res.data.responseCode === "200") {
+    //         setsubsectorData(res.data.responseData);
+    //       } else {
+    //         setsubsectorData([]);
+    //         console.log(res.data.responseMessage);
+    //       }
+    //     })
+    //     .catch((err) => {
+    //       console.log(err);
+    //     });
+    // }
     if (name === "currency" && value !== "") {
       axios
         .post(APIURL + "Master/GetRateByCurrencyID", {
@@ -356,9 +381,32 @@ const INSNewRequestForm = () => {
             setOtherfilesupload([]);
           }
         });
-    }
+    } 
   };
 
+  const changeHandelFormValidate = (e) => {
+    const { name, value } = e.target; 
+
+    const specialChars = /[!@#$%^&*(),.?":{}|<>`~]/;
+    let newErrors = {};
+    let valid = true;
+    if (name == "previousRBZReferenceNumber" && specialChars.test(value)) {
+      newErrors.previousRBZReferenceNumber = "Special characters not allowed";
+      valid = false; 
+    } else if (name == "previousRBZReferenceNumber" && value == " ") {
+      newErrors.previousRBZReferenceNumber = "First character cannot be a blank space";
+      valid = false;
+    } else {
+      setValidateChange({ ...ValidateChange, [name]: value });
+    } 
+    setErrors(newErrors)
+  };
+
+  const handleSetexactReturnType = (e)=>{
+    const value = e.target.value
+    setexactReturnType(value)
+
+  }
   const convertedRate = curRate * parseFloat(INSForm.amount);
 
   const GetApplicationTypes = async () => {
@@ -444,7 +492,7 @@ const INSNewRequestForm = () => {
       axios
         .post(APIURL + "User/GetUsersByRoleID", {
           RoleID: value,
-          DepartmentID: "2",
+          DepartmentID: "5",
           UserID: UserID.replace(/"/g, ""),
         })
         .then((res) => {
@@ -497,6 +545,10 @@ const INSNewRequestForm = () => {
       newErrors.currency = "Currency is required";
       valid = false;
     }
+    if(exactReturnType == '' && INSForm.applicationType == "54"){
+      newErrors.exactReturnType = "Exact Return Type is required";
+      valid = false;
+    }
     if (selectedEquipment.length <= 0 && INSForm.applicationType == "53") {
       newErrors.Equipment = "Equipment is required";
       valid = false;
@@ -529,14 +581,14 @@ const INSNewRequestForm = () => {
       newErrors.amount = "Amount is required";
       valid = false;
     }
-    if (INSForm.sector === "") {
-      newErrors.sector = "Sector is required";
-      valid = false;
-    }
-    if (INSForm.subsector === "") {
-      newErrors.subsector = "Sub sector is required";
-      valid = false;
-    }
+    // if (INSForm.sector === "") {
+    //   newErrors.sector = "Sector is required";
+    //   valid = false;
+    // }
+    // if (INSForm.subsector === "" && INSForm.sector != 2) {
+    //   newErrors.subsector = "Subsector is required";
+    //   valid = false;
+    // }
     if (checkSupervisor == true && selectuserRole == "" && roleID == 4) {
       newErrors.selectuserRole = "Role is required";
       valid = false;
@@ -688,14 +740,76 @@ const INSNewRequestForm = () => {
     setselectOrganogram(value);
   };
 
+  const validatePECANForm = () => {
+    let valid = true;
+    const newErrors = {};
+    if(ValidateChange.previousRBZReferenceNumber.trim().length < 4){
+      newErrors.previousRBZReferenceNumber = "Reference Number allow minimum 4 numbers";
+      valid = false;
+    }else if(ValidateChange.previousRBZReferenceNumber.trim().length > 6){
+      newErrors.previousRBZReferenceNumber = "Reference Number allow maximum 6 numbers";
+      valid = false;
+    }
+    setErrors(newErrors);
+    return valid;
+  };
+  
+  const handleValidateRBZ = () => {
+    if (validatePECANForm()) {
+    setLoader(true);
+    axios
+      .post(APIURL + "ExportApplication/ValidateRBZReferenceNumber", {
+        RBZReferenceNumber: ValidateChange.relatedexchangeControlNumber?.trim(),
+      })
+      .then((res) => { 
+        setErrors({})
+        setValidateShow(true);
+        setLoader(false);
+        if (res.data.responseCode == "200") {
+          setValidateRBZ(res.data.responseData);
+        } else {
+          setLoader(false);
+          setValidateRBZ([]);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        setLoader(false);
+      });
+    }
+  };
+
+
+  const handleViewData = (id) => {
+    setShowUpdateModal(true);
+  };
+
   const handleChangeAntiMone = (e) => {
     const value = e;
     setselectAntiMone(value);
   };  
 
+  const GetApplicationCount = async (id) => {
+    await axios
+      .post(APIURL + "ExportApplication/CountByApplicationID", {
+        ApplicationID: id,
+      })
+      .then((res) => {
+        if (res.data.responseCode == 200) {
+          setresponceCount(res.data.responseData);
+        } else {
+          setresponceCount([]);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
   const HandleSubmit = async (e) => {
-    e.preventDefault();
+    e.preventDefault(); 
     const randomNumber = generateRandomNumber();
+    let formData = new FormData();
     const generatedNumber = `FIN/${userName
       .toUpperCase()
       .replace(/"/g, "")}NMBLZWHX/018363${randomNumber}`;
@@ -711,6 +825,7 @@ const INSNewRequestForm = () => {
             RoleID: roleID,
             ApplicationDate: moment(startDate).format("YYYY-MM-DD"),
             RBZReferenceNumber: generatedNumber,
+            ApplicantReferenceNumber:INSForm.applicantReferenceNumber,
             RelatedApplicationReferenceNumber:
               INSForm.relatedapplicationreferenceNumber,
             Name:
@@ -725,21 +840,24 @@ const INSNewRequestForm = () => {
             AssignedToRoleID: roleID == 2 ? 3 : selectuserRole,
             ApplicationTypeID: INSForm.applicationType,
             BeneficiaryName: INSForm.BeneficiaryName,
+            previoueRBZNumber:ValidateChange.previousRBZReferenceNumber?.trim(),
             BeneficiaryCountry: INSForm.baneficiaryCountry,
-            BPNCode:
-              registerusertype === "1" && bankID !== ""
-                ? filtertin_bpn?.bpnNumber?.toUpperCase()
+            BPNCode: registerusertype === "1" && bankID !== ""
+                ? filtertin_bpn && filtertin_bpn.bpnNumber !== null
+                ? filtertin_bpn?.bpnNumber
+                : ""
                 : "",
-            TINNumber:
-              registerusertype === "1" && bankID !== ""
+                TINNumber: registerusertype === "1" && bankID !== ""
+                ? filtertin_bpn && filtertin_bpn?.tinNumber?.toUpperCase() !== null
                 ? filtertin_bpn?.tinNumber?.toUpperCase()
+                : ""
                 : "",
             Currency: INSForm.currency,
             Amount: INSForm.amount,
             Rate: curRate,
             USDEquivalent: convertedRate.toFixed(2),
-            Sector: INSForm.sector,
-            SubSector: INSForm.subsector,
+            // Sector: INSForm.sector,
+            // SubSector: INSForm.subsector,
             ApplicantType: registerusertype,
             ApplicantComment: INSForm.applicantComments,
             // ApplicationSubTypeID: INSForm.applicationSubType,
@@ -749,7 +867,8 @@ const INSNewRequestForm = () => {
             SystemsData: SystemsData,
             Structure_OrganogramData: OrganogramData,
             Anti_Money_laundering_CombatingData: AntiMoneData,
-            ApplicationSubTypeID: applicationsubID?.join(","),
+            // ApplicationSubTypeID: applicationsubID?.join(","),
+            ApplicationSubTypeID:exactReturnType,
             AssignedTo:
               checkSupervisor === true
                 ? INSForm.bankSupervisor
@@ -761,12 +880,36 @@ const INSNewRequestForm = () => {
         .then((res) => {
           if (res.data.responseCode === "200") { 
             setupdatepopup(true);
-            toast.success(res.data.responseMessage);
-            setTimeout(() => {
-              navigate("/INSDashboard");
-            }, 1200);
+
+            for (let i = 0; i < files?.length; i++) {
+              // Corrected loop condition
+              formData.append("files", files[i].file);
+              formData.append("Label", files[i].label);
+            }
+
+            formData.append(
+              "RBZReferenceNumber",
+              res.data.responseData.rbzReferenceNumber
+            );
+            formData.append("ApplicationID", res.data.responseData.id);
+            formData.append("DepartmentID", "5");
+            formData.append("UserID", UserID.replace(/"/g, ""));
+
+            axios
+              .post(ImageAPI + "File/UploadFile", formData)
+              .then((res) => {
+                console.log("res99999");
+              })
+              .catch((err) => {
+                console.log("file Upload ", err);
+              });
+
+            Storage.setItem(
+              "generatedNumber",
+              res.data.responseData.rbzReferenceNumber
+            );
           } else {
-            toast.error(res.data.responseMessage);
+            toast.error(res.data.responseMessage); 
           }
         })
         .catch((err) => {
@@ -829,6 +972,10 @@ const INSNewRequestForm = () => {
       setToastDisplayed(true);
     }
   };
+
+  console.log("ValidateChange.previousRBZReferenceNumber?.trim()", ValidateChange.previousRBZReferenceNumber?.trim())
+  console.log("INSForm.applicantReferenceNumber", INSForm.applicantReferenceNumber)
+  console.log("previousRBZReferenceNumber", INSForm.previousRBZReferenceNumber)
 
   const closePopupHandle = () => {
     Navigate("/INSDashboard");
@@ -923,6 +1070,150 @@ const INSNewRequestForm = () => {
     }
   }, [toastDisplayed]);
 
+  // ----- Start Code For Geting Table Data
+  const action = (rowData) => {
+    return bankName.replace(/"/g, "") == rowData?.bankName ? (
+      <>
+        <i
+          className="pi pi-eye p-0"
+          style={{ padding: "12px", cursor: "pointer" }}
+          onClick={() => {
+            handleViewData(rowData.id);
+            GetHandelDetail(rowData?.rbzReferenceNumber, rowData.id);
+            GetApplicationCount(rowData.id);
+          }}
+          onMouseEnter={(e) => {
+            e.target.style.color = "var(--primary-color)";
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.color = "";
+          }}
+        ></i>
+       {
+        rowData.filePath ?  <Link to={rowData.filePath} target="_blank" ><i
+            className="pi pi-download p-2 nav-link p-0"
+            style={{ padding: "12px", marginLeft:"6px", cursor: "pointer" }}
+
+            aria-disabled
+            onMouseEnter={(e) => {
+              e.target.style.color = "var(--primary-color)";
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.color = "";
+            }}
+          ></i> </Link>: "" }
+      </>
+    ) : (
+      <i
+      className="pi pi-eye p-0"
+      style={{ padding: "12px", cursor: "pointer" }}
+      onClick={() => {
+        handleViewData(rowData.id);
+        GetHandelDetail(rowData?.rbzReferenceNumber, rowData.id);
+        GetApplicationCount(rowData.id);
+      }}
+      onMouseEnter={(e) => {
+        e.target.style.color = "var(--primary-color)";
+      }}
+      onMouseLeave={(e) => {
+        e.target.style.color = "";
+      }}
+    ></i>
+    );
+  };
+  const amountData = (rowData) => {
+    return (
+      <span>
+        {bankName.replace(/"/g, "") == rowData?.bankName ? rowData.amount + rowData.currencyCode : "--"}
+      </span>
+    )
+  }
+  const createdDate = (rowData) => {
+    return <span>{moment(rowData?.createdDate).format("DD MMM YYYY")}</span>;
+  };
+
+  const applicantNAME = (rowData) => {
+    return <span>{rowData?.name ? rowData?.name : "N/A"}</span>;
+  };
+  const renderFooter = () => {
+    return (
+      <div className="flex justify-content-end">
+        <button
+          className="validateCrossIcon"
+          onClick={() => setValidateShow(false)}
+        >
+          <i class="bi bi-x-circle"></i>
+        </button>
+      </div>
+    );
+  };
+  const footer = renderFooter();
+  const GetHandelDetail = async (rbzrefnumber, id) => { 
+    await axios
+      .post(APIURL + "ExportApplication/GetRequestInfoByApplicationID", {
+        RBZReferenceNumber: `${rbzrefnumber}`,
+        ID: id,
+      })
+      .then((res) => {
+        if (res.data.responseCode === "200") { 
+          setApplicationDetail(res.data.responseData);
+        } else { 
+          // setApplicationmessage(res.data.responseMessage);
+         toast.warn(res.data.responseMessage)
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+
+    await axios
+      .post(APIURL + "ExportApplication/GetNewComments", {
+        ID: id,
+      })
+      .then((res) => {
+        if (res.data.responseCode == 200) {
+          setallcomment(res.data.responseData);
+        } else {
+          setallcomment([]);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+
+    await axios
+      .post(APIURL + "ExportApplication/GetApplicationHistory", {
+        ID: id,
+      })
+      .then((res) => {
+        if (res.data.responseCode == 200) {
+          setTatHistory(res.data.responseData);
+        } else {
+          setTatHistory([]);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+
+    // --------------------------vishwas start----------------------------
+    await axios
+      .post(APIURL + "ExportApplication/GetCommentsInfoByRoleID", {
+        ApplicationID: id,
+      })
+      .then((res) => {
+        if (res.data.responseCode == 200) {
+          setNoDataComment(res.data.responseData);
+        } else {
+          setNoDataComment([]);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+    //---------------------------vishwas end------------------------------
+  };
+
   return (
     <>
       <form>
@@ -983,7 +1274,7 @@ const INSNewRequestForm = () => {
 
         <div className="inner_form_new ">
           <label className="controlform">Type of Applicant</label>
-          <div className="form-bx-radio mt-4">
+          <div className="form-bx-radio">
             {applicantTypes.map((item, index) => {
               return (
                 <>
@@ -1226,10 +1517,10 @@ const INSNewRequestForm = () => {
                 <select
                   name="exactReturnType"
                   onChange={(e) => {
-                    changeHandelForm(e);
+                    handleSetexactReturnType(e);
                   }}
                   className={
-                    errors.exactReturnType && INSForm.exactReturnType === ""
+                    errors.exactReturnType && exactReturnType === ""
                       ? "error"
                       : ""
                   }
@@ -1244,7 +1535,7 @@ const INSNewRequestForm = () => {
                   })}
                 </select>
                 <span className="sspan"></span>
-                {errors.exactReturnType && INSForm.exactReturnType === "" ? (
+                {errors.exactReturnType && exactReturnType === "" ? (
                   <small className="errormsg">{errors.exactReturnType}</small>
                 ) : (
                   ""
@@ -1426,6 +1717,7 @@ const INSNewRequestForm = () => {
                 name="departmentApplicantionBelongTo"
                 placeholder="Department Applicantion Belong To"
                 value={INSForm.departmentApplicantionBelongTo}
+                disabled
               />
               <span className="sspan"></span>
             </label>
@@ -1441,7 +1733,7 @@ const INSNewRequestForm = () => {
         {/* end form-bx  */}
 
         <div className="inner_form_new ">
-          <label className="controlform">Application Reference Number</label>
+          <label className="controlform">Applicant Reference Number</label>
           <div className="row">
             <div className="col-md-12">
               <div className="d-flex">
@@ -1450,12 +1742,12 @@ const INSNewRequestForm = () => {
                     <input
                       ref={applicationreferenceNumberRef}
                       type="text"
-                      name="applicationreferenceNumber"
+                      name="applicantReferenceNumber"
                       onChange={(e) => {
                         changeHandelForm(e);
                       }}
-                      value={INSForm.applicationreferenceNumber?.trim()}
-                      placeholder="Application Reference Number"
+                      value={INSForm.applicantReferenceNumber?.trim()}
+                      placeholder="Applicant Reference Number"
                       className={
                         errors.applicationreferenceNumber
                           ? "text-uppercase error"
@@ -1489,16 +1781,29 @@ const INSNewRequestForm = () => {
                     <input
                       ref={previousRBZReferenceNumberRef}
                       type="text"
+                      // name="previousRBZReferenceNumber"
+                      // onChange={(e) => {
+                      //   changeHandelForm(e);
+                      // }}
+                      // value={INSForm.previousRBZReferenceNumber?.trim()}
+                      min={0}
+                      value={ValidateChange.previousRBZReferenceNumber?.trim()}
                       name="previousRBZReferenceNumber"
-                      onChange={(e) => {
-                        changeHandelForm(e);
+                      onKeyDown={(e) => {
+                        if (e.key === "-" || e.key === "+") {
+                          e.preventDefault();
+                        }
                       }}
-                      value={INSForm.previousRBZReferenceNumber?.trim()}
+                      onChange={(e) => {
+                        changeHandelFormValidate(e);
+                      }}
                       placeholder="Previous RBZ Reference Number"
                       className={
                         errors.previousRBZReferenceNumber
-                          ? "text-uppercase error"
-                          : "text-uppercase"
+                        ? "error"
+                        : ValidateShow.previousRBZReferenceNumber
+                        ? "text-uppercase"
+                        : ""
                       }
                     />
                     <span className="sspan"></span>
@@ -1511,8 +1816,98 @@ const INSNewRequestForm = () => {
                       ""
                     )}
                   </label>
+
+                  {loader == true ? (
+                    <TailSpin
+                      visible={true}
+                      height="20"
+                      width="20"
+                      color="#5e62a1"
+                      ariaLabel="tail-spin-loading"
+                      radius="1"
+                      wrapperStyle={{}}
+                      wrapperClass=""
+                    />
+                  ) : ValidateShow == true ? (
+                    <div className="card validatepecanfield">
+                      {ValidateRBZ.length > 0 ? (
+                        <DataTable
+                          value={ValidateRBZ}
+                          scrollable
+                          scrollHeight="500px"
+                          paginator={ValidateRBZ?.length > 10 ? true : false}
+                          rowHover
+                          paginatorRight
+                          rows={10}
+                          dataKey="id"
+                          rowsPerPageOptions={[10, 50, 100]}
+                          emptyMessage="No Data found."
+                          footer={footer}
+                        >
+                          <Column
+                            field="rbzReferenceNumber"
+                            header="RBZ Reference Number"
+                            style={{ minWidth: "200px" }}
+                          ></Column>
+                          <Column
+                            field="name"
+                            header="Applicant Name"
+                            style={{ minWidth: "180px" }}
+                            body={applicantNAME}
+                          ></Column>
+                          <Column
+                            field="bankName"
+                            header="Bank Name"
+                            style={{ minWidth: "150px" }}
+                          ></Column>
+                          <Column
+                            field="applicationType"
+                            header="Application Type"
+                            style={{ minWidth: "250px" }}
+                          ></Column>
+                          <Column
+                            field="amount"
+                            header="Amount"
+                            style={{ minWidth: "150px" }}
+                            body={amountData}
+                          ></Column>
+                          <Column
+                            field="statusName"
+                            header="Status"
+                            style={{ minWidth: "200px" }}
+                          ></Column>
+                          <Column
+                            field="createdDate"
+                            header="Submitted Date"
+                            style={{ minWidth: "150px" }}
+                            body={createdDate}
+                          ></Column>
+                          <Column
+                            field=""
+                            header="Action"
+                            style={{ minWidth: "100px" }}
+                            frozen
+                            alignFrozen="right"
+                            body={action}
+                          ></Column>
+                        </DataTable>
+                      ) : (
+                        <div className="d-flex justify-content-between align-items-center p-2">
+                          <p className="mb-0">No Data</p>
+                          <button
+                            className="validateCrossIcon"
+                            onClick={() => setValidateShow(false)}
+                          >
+                            <i class="bi bi-x-circle"></i>
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    " "
+                  )}
                 </div>
-                <button type="button" className="primrybtn v-button">
+                <button type="button" className="primrybtn v-button"   onClick={(e) => handleValidateRBZ(e)}>
                   Validate
                 </button>
               </div>
@@ -1731,7 +2126,7 @@ const INSNewRequestForm = () => {
         </div>
         {/* end form-bx  */}
 
-        <div className="inner_form_new ">
+        {/* <div className="inner_form_new ">
           <label className="controlform">Sector</label>
           <div className="form-bx">
             <label>
@@ -1762,10 +2157,10 @@ const INSNewRequestForm = () => {
               )}
             </label>
           </div>
-        </div>
+        </div> */}
         {/* end form-bx  */}
 
-        <div className="inner_form_new">
+        {/* <div className="inner_form_new">
           <label className="controlform">Subsector</label>
           <div className="form-bx">
             <label>
@@ -1797,7 +2192,7 @@ const INSNewRequestForm = () => {
               )}
             </label>
           </div>
-        </div>
+        </div> */}
         {/* end form-bx  */}
 
         <div className="inner_form_new ">
@@ -1806,6 +2201,7 @@ const INSNewRequestForm = () => {
             <label>
               <textarea
                 ref={applicantCommentsRef}
+                value={INSForm.applicantComments}
                 name="applicantComments"
                 onChange={(e) => {
                   changeHandelForm(e);

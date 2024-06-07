@@ -594,7 +594,7 @@ const ReferredDashboardTable = () => {
                   <h5>
                     <Modal.Header closeButton className="p-0">
                       <Modal.Title>
-                        View Import Request --{" "}
+                        View Import Referred Request --{" "}
                         <big>{applicationDetail?.rbzReferenceNumber}</big>
                       </Modal.Title>
                     </Modal.Header>
@@ -636,7 +636,7 @@ const ReferredDashboardTable = () => {
                             }
                             style={{ alignItems: "center" }}
                           >
-                            Edit Import Request --{" "}
+                            Edit Import Referred Request --{" "}
                             <big>
                               {applicationDetail?.rbzReferenceNumber
                                 ? applicationDetail.rbzReferenceNumber
@@ -700,7 +700,7 @@ const ReferredDashboardTable = () => {
                   <h5>
                     <Modal.Header closeButton className="p-0">
                       <Modal.Title>
-                        View Export Request --{" "}
+                        View Export Referred Request --{" "}
                         <big>{applicationDetail?.rbzReferenceNumber}</big>
                       </Modal.Title>
                     </Modal.Header>
@@ -743,7 +743,7 @@ const ReferredDashboardTable = () => {
                             }
                             style={{ alignItems: "center" }}
                           >
-                            Edit Export Request --{" "}
+                            Edit Export Referred Request --{" "}
                             <big>
                               {applicationDetail?.rbzReferenceNumber
                                 ? applicationDetail.rbzReferenceNumber
@@ -807,7 +807,7 @@ const ReferredDashboardTable = () => {
                   <h5>
                     <Modal.Header closeButton className="p-0">
                       <Modal.Title>
-                        View Foreign Investments Request --{" "}
+                        View Foreign Investments Referred Request --{" "}
                         <big>{applicationDetail?.rbzReferenceNumber}</big>
                       </Modal.Title>
                     </Modal.Header>
@@ -850,7 +850,7 @@ const ReferredDashboardTable = () => {
                             }
                             style={{ alignItems: "center" }}
                           >
-                            Edit Foreign Investments Request --{" "}
+                            Edit Foreign Investments Referred Request --{" "}
                             <big>
                               {applicationDetail?.rbzReferenceNumber
                                 ? applicationDetail.rbzReferenceNumber

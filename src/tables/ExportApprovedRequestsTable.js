@@ -256,6 +256,7 @@ const ExportApprovedRequestsTable = () => {
 
   const EditModalClose = () => {
     setshowEditForm(false);
+    // setapplicationstaus("0");
     setnextlevelvalue("");
   };
 

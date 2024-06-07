@@ -215,7 +215,7 @@ const CircularsCancelledTable = () => {
             </span>
         )
     }
-   
+
     const header = renderHeader();
 
     const EditModalClose = () => {
@@ -277,7 +277,7 @@ const CircularsCancelledTable = () => {
                 .post(APIURL + "Circular/GetCircularDataByUserID", {
                     UserID: useId.replace(/"/g, ""),
                     RoleID: roleID,
-                    Status:"25"
+                    Status: "25"
 
                 })
                 .then((res) => {
@@ -813,7 +813,7 @@ const CircularsCancelledTable = () => {
             });
     };
 
-    console.log("data------", data);
+
     return (
 
         <>
@@ -866,7 +866,7 @@ const CircularsCancelledTable = () => {
                             style={{ width: "220px" }}
 
                         ></Column>
-                       
+
                         <Column
                             field="subject"
                             header="Subject"
@@ -913,7 +913,7 @@ const CircularsCancelledTable = () => {
                             <h5>
                                 <Modal.Header closeButton className="p-0">
                                     <Modal.Title>
-                                        View Export Request --{" "}
+                                        View Circular --{" "}
                                         <big>{applicationDetail?.circularReferenceNumber}</big>
                                     </Modal.Title>
                                 </Modal.Header>
@@ -938,66 +938,7 @@ const CircularsCancelledTable = () => {
             </Modal>
             {/* circular view modal close */}
 
-            <Modal
-                show={showEditForm}
-                onHide={EditModalClose}
-                backdrop="static"
-                className="max-width-600"
-            >
-                <div className="application-box">
-                    <div className="login_inner">
-                        <div className="login_form ">
-                            <h5>
-                                <Modal.Header closeButton className="p-0">
-                                    <Modal.Title>
-                                        Edit Cricular Export Request --{" "}
-                                        <big>
-                                            {applicationDetail?.circularReferenceNumber
-                                                ? applicationDetail.circularReferenceNumber
-                                                : ""}
-                                        </big>
-                                    </Modal.Title>
-                                </Modal.Header>
-                            </h5>
-                        </div>
-                        <div className="login_form_panel">
-                            <Modal.Body className="p-0">
-                                <ExportCircularsEditForm
-                                    applicationDetail={applicationDetail}
-                                    setApplicationDetail={setApplicationDetail}
-                                    EditModalClose={EditModalClose}
-                                    setCricularRequests={setCricularRequests}
-                                    handleData={handleData}
-                                    showdataLoader={showdataLoader}
-                                    allcomment={allcomment}
-                                    GetRoleHandle={GetRoleHandle}
-                                    setapplicationstaus={setapplicationstaus}
-                                    applicationstaus={applicationstaus}
-                                    setnextlevelvalue={setnextlevelvalue}
-                                    nextlevelvalue={nextlevelvalue}
-                                    asignUser={asignUser}
-                                    userRole={userRole}
-                                    responceCount={responceCount}
-                                    setAsignUser={setAsignUser}
-                                    supervisorHangechange={supervisorHangechange}
-                                    supervisorHangechangeBankuser={
-                                        supervisorHangechangeBankuser
-                                    }
-                                    tatHistory={tatHistory}
-                                    AssignUserID={AssignUserID}
-                                    setAssignUserID={setAssignUserID}
-                                    Actiondata={Actiondata}
-                                    SupervisorRoleId={SupervisorRoleId}
-                                    supervisorHangechangeRole={supervisorHangechangeRole}
-                                    setSupervisorRoleId={setSupervisorRoleId}
-                                    noDataComment={noDataComment}
-                                />
-                            </Modal.Body>
-                        </div>
-                    </div>
-                </div>
-            </Modal>
-
+          
             {/* pdf generate code start */}
             <div className="login_inner" style={{ display: "none" }}>
                 <div className="login_form_panel" style={{ display: "none" }}>
@@ -1029,28 +970,17 @@ const CircularsCancelledTable = () => {
                                             letterSpacing: "0.01px",
                                         }}
                                     >
-                                        {applicationDetail?.circularReferenceNumber}
+                                        : {applicationDetail?.circularReferenceNumber}
 
                                     </p>
                                 </td>
                             </tr>
-
+                            <tr>
+                                <td colSpan="2">&nbsp;</td>
+                            </tr>
                             <tr>
                                 <td
-
-                                    style={{
-                                        color: "#000",
-                                        fontSize: "18px",
-                                        fontWeight: "800",
-                                        letterSpacing: "0.01px",
-                                    }}
-                                >
-                                    Releasing Date
-
-
-                                </td>
-                                <td
-
+                                    colSpan="2"
                                     style={{
                                         color: "#000",
                                         fontSize: "18px",
@@ -1063,114 +993,121 @@ const CircularsCancelledTable = () => {
                                     ).format("DD MMMM YYYY")}
                                 </td>
                             </tr>
-
                             <tr>
-                                <td
-
-                                    style={{
-                                        color: "#000",
-                                        fontSize: "18px",
-                                        fontWeight: "800",
-                                        letterSpacing: "0.01px",
-                                    }}
-                                >
-                                    To
-
-                                </td>
-                                <td>
-                                    <p
-                                        style={{
-                                            color: "#000",
-                                            fontSize: "18px",
-                                            fontWeight: "600",
-                                            padding: "0px 5px 0px 0px",
-                                            marginBottom: "0px",
-                                            letterSpacing: "0.01px",
-                                        }}
-                                    >
-                                        {applicationDetail?.bankData?.map((item) => {
-                                            return (
-                                                <span
-                                                    style={{
-                                                        marginBottom: "3px",
-                                                        letterSpacing: "0.01px",
-                                                        fontSize: "18px",
-                                                        fontWeight: "400",
-                                                        padding: "0px 5px",
-                                                        color: "#000",
-
-                                                    }}
-                                                >
-                                                    {item?.bankName},
-                                                </span>
-                                            );
-                                        })}
-
-                                    </p>
-                                </td>
+                                <td colSpan="2">&nbsp;</td>
                             </tr>
-
                             <tr>
                                 <td
-
+                                    colSpan="2"
                                     style={{
                                         color: "#000",
                                         fontSize: "18px",
-                                        fontWeight: "800",
+                                        fontWeight: "600",
                                         letterSpacing: "0.01px",
                                     }}
                                 >
-                                    Title
-
-                                </td>
-                                <td>
-                                    <p
-                                        style={{
-                                            color: "#000",
-                                            fontSize: "18px",
-                                            fontWeight: "600",
-
-                                            marginBottom: "0px",
-                                            letterSpacing: "0.01px",
-                                        }}
-                                    >
-                                        {applicationDetail?.name},
-                                    </p>
-                                </td>
-                            </tr>
-
-                            <tr>
-                                <td
-
-                                    style={{
-                                        color: "#000",
-                                        fontSize: "18px",
-                                        fontWeight: "800",
-                                        letterSpacing: "0.01px",
-                                    }}
-                                >
-                                    Subject
-
-                                </td>
-                                <td>
-                                    <p
-                                        style={{
-                                            color: "#000",
-                                            fontSize: "18px",
-                                            fontWeight: "600",
-
-                                            marginBottom: "0px",
-                                            letterSpacing: "0.01px",
-                                        }}
-                                    >
-                                        {applicationDetail?.subject},
-                                    </p>
+                                    Dear{" "}
+                                    {applicationDetail?.name}
+                                    ,
                                 </td>
                             </tr>
 
                             <tr>
                                 <td colSpan="2">
                                     <table width="100%">
+                                        <tr>
+                                            <td colSpan="2">&nbsp;</td>
+                                        </tr>
+                                        <tr>
+                                            <td
+                                                style={{
+                                                    color: "#000",
+                                                    fontSize: "18px",
+                                                    fontWeight: "400",
+                                                }}
+                                            >
+                                                Name
+                                            </td>
+                                            <td
+                                                style={{
+                                                    color: "#000",
+                                                    fontSize: "18px",
+                                                    fontWeight: "800",
+                                                    letterSpacing: "0.01px",
+                                                }}
+                                            >
+                                                :{" "}
+                                                {applicationDetail?.name}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td
+                                                style={{
+                                                    color: "#000",
+                                                    fontSize: "18px",
+                                                    fontWeight: "400",
+                                                    letterSpacing: "0.01px",
+                                                }}
+                                            >
+                                                Releasing Date
+                                            </td>
+                                            <td
+                                                style={{
+                                                    color: "#000",
+                                                    fontSize: "18px",
+                                                    fontWeight: "800",
+                                                    letterSpacing: "0.01px",
+                                                }}
+                                            >
+                                                :{" "}
+                                                {moment(
+                                                    applicationDetail?.releasingDate
+                                                ).format("DD MMMM YYYY")}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td
+                                                style={{
+                                                    color: "#000",
+                                                    fontSize: "18px",
+                                                    fontWeight: "400",
+                                                    letterSpacing: "0.01px",
+                                                }}
+                                            >
+                                                Subject
+                                            </td>
+                                            <td
+                                                style={{
+                                                    color: "#000",
+                                                    fontSize: "18px",
+                                                    fontWeight: "800",
+                                                }}
+                                            >
+                                                :{" "}
+                                                <span
+                                                    style={{
+                                                        minWidth: "45px",
+                                                        display: "inline-block",
+                                                        paddingRight: "5px",
+                                                        fontWeight: "800",
+                                                    }}
+                                                >
+                                                    {applicationDetail?.subject}
+                                                </span>
+
+                                            </td>
+                                        </tr>
+
+
+                                    </table>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colSpan="2">&nbsp;</td>
+                            </tr>
+                            <tr>
+                                <td colSpan="2">
+                                    <table>
                                         <tr>
                                             <td colSpan="2">
                                                 <table width="100%">
@@ -1187,18 +1124,21 @@ const CircularsCancelledTable = () => {
                                                                     style={{
                                                                         fontWeight: "800",
                                                                         padding: "15px 0px 15px",
+                                                                        letterSpacing: "0.01px",
                                                                     }}
                                                                 >
-                                                                    Content
+                                                                    Description
                                                                 </span>
                                                             </div>
                                                             <div
                                                                 className="tableEditorData"
                                                                 dangerouslySetInnerHTML={{
                                                                     __html: applicationDetail?.content
-                                                                        ? applicationDetail?.content
-                                                                        : "N/A",
+                                                                        ?
+                                                                        applicationDetail?.content
+                                                                        : "",
                                                                 }}
+
                                                                 style={{
                                                                     paddingBottom: "60px",
                                                                     letterSpacing: "0.01px",
@@ -1206,59 +1146,19 @@ const CircularsCancelledTable = () => {
                                                             />
                                                         </td>
                                                     </tr>
-                                                    {/* <tr>
-                                                        <td
-                                                            style={{
-                                                                color: "#000",
-                                                                fontSize: "18px",
-                                                                fontWeight: "400",
-                                                            }}
-                                                        >
-                                                            <div>
-                                                                <span
-                                                                    style={{
-                                                                        fontWeight: "800",
-                                                                        padding: "15px 0px 15px",
-                                                                    }}
-                                                                >
-                                                                    Attachment
-                                                                </span>
-                                                            </div>
-                                                            <div
-                                                                className="tableEditorData"
-
-                                                            >
-                                                                {applicationDetail?.attachedFiles?.map((item) => {
-                                                                    return (
-                                                                        <p
-                                                                            style={{
-                                                                                marginBottom: "3px",
-                                                                                letterSpacing: "0.01px",
-                                                                                fontSize: "18px",
-                                                                                fontWeight: "400",
-                                                                                padding: "0px 5px",
-                                                                                color: "#000",
-
-                                                                            }}
-                                                                        >
-                                                                            {item?.filePath}
-                                                                        </p>
-                                                                    );
-                                                                })}
-                                                            </div>
-                                                        </td>
-                                                    </tr> */}
                                                 </table>
                                             </td>
                                         </tr>
-
+                                        <tr>
+                                            <td colSpan="2">&nbsp;</td>
+                                        </tr>
                                         <tr>
                                             <td
                                                 colSpan="2"
                                                 style={{
                                                     color: "#000",
                                                     fontSize: "18px",
-                                                    fontWeight: "800",
+                                                    fontWeight: "400",
                                                 }}
                                             >
                                                 <span
@@ -1267,6 +1167,7 @@ const CircularsCancelledTable = () => {
                                                         fontSize: "18px",
                                                         fontWeight: "400",
                                                         display: "inline-block",
+                                                        letterSpacing: "0.01px",
                                                     }}
                                                 >
                                                     {" "}
@@ -1290,7 +1191,7 @@ const CircularsCancelledTable = () => {
                                                     style={{
                                                         marginBottom: "0px",
                                                         color: "#000",
-                                                        fontSize: "14px",
+                                                        fontSize: "16px",
                                                         fontWeight: "400",
                                                         padding: "15px 0px 3px",
                                                         lineHeight: "13px",
@@ -1305,7 +1206,7 @@ const CircularsCancelledTable = () => {
                                                     style={{
                                                         marginBottom: "0px",
                                                         color: "#000",
-                                                        fontSize: "14px",
+                                                        fontSize: "16px",
                                                         fontWeight: "400",
                                                         padding: "5px 0px",
                                                         lineHeight: "13px",
@@ -1316,16 +1217,54 @@ const CircularsCancelledTable = () => {
                                                         ? PdfRolename?.replace(/"/g, "")
                                                         : "N/A"}
                                                 </p>
-                                                <h3
+
+                                                <div
                                                     style={{
+                                                        marginBottom: "0px",
                                                         color: "#000",
                                                         fontSize: "18px",
-                                                        fontWeight: "800",
+                                                        fontWeight: "400",
+                                                        padding: "25px 0px 5px",
+                                                        lineHeight: "13px",
+                                                        display: "flex",
                                                     }}
                                                 >
-                                                    EXCHANGE &nbsp; CONTROL
-                                                </h3>
-
+                                                    {
+                                                        applicationDetail?.bankData?.length > 0 ? (
+                                                            <>
+                                                                <p
+                                                                    style={{
+                                                                        marginBottom: "0px",
+                                                                        fontSize: "18px",
+                                                                        fontWeight: "400",
+                                                                        paddingRight: "10px",
+                                                                        letterSpacing: "0.01px",
+                                                                    }}
+                                                                >
+                                                                    TO:
+                                                                </p>
+                                                                <div>
+                                                                    {applicationDetail?.bankData.map((item) => {
+                                                                        return (
+                                                                            <p
+                                                                                style={{
+                                                                                    marginBottom: "3px",
+                                                                                    letterSpacing: "0.01px",
+                                                                                    fontSize: "18px",
+                                                                                    fontWeight: "400",
+                                                                                }}
+                                                                            >
+                                                                                {item.bankName}
+                                                                            </p>
+                                                                        );
+                                                                    })}
+                                                                </div>
+                                                            </>
+                                                        ) : (
+                                                            ""
+                                                        )
+                                                    }
+                                                </div>
                                             </td>
                                         </tr>
                                     </table>

@@ -75,7 +75,7 @@ const ExportCircularViewDetails = ({
     ))
     : null;
 
-  
+
   return (
     <>
       {
@@ -223,52 +223,52 @@ const ExportCircularViewDetails = ({
                   </label>
                 </div>
               </div>
-{applicationDetail?.userID !== UserID.replace(/"/g, "") ? 
-              <div class="row">
-                <div class="col-md-6">
-                  <div class="inner_form_new ">
-                    <label class="controlform">
-                      Assigned To Role
-                    </label>
-                    <div class="form-bx">
-                      <label>
-                        <input
-                          type="text"
-                          class=""
-                          disabled
-                          value={
-                            applicationDetail?.assignedToRoleName
-                              ? applicationDetail?.assignedToRoleName
-                              : "N/A"
-                          }
-                        />
+              {applicationDetail?.userID !== UserID.replace(/"/g, "") ?
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="inner_form_new ">
+                      <label class="controlform">
+                        Assigned To Role
                       </label>
+                      <div class="form-bx">
+                        <label>
+                          <input
+                            type="text"
+                            class=""
+                            disabled
+                            value={
+                              applicationDetail?.assignedToRoleName
+                                ? applicationDetail?.assignedToRoleName
+                                : "N/A"
+                            }
+                          />
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="inner_form_new-sm ">
+                      <label class="controlform-sm">
+                        Assigned To User
+                      </label>
+                      <div class="form-bx-sm">
+                        <label>
+                          <input
+                            type="text"
+                            class=""
+                            disabled
+                            value={
+                              applicationDetail?.assignedToName
+                                ? applicationDetail?.assignedToName
+                                : "N/A"
+                            }
+                          />
+                        </label>
+                      </div>
                     </div>
                   </div>
                 </div>
-                <div class="col-md-6">
-                  <div class="inner_form_new-sm ">
-                    <label class="controlform-sm">
-                      Assigned To User
-                    </label>
-                    <div class="form-bx-sm">
-                      <label>
-                        <input
-                          type="text"
-                          class=""
-                          disabled
-                          value={
-                            applicationDetail?.assignedToName
-                              ? applicationDetail?.assignedToName
-                              : "N/A"
-                          }
-                        />
-                      </label>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              : ""}
+                : ""}
               {/* end form-bx  */}
 
 
@@ -278,6 +278,7 @@ const ExportCircularViewDetails = ({
 
               {applicationDetail?.attachedFiles?.length ? (
                 applicationDetail?.attachedFiles?.map((items, index) => {
+                  console.log("items",items);
                   return (
                     <div className="attachemt_form-bx" key={items.id}>
                       <label
@@ -578,46 +579,46 @@ const ExportCircularViewDetails = ({
                                           </div>
                                         </div>
 
-                                     
+
                                         <div className="inner_form_new ">
                                           <label className="controlform">
                                             Attachments
                                           </label>
                                           <div className="form-bx">
-                                          {items?.filesData?.length ? (
-                                            items?.filesData?.map(
-                                              (items, index) => {
-                                                return (
-                                                  <div
-                                                    className="attachemt_form-bx mb-0 width-80"
-                                                    key={items.id}
-                                                  >
-                                                    <label>
-                                                      {items?.fileName
-                                                        ? items?.fileName
-                                                        : `FileUpload ${index}`}
-                                                    </label>
-                                                    <span className="filename">
-                                                      <Link
-                                                        to={items?.filePath}
-                                                        target="_blank"
-                                                        className="viewbtn"
-                                                      >
-                                                        View File
-                                                      </Link>
-                                                    </span>
-                                                  </div>
-                                                );
-                                              }
-                                            )
-                                          ) : (
-                                            <label className="notfound">
-                                              File Not Found
-                                            </label>
-                                          )}
+                                            {items?.filesData?.length ? (
+                                              items?.filesData?.map(
+                                                (items, index) => {
+                                                  return (
+                                                    <div
+                                                      className="attachemt_form-bx mb-0 width-80"
+                                                      key={items.id}
+                                                    >
+                                                      <label>
+                                                        {items?.fileName
+                                                          ? items?.fileName
+                                                          : `FileUpload ${index}`}
+                                                      </label>
+                                                      <span className="filename">
+                                                        <Link
+                                                          to={items?.filePath}
+                                                          target="_blank"
+                                                          className="viewbtn"
+                                                        >
+                                                          View File
+                                                        </Link>
+                                                      </span>
+                                                    </div>
+                                                  );
+                                                }
+                                              )
+                                            ) : (
+                                              <label className="notfound">
+                                                File Not Found
+                                              </label>
+                                            )}
                                           </div>
                                         </div>
-                                           {/* 
+                                        {/* 
                                         <div className="inner_form_new ">
                                           <label className="controlform">
                                             Bank
@@ -766,7 +767,7 @@ const ExportCircularViewDetails = ({
                     );
                   }
                 })}
-                 {noDataComment?.map((v, i) => {
+                {noDataComment?.map((v, i) => {
                   if (v.roleID == 5 && v.isDataAvailable == 0) {
                     return (
                       <div className={analystTab ? "customtab" : "d-none"}>
@@ -1095,38 +1096,38 @@ const ExportCircularViewDetails = ({
                                             Attachments
                                           </label>
                                           <div className="form-bx">
-                                          {items?.filesData?.length ? (
-                                            items?.filesData?.map(
-                                              (items, index) => {
-                                                return (
-                                                  <div
-                                                    className="attachemt_form-bx mb-0 width-80"
-                                                    key={items.id}
-                                                  >
-                                                    <label>
-                                                      {items?.fileName
-                                                        ? items?.fileName
-                                                        : `FileUpload ${index}`}
-                                                    </label>
+                                            {items?.filesData?.length ? (
+                                              items?.filesData?.map(
+                                                (items, index) => {
+                                                  return (
+                                                    <div
+                                                      className="attachemt_form-bx mb-0 width-80"
+                                                      key={items.id}
+                                                    >
+                                                      <label>
+                                                        {items?.fileName
+                                                          ? items?.fileName
+                                                          : `FileUpload ${index}`}
+                                                      </label>
 
-                                                    <span className="filename">
-                                                      <Link
-                                                        to={items?.filePath}
-                                                        target="_blank"
-                                                        className="viewbtn"
-                                                      >
-                                                        View File
-                                                      </Link>
-                                                    </span>
-                                                  </div>
-                                                );
-                                              }
-                                            )
-                                          ) : (
-                                            <label className="notfound">
-                                              File Not Found
-                                            </label>
-                                          )}
+                                                      <span className="filename">
+                                                        <Link
+                                                          to={items?.filePath}
+                                                          target="_blank"
+                                                          className="viewbtn"
+                                                        >
+                                                          View File
+                                                        </Link>
+                                                      </span>
+                                                    </div>
+                                                  );
+                                                }
+                                              )
+                                            ) : (
+                                              <label className="notfound">
+                                                File Not Found
+                                              </label>
+                                            )}
                                           </div>
                                         </div>
                                         {/* <div className="inner_form_new ">
@@ -1259,7 +1260,7 @@ const ExportCircularViewDetails = ({
                     );
                   }
                 })}
-                 {noDataComment?.map((v, i) => {
+                {noDataComment?.map((v, i) => {
                   if (v.roleID == 6 && v.isDataAvailable == 0) {
                     return (
                       <div className={sranalystTab ? "customtab" : "d-none"}>
@@ -1285,7 +1286,7 @@ const ExportCircularViewDetails = ({
                   </span>
                 </h5>
                 {allcomment?.map((cur, i) => {
-               
+
                   if (cur.assignedToRoleID == 7) {
                     return (
                       <>
@@ -1572,38 +1573,38 @@ const ExportCircularViewDetails = ({
                                             Attachments
                                           </label>
                                           <div className="mt-3">
-                                          {items?.filesData?.length ? (
-                                            items?.filesData?.map(
-                                              (items, index) => {
-                                                return (
-                                                  <p
-                                                    className="attachemt_form-bx"
-                                                    key={items.id}
-                                                  >
-                                                    <label>
-                                                      {items?.fileName
-                                                        ? items?.fileName
-                                                        : `FileUpload ${index}`}
-                                                    </label>
+                                            {items?.filesData?.length ? (
+                                              items?.filesData?.map(
+                                                (items, index) => {
+                                                  return (
+                                                    <p
+                                                      className="attachemt_form-bx"
+                                                      key={items.id}
+                                                    >
+                                                      <label>
+                                                        {items?.fileName
+                                                          ? items?.fileName
+                                                          : `FileUpload ${index}`}
+                                                      </label>
 
-                                                    <span className="filename">
-                                                      <Link
-                                                        to={items?.filePath}
-                                                        target="_blank"
-                                                        className="viewbtn"
-                                                      >
-                                                        View File
-                                                      </Link>
-                                                    </span>
-                                                  </p>
-                                                );
-                                              }
-                                            )
-                                          ) : (
-                                            <label className="notfound">
-                                              File Not Found
-                                            </label>
-                                          )}
+                                                      <span className="filename">
+                                                        <Link
+                                                          to={items?.filePath}
+                                                          target="_blank"
+                                                          className="viewbtn"
+                                                        >
+                                                          View File
+                                                        </Link>
+                                                      </span>
+                                                    </p>
+                                                  );
+                                                }
+                                              )
+                                            ) : (
+                                              <label className="notfound">
+                                                File Not Found
+                                              </label>
+                                            )}
                                           </div>
                                         </div>
 
@@ -2016,38 +2017,38 @@ const ExportCircularViewDetails = ({
                                             Attachments
                                           </label>
                                           <div className="form-bx">
-                                          {items?.filesData?.length ? (
-                                            items?.filesData?.map(
-                                              (items, index) => {
-                                                return (
-                                                  <div
-                                                    className="attachemt_form-bx mb-0 width-80"
-                                                    key={items.id}
-                                                  >
-                                                    <label>
-                                                      {items?.fileName
-                                                        ? items?.fileName
-                                                        : `FileUpload ${index}`}
-                                                    </label>
+                                            {items?.filesData?.length ? (
+                                              items?.filesData?.map(
+                                                (items, index) => {
+                                                  return (
+                                                    <div
+                                                      className="attachemt_form-bx mb-0 width-80"
+                                                      key={items.id}
+                                                    >
+                                                      <label>
+                                                        {items?.fileName
+                                                          ? items?.fileName
+                                                          : `FileUpload ${index}`}
+                                                      </label>
 
-                                                    <span className="filename">
-                                                      <Link
-                                                        to={items?.filePath}
-                                                        target="_blank"
-                                                        className="viewbtn"
-                                                      >
-                                                        View File
-                                                      </Link>
-                                                    </span>
-                                                  </div>
-                                                );
-                                              }
-                                            )
-                                          ) : (
-                                            <label className="notfound">
-                                              File Not Found
-                                            </label>
-                                          )}
+                                                      <span className="filename">
+                                                        <Link
+                                                          to={items?.filePath}
+                                                          target="_blank"
+                                                          className="viewbtn"
+                                                        >
+                                                          View File
+                                                        </Link>
+                                                      </span>
+                                                    </div>
+                                                  );
+                                                }
+                                              )
+                                            ) : (
+                                              <label className="notfound">
+                                                File Not Found
+                                              </label>
+                                            )}
                                           </div>
                                         </div>
                                         <div className="inner_form_new ">
@@ -2130,7 +2131,7 @@ const ExportCircularViewDetails = ({
                     );
                   }
                 })}
-                 {noDataComment?.map((v, i) => {
+                {noDataComment?.map((v, i) => {
                   if (v.roleID == 8 && v.isDataAvailable == 0) {
                     return (
                       <div className={deputyTab ? "customtab" : "d-none"}>
@@ -2448,38 +2449,38 @@ const ExportCircularViewDetails = ({
                                             Attachments
                                           </label>
                                           <div className="form-bx">
-                                          {items?.filesData?.length ? (
-                                            items?.filesData?.map(
-                                              (items, index) => {
-                                                return (
-                                                  <div
-                                                    className="attachemt_form-bx mb-0 width-80"
-                                                    key={items.id}
-                                                  >
-                                                    <label>
-                                                      {items?.fileName
-                                                        ? items?.fileName
-                                                        : `FileUpload ${index}`}
-                                                    </label>
+                                            {items?.filesData?.length ? (
+                                              items?.filesData?.map(
+                                                (items, index) => {
+                                                  return (
+                                                    <div
+                                                      className="attachemt_form-bx mb-0 width-80"
+                                                      key={items.id}
+                                                    >
+                                                      <label>
+                                                        {items?.fileName
+                                                          ? items?.fileName
+                                                          : `FileUpload ${index}`}
+                                                      </label>
 
-                                                    <span className="filename">
-                                                      <Link
-                                                        to={items?.filePath}
-                                                        target="_blank"
-                                                        className="viewbtn"
-                                                      >
-                                                        View File
-                                                      </Link>
-                                                    </span>
-                                                  </div>
-                                                );
-                                              }
-                                            )
-                                          ) : (
-                                            <label className="notfound">
-                                              File Not Found
-                                            </label>
-                                          )}
+                                                      <span className="filename">
+                                                        <Link
+                                                          to={items?.filePath}
+                                                          target="_blank"
+                                                          className="viewbtn"
+                                                        >
+                                                          View File
+                                                        </Link>
+                                                      </span>
+                                                    </div>
+                                                  );
+                                                }
+                                              )
+                                            ) : (
+                                              <label className="notfound">
+                                                File Not Found
+                                              </label>
+                                            )}
                                           </div>
                                         </div>
                                         <div className="inner_form_new ">

@@ -17,6 +17,8 @@ const PendingRetunrsTable = () => {
   const useId = Storage.getItem("userID");
   const rollId = Storage.getItem("roleIDs");
   const bankID = Storage.getItem("bankID");
+  const menuname = Storage.getItem("menuname");
+  const submenuname = Storage.getItem("submenuname");
 
   const [ExportPendingReturns, setExportPendingReturns] = useState([]);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
@@ -533,7 +535,7 @@ const PendingRetunrsTable = () => {
                             }
                             style={{ alignItems: "center" }}
                           >
-                            Edit Export Request --{" "}
+                            Edit {menuname === "Exports" && submenuname === "Pending Returns" ? "Returns" : ""} Export Request --{" "}
                             <big>
                               {applicationDetail?.rbzReferenceNumber
                                 ? applicationDetail.rbzReferenceNumber

@@ -1060,4 +1060,6 @@ ul.labelbx li {
     color: #8d8c8c;
     font-size: 14px;
   }
-  
+  .toolinner p * {
+    width: 100%;
+}

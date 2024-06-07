@@ -38,6 +38,8 @@ export default function AuthUser() {
     ipAddress,
     signImageURL
   ) => {
+    // console.log("roleData",roleData)
+
     if (loginToken !== "" || loginToken != undefined) {
       Storage.setItem("userType", JSON.stringify(userType));
       Storage.setItem("loginToken", JSON.stringify(loginToken));
@@ -51,15 +53,22 @@ export default function AuthUser() {
       Storage.setItem("bankName", JSON.stringify(bankName));
       Storage.setItem("ipAddress", JSON.stringify(ipAddress));
       Storage.setItem("signImageURL", signImageURL);
+
+      //       const roleIDs = roleData.map(item => item.roleID);
+      // const roleNames = roleData.map(item => item.roleName);
+
+      // Storage.setItem('roleIDs',(roleIDs))
+      // Storage.setItem('roleName',JSON.stringify(roleNames))
     }
 
     setToken(loginToken);
     setUser(userType);
-    if (roleIDs != 1) {
-      navigate("/AllDashboard");
-    } else {
-      navigate("/PendingUser");
-    }
+    // if(roleIDs != 1){
+    //   navigate('/AllDashboard');
+    // }else{
+    //   // navigate('/');
+    //   navigate('/PendingUser')
+    // }
   };
 
   const logout = async () => {

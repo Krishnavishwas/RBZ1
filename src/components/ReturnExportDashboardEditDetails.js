@@ -3,7 +3,6 @@ import { Link, useNavigate } from "react-router-dom";
 import ExportformDynamicField from "./ExportformDynamicField";
 import { Storage } from "../login/Storagesetting";
 import DatePicker from "react-datepicker";
-// import "react-datepicker/dist/react-datepicker.css";
 import axios from "axios";
 import { APIURL, ImageAPI } from "../constant";
 import moment from "moment";
@@ -12,8 +11,6 @@ import Select from "react-select";
 import UpdatePopupMessage from "./UpdatePopupMessage";
 import "react-quill/dist/quill.snow.css";
 import logo from "../rbz_LOGO.png";
-//import SunEditor from "suneditor-react";
-//import "suneditor/dist/css/suneditor.min.css";
 import NoSign from "../NoSign.png";
 
 import jsPDF from "jspdf";
@@ -31,10 +28,7 @@ import TextAlign from "@tiptap/extension-text-align";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import CustomMultiSelect from "./SearchUI/CustomMultiSelect";
-
 /* Tiptp Editor Ends */
-
-// import MultiSelect from "react-multi-select-component";
 
 const ReturnExportDashboardEditDetails = ({
   applicationDetail,
@@ -102,7 +96,6 @@ const ReturnExportDashboardEditDetails = ({
   const BeneficiaryNameRef = useRef(null);
   const applicantCommentsRef = useRef(null);
   const applicantReferenceNumberRef = useRef(null);
-  // const applicantYearRef = useRef(null);
   const applicationTypeRef = useRef(null);
   const assignedToRef = useRef(null);
   const companyNameRef = useRef(null);
@@ -130,7 +123,6 @@ const ReturnExportDashboardEditDetails = ({
   const PdfRolename = Storage.getItem("roleName");
   const bankidcheck = bankID !== "" ? "1" : "3";
   const roleID = Storage.getItem("roleIDs");
-
   const userSign = Storage.getItem("signImageURL");
 
   const navigate = useNavigate();
@@ -219,15 +211,14 @@ const ReturnExportDashboardEditDetails = ({
   const [options, setOptions] = useState([]);
   const [Description, setDescription] = useState("");
   const [updatepopup, setupdatepopup] = useState(false);
-  const [lastComments, setLastComments] = useState({});
   const [ExpiringDate, setExpiringDate] = useState(new Date());
   const [asignnextLeveldata, setasignnextLeveldata] = useState({
     Notes: "",
     Comment: "",
   });
+
   const [DateExpiryOption, setDateExpiryOption] = useState("");
   const [defaultnoExpiry, setdefaultnoExpiry] = useState("0");
-
   const [IsReturnOption, setIsReturnOption] = useState("");
   const [AllFrequency, setAllFrequency] = useState([]);
   const [getFrequencyID, setGetFrequencyID] = useState("0");
@@ -253,8 +244,6 @@ const ReturnExportDashboardEditDetails = ({
   const [otherDepartmentRoles, setOtherDepartmentRoles] = useState([]);
   const [otherDepartmentUser, setOtherDepartmentUser] = useState("");
   const [otherDepartmentUsers, setOtherDepartmentUsers] = useState([]);
-  const [OtherDepartmentLoader, setOtherDepartmentLoader] = useState(false);
-  const [OtherDepartmentPopup, setOtherDepartmentPopup] = useState(false);
 
   const [content, setEditorContent] = useState("<p></p>");
   const applicationNumber = applicationDetail.rbzReferenceNumber;
@@ -648,10 +637,10 @@ const ReturnExportDashboardEditDetails = ({
 
   useEffect(() => {
     setasignnextLeveldata({
-      Notes: lastComments?.notes,
-      Comment: lastComments?.comment,
+      Notes: applicationDetail?.notes,
+      Comment: applicationDetail?.comment,
     });
-  }, [lastComments]);
+  }, [applicationDetail]);
 
   const editor = useEditor({
     extensions: [
@@ -685,25 +674,17 @@ const ReturnExportDashboardEditDetails = ({
 
   useEffect(() => {
     if (editor) {
-      editor.commands.setContent(
-        applicationDetail.parentApplicationID !== 0 && lastComments
-          ? lastComments?.description
-          : ""
-      );
+      editor.commands.setContent("");
       setDescription(editor.getHTML());
     }
-  }, [applicationDetail, lastComments]);
+  }, [applicationDetail]);
 
   useEffect(() => {
     if (editorAnalyst) {
-      editorAnalyst.commands.setContent(
-        applicationDetail.parentApplicationID !== 0 && lastComments
-          ? lastComments?.description
-          : applicationDetail?.analystDescription
-      );
+      editorAnalyst.commands.setContent(applicationDetail?.analystDescription);
       setDescription(editorAnalyst.getHTML());
     }
-  }, [applicationDetail, lastComments]);
+  }, [applicationDetail]);
 
   const editorAnalyst = useEditor({
     extensions: [
@@ -737,14 +718,10 @@ const ReturnExportDashboardEditDetails = ({
 
   useEffect(() => {
     if (editorSrAnalyst) {
-      editorSrAnalyst.commands.setContent(
-        applicationDetail.parentApplicationID !== 0 && lastComments
-          ? lastComments?.description
-          : applicationDetail?.analystDescription
-      );
+      editorSrAnalyst.commands.setContent(applicationDetail?.analystDescription);
       setDescription(editorSrAnalyst.getHTML());
     }
-  }, [applicationDetail, lastComments]);
+  }, [applicationDetail]);
 
   const editorSrAnalyst = useEditor({
     extensions: [
@@ -778,14 +755,10 @@ const ReturnExportDashboardEditDetails = ({
 
   useEffect(() => {
     if (editorDeputy) {
-      editorDeputy.commands.setContent(
-        applicationDetail.parentApplicationID !== 0 && lastComments
-          ? lastComments?.description
-          : applicationDetail?.analystDescription
-      );
+      editorDeputy.commands.setContent(applicationDetail?.analystDescription);
       setDescription(editorDeputy.getHTML());
     }
-  }, [applicationDetail, lastComments]);
+  }, [applicationDetail]);
 
   const editorDeputy = useEditor({
     extensions: [
@@ -819,14 +792,10 @@ const ReturnExportDashboardEditDetails = ({
 
   useEffect(() => {
     if (editorPrincipleAnalyst) {
-      editorPrincipleAnalyst.commands.setContent(
-        applicationDetail.parentApplicationID !== 0 && lastComments
-          ? lastComments?.description
-          : applicationDetail?.analystDescription
-      );
+      editorPrincipleAnalyst.commands.setContent(applicationDetail?.analystDescription);
       setDescription(editorPrincipleAnalyst.getHTML());
     }
-  }, [applicationDetail, lastComments]);
+  }, [applicationDetail]);
 
   const editorPrincipleAnalyst = useEditor({
     extensions: [
@@ -860,14 +829,10 @@ const ReturnExportDashboardEditDetails = ({
 
   useEffect(() => {
     if (editorDirector) {
-      editorDirector.commands.setContent(
-        applicationDetail.parentApplicationID !== 0 && lastComments
-          ? lastComments?.description
-          : applicationDetail?.analystDescription
-      );
+      editorDirector.commands.setContent(applicationDetail?.analystDescription);
       setDescription(editorDirector.getHTML());
     }
-  }, [applicationDetail, lastComments]);
+  }, [applicationDetail]);
 
   const editorDirector = useEditor({
     extensions: [
@@ -1045,22 +1010,13 @@ const ReturnExportDashboardEditDetails = ({
       };
     });
 
-    const lastResponseCCTodata = lastComments?.copiedResponseData?.map(
-      (items, i) => {
-        return {
-          value: items.bankID,
-          label: items.bankName,
-        };
-      }
-    );
-
     setExpiringDate(
       applicationDetail?.expiringDate
         ? applicationDetail?.expiringDate
         : new Date()
     );
 
-    setSelectedBanks(lastResponseCCTodata ? lastResponseCCTodata : bankdtata);
+    setSelectedBanks(bankdtata);
 
     if (applicationDetail?.isReturnNeeded == 1) {
       axios
@@ -1076,7 +1032,7 @@ const ReturnExportDashboardEditDetails = ({
           console.log(err);
         });
     }
-  }, [applicationDetail, lastComments]);
+  }, [applicationDetail]);
 
   const formatecopyresponse = selectedBanks?.map((item) => {
     return item.value;
@@ -1965,7 +1921,7 @@ const ReturnExportDashboardEditDetails = ({
     if (validateForm()) {
       setSubmitBtnLoader(true);
       await axios
-        .post(APIURL + "ExportApplication/UpdateExportApplications", {
+        .post(APIURL + "ReturnApplication/UpdateReturnApplication", {
           RBZReferenceNumber: applicationDetail?.rbzReferenceNumber,
           ID: applicationDetail?.id,
           DepartmentID: "2",
@@ -2022,17 +1978,15 @@ const ReturnExportDashboardEditDetails = ({
             : roleID,
           Notes: asignnextLeveldata.Notes,
           ExpiringDate: defaultnoExpiry == "0" ? "" : ExpiringDate,
-          ApplicationStatus:
-            roleID == 5
-              ? applicationstaus
-              : nextlevelvalue == "" && roleID != 5
-              ? applicationstaus
-              : applicationDetail?.analystRecommendation,
+          // ApplicationStatus:
+          //   roleID == 5
+          //     ? applicationstaus
+          //     : nextlevelvalue == "" && roleID != 5
+          //     ? applicationstaus
+          //     : applicationDetail?.analystRecommendation,
           ActionStatus:
             (AssignUserID == "" || AssignUserID == null) &&
-            roleID != 5 &&
-            roleID != 2 &&
-            roleID != 4
+            roleID >= 5
               ? "100"
               : nextlevelvalue,
           Description: Description
@@ -2044,7 +1998,7 @@ const ReturnExportDashboardEditDetails = ({
             IsReturn == "1" && getFrequencyID == "1"
               ? IsReturnExpiringDate
               : "",
-          CopiedResponse: formatecopyresponse?.join(),
+          // CopiedResponse: formatecopyresponse?.join(),
         })
         .then((res) => {
           if (res.data.responseCode === "200") {
@@ -2362,7 +2316,6 @@ const ReturnExportDashboardEditDetails = ({
                             pagebreak: true,
                             async callback(doc) {
                               addHeader(doc);
-                              //addFooters(doc);
                               const blobPDF = doc.output("datauristring");
                               let formData = new FormData();
                               formData.append(
@@ -2400,7 +2353,7 @@ const ReturnExportDashboardEditDetails = ({
                             },
                           })
                           .then(async (response) => {
-                            // console.log(response)
+                            console.log("UploadPdf success")
                           })
                           .catch((error) => console.log("pdferror--", error));
                       }
@@ -2552,102 +2505,6 @@ const ReturnExportDashboardEditDetails = ({
       .catch((error) => {
         console.log("FileRemove Error", error);
       });
-  };
-
-  const getLastComment = async (id) => {
-    await axios
-      .post(APIURL + "ExportApplication/GetLastApplicationDataByID", {
-        ApplicationID: id,
-        RoleID: roleID,
-      })
-      .then((res) => {
-        if (res.data.responseCode == 200) {
-          setLastComments(res.data.responseData);
-          setDescription(res.data.responseData.description);
-        } else {
-          toast.warning(res.data.responseMessage);
-        }
-      })
-      .catch((error) => {
-        console.log("GetLastApplicationDataByID Error", error);
-      });
-  };
-
-  const OtherDepartmentRole = async () => {
-    await axios
-      .post(APIURL + "Master/GetRoles", {
-        RoleID: roleID,
-        Status: "40",
-      })
-      .then((res) => {
-        if (res.data.responseCode == 200) {
-          setOtherDepartmentRoles(res.data.responseData);
-        }
-      })
-      .catch((error) => {
-        console.log("Master/GetRoles - Error", error);
-      });
-  };
-
-  const OtherDepartmentUserByRole = async (role) => {
-    await axios
-      .post(APIURL + "User/GetUsersByRoleID", {
-        DepartmentID: OtherDepartment,
-        RoleID: role,
-        UserID: UserID.replace(/"/g, ""),
-      })
-      .then((res) => {
-        if (res.data.responseCode == 200) {
-          setOtherDepartmentUsers(res.data.responseData);
-        }
-      })
-      .catch((error) => {
-        console.log("User/GetUsersByRoleID - Error", error);
-      });
-  };
-
-  const SubmitOtherDepartment = async () => {
-    try {
-      setOtherDepartmentLoader(true);
-      await axios
-        .post(APIURL + "ReferredApplication/CreateReferredApplication", {
-          ID: applicationDetail.id,
-          RoleID: roleID,
-          UserID: UserID.replace(/"/g, ""),
-          ReferredDepartmentID: OtherDepartment,
-          AssignedToRoleID: otherDepartmentRole,
-          AssignedTo: otherDepartmentUser,
-          Comment: asignnextLeveldata.Comment,
-          Notes: asignnextLeveldata.Notes,
-          Description: Description,
-          DepartmentID: DeptID,
-          Status:
-            OtherDepartment == "2"
-              ? "275"
-              : OtherDepartment == "3"
-              ? "280"
-              : OtherDepartment == "4"
-              ? "285"
-              : OtherDepartment == "5"
-              ? "290"
-              : "",
-        })
-        .then((res) => {
-          if (res.data.responseCode == 200) {
-            setOtherDepartmentLoader(false);
-            setOtherDepartmentPopup(true);
-          }
-        })
-        .catch((error) => {
-          setOtherDepartmentPopup(false);
-          setOtherDepartmentLoader(false);
-          console.log("CreateReferredApplication - Error", error);
-        });
-    } catch (error) {
-      setOtherDepartmentPopup(false);
-      setOtherDepartmentLoader(false);
-      console.log("CreateReferredApplication - catch - Error", error);
-    }
   };
 
   return (
@@ -3021,7 +2878,6 @@ const ReturnExportDashboardEditDetails = ({
                 <label className="controlform">Application Date</label>
 
                 <div className="form-bx">
-                  {/* <label> */}
                   <DatePicker
                     closeOnScroll={(e) => e.target === document}
                     selected={
@@ -3050,7 +2906,6 @@ const ReturnExportDashboardEditDetails = ({
                   />
 
                   <span className="sspan"></span>
-                  {/* </label> */}
                 </div>
               </div>
 
@@ -3139,7 +2994,6 @@ const ReturnExportDashboardEditDetails = ({
                       </label>
                     </div>
                   </div>
-                  {/* end form-bx  */}
                 </div>
 
                 <div className="col-md-3">
@@ -3803,12 +3657,6 @@ const ReturnExportDashboardEditDetails = ({
                                     aria-controls="home"
                                     aria-selected="true"
                                   >
-                                    {/* {index == 0
-                ? "Recent"
-                : `Response ${
-                    cur?.applicationActivityData.length -
-                    index
-                  }`} */}
                                     Response{" "}
                                     {cur?.applicationActivityData?.length -
                                       index}
@@ -3846,18 +3694,13 @@ const ReturnExportDashboardEditDetails = ({
                       role="tabpanel"
                       aria-labelledby="banksupervisrotab"
                     >
-                      {/* Edit bank supervisor */}
                       <>
                         {Actiondata?.map((cur) => {
                           const firstItem = cur?.applicationActivityData?.[0];
-
                           if (cur?.assignedToRoleID === 3 && firstItem) {
-                            // Check if firstItem exists
                             return (
                               <div className="bakgroundaction">
                                 <div key={firstItem.actionID}>
-                                  {" "}
-                                  {/* Remember to add a unique key */}
                                   <div className="row">
                                     <div className="col-md-6">
                                       <div className="inner_form_new">
@@ -3995,7 +3838,6 @@ const ReturnExportDashboardEditDetails = ({
                               }
                             >
                               <label className="controlform">Next Action</label>
-
                               <div className="row">
                                 <div className="col-md-12  position-relative">
                                   <div className="hidden-toggles">
@@ -4011,6 +3853,7 @@ const ReturnExportDashboardEditDetails = ({
                                         GetRoleHandle(10);
                                         setapplicationstaus("0");
                                       }}
+                                      checked={nextlevelvalue == "10"}
                                       name="nextactionana"
                                       className="hidden-toggles__input"
                                       value="10"
@@ -4068,7 +3911,6 @@ const ReturnExportDashboardEditDetails = ({
                               <>
                                 <div className="inner_form_new">
                                   <label className="controlform">User</label>
-
                                   <div className="form-bx">
                                     <label>
                                       <select
@@ -4481,27 +4323,6 @@ const ReturnExportDashboardEditDetails = ({
                                         </div>
                                       </div>
                                     </div>
-                                    {/* <div class="col-md-6">
-                                            <div class="inner_form_new-sm ">
-                                              <label class="controlform-sm">
-                                                Assigned To User
-                                              </label>
-                                              <div class="form-bx-sm">
-                                                <label>
-                                                  <input
-                                                    type="text"
-                                                    class=""
-                                                    disabled
-                                                    value={
-                                                      items?.assignedToName
-                                                        ? items?.assignedToName
-                                                        : "N/A"
-                                                    }
-                                                  />
-                                                </label>
-                                              </div>
-                                            </div>
-                                          </div> */}
                                   </div>
                                 </div>
                               </>
@@ -4544,33 +4365,15 @@ const ReturnExportDashboardEditDetails = ({
                   >
                     <i className="bi bi-caret-down-fill"></i>
                   </span>
-                  {applicationDetail?.parentApplicationID !== 0 &&
-                  roleID == 4 ? (
-                    <button
-                      type="button"
-                      className="btn btn-light mx-auto copybtn"
-                      onClick={() =>
-                        getLastComment(applicationDetail?.parentApplicationID)
-                      }
-                    >
-                      Copy Last Response
-                    </button>
-                  ) : (
-                    ""
-                  )}
                 </h5>
 
                 <div className={recordTab ? "customtab" : "d-none"}>
                   {Actiondata?.map((cur) => {
-                    const firstItem = cur?.applicationActivityData?.[0]; // Accessing the first element directly
-
+                    const firstItem = cur?.applicationActivityData?.[0];
                     if (cur?.assignedToRoleID === 4 && firstItem) {
-                      // Check if firstItem exists
                       return (
                         <div className="bakgroundaction">
                           <div key={firstItem.actionID}>
-                            {" "}
-                            {/* Remember to add a unique key */}
                             <div className="row">
                               <div className="col-md-6">
                                 <div className="inner_form_new">
@@ -4584,7 +4387,6 @@ const ReturnExportDashboardEditDetails = ({
                                         type="text"
                                         className=""
                                         disabled
-                                        // value={firstItem?.actionStatusName}
                                         value={
                                           firstItem?.actionStatusName ==
                                             "Approved" ||
@@ -4614,7 +4416,6 @@ const ReturnExportDashboardEditDetails = ({
                                   </label>
                                   <div className="form-bx-sm">
                                     <label>
-                                      {" "}
                                       <input
                                         type="text"
                                         className=""
@@ -4662,7 +4463,6 @@ const ReturnExportDashboardEditDetails = ({
                               <label className="controlform">Action Note</label>
                               <div className="form-bx">
                                 <label>
-                                  {" "}
                                   <textarea
                                     type="text"
                                     className=""
@@ -4705,138 +4505,6 @@ const ReturnExportDashboardEditDetails = ({
                       if (cur?.assignedToRoleID == 4) {
                         return (
                           <>
-                            {/* <div className="bakgroundaction">
-                                          <div className="row">
-                                            <div className="col-md-6">
-                                              <div className="inner_form_new ">
-                                                <label className="controlform">
-                                                  Action Type
-                                                </label>
-                                                <div className="form-bx">
-                                                  <label>
-                                                    <input
-                                                      type="text"
-                                                      className=""
-                                                      disabled
-                                                      value={
-                                                        item?.actionStatusName ==
-                                                          "Approved" ||
-                                                        item?.actionStatusName ==
-                                                          "Reject" ||
-                                                        item?.actionStatusName ==
-                                                          "Cancelled"
-                                                          ? "Assigned"
-                                                          : item?.actionStatusName
-                                                      }
-                                                    />
-                                                  </label>
-                                                </div>
-                                              </div>
-                                            </div>
-
-                                            <div className="col-md-3">
-                                              <div className="inner_form_new-sm ">
-                                                <label className="controlform-sm">
-                                                  User{" "}
-                                                  {item?.actionRoleName !=
-                                                  null ? (
-                                                    <i
-                                                      className="bi bi-info-circle icons-info"
-                                                      title={`Role : ${
-                                                        item?.actionRoleName
-                                                          ? item?.actionRoleName
-                                                          : "N/A"
-                                                      }`}
-                                                    ></i>
-                                                  ) : (
-                                                    ""
-                                                  )}
-                                                </label>
-                                                <div className="form-bx-sm">
-                                                  <label>
-                                                    <input
-                                                      type="text"
-                                                      className=""
-                                                      disabled
-                                                      value={
-                                                        item?.actionUserName
-                                                          ? item?.actionUserName
-                                                          : "N/A"
-                                                      }
-                                                    />
-                                                  </label>
-                                                </div>
-                                              </div>
-                                            </div>
-
-                                            <div className="col-md-3">
-                                              <div className="inner_form_new-sm">
-                                                <label className="controlform-sm">
-                                                  {item?.actionStatusName} Date
-                                                </label>
-                                                <div className="form-bx-sm">
-                                                  <label>
-                                                    <input
-                                                      type="text"
-                                                      className=""
-                                                      disabled
-                                                      value={
-                                                        item?.createdDate
-                                                          ? moment(
-                                                              item?.createdDate
-                                                            ).format(
-                                                              "DD/MMM/yyyy"
-                                                            )
-                                                          : "N/A"
-                                                      }
-                                                    />
-                                                  </label>
-                                                </div>
-                                              </div>
-                                            </div>
-                                          </div>
-
-                                          <div className="inner_form_new ">
-                                            <label className="controlform">
-                                              Action Note
-                                            </label>
-                                            <div className="form-bx">
-                                              <label>
-                                                <textarea
-                                                  type="text"
-                                                  className=""
-                                                  disabled
-                                                  value={
-                                                    item?.actionNotes
-                                                      ? item?.actionNotes
-                                                      : "N/A"
-                                                  }
-                                                />
-                                              </label>
-                                            </div>
-                                          </div>
-
-                                          <div className="inner_form_new ">
-                                            <label className="controlform">
-                                              Action Comment
-                                            </label>
-                                            <div className="form-bx">
-                                              <label>
-                                                <textarea
-                                                  type="text"
-                                                  className=""
-                                                  disabled
-                                                  value={
-                                                    item?.actionComment
-                                                      ? item?.actionComment
-                                                      : "N/A"
-                                                  }
-                                                />
-                                              </label>
-                                            </div>
-                                          </div>
-                                        </div>  */}
-
                             <div className="inner_form_new ">
                               <label className="controlform">Notes</label>
                               <div className="form-bx">
@@ -4940,51 +4608,9 @@ const ReturnExportDashboardEditDetails = ({
                       checked={checkSupervisor}
                     />
                   </div>
-                  {/* end form-bx  */}
 
                   {checkSupervisor == true && roleID == 4 ? (
                     <>
-                      {/* <div className={roleID == 4 ? "inner_form_new " : "d-none"}>
-                    <label className="controlform">Analyst</label> 
-                    <div className="form-bx">
-                      <label>
-                        <select
-                          ref={assignedToRef}
-                          name="assignedTo"
-                          onChange={supervisorHangechangeBankuser}
-                          className={
-                            errors.assignedTo && !SupervisorNameID
-                              ? "error"
-                              : ""
-                          }
-                        >
-                          <option value="">Select to Analyst</option>
-                          {Supervisors?.map((item, index) => {
-                            return (
-                              <option
-                                key={index}
-                                value={JSON?.stringify(item)}
-                                selected={
-                                  item.userID == applicationDetail?.assignedTo
-                                }
-                              >
-                                {item.name}
-                              </option>
-                            );
-                          })}
-                        </select>
-                        <span className="sspan"></span>
-                        {errors.assignedTo && !SupervisorNameID ? (
-                          <small className="errormsg">
-                            Analyst is required
-                          </small>
-                        ) : (
-                          ""
-                        )}
-                      </label>
-                    </div>
-                  </div>  */}
-
                       <div className="row">
                         <div className="col-md-6">
                           <div className="inner_form_new ">
@@ -4997,11 +4623,6 @@ const ReturnExportDashboardEditDetails = ({
                                   onChange={(e) => {
                                     supervisorHangechangeRoleRecordofficer(e);
                                   }}
-                                  // className={
-                                  //   errors.assignedTo && !SupervisorRoleId
-                                  //     ? "error"
-                                  //     : ""
-                                  // }
                                 >
                                   <option value="">Select Role</option>
                                   {userRoleRecordofficer?.map((item, index) => {
@@ -5159,20 +4780,6 @@ const ReturnExportDashboardEditDetails = ({
                   >
                     <i className="bi bi-caret-down-fill"></i>
                   </span>
-                  {applicationDetail?.parentApplicationID !== 0 &&
-                  roleID == 5 ? (
-                    <button
-                      type="button"
-                      className="btn btn-light mx-auto copybtn"
-                      onClick={() =>
-                        getLastComment(applicationDetail?.parentApplicationID)
-                      }
-                    >
-                      Copy Last Response
-                    </button>
-                  ) : (
-                    ""
-                  )}
                 </h5>
 
                 <div className={analystTab ? "customtab" : "d-none"}>
@@ -5740,114 +5347,6 @@ const ReturnExportDashboardEditDetails = ({
                             ) : (
                               ""
                             )}
-                          </div>
-                        </div>
-                      ) : (
-                        ""
-                      )}
-
-                      {nextlevelvalue == 35 ? (
-                        <div className="row mt-2">
-                          <div className="col-md-6">
-                            <div className="inner_form_new align-items-center">
-                              <label className="controlform">
-                                Other Department
-                              </label>
-                              <div className="form-bx">
-                                <label>
-                                  <select
-                                    ref={optionOtherDepartmentRef}
-                                    name="OtherDepartment"
-                                    onChange={(e) => {
-                                      setOtherDepartment(e.target.value);
-                                      OtherDepartmentRole();
-                                      setOtherDepartmentRole("");
-                                      setOtherDepartmentRoles([]);
-                                      setOtherDepartmentUser("");
-                                      setOtherDepartmentUsers([]);
-                                    }}
-                                    className={
-                                      errors.assignedTo && !SupervisorRoleId
-                                        ? "error"
-                                        : ""
-                                    }
-                                  >
-                                    <option value="">
-                                      Select Other Department
-                                    </option>
-                                    <option value="3">Import</option>
-                                    <option value="4">
-                                      Foreign Investments
-                                    </option>
-                                    <option value="5">Inspectorate</option>
-                                  </select>
-                                  <span className="sspan"></span>
-                                  {errors.assignedTo && !SupervisorRoleId ? (
-                                    <small className="errormsg">
-                                      Senior Analyst is required{" "}
-                                    </small>
-                                  ) : (
-                                    ""
-                                  )}
-                                </label>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="col-md-3">
-                            <div className="inner_form_new-sm align-items-center">
-                              <label className="controlform-sm">Role</label>
-                              <div className="form-bx-sm">
-                                <label>
-                                  <select
-                                    onChange={(e) => {
-                                      setOtherDepartmentRole(e.target.value);
-                                      OtherDepartmentUserByRole(e.target.value);
-                                      setOtherDepartmentUser("");
-                                      setOtherDepartmentUsers([]);
-                                    }}
-                                  >
-                                    <option value="">Select Role</option>
-                                    {otherDepartmentRoles?.map(
-                                      (item, index) => {
-                                        return (
-                                          <option key={index} value={item.id}>
-                                            {item.name}
-                                          </option>
-                                        );
-                                      }
-                                    )}
-                                  </select>
-                                </label>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="col-md-3">
-                            <div className="inner_form_new-sm align-items-center">
-                              <label className="controlform-sm">User</label>
-                              <div className="form-bx-sm">
-                                <label>
-                                  <select
-                                    onChange={(e) =>
-                                      setOtherDepartmentUser(e.target.value)
-                                    }
-                                  >
-                                    <option value="">Select User</option>
-                                    {otherDepartmentUsers?.map(
-                                      (item, index) => {
-                                        return (
-                                          <option
-                                            key={index}
-                                            value={item.userID}
-                                          >
-                                            {item.name}
-                                          </option>
-                                        );
-                                      }
-                                    )}
-                                  </select>
-                                </label>
-                              </div>
-                            </div>
                           </div>
                         </div>
                       ) : (
@@ -7039,20 +6538,6 @@ const ReturnExportDashboardEditDetails = ({
                   >
                     <i className="bi bi-caret-down-fill"></i>
                   </span>
-                  {applicationDetail?.parentApplicationID !== 0 &&
-                  roleID == 6 ? (
-                    <button
-                      type="button"
-                      className="btn btn-light mx-auto copybtn"
-                      onClick={() =>
-                        getLastComment(applicationDetail?.parentApplicationID)
-                      }
-                    >
-                      Copy Last Response
-                    </button>
-                  ) : (
-                    ""
-                  )}
                 </h5>
 
                 <div className={sranalystTab ? "customtab" : "d-none"}>
@@ -7582,115 +7067,7 @@ const ReturnExportDashboardEditDetails = ({
 
                           {/* end form-bx  */}
                         </div>
-                      </div>
-
-                      {nextlevelvalue == 35 ? (
-                        <div className="row mt-2">
-                          <div className="col-md-6">
-                            <div className="inner_form_new align-items-center">
-                              <label className="controlform">
-                                Other Department
-                              </label>
-                              <div className="form-bx">
-                                <label>
-                                  <select
-                                    ref={optionOtherDepartmentRef}
-                                    name="OtherDepartment"
-                                    onChange={(e) => {
-                                      setOtherDepartment(e.target.value);
-                                      OtherDepartmentRole();
-                                      setOtherDepartmentRole("");
-                                      setOtherDepartmentRoles([]);
-                                      setOtherDepartmentUser("");
-                                      setOtherDepartmentUsers([]);
-                                    }}
-                                    className={
-                                      errors.assignedTo && !SupervisorRoleId
-                                        ? "error"
-                                        : ""
-                                    }
-                                  >
-                                    <option value="">
-                                      Select Other Department
-                                    </option>
-                                    <option value="3">Import</option>
-                                    <option value="4">
-                                      Foreign Investments
-                                    </option>
-                                    <option value="5">Inspectorate</option>
-                                  </select>
-                                  <span className="sspan"></span>
-                                  {errors.assignedTo && !SupervisorRoleId ? (
-                                    <small className="errormsg">
-                                      Senior Analyst is required{" "}
-                                    </small>
-                                  ) : (
-                                    ""
-                                  )}
-                                </label>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="col-md-3">
-                            <div className="inner_form_new-sm align-items-center">
-                              <label className="controlform-sm">Role</label>
-                              <div className="form-bx-sm">
-                                <label>
-                                  <select
-                                    onChange={(e) => {
-                                      setOtherDepartmentRole(e.target.value);
-                                      OtherDepartmentUserByRole(e.target.value);
-                                      setOtherDepartmentUser("");
-                                      setOtherDepartmentUsers([]);
-                                    }}
-                                  >
-                                    <option value="">Select Role</option>
-                                    {otherDepartmentRoles?.map(
-                                      (item, index) => {
-                                        return (
-                                          <option key={index} value={item.id}>
-                                            {item.name}
-                                          </option>
-                                        );
-                                      }
-                                    )}
-                                  </select>
-                                </label>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="col-md-3">
-                            <div className="inner_form_new-sm align-items-center">
-                              <label className="controlform-sm">User</label>
-                              <div className="form-bx-sm">
-                                <label>
-                                  <select
-                                    onChange={(e) =>
-                                      setOtherDepartmentUser(e.target.value)
-                                    }
-                                  >
-                                    <option value="">Select User</option>
-                                    {otherDepartmentUsers?.map(
-                                      (item, index) => {
-                                        return (
-                                          <option
-                                            key={index}
-                                            value={item.userID}
-                                          >
-                                            {item.name}
-                                          </option>
-                                        );
-                                      }
-                                    )}
-                                  </select>
-                                </label>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      ) : (
-                        ""
-                      )}
+                      </div>                      
 
                       {nextlevelvalue != "35" &&
                         attachmentData?.map((items, index) => {
@@ -8981,20 +8358,6 @@ const ReturnExportDashboardEditDetails = ({
                   >
                     <i className="bi bi-caret-down-fill"></i>
                   </span>
-                  {applicationDetail?.parentApplicationID !== 0 &&
-                  roleID == 7 ? (
-                    <button
-                      type="button"
-                      className="btn btn-light mx-auto copybtn"
-                      onClick={() =>
-                        getLastComment(applicationDetail?.parentApplicationID)
-                      }
-                    >
-                      Copy Last Response
-                    </button>
-                  ) : (
-                    ""
-                  )}
                 </h5>
 
                 <div className={principalanalystTab ? "customtab" : "d-none"}>
@@ -9514,124 +8877,13 @@ const ReturnExportDashboardEditDetails = ({
                                     </label>
                                   </div>
                                 </div>
-                                {/* end form-bx  */}
                               </>
                             ) : (
                               ""
                             )}
                           </div>
-
-                          {/* end form-bx  */}
                         </div>
                       </div>
-
-                      {nextlevelvalue == 35 ? (
-                        <div className="row mt-2">
-                          <div className="col-md-6">
-                            <div className="inner_form_new align-items-center">
-                              <label className="controlform">
-                                Other Department
-                              </label>
-                              <div className="form-bx">
-                                <label>
-                                  <select
-                                    ref={optionOtherDepartmentRef}
-                                    name="OtherDepartment"
-                                    onChange={(e) => {
-                                      setOtherDepartment(e.target.value);
-                                      OtherDepartmentRole();
-                                      setOtherDepartmentRole("");
-                                      setOtherDepartmentRoles([]);
-                                      setOtherDepartmentUser("");
-                                      setOtherDepartmentUsers([]);
-                                    }}
-                                    className={
-                                      errors.assignedTo && !SupervisorRoleId
-                                        ? "error"
-                                        : ""
-                                    }
-                                  >
-                                    <option value="">
-                                      Select Other Department
-                                    </option>
-                                    <option value="3">Import</option>
-                                    <option value="4">
-                                      Foreign Investments
-                                    </option>
-                                    <option value="5">Inspectorate</option>
-                                  </select>
-                                  <span className="sspan"></span>
-                                  {errors.assignedTo && !SupervisorRoleId ? (
-                                    <small className="errormsg">
-                                      Senior Analyst is required{" "}
-                                    </small>
-                                  ) : (
-                                    ""
-                                  )}
-                                </label>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="col-md-3">
-                            <div className="inner_form_new-sm align-items-center">
-                              <label className="controlform-sm">Role</label>
-                              <div className="form-bx-sm">
-                                <label>
-                                  <select
-                                    onChange={(e) => {
-                                      setOtherDepartmentRole(e.target.value);
-                                      OtherDepartmentUserByRole(e.target.value);
-                                      setOtherDepartmentUser("");
-                                      setOtherDepartmentUsers([]);
-                                    }}
-                                  >
-                                    <option value="">Select Role</option>
-                                    {otherDepartmentRoles?.map(
-                                      (item, index) => {
-                                        return (
-                                          <option key={index} value={item.id}>
-                                            {item.name}
-                                          </option>
-                                        );
-                                      }
-                                    )}
-                                  </select>
-                                </label>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="col-md-3">
-                            <div className="inner_form_new-sm align-items-center">
-                              <label className="controlform-sm">User</label>
-                              <div className="form-bx-sm">
-                                <label>
-                                  <select
-                                    onChange={(e) =>
-                                      setOtherDepartmentUser(e.target.value)
-                                    }
-                                  >
-                                    <option value="">Select User</option>
-                                    {otherDepartmentUsers?.map(
-                                      (item, index) => {
-                                        return (
-                                          <option
-                                            key={index}
-                                            value={item.userID}
-                                          >
-                                            {item.name}
-                                          </option>
-                                        );
-                                      }
-                                    )}
-                                  </select>
-                                </label>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      ) : (
-                        ""
-                      )}
 
                       {nextlevelvalue != "35" &&
                         attachmentData?.map((items, index) => {
@@ -10895,20 +10147,6 @@ const ReturnExportDashboardEditDetails = ({
                   >
                     <i className="bi bi-caret-down-fill"></i>
                   </span>
-                  {applicationDetail?.parentApplicationID !== 0 &&
-                  roleID == 8 ? (
-                    <button
-                      type="button"
-                      className="btn btn-light mx-auto copybtn"
-                      onClick={() =>
-                        getLastComment(applicationDetail?.parentApplicationID)
-                      }
-                    >
-                      Copy Last Response
-                    </button>
-                  ) : (
-                    ""
-                  )}
                 </h5>
 
                 <div className={deputyTab ? "customtab" : "d-none"}>
@@ -11421,124 +10659,13 @@ const ReturnExportDashboardEditDetails = ({
                                     </label>
                                   </div>
                                 </div>
-                                {/* end form-bx  */}
                               </>
                             ) : (
                               ""
                             )}
                           </div>
-
-                          {/* end form-bx  */}
                         </div>
                       </div>
-
-                      {nextlevelvalue == 35 ? (
-                        <div className="row mt-2">
-                          <div className="col-md-6">
-                            <div className="inner_form_new align-items-center">
-                              <label className="controlform">
-                                Other Department
-                              </label>
-                              <div className="form-bx">
-                                <label>
-                                  <select
-                                    ref={optionOtherDepartmentRef}
-                                    name="OtherDepartment"
-                                    onChange={(e) => {
-                                      setOtherDepartment(e.target.value);
-                                      OtherDepartmentRole();
-                                      setOtherDepartmentRole("");
-                                      setOtherDepartmentRoles([]);
-                                      setOtherDepartmentUser("");
-                                      setOtherDepartmentUsers([]);
-                                    }}
-                                    className={
-                                      errors.assignedTo && !SupervisorRoleId
-                                        ? "error"
-                                        : ""
-                                    }
-                                  >
-                                    <option value="">
-                                      Select Other Department
-                                    </option>
-                                    <option value="3">Import</option>
-                                    <option value="4">
-                                      Foreign Investments
-                                    </option>
-                                    <option value="5">Inspectorate</option>
-                                  </select>
-                                  <span className="sspan"></span>
-                                  {errors.assignedTo && !SupervisorRoleId ? (
-                                    <small className="errormsg">
-                                      Senior Analyst is required{" "}
-                                    </small>
-                                  ) : (
-                                    ""
-                                  )}
-                                </label>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="col-md-3">
-                            <div className="inner_form_new-sm align-items-center">
-                              <label className="controlform-sm">Role</label>
-                              <div className="form-bx-sm">
-                                <label>
-                                  <select
-                                    onChange={(e) => {
-                                      setOtherDepartmentRole(e.target.value);
-                                      OtherDepartmentUserByRole(e.target.value);
-                                      setOtherDepartmentUser("");
-                                      setOtherDepartmentUsers([]);
-                                    }}
-                                  >
-                                    <option value="">Select Role</option>
-                                    {otherDepartmentRoles?.map(
-                                      (item, index) => {
-                                        return (
-                                          <option key={index} value={item.id}>
-                                            {item.name}
-                                          </option>
-                                        );
-                                      }
-                                    )}
-                                  </select>
-                                </label>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="col-md-3">
-                            <div className="inner_form_new-sm align-items-center">
-                              <label className="controlform-sm">User</label>
-                              <div className="form-bx-sm">
-                                <label>
-                                  <select
-                                    onChange={(e) =>
-                                      setOtherDepartmentUser(e.target.value)
-                                    }
-                                  >
-                                    <option value="">Select User</option>
-                                    {otherDepartmentUsers?.map(
-                                      (item, index) => {
-                                        return (
-                                          <option
-                                            key={index}
-                                            value={item.userID}
-                                          >
-                                            {item.name}
-                                          </option>
-                                        );
-                                      }
-                                    )}
-                                  </select>
-                                </label>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      ) : (
-                        ""
-                      )}
 
                       {nextlevelvalue != "35" &&
                         attachmentData?.map((items, index) => {
@@ -12791,20 +11918,6 @@ const ReturnExportDashboardEditDetails = ({
                   >
                     <i className="bi bi-caret-down-fill"></i>
                   </span>
-                  {applicationDetail?.parentApplicationID !== 0 &&
-                  roleID == 9 ? (
-                    <button
-                      type="button"
-                      className="btn btn-light mx-auto copybtn"
-                      onClick={() =>
-                        getLastComment(applicationDetail?.parentApplicationID)
-                      }
-                    >
-                      Copy Last Response
-                    </button>
-                  ) : (
-                    ""
-                  )}
                 </h5>
 
                 <div className={director ? "customtab mb-3" : "d-none"}>
@@ -14781,7 +13894,7 @@ const ReturnExportDashboardEditDetails = ({
               </button>
 
               <div>
-                {(roleID > 5 &&
+                {/* {(roleID > 5 &&
                   recomdAnalyst == "121" &&
                   applicationstaus != "25") ||
                 (roleID == 3 &&
@@ -14807,30 +13920,8 @@ const ReturnExportDashboardEditDetails = ({
                   </>
                 ) : (
                   ""
-                )}
-                {nextlevelvalue == 35 ? (
-                  <button
-                    className="login"
-                    type="button"
-                    disabled={
-                      !otherDepartmentRole ||
-                      !otherDepartmentUser ||
-                      !asignnextLeveldata.Comment ||
-                      !asignnextLeveldata.Notes ||
-                      OtherDepartmentLoader
-                        ? true
-                        : false
-                    }
-                    onClick={() => SubmitOtherDepartment()}
-                  >
-                    {OtherDepartmentLoader ? (
-                      <span className="loaderwait">Please Wait...</span>
-                    ) : (
-                      <span>Submit</span>
-                    )}
-                  </button>
-                ) : (
-                  <button
+                )} */}
+                <button
                     type="button"
                     onClick={(e) => {
                       HandleSubmit(e);
@@ -14858,23 +13949,19 @@ const ReturnExportDashboardEditDetails = ({
                         : false
                     }
                   >
-                    {(roleID > 5 &&
+                    {(roleID >= 5 &&
                       nextlevelvalue != "15" &&
                       nextlevelvalue != "20" &&
                       nextlevelvalue != "35" &&
-                      recomdAnalyst == "121") ||
-                    (roleID == 3 &&
-                      checkSupervisor == false &&
-                      nextlevelvalue == "")
+                      recomdAnalyst == "121")
                       ? "Submit & Close"
-                      : "Submit"}{" "}
+                      : "Submit"}
                     {SubmitBtnLoader == true ? (
                       <div className="smallloader"></div>
                     ) : (
                       ""
                     )}
                   </button>
-                )}
               </div>
             </div>
 
@@ -15749,7 +14836,6 @@ const ReturnExportDashboardEditDetails = ({
                                 : applicationstaus == "25"
                                 ? "Cancelled"
                                 : ""}
-                              {/* {applicationDetail?.statusName} */}
                             </td>
                           </tr>
                         </table>
@@ -16191,7 +15277,6 @@ const ReturnExportDashboardEditDetails = ({
                                 : applicationstaus == "25"
                                 ? "Cancelled"
                                 : ""}
-                              {/* {applicationDetail?.statusName} */}
                             </td>
                           </tr>
                           <tr
@@ -16828,17 +15913,6 @@ const ReturnExportDashboardEditDetails = ({
               <UpdatePopupMessage
                 heading={heading}
                 para={para}
-                applicationNumber={applicationNumber}
-                closePopupHandle={closePopupHandle}
-              ></UpdatePopupMessage>
-            ) : (
-              ""
-            )}
-
-            {OtherDepartmentPopup == true ? (
-              <UpdatePopupMessage
-                heading={heading1}
-                para={para1}
                 applicationNumber={applicationNumber}
                 closePopupHandle={closePopupHandle}
               ></UpdatePopupMessage>

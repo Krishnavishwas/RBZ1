@@ -2740,7 +2740,7 @@ const ExportDashboardRenewEditDetails = ({
               {menuname === "Exports" && submenuname === "Pending Returns" ? (
                 <>
                   <div className="inner_form_new ">
-                    <label className="controlform">Pending Returns Notes</label>
+                    <label className="controlform">Returns Notes</label>
                     <div className="form-bx">
                       <label>
                         <textarea
@@ -2749,7 +2749,7 @@ const ExportDashboardRenewEditDetails = ({
                           onChange={(e) => {
                             setPendingReturnNote(e.target.value);
                           }}
-                          placeholder="Pending Returns Notes"
+                          placeholder="Returns Notes"
                           value={PendingReturnNote}
                           disabled={roleID == 2 ? false : true}
                         />
@@ -2758,9 +2758,7 @@ const ExportDashboardRenewEditDetails = ({
                     </div>
                   </div>
                   <div className="inner_form_new ">
-                    <label className="controlform">
-                      Pending Returns Comments
-                    </label>
+                    <label className="controlform">Returns Comments</label>
                     <div className="form-bx">
                       <label>
                         <textarea
@@ -2769,7 +2767,7 @@ const ExportDashboardRenewEditDetails = ({
                           onChange={(e) => {
                             setPendingReturnComment(e.target.value);
                           }}
-                          placeholder="Pending Returns Comments"
+                          placeholder="Returns Comments"
                           value={PendingReturnComment}
                           disabled={roleID == 2 ? false : true}
                         />
@@ -2903,7 +2901,8 @@ const ExportDashboardRenewEditDetails = ({
                         !PendingReturnComment) ||
                       (menuname === "Exports" &&
                         submenuname === "Pending Returns" &&
-                        !PendingReturnNote) || !files.length
+                        !PendingReturnNote) ||
+                      !files.length
                         ? true
                         : false
                     }
@@ -2931,10 +2930,13 @@ const ExportDashboardRenewEditDetails = ({
               </div>
             </div>
 
-            {updatepopup == true ? (
+            {updatepopup == true &&
+            menuname === "Exports" &&
+            submenuname === "Pending Returns" ? (
               <UpdatePopupMessage
                 heading={heading}
                 para={para}
+                applicationNumber={applicationNumber}
                 closePopupHandle={closePopupHandle}
               ></UpdatePopupMessage>
             ) : (

@@ -35,7 +35,7 @@ const INSDashboardViewDetails = ({
   const [tabstatus6, settabstatus6] = useState(true);
   const [sharefiletab, setsharefiletab] = useState(false);
 
-  console.log("applicationDetail",applicationDetail)
+  console.log("applicationDetail", applicationDetail);
   return (
     <>
       {showdataLoader == true || !noDataComment?.length ? (
@@ -63,7 +63,14 @@ const INSDashboardViewDetails = ({
               <label className="controlform">User</label>
               <div className="form-bx">
                 <label>
-                  <input value={applicationDetail?.userName ? applicationDetail?.userName : "N/A"} disabled />
+                  <input
+                    value={
+                      applicationDetail?.userName
+                        ? applicationDetail?.userName
+                        : "N/A"
+                    }
+                    disabled
+                  />
                 </label>
               </div>
             </div>
@@ -104,25 +111,6 @@ const INSDashboardViewDetails = ({
             </div>
 
             <div className="inner_form_new ">
-              <label className="controlform">
-                Prior Exchange Control Authority Number(PECAN)
-              </label>
-              <div className="form-bx">
-                <label>
-                  <input
-                    disabled
-                    value={
-                      applicationDetail?.pecaNumber
-                        ? applicationDetail?.pecaNumber
-                        : "N/A"
-                    }
-                    className="text-uppercase"
-                  />
-                </label>
-              </div>
-            </div>
-
-            <div className="inner_form_new ">
               <label className="controlform">Type of Applicant</label>
               <div className="form-bx-radio mt-4">
                 {applicantTypes.map((item, index) => {
@@ -151,7 +139,11 @@ const INSDashboardViewDetails = ({
                   <div className="form-bx">
                     <label>
                       <input
-                        value={applicationDetail?.companyName ? applicationDetail?.companyName : "N/A"}
+                        value={
+                          applicationDetail?.companyName
+                            ? applicationDetail?.companyName
+                            : "N/A"
+                        }
                         className="text-uppercase"
                         disabled
                       />
@@ -164,7 +156,11 @@ const INSDashboardViewDetails = ({
                   <div className="form-bx">
                     <label>
                       <input
-                        value={applicationDetail?.tinNumber ? applicationDetail?.tinNumber : "N/A"}
+                        value={
+                          applicationDetail?.tinNumber
+                            ? applicationDetail?.tinNumber
+                            : "N/A"
+                        }
                         disabled
                         className="text-uppercase"
                       />
@@ -178,7 +174,11 @@ const INSDashboardViewDetails = ({
                   <div className="form-bx">
                     <label>
                       <input
-                        value={applicationDetail?.bpnCode ? applicationDetail?.bpnCode : "N/A"}
+                        value={
+                          applicationDetail?.bpnCode
+                            ? applicationDetail?.bpnCode
+                            : "N/A"
+                        }
                         className="text-uppercase"
                         disabled
                       />
@@ -195,7 +195,14 @@ const INSDashboardViewDetails = ({
                 <label className="controlform">Applicant</label>
                 <div className="form-bx">
                   <label>
-                    <input value={applicationDetail?.name ? applicationDetail?.name : "N/A"} disabled />
+                    <input
+                      value={
+                        applicationDetail?.name
+                          ? applicationDetail?.name
+                          : "N/A"
+                      }
+                      disabled
+                    />
                   </label>
                 </div>
               </div>
@@ -207,137 +214,191 @@ const INSDashboardViewDetails = ({
               <label className="controlform">Type of Application</label>
               <div className="form-bx">
                 <label>
-                  <input value={applicationDetail?.applicationType ? applicationDetail?.applicationType : "N/A"} disabled />
+                  <input
+                    value={
+                      applicationDetail?.applicationType
+                        ? applicationDetail?.applicationType
+                        : "N/A"
+                    }
+                    disabled
+                  />
                 </label>
               </div>
             </div>
-            <div className="inner_form_new ">
+            <div className={applicationDetail?.applicationSubTypeName ? "inner_form_new " : "d-none"}>
               <label className="controlform">Exact Return Type</label>
               <div className="form-bx">
                 <label>
-                  <input value={applicationDetail?.applicationType ? applicationDetail?.applicationType : "N/A"} disabled />
+                  <input
+                    value={
+                      applicationDetail?.applicationSubTypeName
+                        ? applicationDetail?.applicationSubTypeName
+                        : "N/A"
+                    }
+                    disabled
+                  />
                 </label>
               </div>
             </div>
 
-            <div className={applicationDetail?.equipmentData?.length ? "inner_form_new " : "d-none"}>
+            <div
+              className={
+                applicationDetail?.equipmentData?.length
+                  ? "inner_form_new "
+                  : "d-none"
+              }
+            >
               <label className="controlform">Equipment</label>
               <div className="form-bx">
                 <label>
-                   {
-                applicationDetail?.equipmentData?.length ?  applicationDetail?.equipmentData.map((item)=>{
-                      return(
-                        <span className="listlable">{item.value}</span>
-                      )
-                    })
-                    : "N/A"
-                   }
+                  {applicationDetail?.equipmentData?.length
+                    ? applicationDetail?.equipmentData.map((item) => {
+                        return <span className="listlable">{item.value}</span>;
+                      })
+                    : "N/A"}
                 </label>
               </div>
             </div>
 
-            <div className={applicationDetail?.stationeryData?.length ? "inner_form_new " : "d-none"}>
+            <div
+              className={
+                applicationDetail?.stationeryData?.length
+                  ? "inner_form_new "
+                  : "d-none"
+              }
+            >
               <label className="controlform">Stationery</label>
               <div className="form-bx">
                 <label>
-                 
-                {
-                applicationDetail?.stationeryData?.length ?  applicationDetail?.stationeryData.map((item)=>{
-                      return(
-                        <span className="listlable">{item.value}</span>
-                      )
-                    })
-                    : "N/A"
-                   }
-
+                  {applicationDetail?.stationeryData?.length
+                    ? applicationDetail?.stationeryData.map((item) => {
+                        return <span className="listlable">{item.value}</span>;
+                      })
+                    : "N/A"}
                 </label>
               </div>
             </div>
 
-            <div  className={applicationDetail?.personnelData?.length ? "inner_form_new " : "d-none"}>
+            <div
+              className={
+                applicationDetail?.personnelData?.length
+                  ? "inner_form_new "
+                  : "d-none"
+              }
+            >
               <label className="controlform">Personnel</label>
               <div className="form-bx">
                 <label>
-                {
-                applicationDetail?.personnelData?.length ?  applicationDetail?.personnelData.map((item)=>{
-                      return(
-                        <span className="listlable">{item.value}</span>
-                      )
-                    })
-                    : "N/A"
-                   }
+                  {applicationDetail?.personnelData?.length
+                    ? applicationDetail?.personnelData.map((item) => {
+                        return <span className="listlable">{item.value}</span>;
+                      })
+                    : "N/A"}
                 </label>
               </div>
             </div>
 
-            <div className={applicationDetail?.systemsData?.length ? "inner_form_new " : "d-none"}>
+            <div
+              className={
+                applicationDetail?.systemsData?.length
+                  ? "inner_form_new "
+                  : "d-none"
+              }
+            >
               <label className="controlform">Systems</label>
               <div className="form-bx">
                 <label>
-                {
-                applicationDetail?.systemsData?.length ?  applicationDetail?.systemsData.map((item)=>{
-                      return(
-                        <span className="listlable">{item.value}</span>
-                      )
-                    })
-                    : "N/A"
-                   }
+                  {applicationDetail?.systemsData?.length
+                    ? applicationDetail?.systemsData.map((item) => {
+                        return <span className="listlable">{item.value}</span>;
+                      })
+                    : "N/A"}
                 </label>
               </div>
             </div>
 
-            <div className={applicationDetail?.structure_OrganogramData?.length ? "inner_form_new " : "d-none"}>
+            <div
+              className={
+                applicationDetail?.structure_OrganogramData?.length
+                  ? "inner_form_new "
+                  : "d-none"
+              }
+            >
               <label className="controlform">Structure/Organogram</label>
               <div className="form-bx">
                 <label>
-                {
-                applicationDetail?.structure_OrganogramData?.length ?  applicationDetail?.structure_OrganogramData.map((item)=>{
-                      return(
-                        <span className="listlable">{item.value}</span>
+                  {applicationDetail?.structure_OrganogramData?.length
+                    ? applicationDetail?.structure_OrganogramData.map(
+                        (item) => {
+                          return (
+                            <span className="listlable">{item.value}</span>
+                          );
+                        }
                       )
-                    })
-                    : "N/A"
-                   }
+                    : "N/A"}
                 </label>
               </div>
             </div>
 
-            <div className={applicationDetail?.anti_Money_laundering_CombatingData?.length ? "inner_form_new " : "d-none"}>
-              <label className="controlform">Anti-Money laundering and Combating the Financing of Terrorism program and procedures</label>
+            <div
+              className={
+                applicationDetail?.anti_Money_laundering_CombatingData?.length
+                  ? "inner_form_new "
+                  : "d-none"
+              }
+            >
+              <label className="controlform">
+                Anti-Money laundering and Combating the Financing of Terrorism
+                program and procedures
+              </label>
               <div className="form-bx">
                 <label>
-                {
-                applicationDetail?.anti_Money_laundering_CombatingData?.length ?  applicationDetail?.anti_Money_laundering_CombatingData.map((item)=>{
-                      return(
-                        <span className="listlable">{item.value}</span>
+                  {applicationDetail?.anti_Money_laundering_CombatingData
+                    ?.length
+                    ? applicationDetail?.anti_Money_laundering_CombatingData.map(
+                        (item) => {
+                          return (
+                            <span className="listlable">{item.value}</span>
+                          );
+                        }
                       )
-                    })
-                    : "N/A"
-                   }
+                    : "N/A"}
                 </label>
               </div>
             </div>
-
 
             <div className="inner_form_new ">
-              <label className="controlform">Department Applicantion Belong To</label>
+              <label className="controlform">
+                Department Applicantion Belong To
+              </label>
               <div className="form-bx">
                 <label>
-                  <input value={applicationDetail?.applicationType ? applicationDetail?.applicationType : "N/A"} disabled />
+                  <input
+                    value="Bank/ADLA"
+                    disabled
+                  />
                 </label>
+                <small className="informgs" style={{position:"absolute", bottom:"-10px"}}>This information need to submit only when government agencies are submitting the application.</small>
               </div>
             </div>
 
             <div className="inner_form_new ">
-              <label className="controlform">Application Reference Number</label>
+              <label className="controlform">
+              Applicant Reference Number
+              </label>
               <div className="form-bx">
                 <label>
-                  <input value={applicationDetail?.applicationType ? applicationDetail?.applicationType : "N/A"} disabled />
+                  <input
+                    value={
+                      applicationDetail?.applicantReferenceNumber
+                        ? applicationDetail?.applicantReferenceNumber
+                        : "N/A"
+                    }
+                    disabled
+                  />
                 </label>
               </div>
-            </div> 
-
-            
+            </div>
 
             <div className="inner_form_new ">
               <label className="controlform">Beneficiary Name</label>
@@ -377,7 +438,14 @@ const INSDashboardViewDetails = ({
                   <label className="controlform">Currency</label>
                   <div className="form-bx">
                     <label>
-                      <input value={applicationDetail?.currencyCode ? applicationDetail?.currencyCode : "N/A"} disabled />
+                      <input
+                        value={
+                          applicationDetail?.currencyCode
+                            ? applicationDetail?.currencyCode
+                            : "N/A"
+                        }
+                        disabled
+                      />
                     </label>
                   </div>
                 </div>
@@ -388,7 +456,14 @@ const INSDashboardViewDetails = ({
                   <label className="controlform-sm">Amount</label>
                   <div className="form-bx-sm">
                     <label>
-                      <input value={applicationDetail?.amount ? applicationDetail?.amount : "N/A"} disabled />
+                      <input
+                        value={
+                          applicationDetail?.amount
+                            ? applicationDetail?.amount
+                            : "N/A"
+                        }
+                        disabled
+                      />
                     </label>
                   </div>
                 </div>
@@ -399,7 +474,14 @@ const INSDashboardViewDetails = ({
                   <label className="controlform-sm">Rate</label>
                   <div className="form-bx-sm">
                     <label>
-                      <input value={applicationDetail?.rate ? applicationDetail?.rate : "N/A"} disabled />
+                      <input
+                        value={
+                          applicationDetail?.rate
+                            ? applicationDetail?.rate
+                            : "N/A"
+                        }
+                        disabled
+                      />
                     </label>
                   </div>
                 </div>
@@ -410,22 +492,36 @@ const INSDashboardViewDetails = ({
               <label className="controlform">USD Equivalent</label>
               <div className="form-bx">
                 <label>
-                  <input value={applicationDetail?.usdEquivalent ? applicationDetail?.usdEquivalent : "N/A"} disabled />
+                  <input
+                    value={
+                      applicationDetail?.usdEquivalent
+                        ? applicationDetail?.usdEquivalent
+                        : "N/A"
+                    }
+                    disabled
+                  />
                   <span className="sspan"></span>
                 </label>
               </div>
             </div>
 
-            <div className="inner_form_new ">
+            {/* <div className="inner_form_new ">
               <label className="controlform">Sector</label>
               <div className="form-bx">
                 <label>
-                  <input value={applicationDetail?.sectorName ? applicationDetail?.sectorName : "N/A"} disabled />
+                  <input
+                    value={
+                      applicationDetail?.sectorName
+                        ? applicationDetail?.sectorName
+                        : "N/A"
+                    }
+                    disabled
+                  />
                 </label>
               </div>
-            </div>
+            </div> */}
 
-            <div className="inner_form_new">
+            {/* <div className="inner_form_new">
               <label className="controlform">Subsector</label>
               <div className="form-bx">
                 <label>
@@ -440,14 +536,18 @@ const INSDashboardViewDetails = ({
                   <span className="sspan"></span>
                 </label>
               </div>
-            </div>
+            </div> */}
 
             <div className="inner_form_new ">
               <label className="controlform">Applicant Comments</label>
               <div className="form-bx">
                 <label>
                   <textarea
-                    value={applicationDetail?.applicantComment ? applicationDetail?.applicantComment : "N/A"}
+                    value={
+                      applicationDetail?.applicantComment
+                        ? applicationDetail?.applicantComment
+                        : "N/A"
+                    }
                     disabled
                   />
                 </label>
@@ -455,49 +555,49 @@ const INSDashboardViewDetails = ({
             </div>
 
             <div
-                class={
-                  applicationDetail?.applicationStatus == 0 ? "d-none" : "row"
-                }
-              >
-                <div class="col-md-6">
-                  <div class="inner_form_new ">
-                    <label class="controlform">Assigned To Role</label>
-                    <div class="form-bx">
-                      <label>
-                        <input
-                          type="text"
-                          class=""
-                          disabled
-                          value={
-                            applicationDetail?.assignedToRoleName
-                              ? applicationDetail?.assignedToRoleName
-                              : "N/A"
-                          }
-                        />
-                      </label>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-md-6">
-                  <div class="inner_form_new-sm ">
-                    <label class="controlform-sm">Assigned To User</label>
-                    <div class="form-bx-sm">
-                      <label>
-                        <input
-                          type="text"
-                          class=""
-                          disabled
-                          value={
-                            applicationDetail?.assignedToName
-                              ? applicationDetail?.assignedToName
-                              : "N/A"
-                          }
-                        />
-                      </label>
-                    </div>
+              class={
+                applicationDetail?.applicationStatus == 0 ? "d-none" : "row"
+              }
+            >
+              <div class="col-md-6">
+                <div class="inner_form_new ">
+                  <label class="controlform">Assigned To Role</label>
+                  <div class="form-bx">
+                    <label>
+                      <input
+                        type="text"
+                        class=""
+                        disabled
+                        value={
+                          applicationDetail?.assignedToRoleName
+                            ? applicationDetail?.assignedToRoleName
+                            : "N/A"
+                        }
+                      />
+                    </label>
                   </div>
                 </div>
               </div>
+              <div class="col-md-6">
+                <div class="inner_form_new-sm ">
+                  <label class="controlform-sm">Assigned To User</label>
+                  <div class="form-bx-sm">
+                    <label>
+                      <input
+                        type="text"
+                        class=""
+                        disabled
+                        value={
+                          applicationDetail?.assignedToName
+                            ? applicationDetail?.assignedToName
+                            : "N/A"
+                        }
+                      />
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
 
             <h5 className="section_top_subheading">Attachments</h5>
             {(applicationDetail?.fileName || applicationDetail?.filePath) &&
@@ -775,7 +875,13 @@ const INSDashboardViewDetails = ({
                                           </div>
                                         </div>
 
-                                        <div className={items?.actionNotes ? "inner_form_new " : "d-none"}>
+                                        <div
+                                          className={
+                                            items?.actionNotes
+                                              ? "inner_form_new "
+                                              : "d-none"
+                                          }
+                                        >
                                           <label className="controlform">
                                             Action Note
                                           </label>
@@ -795,7 +901,13 @@ const INSDashboardViewDetails = ({
                                           </div>
                                         </div>
 
-                                        <div className={items?.actionComment ? "inner_form_new " : "d-none"}>
+                                        <div
+                                          className={
+                                            items?.actionComment
+                                              ? "inner_form_new "
+                                              : "d-none"
+                                          }
+                                        >
                                           <label className="controlform">
                                             Action Comment
                                           </label>
@@ -1486,39 +1598,38 @@ const INSDashboardViewDetails = ({
                                         <label className="controlform">
                                           Attachments
                                         </label>
-                                        <div>{items?.filesData?.length ? (
-                                          items?.filesData?.map(
-                                            (items, index) => {
-                                              return (
-                                               
-                                                <div
-                                                  className="attachemt_form-bx mt-1"
-                                                  key={items.id}
-                                                >
-                                                  <label>
-                                                    {items?.fileName
-                                                      ? items?.fileName
-                                                      : `FileUpload ${index}`}
-                                                  </label>
-                                                  <span className="filename">
-                                                    <Link
-                                                      to={items?.filePath}
-                                                      target="_blank"
-                                                      className="viewbtn"
-                                                    >
-                                                      View File
-                                                    </Link>
-                                                  </span>
-                                                </div>
-                                                
-                                              );
-                                            }
-                                          )
-                                        ) : (
-                                          <label className="notfound">
-                                            File Not Found
-                                          </label>
-                                        )}
+                                        <div>
+                                          {items?.filesData?.length ? (
+                                            items?.filesData?.map(
+                                              (items, index) => {
+                                                return (
+                                                  <div
+                                                    className="attachemt_form-bx mt-1"
+                                                    key={items.id}
+                                                  >
+                                                    <label>
+                                                      {items?.fileName
+                                                        ? items?.fileName
+                                                        : `FileUpload ${index}`}
+                                                    </label>
+                                                    <span className="filename">
+                                                      <Link
+                                                        to={items?.filePath}
+                                                        target="_blank"
+                                                        className="viewbtn"
+                                                      >
+                                                        View File
+                                                      </Link>
+                                                    </span>
+                                                  </div>
+                                                );
+                                              }
+                                            )
+                                          ) : (
+                                            <label className="notfound">
+                                              File Not Found
+                                            </label>
+                                          )}
                                         </div>
                                       </div>
 
@@ -2084,38 +2195,40 @@ const INSDashboardViewDetails = ({
                                         <label className="controlform">
                                           Attachments
                                         </label>
-                                        <div>{items?.filesData?.length ? (
-                                          items?.filesData?.map(
-                                            (items, index) => {
-                                              return (
-                                                <div
-                                                  className="attachemt_form-bx mt-1"
-                                                  key={items.id}
-                                                >
-                                                  <label>
-                                                    {items?.fileName
-                                                      ? items?.fileName
-                                                      : `FileUpload ${index}`}
-                                                  </label>
+                                        <div>
+                                          {items?.filesData?.length ? (
+                                            items?.filesData?.map(
+                                              (items, index) => {
+                                                return (
+                                                  <div
+                                                    className="attachemt_form-bx mt-1"
+                                                    key={items.id}
+                                                  >
+                                                    <label>
+                                                      {items?.fileName
+                                                        ? items?.fileName
+                                                        : `FileUpload ${index}`}
+                                                    </label>
 
-                                                  <span className="filename">
-                                                    <Link
-                                                      to={items?.filePath}
-                                                      target="_blank"
-                                                      className="viewbtn"
-                                                    >
-                                                      View File
-                                                    </Link>
-                                                  </span>
-                                                </div>
-                                              );
-                                            }
-                                          )
-                                        ) : (
-                                          <label className="notfound">
-                                            File Not Found
-                                          </label>
-                                        )}</div>
+                                                    <span className="filename">
+                                                      <Link
+                                                        to={items?.filePath}
+                                                        target="_blank"
+                                                        className="viewbtn"
+                                                      >
+                                                        View File
+                                                      </Link>
+                                                    </span>
+                                                  </div>
+                                                );
+                                              }
+                                            )
+                                          ) : (
+                                            <label className="notfound">
+                                              File Not Found
+                                            </label>
+                                          )}
+                                        </div>
                                       </div>
                                       <div className="inner_form_new ">
                                         <label className="controlform">
@@ -2684,38 +2797,40 @@ const INSDashboardViewDetails = ({
                                         <label className="controlform">
                                           Attachments
                                         </label>
-                                        <div>{items?.filesData?.length ? (
-                                          items?.filesData?.map(
-                                            (items, index) => {
-                                              return (
-                                                <div
-                                                  className="attachemt_form-bx mt-1"
-                                                  key={items.id}
-                                                >
-                                                  <label>
-                                                    {items?.fileName
-                                                      ? items?.fileName
-                                                      : `FileUpload ${index}`}
-                                                  </label>
+                                        <div>
+                                          {items?.filesData?.length ? (
+                                            items?.filesData?.map(
+                                              (items, index) => {
+                                                return (
+                                                  <div
+                                                    className="attachemt_form-bx mt-1"
+                                                    key={items.id}
+                                                  >
+                                                    <label>
+                                                      {items?.fileName
+                                                        ? items?.fileName
+                                                        : `FileUpload ${index}`}
+                                                    </label>
 
-                                                  <span className="filename">
-                                                    <Link
-                                                      to={items?.filePath}
-                                                      target="_blank"
-                                                      className="viewbtn"
-                                                    >
-                                                      View File
-                                                    </Link>
-                                                  </span>
-                                                </div>
-                                              );
-                                            }
-                                          )
-                                        ) : (
-                                          <label className="notfound">
-                                            File Not Found
-                                          </label>
-                                        )}</div>
+                                                    <span className="filename">
+                                                      <Link
+                                                        to={items?.filePath}
+                                                        target="_blank"
+                                                        className="viewbtn"
+                                                      >
+                                                        View File
+                                                      </Link>
+                                                    </span>
+                                                  </div>
+                                                );
+                                              }
+                                            )
+                                          ) : (
+                                            <label className="notfound">
+                                              File Not Found
+                                            </label>
+                                          )}
+                                        </div>
                                       </div>
                                       <div className="inner_form_new ">
                                         <label className="controlform">
@@ -3281,38 +3396,39 @@ const INSDashboardViewDetails = ({
                                         <label className="controlform">
                                           Attachments
                                         </label>
-                                        <div>{items?.filesData?.length ? (
-                                          items?.filesData?.map(
-                                            (items, index) => {
-                                              return (
-                                                <div
-                                                  className="attachemt_form-bx mt-1"
-                                                  key={items.id}
-                                                >
-                                                  <label>
-                                                    {items?.fileName
-                                                      ? items?.fileName
-                                                      : `FileUpload ${index}`}
-                                                  </label>
+                                        <div>
+                                          {items?.filesData?.length ? (
+                                            items?.filesData?.map(
+                                              (items, index) => {
+                                                return (
+                                                  <div
+                                                    className="attachemt_form-bx mt-1"
+                                                    key={items.id}
+                                                  >
+                                                    <label>
+                                                      {items?.fileName
+                                                        ? items?.fileName
+                                                        : `FileUpload ${index}`}
+                                                    </label>
 
-                                                  <span className="filename">
-                                                    <Link
-                                                      to={items?.filePath}
-                                                      target="_blank"
-                                                      className="viewbtn"
-                                                    >
-                                                      View File
-                                                    </Link>
-                                                  </span>
-                                                </div>
-                                              );
-                                            }
-                                          )
-                                        ) : (
-                                          <label className="notfound">
-                                            File Not Found
-                                          </label>
-                                        )}
+                                                    <span className="filename">
+                                                      <Link
+                                                        to={items?.filePath}
+                                                        target="_blank"
+                                                        className="viewbtn"
+                                                      >
+                                                        View File
+                                                      </Link>
+                                                    </span>
+                                                  </div>
+                                                );
+                                              }
+                                            )
+                                          ) : (
+                                            <label className="notfound">
+                                              File Not Found
+                                            </label>
+                                          )}
                                         </div>
                                       </div>
                                       <div className="inner_form_new ">
@@ -3877,38 +3993,39 @@ const INSDashboardViewDetails = ({
                                         <label className="controlform">
                                           Attachments
                                         </label>
-                                        <div>{items?.filesData?.length ? (
-                                          items?.filesData?.map(
-                                            (items, index) => {
-                                              return (
-                                                <div
-                                                  className="attachemt_form-bx mt-1"
-                                                  key={items.id}
-                                                >
-                                                  <label>
-                                                    {items?.fileName
-                                                      ? items?.fileName
-                                                      : `FileUpload ${index}`}
-                                                  </label>
+                                        <div>
+                                          {items?.filesData?.length ? (
+                                            items?.filesData?.map(
+                                              (items, index) => {
+                                                return (
+                                                  <div
+                                                    className="attachemt_form-bx mt-1"
+                                                    key={items.id}
+                                                  >
+                                                    <label>
+                                                      {items?.fileName
+                                                        ? items?.fileName
+                                                        : `FileUpload ${index}`}
+                                                    </label>
 
-                                                  <span className="filename">
-                                                    <Link
-                                                      to={items?.filePath}
-                                                      target="_blank"
-                                                      className="viewbtn"
-                                                    >
-                                                      View File
-                                                    </Link>
-                                                  </span>
-                                                </div>
-                                              );
-                                            }
-                                          )
-                                        ) : (
-                                          <label className="notfound">
-                                            File Not Found
-                                          </label>
-                                        )}
+                                                    <span className="filename">
+                                                      <Link
+                                                        to={items?.filePath}
+                                                        target="_blank"
+                                                        className="viewbtn"
+                                                      >
+                                                        View File
+                                                      </Link>
+                                                    </span>
+                                                  </div>
+                                                );
+                                              }
+                                            )
+                                          ) : (
+                                            <label className="notfound">
+                                              File Not Found
+                                            </label>
+                                          )}
                                         </div>
                                       </div>
                                       <div className="inner_form_new ">
@@ -4159,113 +4276,118 @@ const INSDashboardViewDetails = ({
             ""
           )}
 
-
-{roleID >= 5 ? (
-              <>  
-          <h5
-            className={
-              sharefiletab
-                ? "section_top_subheading mt-1 py-3 btn-collapse_active cursorpointer"
-                : "section_top_subheading mt-1 py-3 cursorpointer"
-            }
-            onClick={() => setsharefiletab(!sharefiletab)}
-          >
-            Share File{" "}
-            <span className="counter-tab">{viewShareFile?.length}</span>
-            <span className="btn-collapse">
-              <i className="bi bi-caret-down-fill"></i>
-            </span>
-          </h5>
-          <div className={sharefiletab ? "customtab  mt-2" : "d-none"}>
-            {viewShareFile?.length ? (
-              viewShareFile?.map((items, index) => {
-                return (
-                  <div className="attachemt_form-bx" key={items.id}>
-                    <label>
-                      {/* {items.filename} */}
-                      {items?.fileName
-                        ? items?.fileName
-                        : `FileUpload ${index}`}
-                    </label>
-                    <div
-                      className={
-                        roleID == 2 || roleID == 3 ? "browse-btn" : "d-none"
-                      }
-                    >
-                      Browse{" "}
-                    </div>
-                    <span className="filename">
-                      <Link
-                        to={items?.filePath}
-                        target="_blank"
-                        className="viewbtn"
-                      >
-                        View File
-                      </Link>
-                    </span>
-                  </div>
-                );
-              })
-            ) : (
-              <label className="notfound">File Not Found</label>
-            )}
-          </div>
-          </>
-            ) : (
-              ""
-            )}
-            
-          <>
-              <h5 className={roleID > 3 ? "section_top_subheading mt-3 py-3 btn-collapse_active " : "d-none"}>
-                Application History
+          {roleID >= 5 ? (
+            <>
+              <h5
+                className={
+                  sharefiletab
+                    ? "section_top_subheading mt-1 py-3 btn-collapse_active cursorpointer"
+                    : "section_top_subheading mt-1 py-3 cursorpointer"
+                }
+                onClick={() => setsharefiletab(!sharefiletab)}
+              >
+                Share File{" "}
+                <span className="counter-tab">{viewShareFile?.length}</span>
+                <span className="btn-collapse">
+                  <i className="bi bi-caret-down-fill"></i>
+                </span>
               </h5>
-
-              <div className={roleID > 3 ? "tab-content" : "d-none"}>
-                <div className="table-responsive">
-                  <table className="table">
-                    <thead>
-                      <tr>
-                        <th scope="col">User Type</th>
-                        <th scope="col">User Name</th>
-                        <th scope="col">Receive Date</th>
-                        <th scope="col">Submit Date</th>
-                        <th scope="col">Turn Around Days</th>
-                      </tr>
-                    </thead>
-                    <tbody className="table-group-divider">
-                      {tatHistory?.length
-                        ? tatHistory?.map((item, index) => {
-                            return (
-                              <tr key={index}>
-                                <td>{item.roleName}</td>
-                                <td>{item.name ? item.name : "--"}</td>
-                                <td>
-                                  {item.createdDate
-                                    ? moment(item.createdDate).format(
-                                        "DD/MMM/yyyy hh:mm A"
-                                      )
-                                    : "--"}
-                                </td>
-                                <td>
-                                  {item.submittedDate
-                                    ? moment(item.submittedDate).format(
-                                        "DD/MMM/yyyy hh:mm A"
-                                      )
-                                    : "--"}
-                                </td>
-                                <td>
-                                  {item.workinG_DAYS}{" "}
-                                  {item.workinG_DAYS > 1 ? "Days" : "Day"}{" "}
-                                </td>
-                              </tr>
-                            );
-                          })
-                        : "No History Found"}
-                    </tbody>
-                  </table>
-                </div>
+              <div className={sharefiletab ? "customtab  mt-2" : "d-none"}>
+                {viewShareFile?.length ? (
+                  viewShareFile?.map((items, index) => {
+                    return (
+                      <div className="attachemt_form-bx" key={items.id}>
+                        <label>
+                          {/* {items.filename} */}
+                          {items?.fileName
+                            ? items?.fileName
+                            : `FileUpload ${index}`}
+                        </label>
+                        <div
+                          className={
+                            roleID == 2 || roleID == 3 ? "browse-btn" : "d-none"
+                          }
+                        >
+                          Browse{" "}
+                        </div>
+                        <span className="filename">
+                          <Link
+                            to={items?.filePath}
+                            target="_blank"
+                            className="viewbtn"
+                          >
+                            View File
+                          </Link>
+                        </span>
+                      </div>
+                    );
+                  })
+                ) : (
+                  <label className="notfound">File Not Found</label>
+                )}
               </div>
             </>
+          ) : (
+            ""
+          )}
+
+          <>
+            <h5
+              className={
+                roleID > 3
+                  ? "section_top_subheading mt-3 py-3 btn-collapse_active "
+                  : "d-none"
+              }
+            >
+              Application History
+            </h5>
+
+            <div className={roleID > 3 ? "tab-content" : "d-none"}>
+              <div className="table-responsive">
+                <table className="table">
+                  <thead>
+                    <tr>
+                      <th scope="col">User Type</th>
+                      <th scope="col">User Name</th>
+                      <th scope="col">Receive Date</th>
+                      <th scope="col">Submit Date</th>
+                      <th scope="col">Turn Around Days</th>
+                    </tr>
+                  </thead>
+                  <tbody className="table-group-divider">
+                    {tatHistory?.length
+                      ? tatHistory?.map((item, index) => {
+                          return (
+                            <tr key={index}>
+                              <td>{item.roleName}</td>
+                              <td>{item.name ? item.name : "--"}</td>
+                              <td>
+                                {item.createdDate
+                                  ? moment(item.createdDate).format(
+                                      "DD/MMM/yyyy hh:mm A"
+                                    )
+                                  : "--"}
+                              </td>
+                              <td>
+                                {item.submittedDate
+                                  ? moment(item.submittedDate).format(
+                                      "DD/MMM/yyyy hh:mm A"
+                                    )
+                                  : "--"}
+                              </td>
+                              <td>
+                                {item.workinG_DAYS}{" "}
+                                {item.workinG_DAYS > 1 ? "Days" : "Day"}{" "}
+                              </td>
+                            </tr>
+                          );
+                        })
+                      : "No History Found"}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </>
 
           <div className="form-footer mt-5 mb-3">
             <button type="button" className="login" onClick={handleFormClose}>

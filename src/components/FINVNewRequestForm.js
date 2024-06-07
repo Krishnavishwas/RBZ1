@@ -462,7 +462,7 @@ const FINVNewRequestForm = () => {
 
   const GetApplicationCount = async (id) => {
     await axios
-      .post(APIURL + "ExportApplication/CountByApplicationID", {
+      .post(APIURL + "FINApplication/CountByApplicationIDFIN", {
         ApplicationID: id,
       })
       .then((res) => {
@@ -898,7 +898,13 @@ const FINVNewRequestForm = () => {
           Sector: FINForm.sector,
           SubSector: FINForm.subsector,
           ApplicantComment: FINForm.applicantComments,
-          AssignedTo: checkSupervisor === true ? FINForm.bankSupervisor : "",
+          // AssignedTo: checkSupervisor === true ? FINForm.bankSupervisor : "",
+          AssignedTo:
+          checkSupervisor == true
+            ? FINForm.bankSupervisor
+            : roleID == 4 && FINForm.bankSupervisor == ""
+            ? UserID.replace(/"/g, "")
+            : "",
         })
         .then((res) => {
           if (res.data.responseCode === "200") {
@@ -1944,6 +1950,7 @@ const FINVNewRequestForm = () => {
               <textarea
                 ref={applicantCommentsRef}
                 name="applicantComments"
+                value={FINForm.applicantComments}
                 onChange={(e) => {
                   changeHandelForm(e);
                 }}

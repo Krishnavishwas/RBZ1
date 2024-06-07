@@ -140,7 +140,7 @@ const Login = () => {
             IPAddress: ipAddress == null ? "0.0.0.0" : ipAddress,
           })
           .then((res) => {
-            if (res.data.responseCode === "200") {              
+            if (res.data.responseCode === "200") {
               setToken(
                 res.data.responseData.userType,
                 res.data.responseData.loginToken,

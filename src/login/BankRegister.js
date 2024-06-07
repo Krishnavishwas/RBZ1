@@ -465,6 +465,9 @@ value.includes("["))){
                             <option value="Bank/ADLA Supervisor">
                               Bank/ADLA Supervisor
                             </option>
+                            <option value="RBZ">
+                            RBZ
+                            </option>
                           </select>
                           <span className="sspan"></span>
                         </label>
