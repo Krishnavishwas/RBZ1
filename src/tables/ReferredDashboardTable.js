@@ -20,6 +20,8 @@ import ExportOtherDepartmentEditDetails from "../components/ExportOtherDepartmen
 import ExportOtherDepartmentViewDetails from "../components/ExportOtherDepartmentViewDetails";
 import FINOtherDepartmentViewDetails from "../components/FINOtherDepartmentViewDetails";
 import FINOtherDepartmentEditDetails from "../components/FINOtherDepartmentEditDetails";
+import INSOtherDepartmentEditDetails from "../components/INSOtherDepartmentEditDetails";
+import INSOtherDepartmentViewDetails from "../components/INSOtherDepartmentViewDetails";
 
 const ReferredDashboardTable = () => {
   const useId = Storage.getItem("userID");
@@ -39,12 +41,10 @@ const ReferredDashboardTable = () => {
       : "";
 
   const [ExportsapproveRequests, setExportsapproveRequests] = useState([]);
-  const [ExportsapproveAllRequests, setExportsapproveAllRequests] = useState(
-    []
-  );
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [showExportUpdateModal, setExportShowUpdateModal] = useState(false);
   const [showFINUpdateModal, setFINShowUpdateModal] = useState(false);
+  const [showINSUpdateModal, setINSShowUpdateModal] = useState(false);
   const [applicationDetail, setApplicationDetail] = useState({});
   const [applicationmessage, setApplicationmessage] = useState("");
   const [tatHistory, setTatHistory] = useState([]);
@@ -58,17 +58,16 @@ const ReferredDashboardTable = () => {
   const [showEditForm, setshowEditForm] = useState(false);
   const [showExportEditForm, setshowExportEditForm] = useState(false);
   const [showFINEditForm, setshowFINEditForm] = useState(false);
+  const [showINSEditForm, setshowINSEditForm] = useState(false);
   const [AssignUserID, setAssignUserID] = useState("");
   const [asignUser, setAsignUser] = useState([]);
   const [Actiondata, setActiondata] = useState([]);
-
   const [applicationstaus, setapplicationstaus] = useState(
     applicationDetail?.applicationStatus
       ? `${applicationDetail?.applicationStatus}`
       : "0"
   );
   const [SupervisorRoleId, setSupervisorRoleId] = useState("");
-  const [loader, setLoader] = useState("");
   const [pageLoader, setPageLoader] = useState("");
   const [tabDepId, setTabDepId] = useState("");
   const [filters, setFilters] = useState({
@@ -79,15 +78,6 @@ const ReferredDashboardTable = () => {
   });
   const [loading, setLoading] = useState(false);
   const [globalFilterValue, setGlobalFilterValue] = useState("");
-
-  const csvLinkRef = useRef();
-  FilterService.register("custom_activity", (value, filters) => {
-    const [from, to] = filters ?? [null, null];
-    if (from === null && to === null) return true;
-    if (from !== null && to === null) return from <= value;
-    if (from === null && to !== null) return value <= to;
-    return from <= value && value <= to;
-  });
 
   const onGlobalFilterChange = (e) => {
     const value = e.target.value;
@@ -104,6 +94,8 @@ const ReferredDashboardTable = () => {
       setShowUpdateModal(false);
     } else if (tabDepId == "4") {
       setFINShowUpdateModal(false);
+    } else if (tabDepId == "5") {
+      setINSShowUpdateModal(false);
     }
   };
 
@@ -153,6 +145,7 @@ const ReferredDashboardTable = () => {
       .post(APIURL + "Master/GetRoles", {
         RoleID: rollId,
         Status: `${id}`,
+        DepartmentID: tabDepId
       })
       .then((res) => {
         if (res.data.responseCode == 200) {
@@ -290,6 +283,8 @@ const ReferredDashboardTable = () => {
       setShowUpdateModal(true);
     } else if (tabDepId == "4") {
       setFINShowUpdateModal(true);
+    } else if (tabDepId == "5") {
+      setINSShowUpdateModal(true);
     }
   };
 
@@ -300,6 +295,8 @@ const ReferredDashboardTable = () => {
       setshowEditForm(true);
     } else if (tabDepId == "4") {
       setshowFINEditForm(true);
+    } else if (tabDepId == "5") {
+      setshowINSEditForm(true);
     }
   };
 
@@ -310,6 +307,8 @@ const ReferredDashboardTable = () => {
       setshowEditForm(false);
     } else if (tabDepId == "4") {
       setshowFINEditForm(false);
+    } else if (tabDepId == "5") {
+      setshowINSEditForm(false);
     }
     setnextlevelvalue("");
     setapplicationstaus("0");
@@ -900,6 +899,113 @@ const ReferredDashboardTable = () => {
             </div>
           </Modal>
           {/* FIN View and Edit popup end */}
+
+          {/* INS View and Edit popup start */}
+          <Modal
+            show={showINSUpdateModal}
+            onHide={handleFormClose}
+            backdrop="static"
+            className="max-width-600"
+          >
+            <div className="application-box">
+              <div className="login_inner">
+                <div className="login_form ">
+                  <h5>
+                    <Modal.Header closeButton className="p-0">
+                      <Modal.Title>
+                        View Inspectorate Referred Request --{" "}
+                        <big>{applicationDetail?.rbzReferenceNumber}</big>
+                      </Modal.Title>
+                    </Modal.Header>
+                  </h5>
+                </div>
+                <div className="login_form_panel">
+                  <Modal.Body className="p-0">
+                    <INSOtherDepartmentViewDetails
+                      applicationDetail={applicationDetail}
+                      handleFormClose={handleFormClose}
+                      allcomment={allcomment}
+                      tatHistory={tatHistory}
+                      noDataComment={noDataComment}
+                      responceCount={responceCount}
+                      showdataLoader={loading}
+                    />
+                  </Modal.Body>
+                </div>
+              </div>
+            </div>
+          </Modal>
+          <Modal
+            show={showINSEditForm}
+            onHide={EditModalClose}
+            backdrop="static"
+            className="max-width-600"
+          >
+            <div className="application-box">
+              <div className="login_inner">
+                <div className="login_form ">
+                  <h5>
+                    <Modal.Header closeButton className="p-0">
+                      <Modal.Title style={{ width: "100%" }}>
+                        <div className="row">
+                          <div
+                            className={
+                              applicationDetail?.parentApplicationID == 0
+                                ? "col-md-12"
+                                : "col-md-6"
+                            }
+                            style={{ alignItems: "center" }}
+                          >
+                            Edit Inspectorate Referred Request --{" "}
+                            <big>
+                              {applicationDetail?.rbzReferenceNumber
+                                ? applicationDetail.rbzReferenceNumber
+                                : ""}
+                            </big>
+                          </div>
+                        </div>
+                      </Modal.Title>
+                    </Modal.Header>
+                  </h5>
+                </div>
+                <div className="login_form_panel">
+                  <Modal.Body className="p-0">
+                    <INSOtherDepartmentEditDetails
+                      applicationDetail={applicationDetail}
+                      setApplicationDetail={setApplicationDetail}
+                      EditModalClose={EditModalClose}
+                      setImportData={setExportsapproveRequests}
+                      handleData={handleData}
+                      showdataLoader={showdataLoader}
+                      allcomment={allcomment}
+                      GetRoleHandle={GetRoleHandle}
+                      setapplicationstaus={setapplicationstaus}
+                      applicationstaus={applicationstaus}
+                      setnextlevelvalue={setnextlevelvalue}
+                      nextlevelvalue={nextlevelvalue}
+                      asignUser={asignUser}
+                      userRole={userRole}
+                      responceCount={responceCount}
+                      setAsignUser={setAsignUser}
+                      supervisorHangechange={supervisorHangechange}
+                      supervisorHangechangeBankuser={
+                        supervisorHangechangeBankuser
+                      }
+                      tatHistory={tatHistory}
+                      AssignUserID={AssignUserID}
+                      setAssignUserID={setAssignUserID}
+                      Actiondata={Actiondata}
+                      SupervisorRoleId={SupervisorRoleId}
+                      supervisorHangechangeRole={supervisorHangechangeRole}
+                      setSupervisorRoleId={setSupervisorRoleId}
+                      noDataComment={noDataComment}
+                    />
+                  </Modal.Body>
+                </div>
+              </div>
+            </div>
+          </Modal>
+          {/* INS View and Edit popup end */}
         </>
       )}
     </>

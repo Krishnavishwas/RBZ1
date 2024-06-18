@@ -2317,6 +2317,8 @@ const ImportDashboardRenewEditDetails = ({
                   }}
                   disabled={
                     (!checkSupervisor && roleID == 4) ||
+                    (checkSupervisor && !AssignUserID && roleID == 4) ||
+                    (checkSupervisor === false && roleID == 2) ||
                     (checkSupervisor && !AssignUserID && roleID == 4)
                       ? true
                       : false

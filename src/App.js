@@ -81,6 +81,14 @@ import FINSearch from "./pages/FINSearch";
 import PendingReturns from "./pages/PendingReturns";
 
 import ReturnDashboardExport from "./pages/ReturnDashboardExport";
+import INSSubmittedRequests from "./pages/INSSubmittedRequests";
+import INSPendingRequests from './pages/INSPendingRequests'
+import INSApprovedRequests from './pages/INSApprovedRequests'
+import INSRejectedRequests from './pages/INSRejectedRequests'
+import INSDeferredRequests from './pages/INSDeferredRequests'
+import INSCancelledRequests from './pages/INSCancelledRequests'
+import InspectorateExpiredRequests from './pages/InspectorateExpiredRequests'
+import InspectorateExpiringRequests from './pages/InspectorateExpiringRequests'
 
 function App() {
   const loginToken = Storage.getItem("loginToken");
@@ -275,8 +283,16 @@ function App() {
               path="/ReturnDashboardExport"
               element={<ReturnDashboardExport />}
             />
+            <Route path="/INSSubmittedRequests" element={<INSSubmittedRequests />}/>
 
             <Route path="/PendingReturns" element={<PendingReturns />} />
+            <Route path="/INSPendingRequests" element={<INSPendingRequests />} />
+            <Route path="/INSApprovedRequests" element={<INSApprovedRequests />} />
+            <Route path="/INSRejectedRequests" element={<INSRejectedRequests />} />
+            <Route path="/INSDeferredRequests" element={<INSDeferredRequests />} />
+            <Route path="/INSCancelledRequests" element={<INSCancelledRequests />} />
+            <Route path="/InspectorateExpiredRequests" element={<InspectorateExpiredRequests />} />
+            <Route path="/InspectorateExpiringRequests" element={<InspectorateExpiringRequests /> } />
             <Route path="*" element={<NotFound />} />
           </>
         ) : (

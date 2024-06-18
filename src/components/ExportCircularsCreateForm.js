@@ -19,6 +19,8 @@ import { Color } from "@tiptap/extension-color";
 import ListItem from "@tiptap/extension-list-item";
 import TextStyle from "@tiptap/extension-text-style";
 import Text from "@tiptap/extension-text";
+import Button from 'react-bootstrap/Button';
+import Modal from 'react-bootstrap/Modal';
 import TextAlign from "@tiptap/extension-text-align";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
@@ -28,6 +30,7 @@ import { useNavigate } from "react-router-dom";
 import DirectiveMultiSelectComponent from './SearchUI/DirectiveMultiSelectComponent'
 import CustomBankMultiSelect from './SearchUI/CustomBankMultiSelect'
 import { generate } from "shortid";
+import UpdatePopupMessage from "./UpdatePopupMessage";
 const ExportCircularsCreateForm = () => {
   const navigate = useNavigate()
   // const purposeApplicationRef = useRef(null);
@@ -41,15 +44,19 @@ const ExportCircularsCreateForm = () => {
   const PdfRolename = Storage.getItem("roleName");
   const [errors, setErrors] = useState({});
   const [checkAnalyst, setAnalyst] = useState(false);
+  const [btnLoader, setBtnLoader] = useState(false);
   const [checkDecision, setCheckDecision] = useState(false);
   const [selectedBankOption, setSelectedBankOption] = useState([]);
   const [selectedBanks, setSelectedBanks] = useState([]);
+  const [SubmitBtnLoader, setSubmitBtnLoader] = useState(false);
   const [selectedDirectives, setSelectedDirectives] = useState([]);
   const [applicationDetail, setApplicationDetail] = useState({});
   const [circularAttachmentData, setCircularAttachmentData] = useState([
     { filename: "File Upload", upload: "" },
   ]);
   const [otherfilesupload, setOtherfilesupload] = useState([]);
+  const [showUpdateModal, setShowUpdateModal] = useState(false);
+  const [updatepopup, setupdatepopup] = useState(false);
   const [selectedDirectivesOpt, setSelectedDirectivesOpt] = useState([]);
   const [analystUser, setAnalystUser] = useState([]);
   const [applicationstaus, setapplicationstaus] = useState("0");
@@ -57,7 +64,14 @@ const ExportCircularsCreateForm = () => {
   const [department, setDepartment] = useState([]);
   const [otherfiles, setOtherfiles] = useState([]);
   const [Description, setDescription] = useState("");
+  const [show, setShow] = useState(false);
+  const [showDirectiveModal, setShowDirectiveModal] = useState(false)
+
+  const handleDirectiveClose = () => setShowDirectiveModal(false);
+  const handleDirectiveModalShow = () => setShowDirectiveModal(true);
   const [releasingDate, setReleasingDate] = useState(new Date());
+  const heading = "Created Successfully!";
+  const para = "Circular created successfully";
   const [exportForm, setExportForm] = useState({
     name: "",
     subject: "",
@@ -73,6 +87,7 @@ const ExportCircularsCreateForm = () => {
   const handelAnalystCheck = () => {
     setAnalyst(!checkAnalyst);
     setCheckDecision(!checkDecision);
+    setapplicationstaus("0")
 
   }
   //--------   department api call start
@@ -178,13 +193,24 @@ const ExportCircularsCreateForm = () => {
   const DirectiveOption = selectedDirectivesOpt?.map((res) => ({
     label: res.directiveName,
     value: res.id,
+    filePath: res.filesData,
+    tagName: res.directiveTags
   }));
+  // const DirectiveOption = selectedDirectivesOpt?.flatMap((res) => {
 
+  //   return res?.filesData?.map((item) => ({
+  //     label: res.directiveName,
+  //     value: res.id,
+  //     filePath: item.filePath,
+  //     tagName:res.directiveTags
+  //   }));
+  // });
   const handleChangeDirective = (e) => {
     const values = e;
     setSelectedDirectives(values);
   };
   //---------director end
+
   //--------analyst user api start
   const analystUserFun = async () => {
     await
@@ -247,10 +273,10 @@ const ExportCircularsCreateForm = () => {
       valid = false;
     }
 
-    if (selectedDirectives.length == '0') {
+    if (selectedDirectives.length == '0' || selectedDirectives.length == "") {
       newErrors.selectedDirectives = "Directive is required";
       valid = false;
-    } if (selectedBanks.length == '0') {
+    } if (selectedBanks.length == '0' || selectedDirectives.length == "") {
       newErrors.selectedBanks = "Bank is required";
       valid = false;
     }
@@ -262,7 +288,8 @@ const ExportCircularsCreateForm = () => {
       newErrors.releasingDate = "Releasing date is required";
       valid = false;
     } if (checkAnalyst == true && exportForm.analyst == '') {
-      newErrors.analyst = "Please select analyst";
+      newErrors.analyst = `Please select ${roleID == "5" ? " senior analyst" : roleID == "6" ? " principal analyst" : roleID == "7" ? " deputy director" : " director" }`
+      
       valid = false;
     }
     setErrors(newErrors);
@@ -273,6 +300,135 @@ const ExportCircularsCreateForm = () => {
   //---------- End Code For Check Validation for Form Field
   const bankSelectedID = selectedBanks.map((res) => res.value);
   const directiveSelectedID = selectedDirectives.map((res) => res.value);
+  /* PDF Preview code starts */
+  const GetHandelDetailPDF = async () => {
+    setBtnLoader(true);
+    let formData = new FormData();
+
+    const data = {
+      UserID: userID.replace(/"/g, ""),
+      RoleID: (checkAnalyst != true && checkDecision != true) ? "0" : roleID,
+      Name: exportForm.name,
+      // BankID: '"'+bankSelectedID.join()+'"',
+      BankID: bankSelectedID.join(),
+      Subject: exportForm.subject,
+      Content: Description,
+      DirectiveID: directiveSelectedID.join(),
+      AssignedTo: checkAnalyst ? exportForm.analyst : "",
+      AssignedToRoleID: checkAnalyst ? parseInt(roleID) + 1 : (checkAnalyst != true && checkDecision != true) ? "0" : roleID,
+      ReleasingDate: releasingDate,
+      DepartmentID: exportForm.departmentValue,
+      CircularStatus:
+        (roleID == 8 || roleID == 9)
+          ? applicationstaus
+          : "0",
+      ActionStatus:
+        ((roleID == 8 && applicationstaus !== "0") || (roleID == 8 && applicationstaus !== "0"))
+          ? "100"
+          : "0"
+
+    }
+    await axios
+      .post(APIURL + "Circular/CreateCircular", data)
+      .then((res) => {
+
+        setApplicationDetail(res.data.responseData)
+        if (res.data.responseCode === '200') {
+          for (let i = 0; i < files?.length; i++) { // Corrected loop condition
+            formData.append("files", files[i].file);
+            formData.append("Label", files[i].label);
+          }
+          formData.append("CircularReferenceNumber", res.data.responseData.circularReferenceNumber);
+          formData.append("CircularID", res.data.responseData.id);
+          formData.append("DepartmentID", res.data.responseData.departmentID);
+          formData.append("UserID", userID.replace(/"/g, ""));
+          // pdf generate code
+          setTimeout(() => {
+            const doc = new jsPDF({
+              format: "a4",
+              unit: "pt",
+            });
+            const addHeader = (doc) => {
+              const pageCount = doc.internal.getNumberOfPages();
+              const headerpositionfromleft =
+                (doc.internal.pageSize.width - 10) / 4;
+              for (var i = 1; i <= pageCount; i++) {
+                doc.setPage(i);
+                doc.addImage(
+                  logo,
+                  "png",
+                  70,
+                  10,
+                  80,
+                  80,
+                  "DMS-RBZ",
+                  "NONE",
+                  0
+                );
+                doc.setFontSize(8);
+                doc.text(
+                  "Reserve Bank of Zimbabwe. 80 Samora Machel Avenue, P.O. Box 1283, Harare, Zimbabwe.",
+                  headerpositionfromleft + 50,
+                  40
+                );
+                doc.text(
+                  "Tel: 263 242 703000, 263 8677000477 | Website:www.rbz.co.zw",
+                  headerpositionfromleft + 100,
+                  50
+                );
+              }
+            };
+            const addWaterMark = (doc) => {
+              const pageCount = doc.internal.getNumberOfPages();
+              for (var i = 1; i <= pageCount; i++) {
+                doc.setPage(i);
+                doc.setTextColor("#cccaca");
+                doc.saveGraphicsState();
+                doc.setGState(new doc.GState({ opacity: 0.4 }));
+                doc.setFont("helvetica", "normal");
+                doc.setFontSize(80);
+                //doc.text("PREVIEW", 50, 150, {align: 'center', baseline: 'middle'})
+                doc.text(
+                  doc.internal.pageSize.width / 3,
+                  doc.internal.pageSize.height / 2,
+                  "Preview",
+                  { angle: 45 }
+                );
+                doc.restoreGraphicsState();
+              }
+            };
+            // doc.setFont("helvetica", "normal");
+            // doc.setFontSize(3);
+            let docWidth = doc.internal.pageSize.getWidth();
+            const refpdfview =
+              PdfPrivewsupervisorRef
+            doc.html(refpdfview.current, {
+              x: 12,
+              y: 12,
+              width: 513,
+              height: doc.internal.pageSize.getHeight(),
+              margin: [110, 80, 60, 35],
+              windowWidth: 1000,
+              pagebreak: true,
+              async callback(doc) {
+                addHeader(doc);
+                addWaterMark(doc);
+                doc.setProperties({
+                  title: `${res.data.responseData.circularReferenceNumber}`,
+                });
+                var string = doc.output('dataurlnewwindow');
+                // var blob = doc.output("blob");
+                // window.open(URL.createObjectURL(blob), "_blank");
+              },
+
+            });
+
+            setBtnLoader(false);
+          }, 1500);
+        }
+      })
+  };
+  /* Ends Here */
 
   const HandleSubmit = async (e) => {
     e.preventDefault();
@@ -280,7 +436,8 @@ const ExportCircularsCreateForm = () => {
 
     const data = {
       UserID: userID.replace(/"/g, ""),
-      RoleID: (checkAnalyst != true && checkDecision != true) ? "0" : roleID,
+      // RoleID: (checkAnalyst != true && checkDecision != true) ? "0" : roleID,
+      RoleID: roleID,
       Name: exportForm.name,
       // BankID: '"'+bankSelectedID.join()+'"',
       BankID: bankSelectedID.join(),
@@ -300,8 +457,6 @@ const ExportCircularsCreateForm = () => {
         (roleID == 8 || roleID == 9)
           ? applicationstaus
           : "0",
-
-
       ActionStatus:
         ((roleID == 8 && applicationstaus !== "0") || (roleID == 8 && applicationstaus !== "0"))
           ? "100"
@@ -311,11 +466,20 @@ const ExportCircularsCreateForm = () => {
 
 
     if (validateForm()) {
+      if ((roleID == 8 && applicationstaus == "10") || (roleID == 9 && applicationstaus == "10")) {
+        setSubmitBtnLoader(true);
+      }
       await axios
         .post(APIURL + "Circular/CreateCircular", data)
         .then((res) => {
+
           setApplicationDetail(res.data.responseData)
+          Storage.setItem(
+            "generatedNumber", res.data.responseData.circularReferenceNumber
+          );
           if (res.data.responseCode === '200') {
+
+            setupdatepopup(true);
             for (let i = 0; i < files?.length; i++) { // Corrected loop condition
               formData.append("files", files[i].file);
               formData.append("Label", files[i].label);
@@ -332,237 +496,94 @@ const ExportCircularsCreateForm = () => {
                 console.log("file Upload ", err)
               })
 
-            // pdf generate code
-            setTimeout(() => {
-              const doc = new jsPDF({
-                format: "a4",
-                unit: "pt",
-              });
-              const addHeader = (doc) => {
-                const pageCount = doc.internal.getNumberOfPages();
-                const headerpositionfromleft =
-                  (doc.internal.pageSize.width - 10) / 4;
-                for (var i = 1; i <= pageCount; i++) {
-                  doc.setPage(i);
-                  doc.addImage(
-                    logo,
-                    "png",
-                    70,
-                    10,
-                    80,
-                    80,
-                    "DMS-RBZ",
-                    "NONE",
-                    0
-                  );
-                  doc.setFontSize(8);
-                  doc.text(
-                    "Reserve Bank of Zimbabwe. 80 Samora Machel Avenue, P.O. Box 1283, Harare, Zimbabwe.",
-                    headerpositionfromleft + 50,
-                    40
-                  );
-                  doc.text(
-                    "Tel: 263 242 703000, 263 8677000477 | Website:www.rbz.co.zw",
-                    headerpositionfromleft + 100,
-                    50
-                  );
-                }
-              };
-              // doc.setFont("helvetica", "normal");
-              // doc.setFontSize(3);
-              let docWidth = doc.internal.pageSize.getWidth();
-              const refpdfview =
-                PdfPrivewsupervisorRef
-              doc.html(refpdfview.current, {
-                x: 12,
-                y: 12,
-                width: 513,
-                height: doc.internal.pageSize.getHeight(),
-                margin: [110, 80, 60, 35],
-                windowWidth: 1000,
-                pagebreak: true,
-                async callback(doc) {
-                  addHeader(doc);
-
-
-                  const blobPDF = doc.output("datauristring");
-                  let formData = new FormData();
-                  formData.append(
-                    "UserID",
-                    userID.replace(/"/g, "")
-                  );
-                  formData.append("FileType", "LetterHeadPDF");
-                  formData.append("Label", "CoverLetter");
-                 
-                  formData.append(
-                    "CircularID",
-                    res.data.responseData.id
-                  );
-                  formData.append("DepartmentID",res.data.responseData.departmentID)
-                  formData.append("PdfData", blobPDF);
-                  await axios
-                    .post(ImageAPI + "File/UploadPdf", formData)
-                    .then(async (res) => {
-                      if (res.data.responseCode == "Success") {
-                        console.log("success Pdf");
-                      } else {
-                        console.log("Not Create pdf");
-                      }
-                    })
-                    .catch((error) =>
-                      console.log("DATA SAVE ERROR--", error)
+            // pdf generate code start
+            if ((roleID == 8 && applicationstaus == "10") || (roleID == 9 && applicationstaus == "10")) {
+              setTimeout(() => {
+                const doc = new jsPDF({
+                  format: "a4",
+                  unit: "pt",
+                });
+                const addHeader = (doc) => {
+                  const pageCount = doc.internal.getNumberOfPages();
+                  const headerpositionfromleft =
+                    (doc.internal.pageSize.width - 10) / 4;
+                  for (var i = 1; i <= pageCount; i++) {
+                    doc.setPage(i);
+                    doc.addImage(
+                      logo,
+                      "png",
+                      70,
+                      10,
+                      80,
+                      80,
+                      "DMS-RBZ",
+                      "NONE",
+                      0
                     );
-                },
-              });
+                    doc.setFontSize(8);
+                    doc.text(
+                      "Reserve Bank of Zimbabwe. 80 Samora Machel Avenue, P.O. Box 1283, Harare, Zimbabwe.",
+                      headerpositionfromleft + 50,
+                      40
+                    );
+                    doc.text(
+                      "Tel: 263 242 703000, 263 8677000477 | Website:www.rbz.co.zw",
+                      headerpositionfromleft + 100,
+                      50
+                    );
+                  }
+                };
+                // doc.setFont("helvetica", "normal");
+                // doc.setFontSize(3);
+                let docWidth = doc.internal.pageSize.getWidth();
+                const refpdfview =
+                  PdfPrivewsupervisorRef
+                doc.html(refpdfview.current, {
+                  x: 12,
+                  y: 12,
+                  width: 513,
+                  height: doc.internal.pageSize.getHeight(),
+                  margin: [110, 80, 60, 35],
+                  windowWidth: 1000,
+                  pagebreak: true,
+                  async callback(doc) {
+                    addHeader(doc);
 
-              // axios
-              //     .post(APIURL + "Admin/GetBankByID", {
-              //         id: applicationDetail?.bankID,
-              //     })
-              //     .then((response) => {
-              //         if (response.data.responseCode === "200") {
-              //             if (
-              //                 response.data.responseData?.headerFooterData["0"]?.fileType ==
-              //                 "HeaderFile"
-              //             ) {
-              //                 var headerImage =
-              //                     response.data.responseData.headerFooterData["0"].filePath;
-              //                 var headerImagewidth =
-              //                     response.data.responseData.headerFooterData["0"].imageWidth;
-              //             } else {
-              //                 var headerImage = "";
-              //             }
-              //             if (
-              //                 response.data.responseData?.headerFooterData["1"]?.fileType ==
-              //                 "FooterFile"
-              //             ) {
-              //                 var footerImage =
-              //                     response.data.responseData.headerFooterData["1"].filePath;
-              //                 var footerImagewidth =
-              //                     response.data.responseData.headerFooterData["1"].imageWidth;
-              //             } else {
-              //                 var footerImage = "";
-              //             }
 
-              //             const addHeader = (doc) => {
-              //                 if (roleID != 3) {
-              //                     const pageCount = doc.internal.getNumberOfPages();
-              //                     const headerpositionfromleft =
-              //                         (doc.internal.pageSize.width - 10) / 4;
-              //                     for (var i = 1; i <= pageCount; i++) {
-              //                         doc.setPage(i);
-              //                         doc.addImage(
-              //                             logo,
-              //                             "png",
-              //                             70,
-              //                             10,
-              //                             80,
-              //                             80,
-              //                             "DMS-RBZ",
-              //                             "NONE",
-              //                             0
-              //                         );
-              //                         doc.setFontSize(8);
-              //                         doc.text(
-              //                             "Reserve Bank of Zimbabwe. 80 Samora Machel Avenue, P.O. Box 1283, Harare, Zimbabwe.",
-              //                             headerpositionfromleft + 50,
-              //                             40
-              //                         );
-              //                         doc.text(
-              //                             "Tel: 263 242 703000, 263 8677000477 | Website:www.rbz.co.zw",
-              //                             headerpositionfromleft + 100,
-              //                             50
-              //                         );
-              //                     }
-              //                 } else {
-              //                     if (headerImage != "") {
-              //                         const pageCount = doc.internal.getNumberOfPages();
-              //                         var pagewidth = doc.internal.pageSize.width;
-              //                         if (pagewidth > headerImagewidth) {
-              //                             var diff = parseInt(pagewidth) - parseInt(headerImagewidth);
-              //                             var positionLeft = parseInt(diff / 2);
-              //                         } else {
-              //                             var positionLeft = 250;
-              //                         }
+                    const blobPDF = doc.output("datauristring");
+                    let formData = new FormData();
+                    formData.append(
+                      "UserID",
+                      userID.replace(/"/g, "")
+                    );
+                    formData.append("FileType", "CircularPDF");
+                    formData.append("Label", "Circular");
+                    formData.append("CircularReferenceNumber", res.data.responseData.circularReferenceNumber);
+                    formData.append("CircularID", res.data.responseData.id);
+                    formData.append("DepartmentID", res.data.responseData.departmentID)
+                    formData.append("PdfData", blobPDF);
+                    await axios
+                      .post(ImageAPI + "File/UploadCircularPdf", formData)
+                      .then(async (res) => {
+                        if (res.data.responseCode == "Success") {
+                          console.log("success Pdf");
+                          setSubmitBtnLoader(false);
+                        } else {
+                          console.log("Not Create pdf");
+                        }
+                      })
+                      .catch((error) =>
+                        console.log("DATA SAVE ERROR--", error)
+                      );
+                  },
+                });
 
-              //                         for (var i = 1; i <= pageCount; i++) {
-              //                             doc.setPage(i);
-              //                             doc.addImage(
-              //                                 headerImage,
-              //                                 "png",
-              //                                 positionLeft,
-              //                                 10,
-              //                                 80,
-              //                                 80,
-              //                                 "Header",
-              //                                 "NONE",
-              //                                 0
-              //                             );
-              //                         }
-              //                     } else {
-              //                         doc.setFont("helvetica", "bold");
-              //                         doc.setFontSize(20);
-              //                         doc.text("Final Letter", 250, 40);
-              //                     }
-              //                 }
-              //             };
 
-              //             const addWaterMark = (doc) => {
-              //                 const pageCount = doc.internal.getNumberOfPages();
-              //                 for (var i = 1; i <= pageCount; i++) {
-              //                     doc.setPage(i);
-              //                     doc.setTextColor("#cccaca");
-              //                     doc.saveGraphicsState();
-              //                     doc.setGState(new doc.GState({ opacity: 0.4 }));
-              //                     doc.setFont("helvetica", "normal");
-              //                     doc.setFontSize(80);
-              //                     //doc.text("PREVIEW", 50, 150, {align: 'center', baseline: 'middle'})
-              //                     doc.text(
-              //                         doc.internal.pageSize.width / 3,
-              //                         doc.internal.pageSize.height / 2,
-              //                         "Preview",
-              //                         { angle: 45 }
-              //                     );
-              //                     doc.restoreGraphicsState();
-              //                 }
-              //             };
-              //             doc.setFont("helvetica", "normal");
-              //             doc.setFontSize(3);
-              //             let docWidth = doc.internal.pageSize.getWidth();
-              //             const refpdfview =
-              //                 roleID == 3 && nextlevelvalue == 10
-              //                     ? PdfPrivewsupervisorRef
-              //                     : roleID == 3 && nextlevelvalue == ""
-              //                         ? CoverigLetterRef
-              //                         : PdfPrivewRef;
-              //             doc.html(refpdfview.current, {
-              //                 x: 12,
-              //                 y: 12,
-              //                 width: 513,
-              //                 height: doc.internal.pageSize.getHeight(),
-              //                 margin: [110, 80, 60, 35],
-              //                 windowWidth: 1000,
-              //                 pagebreak: true,
-              //                 async callback(doc) {
-              //                     addHeader(doc);
-              //                     addWaterMark(doc);
-              //                     doc.setProperties({
-              //                         title: `${applicationDetail?.rbzReferenceNumber}`,
-              //                     });
-              //                     var blob = doc.output("blob");
-              //                     window.open(URL.createObjectURL(blob), "_blank");
-              //                 },
-              //             });
-              //             setBtnLoader(false);
-              //         } else {
-              //             var headerImage = "";
-              //             var footerImage = "";
-              //         }
-              //     });
-            }, 1500);
-            toast.success(res.data.responseMessage, { autoClose: 2000 })
+              }, 1500);
+            }
+            // pdf generate code end
+            // toast.success(res.data.responseMessage, { autoClose: 2000 })
             setTimeout(() => {
-              navigate("/CircularDashboard");
               setToastDisplayed(false)
               setExportForm({
                 name: "",
@@ -1051,7 +1072,14 @@ const ExportCircularsCreateForm = () => {
     }
   }, [editor]);
 
-  
+
+
+  const closePopupHandle = () => {
+    navigate("/CircularDashboard");
+    setupdatepopup(false);
+  };
+
+
   return (
     <>
       <form className="circular-form">
@@ -1155,7 +1183,7 @@ const ExportCircularsCreateForm = () => {
                 isSelectAll={true}
                 menuPlacement={"bottom"}
               />
-              {errors?.selectedBanks ? (
+              {errors?.selectedBanks && selectedBanks.length == 0 ? (
                 <span className="errormsg">
                   {errors?.selectedBanks}
                 </span>
@@ -1188,22 +1216,11 @@ const ExportCircularsCreateForm = () => {
         </div>
         {/* end form-bx  */}
 
-        <div className="inner_form_new ">
+        {/* <div className="inner_form_new">
           <label className="controlform">Directives</label>
           <div className="cccto position-relative">
             <div className="multiselect flex justify-content-center">
-              {/* <MultiSelect
-                value={exportForm.directiveSelectValue}
-                onChange={(e) => {
-                  changeHandelForm(e);
-                }}
-                options={selectedDirectivesOpt}
-                optionLabel="directiveName"
-          
-                name="directiveSelectValue"
-                placeholder="Select Directives"
-                display="chip"
-              /> */}
+
               <DirectiveMultiSelectComponent
                 key="multyselectprinciple"
                 options={DirectiveOption}
@@ -1219,7 +1236,7 @@ const ExportCircularsCreateForm = () => {
               )}
             </div>
           </div>
-        </div>
+        </div> */}
         {/* end form-bx  */}
         <div className="inner_form_new ">
           <label className="controlform">Select Department</label>
@@ -1301,7 +1318,7 @@ const ExportCircularsCreateForm = () => {
         }>
           <label className="controlform">Assign to
             {
-              roleID == "5" ? " Analyst" : roleID == "6" ? " Principal Analyst" : roleID == "7" ? " Deputy Director" : " Director"
+              roleID == "5" ? " Senior Analyst" : roleID == "6" ? " Principal Analyst" : roleID == "7" ? " Deputy Director" : " Director"
             }
           </label>
           <input
@@ -1317,8 +1334,8 @@ const ExportCircularsCreateForm = () => {
         {/* end form-bx  */}
         {checkAnalyst == true ?
           <div className="inner_form_new ">
-            <label className="controlform"> {
-              roleID == "5" ? " Analyst" : roleID == "6" ? " Principal Analyst" : roleID == "7" ? " Deputy Director" : " Director"
+            <label className="controlform">  {
+              roleID == "5" ? "Senior Analyst" : roleID == "6" ? " Principal Analyst" : roleID == "7" ? " Deputy Director" : " Director"
             }</label>
 
             <div className="form-bx">
@@ -1331,8 +1348,9 @@ const ExportCircularsCreateForm = () => {
                   value={exportForm.analyst}
                 >
                   <option disabled value="">
+                    Select
                     {
-                      roleID == "5" ? " Analyst" : roleID == "6" ? " Principal Analyst" : roleID == "7" ? " Deputy Director" : " Director"
+                      roleID == "5" ? " Senior Analyst" : roleID == "6" ? " Principal Analyst" : roleID == "7" ? " Deputy Director" : " Director"
                     }
                   </option>
                   {
@@ -1413,6 +1431,126 @@ const ExportCircularsCreateForm = () => {
             </div>
           </div>
         </div>
+        {/* directive code start */}
+        <h5 className="section_top_subheading mt-3">Directives</h5>
+        <div className="inner_form_new">
+          <label className="controlform">Directives</label>
+          <div className="cccto position-relative">
+            <div className="multiselect d-flex justify-content-between align-items-end">
+              <div className="adddirectiveBox">
+                <ul className="newdirectivelist">
+                  {selectedDirectives
+                    ?.length ? (
+                    selectedDirectives?.map(
+                      (res) => {
+                        return (
+                          <li>{res?.label}</li>
+                        );
+                      }
+                    )
+                  ) : (
+                    <li className="disabletext">
+                      Directives
+                    </li>
+                  )}
+                </ul>
+              </div>
+              <Button variant="primary" className="addDirectiveBtn" onClick={handleDirectiveModalShow}>
+                Add Directives
+              </Button>
+              {errors?.selectedDirectives && selectedDirectives.length == 0 ? (
+                <small className="errormsg directiveErrormsg">{errors.selectedDirectives}</small>
+              ) : (
+                ""
+              )}
+              <Modal
+                size="lg"
+                show={showDirectiveModal}
+                onHide={handleDirectiveClose}
+                backdrop="static"
+                className="directiveModal"
+              >
+                <div className="application-box">
+                  <div className="login_inner">
+                    <div className="login_form ">
+                      <h5>
+                        <Modal.Header closeButton className="p-0">
+                          <Modal.Title>
+                            Add Directives
+                            {/* <big>{applicationDetail?.circularReferenceNumber}</big> */}
+                          </Modal.Title>
+                        </Modal.Header>
+                      </h5>
+                    </div>
+                    <div className="login_form_panel">
+                      <Modal.Body className="p-0">
+                        <DirectiveMultiSelectComponent
+                          key="multyselectprinciple"
+                          placeholder="Select Directives"
+                          options={DirectiveOption}
+                          onChange={(e) => handleChangeDirective(e)}
+                          value={selectedDirectives}
+                          isSelectAll={true}
+                          menuPlacement={"bottom"}
+                        />
+
+                        <div className="directiveFileData-field">
+                          <div className="directiveFileData-show">
+                            {selectedDirectives?.length > 0 ? (
+                              selectedDirectives.map((item) => {
+                                const firstTagName = item.tagName.split(',')[0]; // Extract the first tag name
+                                return (
+                                  <>
+                                    {item?.filePath.length > 0 ?
+                                      <div className="directiveFileBox" key={item.value}>
+                                        {/* <div>{firstTagName}</div> Display the first tag name */}
+                                        {item.filePath.map((fileItem, index) => (
+                                          <a
+                                            target="_blank"
+                                            href={fileItem.filePath}
+                                            key={fileItem.id}
+                                            style={{
+                                              marginBottom: "3px",
+                                              letterSpacing: "0.01px",
+                                              fontSize: "14px",
+                                              fontWeight: "400",
+                                              display: "block",
+                                              padding: "0px 5px",
+                                              color: "#4154f1",
+                                              // borderBottom:"1px solid #ddd"
+                                            }}
+                                          >
+                                            {firstTagName + (index + 1)}
+                                            {/* {fileItem.filePath} */}
+                                          </a>
+                                        ))}
+                                      </div>
+                                      : ""}
+                                  </>
+                                );
+                              })
+                            ) : (
+                              <></>
+                            )}
+
+                          </div>
+                        </div>
+                      </Modal.Body>
+
+                    </div>
+                    <Modal.Footer className="justify-content-end">
+                      <Button variant="secondary" onClick={handleDirectiveClose}>Close</Button>
+                      {/* <Button variant="primary" onClick={handleDirectiveClose}>Add</Button> */}
+                    </Modal.Footer>
+                  </div>
+                </div>
+              </Modal>
+
+
+            </div>
+          </div>
+        </div>
+        {/* directive code end */}
         <h5 className="section_top_subheading mt-3">Attachments</h5>
 
         {/* <div className="attachemt_form-bx" >
@@ -1432,8 +1570,6 @@ const ExportCircularsCreateForm = () => {
               "No file chosen"}
 
           </span>
-
-      
         </div> */}
         {
           circularAttachmentData?.map((items, index) => {
@@ -1483,7 +1619,6 @@ const ExportCircularsCreateForm = () => {
             );
           })
         }
-
         {/* other file start */}
         {otherfiles.map((file, index) => (
           <div key={"other" + (index + 1)} className="attachemt_form-bx">
@@ -1541,18 +1676,43 @@ const ExportCircularsCreateForm = () => {
           >
             Reset
           </button> */}
+          {
+            (roleID == 8 && applicationstaus == "10") || (roleID == 9 && applicationstaus == "10")
+              ?
+              <button
+                type="button"
+                className="login m-end-4"
+                onClick={() => GetHandelDetailPDF()}
+                disabled={btnLoader}
+              >
+                {btnLoader ? (
+                  <span className="loaderwait">Please Wait...</span>
+                ) : (
+                  <span>Preview PDF</span>
+                )}
+
+              </button>
+              : ""}
           <button
             type="button"
             onClick={(e) => {
               HandleSubmit(e);
             }}
             className="login"
-            disabled={((roleID > 5 && checkAnalyst == false && checkDecision == false)) || (toastDisplayed ? true : false) || (roleID > 5 && checkDecision == false && applicationstaus == "0")}
+            disabled={((roleID > 5 && checkAnalyst == false && checkDecision == false)) || (toastDisplayed ? true : false) || (roleID > 5 && checkDecision == false && applicationstaus == "0") || (SubmitBtnLoader == true)}
           >
-            Submit
+           {applicationstaus == "0" ?  "Submit" : "Submit & Close" }
+            {SubmitBtnLoader == true ? (
+              <div className="smallloader"></div>
+            ) : (
+              ""
+            )}
+
           </button>
         </div>
         {/* generate pdf code start */}
+
+
         <div className="login_inner" style={{ display: "none" }}>
           <div className="login_form_panel" style={{ display: "none" }}>
             <div
@@ -1609,51 +1769,22 @@ const ExportCircularsCreateForm = () => {
                 <tr>
                   <td colSpan="2">&nbsp;</td>
                 </tr>
-                <tr>
-                  <td
-                    colSpan="2"
-                    style={{
-                      color: "#000",
-                      fontSize: "18px",
-                      fontWeight: "600",
-                      letterSpacing: "0.01px",
-                    }}
-                  >
-                    Dear{" "}
-                    {applicationDetail?.name}
-                    ,
-                  </td>
-                </tr>
+
 
                 <tr>
                   <td colSpan="2">
                     <table width="100%">
+
                       <tr>
-                        <td colSpan="2">&nbsp;</td>
-                      </tr>
-                      <tr>
-                        <td
-                          style={{
-                            color: "#000",
-                            fontSize: "18px",
-                            fontWeight: "400",
-                          }}
-                        >
-                          Name
-                        </td>
                         <td
                           style={{
                             color: "#000",
                             fontSize: "18px",
                             fontWeight: "800",
-                            letterSpacing: "0.01px",
                           }}
                         >
-                          :{" "}
-                          {exportForm.name}
+                          Circular
                         </td>
-                      </tr>
-                      <tr>
                         <td
                           style={{
                             color: "#000",
@@ -1662,28 +1793,17 @@ const ExportCircularsCreateForm = () => {
                             letterSpacing: "0.01px",
                           }}
                         >
-                          Releasing Date
+                          :{" "}
+                          {applicationDetail?.name}
                         </td>
+                      </tr>
+
+                      <tr>
                         <td
                           style={{
                             color: "#000",
                             fontSize: "18px",
                             fontWeight: "800",
-                            letterSpacing: "0.01px",
-                          }}
-                        >
-                          :{" "}
-                          {moment(
-                            applicationDetail?.releasingDate
-                          ).format("DD MMMM YYYY")}
-                        </td>
-                      </tr>
-                      <tr>
-                        <td
-                          style={{
-                            color: "#000",
-                            fontSize: "18px",
-                            fontWeight: "400",
                             letterSpacing: "0.01px",
                           }}
                         >
@@ -1693,7 +1813,7 @@ const ExportCircularsCreateForm = () => {
                           style={{
                             color: "#000",
                             fontSize: "18px",
-                            fontWeight: "800",
+                            fontWeight: "400",
                           }}
                         >
                           :{" "}
@@ -1702,7 +1822,10 @@ const ExportCircularsCreateForm = () => {
                               minWidth: "45px",
                               display: "inline-block",
                               paddingRight: "5px",
-                              fontWeight: "800",
+
+                              color: "#000",
+                              fontSize: "18px",
+                              fontWeight: "400",
                             }}
                           >
                             {applicationDetail?.subject}
@@ -1710,8 +1833,241 @@ const ExportCircularsCreateForm = () => {
 
                         </td>
                       </tr>
+                      <tr>
 
 
+                        <td
+                          style={{
+                            color: "#000",
+                            fontSize: "18px",
+                            fontWeight: "800",
+                          }}
+                        >
+                          To
+                        </td>
+                        <td>
+                          <div>
+                            {applicationDetail?.bankData?.length > 0 ? (
+                              <>
+                                :{" "}
+                                {applicationDetail?.bankData.map((item) => {
+                                  return (
+
+                                    <span
+                                      style={{
+                                        marginBottom: "3px",
+                                        letterSpacing: "0.01px",
+                                        fontSize: "18px",
+                                        fontWeight: "400",
+                                        display: "inline-block",
+                                        padding: "0px 5px"
+                                      }}
+                                    >
+                                      {item.bankName},
+                                    </span>
+                                  );
+                                })}
+                              </>
+                            ) : ""
+                            }
+                          </div>
+
+                        </td>
+                      </tr>
+
+                    </table>
+                  </td>
+                </tr>
+                <tr>
+                  <td colSpan="2">&nbsp;</td>
+                </tr>
+                <tr>
+                  <td colSpan="2">
+                    <table width="100%">
+                      <tr>
+                        <td
+                          colSpan="2"
+                          style={{
+                            color: "#000",
+                            fontSize: "18px",
+                            fontWeight: "600",
+                            letterSpacing: "0.01px",
+                          }}
+                        >Dear All,</td>
+                      </tr>
+                      <tr>
+                        <td colSpan="2">&nbsp;</td>
+                      </tr>
+                      <tr>
+                        <td
+                          colSpan="2"
+                          style={{
+                            color: "#000",
+                            fontSize: "18px",
+                            fontWeight: "400",
+                          }}
+                        >
+                          <p
+                            style={{
+                              marginBottom: "0px",
+                              fontSize: "18px",
+                              fontWeight: "400",
+                            }}
+                          > Circular Vide No, <b>{applicationDetail?.circularReferenceNumber}</b> is only released on <b> {moment(
+                            applicationDetail?.releasingDate
+                          ).format("DD MMMM YYYY")}</b> pertained to:-</p>
+
+                        </td>
+
+                      </tr>
+                      <tr>
+                        <td colSpan="2">
+                          <table width="100%">
+
+                            <tr>
+                              <td
+
+                                style={{
+                                  color: "#000",
+                                  fontSize: "18px",
+                                  fontWeight: "800",
+                                }}
+                              >
+                                Title
+                              </td>
+                              <td
+                                style={{
+                                  color: "#000",
+                                  fontSize: "18px",
+                                  fontWeight: "400",
+                                  letterSpacing: "0.01px",
+                                }}
+                              >
+                                :{" "}
+                                {applicationDetail?.name}
+                              </td>
+                            </tr>
+
+                            <tr>
+                              <td
+                                style={{
+                                  color: "#000",
+                                  fontSize: "18px",
+                                  fontWeight: "800",
+                                  letterSpacing: "0.01px",
+                                }}
+                              >
+                                Subject
+                              </td>
+                              <td
+                                style={{
+                                  color: "#000",
+                                  fontSize: "18px",
+                                  fontWeight: "400",
+                                }}
+                              >
+                                :{" "}
+                                <span
+                                  style={{
+                                    minWidth: "45px",
+                                    display: "inline-block",
+                                    paddingRight: "5px",
+
+                                    color: "#000",
+                                    fontSize: "18px",
+                                    fontWeight: "400",
+                                  }}
+                                >
+                                  {applicationDetail?.subject}
+                                </span>
+
+                              </td>
+                            </tr>
+                            <tr>
+
+
+                              <td
+                                style={{
+                                  color: "#000",
+                                  fontSize: "18px",
+                                  fontWeight: "800",
+                                  verticalAlign: "top"
+                                }}
+                              >
+                                Directive
+                              </td>
+                              <td
+                                style={{
+
+                                  verticalAlign: "top"
+                                }}
+                              >
+
+                                <div>
+                                  {applicationDetail?.directiveData?.length > 0 ? (
+                                    <>
+                                      :{" "}
+                                      <table border="1" className="directiveTable">
+                                        {applicationDetail?.directiveData.map((item) => {
+                                          return (
+
+                                            <tr>
+                                              <td>
+                                                <span
+                                                  style={{
+                                                    marginBottom: "3px",
+                                                    letterSpacing: "0.01px",
+                                                    fontSize: "18px",
+                                                    fontWeight: "400",
+                                                    display: "inline-block",
+                                                    padding: "0px 5px"
+                                                  }}
+                                                >
+                                                  {item.directiveName}
+                                                </span>
+                                              </td>
+                                              <td>
+
+
+                                                {item?.directiveFiles?.map((fileitem) => {
+                                                  if (item.id == fileitem.directiveID) {
+                                                    return (
+                                                      <span
+                                                        style={{
+                                                          marginBottom: "3px",
+                                                          letterSpacing: "0.01px",
+                                                          fontSize: "14px",
+                                                          fontWeight: "400",
+                                                          display: "inline-block",
+                                                          padding: "0px 5px",
+                                                          marginBottom: "0"
+                                                        }}
+                                                      >
+                                                        {fileitem.filePath},
+                                                      </span>
+                                                    )
+                                                  }
+
+                                                })}
+
+
+
+                                              </td>
+                                            </tr>
+
+                                          );
+                                        })}
+                                      </table>
+
+                                    </>
+                                  ) : ""
+                                  }
+                                </div>
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
                     </table>
                   </td>
                 </tr>
@@ -1831,64 +2187,30 @@ const ExportCircularsCreateForm = () => {
                               : "N/A"}
                           </p>
 
-                          <div
-                            style={{
-                              marginBottom: "0px",
-                              color: "#000",
-                              fontSize: "18px",
-                              fontWeight: "400",
-                              padding: "25px 0px 5px",
-                              lineHeight: "13px",
-                              display: "flex",
-                            }}
-                          >
-                            {
-                              applicationDetail?.bankData?.length > 0 ? (
-                                <>
-                                  <p
-                                    style={{
-                                      marginBottom: "0px",
-                                      fontSize: "18px",
-                                      fontWeight: "400",
-                                      paddingRight: "10px",
-                                      letterSpacing: "0.01px",
-                                    }}
-                                  >
-                                    TO:
-                                  </p>
-                                  <div>
-                                    {applicationDetail?.bankData.map((item) => {
-                                      return (
-                                        <p
-                                          style={{
-                                            marginBottom: "3px",
-                                            letterSpacing: "0.01px",
-                                            fontSize: "18px",
-                                            fontWeight: "400",
-                                          }}
-                                        >
-                                          {item.bankName}
-                                        </p>
-                                      );
-                                    })}
-                                  </div>
-                                </>
-                              ) : (
-                                ""
-                              )
-                            }
-                          </div>
+
                         </td>
                       </tr>
                     </table>
                   </td>
                 </tr>
               </table>
-           
+
             </div>
           </div>
         </div>
         {/* generate pdf coed end */}
+
+
+        {updatepopup == true ? (
+          <UpdatePopupMessage
+            heading={heading}
+            para={para}
+            closePopupHandle={closePopupHandle}
+          ></UpdatePopupMessage>
+        ) : (
+          ""
+        )}
+
       </form>
 
     </>

@@ -33,8 +33,6 @@ import StarterKit from "@tiptap/starter-kit";
 import CustomMultiSelect from "./SearchUI/CustomMultiSelect";
 /* Tiptp Editor Ends */
 
-// import MultiSelect from "react-multi-select-component";
-
 const FINDashboardRenewEditDetails = ({
   applicationDetail,
   setApplicationDetail,
@@ -2609,6 +2607,7 @@ const FINDashboardRenewEditDetails = ({
             );
             shareformData.append("ApplicationID", applicationDetail?.id);
             shareformData.append("IsSharedDoc", "1");
+            shareformData.append("DepartmentID", "4");
             shareformData.append("UserID", UserID.replace(/"/g, ""));
 
             axios
@@ -2643,10 +2642,7 @@ const FINDashboardRenewEditDetails = ({
     }
   };
   // End code for save form
-
-  useEffect(() => {
-    handleData();
-  }, []);
+ 
 
   const handleChangecompany = (selectedOption) => {
     setgetCompanyName(selectedOption);
@@ -3274,7 +3270,7 @@ const FINDashboardRenewEditDetails = ({
               </div>
 
               <div className="inner_form_new ">
-                <label className="controlform">Baneficiary Country</label>
+                <label className="controlform">Beneficiary Country</label>
                 <div className="form-bx">
                   <label>
                     <select
@@ -4055,6 +4051,8 @@ const FINDashboardRenewEditDetails = ({
                   }}
                   disabled={
                     (!checkSupervisor && roleID == 4) ||
+                    (checkSupervisor && !AssignUserID && roleID == 4) ||
+                    (checkSupervisor === false && roleID == 2) ||
                     (checkSupervisor && !AssignUserID && roleID == 4)
                       ? true
                       : false

@@ -231,7 +231,7 @@ const INSDashboardTable = () => {
 
   const GetApplicationCount = async (id) => {
     await axios
-      .post(APIURL + "ImportApplication/CountByApplicationIDImport", {
+      .post(APIURL + "InspectorateApplication/CountByApplicationIDINS", {
         ApplicationID: id,
       })
       .then((res) => {
@@ -500,7 +500,7 @@ const INSDashboardTable = () => {
     e.preventDefault();
     setBtnLoader(true);
     axios
-      .post(APIURL + "ImportApplication/BulkDelegateImport", delegateValues)
+      .post(APIURL + "InspectorateApplication/BulkDelegateINS", delegateValues)
       .then((res) => {
         if (res.data.responseCode == 200) {
           setBtnLoader(false);
@@ -623,7 +623,7 @@ const INSDashboardTable = () => {
 
   const GetOldApplicationCount = async (id) => {
     await axios
-      .post(APIURL + "ImportApplication/CountByApplicationIDImport", {
+      .post(APIURL + "InspectorateApplication/CountByApplicationIDINS", {
         ApplicationID: id,
       })
       .then((res) => {
@@ -646,7 +646,7 @@ const INSDashboardTable = () => {
     try {
       setRODLoader(true);
       await axios
-        .post(APIURL + "ImportApplication/GetReferredImportApplicationByID", {
+        .post(APIURL + "InspectorateApplication/GetReferredINSApplicationByID", {
           ID: id,
         })
         .then((res) => {
@@ -665,7 +665,7 @@ const INSDashboardTable = () => {
           setreferredDataTrue(false);
         });
     } catch (error) {
-      console.log("GetReferredImportApplicationByID error - ", error);
+      console.log("error - ", error);
     }
   };
 
@@ -771,7 +771,7 @@ const INSDashboardTable = () => {
           >
             <div className="application-box">
               <div className="login_inner">
-                <div class="login_form ">
+                <div className="login_form ">
                   <h5>
                     <Modal.Header closeButton className="p-0">
                       <Modal.Title>
@@ -897,7 +897,7 @@ const INSDashboardTable = () => {
                                   }
                                   className="closedepartment_btnicn"
                                 >
-                                  <i class="bi bi-x-lg"></i>
+                                  <i className="bi bi-x-lg"></i>
                                 </span>{" "}
                               </h3>
 
@@ -991,7 +991,7 @@ const INSDashboardTable = () => {
                   <h5>
                     <Modal.Header closeButton className="p-0">
                       <Modal.Title>
-                        View Old Export Request --{" "}
+                        View Old Inspectorate Request --{" "}
                         <big>{oldApplicationDetail?.rbzReferenceNumber}</big>
                       </Modal.Title>
                     </Modal.Header>

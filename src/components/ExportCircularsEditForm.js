@@ -7,6 +7,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import axios from "axios";
 import { APIURL, ImageAPI } from "../constant";
 import moment from "moment";
+import Button from "react-bootstrap/Button";
 import { toast } from "react-toastify";
 import Select from "react-select";
 import UpdatePopupMessage from "./UpdatePopupMessage";
@@ -38,8 +39,8 @@ import StarterKit from "@tiptap/starter-kit";
 /* Tiptp Editor Ends */
 import ExportCirculargenInfo from "./ExportCirculargenInfo";
 // import MultiSelect from "react-multi-select-component";
-import CustomBankMultiSelect from './SearchUI/CustomBankMultiSelect'
-import DirectiveMultiSelectComponent from './SearchUI/DirectiveMultiSelectComponent'
+import CustomBankMultiSelect from "./SearchUI/CustomBankMultiSelect";
+import DirectiveMultiSelectComponent from "./SearchUI/DirectiveMultiSelectComponent";
 
 const ExportCircularsEditForm = ({
   applicationDetail,
@@ -93,13 +94,7 @@ const ExportCircularsEditForm = ({
     },
   });
 
-
-  const {
-    companies,
-    Supervisors,
-    masterBank,
-
-  } = ExportformDynamicField();
+  const { companies, Supervisors, masterBank } = ExportformDynamicField();
 
   const BPNCodeRef = useRef(null);
   const TINRef = useRef(null);
@@ -161,24 +156,14 @@ const ExportCircularsEditForm = ({
   const [recomdAnalyst, setRecomdAnalyst] = useState("121");
   const [selectedBanks, setSelectedBanks] = useState([]);
   const [selectedDirectives, setSelectedDirectives] = useState([]);
-  const [registerusertype, setregisterusertype] = useState(
-    applicationDetail?.userTypeID
-  );
-  const [supervisordecision, setsupervisordecision] = useState(false);
 
   const [files, setFiles] = useState([]);
-
-  const [otherfiles, setOtherfiles] = useState([]);
 
   const [userfiles, setuserFiles] = useState([]);
 
   const [otheruserfiles, setOtheruserfiles] = useState([]);
 
-  const [sharefile, setsharefile] = useState([]);
-  const [othersharefile, setOthersharefile] = useState([]);
-
-
-  const [releasingDate, setReleasingDate] = useState('');
+  const [releasingDate, setReleasingDate] = useState("");
   // const [releasingDate, setReleasingDate] = useState(new Date());
   const [errors, setErrors] = useState({});
   const [applicationType, setapplicationType] = useState([]);
@@ -210,11 +195,20 @@ const ExportCircularsEditForm = ({
   const [IsReturnExpiringDate, setIsReturnExpiringDate] = useState(new Date());
   const [DateExpirydisplay, setDateExpirydisplay] = useState("");
   const [curRate, setCurrate] = useState();
+  const [showDirectiveModal, setShowDirectiveModal] = useState(false);
 
+  const handleDirectiveClose = () => setShowDirectiveModal(false);
+  const handleDirectiveModalShow = () => setShowDirectiveModal(true);
+
+  const [showGenInfoDirectiveModal, setGenInfoShowDirectiveModal] =
+    useState(false);
+
+  const handleGenInfoDirectiveClose = () => setGenInfoShowDirectiveModal(false);
+  const handleGenInfoDirectiveModalShow = () =>
+    setGenInfoShowDirectiveModal(true);
   const [userRoleRecordofficer, setuserRoleRecordofficer] = useState([]);
   const [selectuserRoleRecordofficer, setselectuserRoleRecordofficer] =
     useState("");
-  const [getalluser, setGetalluser] = useState([]);
 
   const [getBlankFile, setgetBlankFile] = useState([]);
   const [viewShareFile, setviewShareFile] = useState([]);
@@ -222,9 +216,9 @@ const ExportCircularsEditForm = ({
   const [newData, setnewData] = useState([]);
   const [SubmitBtnLoader, setSubmitBtnLoader] = useState(false);
   const [content, setEditorContent] = useState("<p></p>");
-  const applicationNumber = applicationDetail.rbzReferenceNumber;
+  const applicationNumber = applicationDetail.circularReferenceNumber;
   const heading = "Updated Successfully!";
-  const para = "Export request updated successfully!";
+  const para = "Circular updated successfully!";
 
   const ChangeApplicationStatus = (e) => {
     const values = e.target.value;
@@ -237,10 +231,6 @@ const ExportCircularsEditForm = ({
     const value = e.target.value;
     setSupervisorRoleId(value);
   };
-
-  useEffect(() => {
-    setEditorContent(applicationDetail?.content);
-  }, [content]);
 
   const MenuBar = ({ editor }) => {
     if (!editor) {
@@ -604,10 +594,11 @@ const ExportCircularsEditForm = ({
       </>
     );
   };
+
   // directives api call start
   const directiveDate = async () => {
     await axios
-      .post(APIURL + 'Admin/GetAllDirectives')
+      .post(APIURL + "Admin/GetAllDirectives")
       .then((res) => {
         if (res.data.responseCode === "200") {
           setAdminDirectives(res.data.responseData);
@@ -618,7 +609,7 @@ const ExportCircularsEditForm = ({
       .catch((err) => {
         console.log(err);
       });
-  }
+  };
 
   //directive api end
   const editor = useEditor({
@@ -690,9 +681,7 @@ const ExportCircularsEditForm = ({
 
   useEffect(() => {
     if (editorSrAnalyst) {
-      editorSrAnalyst.commands.setContent(
-        applicationDetail?.content
-      );
+      editorSrAnalyst.commands.setContent(applicationDetail?.content);
       setDescription(editorSrAnalyst.getHTML());
     }
   }, [applicationDetail]);
@@ -766,9 +755,7 @@ const ExportCircularsEditForm = ({
 
   useEffect(() => {
     if (editorPrincipleAnalyst) {
-      editorPrincipleAnalyst.commands.setContent(
-        applicationDetail?.content
-      );
+      editorPrincipleAnalyst.commands.setContent(applicationDetail?.content);
       setDescription(editorPrincipleAnalyst.getHTML());
     }
   }, [applicationDetail]);
@@ -840,6 +827,191 @@ const ExportCircularsEditForm = ({
     },
   });
 
+  useEffect(() => {
+    if (referbackUser) {
+      referbackUser.commands.setContent("");
+      setDescription(referbackUser.getHTML());
+    }
+  }, [applicationDetail]);
+
+  const referbackUser = useEditor({
+    extensions: [
+      Color.configure({ types: [TextStyle.name, ListItem.name] }),
+      TextStyle.configure({ types: [ListItem.name] }),
+      Table.configure({ resizable: true }),
+      Text,
+      Color,
+      TextAlign.configure({
+        types: ["heading", "paragraph"],
+      }),
+      TableRow,
+      TableHeader,
+      CustomTableCell,
+      StarterKit.configure({
+        bulletList: {
+          keepMarks: true,
+          keepAttributes: false, // TODO : Making this as `false` becase marks are not preserved when I try to preserve attrs, awaiting a bit of help
+        },
+        orderedList: {
+          keepMarks: true,
+          keepAttributes: false, // TODO : Making this as `false` becase marks are not preserved when I try to preserve attrs, awaiting a bit of help
+        },
+      }),
+    ],
+    content: applicationDetail?.content,
+    onUpdate({ editor }) {
+      setDescription(editor.getHTML());
+    },
+  });
+
+  useEffect(() => {
+    if (referbacksrUser) {
+      referbackUser.commands.setContent("");
+      setDescription(referbacksrUser.getHTML());
+    }
+  }, [applicationDetail]);
+
+  const referbacksrUser = useEditor({
+    extensions: [
+      Color.configure({ types: [TextStyle.name, ListItem.name] }),
+      TextStyle.configure({ types: [ListItem.name] }),
+      Table.configure({ resizable: true }),
+      Text,
+      Color,
+      TextAlign.configure({
+        types: ["heading", "paragraph"],
+      }),
+      TableRow,
+      TableHeader,
+      CustomTableCell,
+      StarterKit.configure({
+        bulletList: {
+          keepMarks: true,
+          keepAttributes: false, // TODO : Making this as `false` becase marks are not preserved when I try to preserve attrs, awaiting a bit of help
+        },
+        orderedList: {
+          keepMarks: true,
+          keepAttributes: false, // TODO : Making this as `false` becase marks are not preserved when I try to preserve attrs, awaiting a bit of help
+        },
+      }),
+    ],
+    content: applicationDetail?.content,
+    onUpdate({ editor }) {
+      setDescription(editor.getHTML());
+    },
+  });
+
+  useEffect(() => {
+    if (referbackprUser) {
+      referbackprUser.commands.setContent("");
+      setDescription(referbackprUser.getHTML());
+    }
+  }, [applicationDetail]);
+
+  const referbackprUser = useEditor({
+    extensions: [
+      Color.configure({ types: [TextStyle.name, ListItem.name] }),
+      TextStyle.configure({ types: [ListItem.name] }),
+      Table.configure({ resizable: true }),
+      Text,
+      Color,
+      TextAlign.configure({
+        types: ["heading", "paragraph"],
+      }),
+      TableRow,
+      TableHeader,
+      CustomTableCell,
+      StarterKit.configure({
+        bulletList: {
+          keepMarks: true,
+          keepAttributes: false, // TODO : Making this as `false` becase marks are not preserved when I try to preserve attrs, awaiting a bit of help
+        },
+        orderedList: {
+          keepMarks: true,
+          keepAttributes: false, // TODO : Making this as `false` becase marks are not preserved when I try to preserve attrs, awaiting a bit of help
+        },
+      }),
+    ],
+    content: applicationDetail?.content,
+    onUpdate({ editor }) {
+      setDescription(editor.getHTML());
+    },
+  });
+
+  useEffect(() => {
+    if (referbackduptyUser) {
+      referbackduptyUser.commands.setContent("");
+      setDescription(referbackduptyUser.getHTML());
+    }
+  }, [applicationDetail]);
+
+  const referbackduptyUser = useEditor({
+    extensions: [
+      Color.configure({ types: [TextStyle.name, ListItem.name] }),
+      TextStyle.configure({ types: [ListItem.name] }),
+      Table.configure({ resizable: true }),
+      Text,
+      Color,
+      TextAlign.configure({
+        types: ["heading", "paragraph"],
+      }),
+      TableRow,
+      TableHeader,
+      CustomTableCell,
+      StarterKit.configure({
+        bulletList: {
+          keepMarks: true,
+          keepAttributes: false, // TODO : Making this as `false` becase marks are not preserved when I try to preserve attrs, awaiting a bit of help
+        },
+        orderedList: {
+          keepMarks: true,
+          keepAttributes: false, // TODO : Making this as `false` becase marks are not preserved when I try to preserve attrs, awaiting a bit of help
+        },
+      }),
+    ],
+    content: applicationDetail?.content,
+    onUpdate({ editor }) {
+      setDescription(editor.getHTML());
+    },
+  });
+
+  useEffect(() => {
+    if (referbackdirectorUser) {
+      referbackdirectorUser.commands.setContent("");
+      setDescription(referbackdirectorUser.getHTML());
+    }
+  }, [applicationDetail]);
+
+  const referbackdirectorUser = useEditor({
+    extensions: [
+      Color.configure({ types: [TextStyle.name, ListItem.name] }),
+      TextStyle.configure({ types: [ListItem.name] }),
+      Table.configure({ resizable: true }),
+      Text,
+      Color,
+      TextAlign.configure({
+        types: ["heading", "paragraph"],
+      }),
+      TableRow,
+      TableHeader,
+      CustomTableCell,
+      StarterKit.configure({
+        bulletList: {
+          keepMarks: true,
+          keepAttributes: false, // TODO : Making this as `false` becase marks are not preserved when I try to preserve attrs, awaiting a bit of help
+        },
+        orderedList: {
+          keepMarks: true,
+          keepAttributes: false, // TODO : Making this as `false` becase marks are not preserved when I try to preserve attrs, awaiting a bit of help
+        },
+      }),
+    ],
+    content: applicationDetail?.content,
+    onUpdate({ editor }) {
+      setDescription(editor.getHTML());
+    },
+  });
+
   const ChangeNextlevelHandle = (e) => {
     const value = e.target.value;
     setSupervisorRoleId("");
@@ -873,6 +1045,21 @@ const ExportCircularsEditForm = ({
     if (editorDirector) {
       setDescription(editorDirector.getHTML());
     }
+    if (referbackUser) {
+      setDescription(referbackUser.getHTML());
+    }
+    if (referbacksrUser) {
+      setDescription(referbacksrUser.getHTML());
+    }
+    if (referbackprUser) {
+      setDescription(referbackprUser.getHTML());
+    }
+    if (referbackduptyUser) {
+      setDescription(referbackduptyUser.getHTML());
+    }
+    if (referbackdirectorUser) {
+      setDescription(referbackdirectorUser.getHTML());
+    }
   }, [
     editor,
     editorAnalyst,
@@ -880,6 +1067,7 @@ const ExportCircularsEditForm = ({
     editorPrincipleAnalyst,
     editorDeputy,
     editorDirector,
+    referbackUser,
   ]);
 
   useEffect(() => {
@@ -993,9 +1181,11 @@ const ExportCircularsEditForm = ({
     const directiveSData = applicationDetail?.directiveData?.map((item, i) => {
       return {
         label: item.directiveName,
-        value: item.id
-      }
-    })
+        value: item.id,
+        filePath: item.directiveFiles,
+        tagName: item.directiveTags,
+      };
+    });
     setSelectedDirectives(directiveSData);
     setExpiringDate(
       applicationDetail?.expiringDate
@@ -1003,10 +1193,7 @@ const ExportCircularsEditForm = ({
         : new Date()
     );
 
-
-
-
-
+    console.log("selectedDirectives", selectedDirectives);
     // setSelectedBanks(bankdtata);
 
     if (applicationDetail?.isReturnNeeded == 1) {
@@ -1139,93 +1326,18 @@ const ExportCircularsEditForm = ({
     }
 
     setErrors(newErrors);
-
   };
 
-  const HandleDateExpiryOption = (e) => {
-    const { name, value } = e.target;
-    setDateExpiryOption(e.target.value);
-    setdefaultnoExpiry(value);
+  {
+    console.log("allcomment", allcomment);
+  }
 
-    if (value == 0) {
-      setDateExpirydisplay("");
-      if (dateExpirydisplayRef.current) dateExpirydisplayRef.current.value = "";
-      if (optionExpirydisplayRef.current) optionExpirydisplayRef.current = "";
-    }
-  };
-
-  const HandleIsReturnOption = (e) => {
-    const { name, value } = e.target;
-    setIsReturnOption(e.target.value);
-    setIsReturn(value);
-
-    if (value == 0) {
-      setIsReturndisplay("");
-      setIsReturnExpiringDate(new Date());
-      setGetFrequencyID("");
-      if (FrequencyRef.current) FrequencyRef.current.value = "";
-      if (FrequencyDateRef.current) FrequencyDateRef.current = "";
-    } else {
-      axios
-        .post(APIURL + "Master/GetAllFrequencies")
-        .then((res) => {
-          if (res.data.responseCode == 200) {
-            setAllFrequency(res.data.responseData);
-          } else {
-            setAllFrequency([]);
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    }
-  };
-  const SelectReturnFrequency = (e) => {
-    const { name, value } = e.target;
-
-    if (value == 1) {
-      setGetFrequencyID(value);
-      setIsReturnExpiringDate(new Date());
-    } else {
-      setGetFrequencyID(value);
-      setIsReturnExpiringDate(new Date());
-    }
-  };
-
-  const handleshareFileChange = (e, id) => {
-    const file = e.target.files[0];
-    const index = userfiles?.findIndex((item) => item.id === id);
-    if (index !== -1) {
-      setsharefile((prevFiles) => {
-        const newFiles = [...prevFiles];
-        newFiles[index] = { file, id };
-        return newFiles;
-      });
-    } else {
-      setsharefile((prevFiles) => [...prevFiles, { file, id }]);
-    }
-  };
-
-  const handlesharefileAddMore = (e) => {
-    setOthersharefile([...othersharefile, null]);
-  };
-
-  const removeshareImage = (index, id) => {
-    const updatedShareFile = sharefile?.filter((item) => item.id !== id);
-    setsharefile(updatedShareFile);
-  };
+  console.log("applicationDetail", applicationDetail);
 
   const removeUserImage = (index, id) => {
     const updatedUserFile = userfiles?.filter((item) => item.id !== id);
     setuserFiles(updatedUserFile);
   };
-
-  const removefileImage = (label) => {
-    const updatedUserFile = files?.filter((item, i) => item?.label != label);
-    setFiles(updatedUserFile);
-  };
-
-  const [blobdata, setblobdata] = useState(null);
 
   /* PDF Preview code starts */
   const GetHandelDetailPDF = async () => {
@@ -1236,150 +1348,69 @@ const ExportCircularsEditForm = ({
         unit: "pt",
       });
 
-      axios
-        .post(APIURL + "Admin/GetBankByID", {
-          id: applicationDetail?.bankID,
-        })
-        .then((response) => {
-          if (response.data.responseCode === "200") {
-            if (
-              response.data.responseData?.headerFooterData["0"]?.fileType ==
-              "HeaderFile"
-            ) {
-              var headerImage =
-                response.data.responseData.headerFooterData["0"].filePath;
-              var headerImagewidth =
-                response.data.responseData.headerFooterData["0"].imageWidth;
-            } else {
-              var headerImage = "";
-            }
-            if (
-              response.data.responseData?.headerFooterData["1"]?.fileType ==
-              "FooterFile"
-            ) {
-              var footerImage =
-                response.data.responseData.headerFooterData["1"].filePath;
-              var footerImagewidth =
-                response.data.responseData.headerFooterData["1"].imageWidth;
-            } else {
-              var footerImage = "";
-            }
+      const addHeader = (doc) => {
+        const pageCount = doc.internal.getNumberOfPages();
+        const headerpositionfromleft = (doc.internal.pageSize.width - 10) / 4;
+        for (var i = 1; i <= pageCount; i++) {
+          doc.setPage(i);
+          doc.addImage(logo, "png", 70, 10, 80, 80, "DMS-RBZ", "NONE", 0);
+          doc.setFontSize(8);
+          doc.text(
+            "Reserve Bank of Zimbabwe. 80 Samora Machel Avenue, P.O. Box 1283, Harare, Zimbabwe.",
+            headerpositionfromleft + 50,
+            40
+          );
+          doc.text(
+            "Tel: 263 242 703000, 263 8677000477 | Website:www.rbz.co.zw",
+            headerpositionfromleft + 100,
+            50
+          );
+        }
+      };
 
-            const addHeader = (doc) => {
-              if (roleID != 3) {
-                const pageCount = doc.internal.getNumberOfPages();
-                const headerpositionfromleft =
-                  (doc.internal.pageSize.width - 10) / 4;
-                for (var i = 1; i <= pageCount; i++) {
-                  doc.setPage(i);
-                  doc.addImage(
-                    logo,
-                    "png",
-                    70,
-                    10,
-                    80,
-                    80,
-                    "DMS-RBZ",
-                    "NONE",
-                    0
-                  );
-                  doc.setFontSize(8);
-                  doc.text(
-                    "Reserve Bank of Zimbabwe. 80 Samora Machel Avenue, P.O. Box 1283, Harare, Zimbabwe.",
-                    headerpositionfromleft + 50,
-                    40
-                  );
-                  doc.text(
-                    "Tel: 263 242 703000, 263 8677000477 | Website:www.rbz.co.zw",
-                    headerpositionfromleft + 100,
-                    50
-                  );
-                }
-              } else {
-                if (headerImage != "") {
-                  const pageCount = doc.internal.getNumberOfPages();
-                  var pagewidth = doc.internal.pageSize.width;
-                  if (pagewidth > headerImagewidth) {
-                    var diff = parseInt(pagewidth) - parseInt(headerImagewidth);
-                    var positionLeft = parseInt(diff / 2);
-                  } else {
-                    var positionLeft = 250;
-                  }
-
-                  for (var i = 1; i <= pageCount; i++) {
-                    doc.setPage(i);
-                    doc.addImage(
-                      headerImage,
-                      "png",
-                      positionLeft,
-                      10,
-                      80,
-                      80,
-                      "Header",
-                      "NONE",
-                      0
-                    );
-                  }
-                } else {
-                  doc.setFont("helvetica", "bold");
-                  doc.setFontSize(20);
-                  doc.text("Final Letter", 250, 40);
-                }
-              }
-            };
-
-            const addWaterMark = (doc) => {
-              const pageCount = doc.internal.getNumberOfPages();
-              for (var i = 1; i <= pageCount; i++) {
-                doc.setPage(i);
-                doc.setTextColor("#cccaca");
-                doc.saveGraphicsState();
-                doc.setGState(new doc.GState({ opacity: 0.4 }));
-                doc.setFont("helvetica", "normal");
-                doc.setFontSize(80);
-                //doc.text("PREVIEW", 50, 150, {align: 'center', baseline: 'middle'})
-                doc.text(
-                  doc.internal.pageSize.width / 3,
-                  doc.internal.pageSize.height / 2,
-                  "Preview",
-                  { angle: 45 }
-                );
-                doc.restoreGraphicsState();
-              }
-            };
-            doc.setFont("helvetica", "normal");
-            doc.setFontSize(3);
-            let docWidth = doc.internal.pageSize.getWidth();
-            const refpdfview =
-              roleID == 3 && nextlevelvalue == 10
-                ? PdfPrivewsupervisorRef
-                : roleID == 3 && nextlevelvalue == ""
-                  ? CoverigLetterRef
-                  : PdfPrivewRef;
-            doc.html(refpdfview.current, {
-              x: 12,
-              y: 12,
-              width: 513,
-              height: doc.internal.pageSize.getHeight(),
-              margin: [110, 80, 60, 35],
-              windowWidth: 1000,
-              pagebreak: true,
-              async callback(doc) {
-                addHeader(doc);
-                addWaterMark(doc);
-                doc.setProperties({
-                  title: `${applicationDetail?.rbzReferenceNumber}`,
-                });
-                var blob = doc.output("blob");
-                window.open(URL.createObjectURL(blob), "_blank");
-              },
-            });
-            setBtnLoader(false);
-          } else {
-            var headerImage = "";
-            var footerImage = "";
-          }
-        });
+      const addWaterMark = (doc) => {
+        const pageCount = doc.internal.getNumberOfPages();
+        for (var i = 1; i <= pageCount; i++) {
+          doc.setPage(i);
+          doc.setTextColor("#cccaca");
+          doc.saveGraphicsState();
+          doc.setGState(new doc.GState({ opacity: 0.4 }));
+          doc.setFont("helvetica", "normal");
+          doc.setFontSize(80);
+          //doc.text("PREVIEW", 50, 150, {align: 'center', baseline: 'middle'})
+          doc.text(
+            doc.internal.pageSize.width / 3,
+            doc.internal.pageSize.height / 2,
+            "Preview",
+            { angle: 45 }
+          );
+          doc.restoreGraphicsState();
+        }
+      };
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(3);
+      let docWidth = doc.internal.pageSize.getWidth();
+      // const refpdfview = PdfPrivewRef;PdftargetRef
+      const refpdfview = PdfPrivewRef;
+      doc.html(refpdfview.current, {
+        x: 12,
+        y: 12,
+        width: 513,
+        height: doc.internal.pageSize.getHeight(),
+        margin: [110, 80, 60, 35],
+        windowWidth: 1000,
+        pagebreak: true,
+        async callback(doc) {
+          addHeader(doc);
+          addWaterMark(doc);
+          doc.setProperties({
+            title: `${applicationDetail?.circularReferenceNumber}`,
+          });
+          var blob = doc.output("blob");
+          window.open(URL.createObjectURL(blob), "_blank");
+        },
+      });
+      setBtnLoader(false);
     }, 1500);
   };
   /* Ends Here */
@@ -1426,76 +1457,13 @@ const ExportCircularsEditForm = ({
       });
   };
 
-  const supervisorHangechangeRoleRecordofficer = (e) => {
-    const value = e.target.value;
-    setErrors({});
-    setselectuserRoleRecordofficer(value);
-    setAssignUserID("");
-    setSupervisorRoleId("");
-    if (value == "") {
-      setGetalluser([]);
-    } else {
-      axios
-        .post(APIURL + "User/GetUsersByRoleID", {
-          RoleID: value,
-          DepartmentID: "1",
-          UserID: UserID.replace(/"/g, ""),
-        })
-        .then((res) => {
-          if (res.data.responseCode == "200") {
-            setGetalluser(res.data.responseData);
-          } else {
-            setGetalluser([]);
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    }
-  };
-
-  const handleuserByrecordOfficer = (e) => {
-    const value = e.target.value;
-
-    if (value == "") {
-      setAssignUserID("");
-      setSupervisorRoleId("");
-    } else {
-      setAssignUserID(value);
-      setSupervisorRoleId(selectuserRoleRecordofficer);
-      setErrors({});
-    }
-  };
-
   useEffect(() => {
     getRoleHandle();
   }, []);
 
-  const convertedRate =
-    parseFloat(curRate ? curRate : ratevalue) *
-    parseFloat(applicationDetail?.amount);
-
-  const handleuserAddMore = (e) => {
-    setOtheruserfiles([...otheruserfiles, null]);
-  };
-
   const handleFileChange = (e, label) => {
     const file = e.target.files[0];
     const index = files?.findIndex((item) => item.label === label);
-    if (index !== -1) {
-      setFiles((prevFiles) => {
-        const newFiles = [...prevFiles];
-        newFiles[index] = { file, label };
-        return newFiles;
-      });
-    } else {
-      setFiles((prevFiles) => [...prevFiles, { file, label }]);
-    }
-  };
-
-  const HandleFileUpload = (e, label, indx) => {
-    const file = e.target.files[0];
-    const index = files?.findIndex((item, i) => i === indx);
     if (index !== -1) {
       setFiles((prevFiles) => {
         const newFiles = [...prevFiles];
@@ -1524,10 +1492,6 @@ const ExportCircularsEditForm = ({
   const handleOthrefile = (e, id) => {
     const otherfile = e.target.files[0];
     setOtherfilesupload([...otherfilesupload, { otherfile, id }]);
-  };
-
-  const handleAddMore = (e) => {
-    setOtherfiles([...otherfiles, null]);
   };
 
   const handleFIleview = () => {
@@ -1578,13 +1542,8 @@ const ExportCircularsEditForm = ({
     // setselectuserRoleRecordofficer("");
   };
 
-  const getNextvaluesupervisor = (e) => {
-    const value = e.target.checked;
-
-    if (value == false) {
-      setnextlevelvalue("");
-    }
-    setapplicationstaus("");
+  const handleuserAddMore = (e) => {
+    setOtheruserfiles([...otheruserfiles, null]);
   };
 
   const validateForm = () => {
@@ -1610,14 +1569,23 @@ const ExportCircularsEditForm = ({
     }
     if (
       AssignUserID == "" &&
-      (nextlevelvalue == "10") &&
+      nextlevelvalue == "10" &&
       roleID == 6 &&
       checkSupervisor == true
     ) {
       newErrors.assignUserID = "User is required";
       valid = false;
     }
-     if (
+    if (
+      Description == "<p></p>" &&
+      (applicationDetail?.content == "" ||
+        applicationDetail?.content == null ||
+        applicationDetail?.content == "<p></p>")
+    ) {
+      newErrors.Description = "Description is required";
+      valid = false;
+    }
+    if (
       AssignUserID == "" &&
       roleID > 5 &&
       checkSupervisor == true &&
@@ -1626,10 +1594,26 @@ const ExportCircularsEditForm = ({
       newErrors.assignUserID = "User is required";
       valid = false;
     }
-  
+    if (checkSupervisor == true && !AssignUserID) {
+      newErrors.assignedTo = "User is required";
+      valid = false;
+    }
+
+    if (
+      checkSupervisor == true &&
+      applicationDetail?.assignedTo == UserID.replace(/"/g, "") &&
+      applicationDetail?.actionStatus == 15 &&
+      applicationDetail?.actionStatusName == "Referred Back" &&
+      applicationDetail.userID != UserID.replace(/"/g, "") &&
+      !AssignUserID
+    ) {
+      newErrors.assignedTo = "User is required";
+      valid = false;
+    }
+
     if (
       SupervisorRoleId == "" &&
-      ( nextlevelvalue == "15") &&
+      nextlevelvalue == "15" &&
       checkSupervisor == true
     ) {
       newErrors.SupervisorRoleId = "Role is required";
@@ -1654,7 +1638,6 @@ const ExportCircularsEditForm = ({
     return valid;
   };
 
-
   const onShow = () => {
     setTimeout(() => {
       let selectAllCheckbox = document.querySelector(
@@ -1672,6 +1655,7 @@ const ExportCircularsEditForm = ({
     }, 0);
   };
 
+  console.log("Actiondata", Actiondata);
   const filtertin_bpn = companies?.find((company) => {
     if (company.id === getCompanyName?.value) {
       return {
@@ -1698,6 +1682,8 @@ const ExportCircularsEditForm = ({
   const DirectiveOption = adminDirectives?.map((res) => ({
     label: res.directiveName,
     value: res.id,
+    filePath: res.filesData,
+    tagName: res.directiveTags,
   }));
 
   const handleChangeDirective = (e) => {
@@ -1709,7 +1695,8 @@ const ExportCircularsEditForm = ({
   const PdfPrivewsupervisorRef = useRef();
 
   const closePopupHandle = () => {
-    navigate("/BankADLADashboard");
+    // navigate("/BankADLADashboard");
+    navigate("/CircularDashboard");
     EditModalClose();
     handleData();
     setupdatepopup(false);
@@ -1749,7 +1736,7 @@ const ExportCircularsEditForm = ({
     if (FrequencyRef.current) FrequencyRef.current.value = "";
   };
 
-  // select BankiId & Directived Id start 
+  // select BankiId & Directived Id start
 
   const bankSelectedID = selectedBanks?.map((res) => res.value);
   const directiveSelectedID = selectedDirectives?.map((res) => res.value);
@@ -1757,13 +1744,19 @@ const ExportCircularsEditForm = ({
 
   // errors.assignedTo &&
   // !SupervisorRoleId
+
   // Code start for save form
   const HandleSubmit = async (e) => {
     // setSubmitBtnLoader(true);
     let formData = new FormData();
     e.preventDefault();
     if (validateForm()) {
-      setSubmitBtnLoader(true);
+      if (
+        (roleID == 8 && applicationstaus == "10") ||
+        (roleID == 9 && applicationstaus == "10")
+      ) {
+        setSubmitBtnLoader(true);
+      }
       await axios
         .post(APIURL + "Circular/UpdateCircular", {
           ID: applicationDetail?.id,
@@ -1773,74 +1766,195 @@ const ExportCircularsEditForm = ({
           Subject: applicationDetail.subject,
           // Description: Description,
           // Content: applicationDetail.content,
-          Content: Description,
-          ReleasingDate: releasingDate ? releasingDate : applicationDetail.releasingDate,
+          Content:
+            Description == null || Description == "<p></p>" || !Description
+              ? applicationDetail?.content
+              : Description,
+          ReleasingDate: releasingDate
+            ? releasingDate
+            : applicationDetail.releasingDate,
           BankID: bankSelectedID?.join(),
           DirectiveID: directiveSelectedID?.join(),
-          AssignedTo: (AssignUserID == "" || AssignUserID == null) &&
-            roleID != 5 &&
-            roleID != 4
-            ? ""
-            : AssignUserID ? AssignUserID
+          AssignedTo:
+            ((AssignUserID == "" || AssignUserID == null) &&
+              roleID != 5 &&
+              roleID != 4) ||
+            (!AssignUserID && roleID == 5)
+              ? ""
+              : AssignUserID
+              ? AssignUserID
               : UserID.replace(/"/g, ""),
           // AssignedToRoleID: SupervisorRoleId ? SupervisorRoleId : roleID,
-          AssignedToRoleID: (AssignUserID == "" || AssignUserID == null) &&
-            roleID != 5 &&
-            roleID != 4
-            ? "0"
-            : SupervisorRoleId
+          AssignedToRoleID:
+            ((AssignUserID == "" || AssignUserID == null) &&
+              roleID != 5 &&
+              roleID != 4) ||
+            (!AssignUserID && roleID == 5)
+              ? "0"
+              : SupervisorRoleId
               ? SupervisorRoleId
               : AssignUserID && SupervisorRoleId == "" && nextlevelvalue != "20"
-                ? parseInt(roleID) + 1
-                : roleID,
+              ? parseInt(roleID) + 1
+              : roleID,
           CircularStatus:
             roleID == 8
               ? applicationstaus
               : nextlevelvalue == "" && roleID != 8
-                ? applicationstaus
-                : applicationDetail?.analystRecommendation,
+              ? applicationstaus
+              : applicationDetail?.analystRecommendation,
           // ActionStatus: nextlevelvalue,
           ActionStatus:
             (AssignUserID == "" || AssignUserID == null) &&
-              roleID != 5 &&
-              roleID != 4
+            roleID != 5 &&
+            roleID != 4
               ? "100"
               : nextlevelvalue,
           Comment: asignnextLeveldata.Comment,
           Notes: asignnextLeveldata.Notes,
           // AssignedToRoleID: SupervisorRoleId,
-
         })
         .then((res) => {
-          if (res.data.responseCode === '200') {
-         
+          if (res.data.responseCode === "200") {
+            setupdatepopup(true);
+            if (
+              (roleID == 8 && applicationstaus == "10") ||
+              (roleID == 9 && applicationstaus == "10")
+            ) {
+              setupdatepopup(true);
+            }
+            if (
+              (roleID == 8 && applicationstaus == "10") ||
+              (roleID == 9 && applicationstaus == "10")
+            ) {
+              setTimeout(() => {
+                const doc = new jsPDF({
+                  format: "a4",
+                  unit: "pt",
+                });
+
+                const addHeader = (doc) => {
+                  const pageCount = doc.internal.getNumberOfPages();
+                  const headerpositionfromleft =
+                    (doc.internal.pageSize.width - 10) / 4;
+                  for (var i = 1; i <= pageCount; i++) {
+                    doc.setPage(i);
+                    doc.addImage(
+                      logo,
+                      "png",
+                      70,
+                      10,
+                      80,
+                      80,
+                      "DMS-RBZ",
+                      "NONE",
+                      0
+                    );
+                    doc.setFontSize(8);
+                    doc.text(
+                      "Reserve Bank of Zimbabwe. 80 Samora Machel Avenue, P.O. Box 1283, Harare, Zimbabwe.",
+                      headerpositionfromleft + 50,
+                      40
+                    );
+                    doc.text(
+                      "Tel: 263 242 703000, 263 8677000477 | Website:www.rbz.co.zw",
+                      headerpositionfromleft + 100,
+                      50
+                    );
+                  }
+                };
+
+                let docWidth = doc.internal.pageSize.getWidth();
+                doc
+                  .html(PdftargetRef.current, {
+                    x: 12,
+                    y: 12,
+                    width: 513,
+                    height: doc.internal.pageSize.getHeight(),
+                    margin: [110, 80, 60, 35],
+                    windowWidth: 1000,
+                    pagebreak: true,
+                    async callback(doc) {
+                      addHeader(doc);
+                      const blobPDF = doc.output("datauristring");
+                      let formData = new FormData();
+
+                      formData.append("UserID", UserID.replace(/"/g, ""));
+                      formData.append("FileType", "CircularPDF");
+                      formData.append("Label", "Circular");
+
+                      formData.append("CircularID", applicationDetail.id);
+                      formData.append(
+                        "CircularReferenceNumber",
+                        applicationDetail.circularReferenceNumber
+                      );
+                      formData.append(
+                        "DepartmentID",
+                        applicationDetail.departmentID
+                      );
+                      formData.append("PdfData", blobPDF);
+                      axios
+                        .post(ImageAPI + "File/UploadCircularPdf", formData)
+                        .then((res) => {
+                          if (res.data.responseCode == "Success") {
+                            console.log("Successful pdf");
+
+                            setSubmitBtnLoader(false);
+                            // setAssignUserID("");
+                            // setselectuserRoleRecordofficer("");
+                          } else {
+                            console.log("Not Successful pdf");
+                            // setupdatepopup(true);
+                          }
+                        })
+                        .catch((error) =>
+                          console.log("DATA SAVE ERROR--", error)
+                        );
+                    },
+                  })
+                  .then(async (response) => {
+                    console.log("response-- pdf", response);
+                  })
+                  .catch((error) => console.log("pdferror--", error));
+              }, 1500);
+            }
+
             const fileupload = userfiles.length > 0 ? userfiles : files;
-            for (let i = 0; i < fileupload?.length; i++) { // Corrected loop condition
+            for (let i = 0; i < fileupload?.length; i++) {
+              // Corrected loop condition
               formData.append("files", fileupload[i].file);
               formData.append("Label", fileupload[i].id);
             }
             formData.append("CircularID", res.data.responseData.id);
-            formData.append("circularActivityID", res.data.responseData.circularActivityID);
+            formData.append(
+              "circularActivityID",
+              res.data.responseData.circularActivityID
+            );
             formData.append("DepartmentID", res.data.responseData.departmentID);
             formData.append("UserID", UserID.replace(/"/g, ""));
-            axios.post(ImageAPI + 'File/UploadCircularDocs', formData)
-              .then((res) => {
-
-              })
+            axios
+              .post(ImageAPI + "File/UploadCircularDocs", formData)
+              .then((res) => {})
               .catch((err) => {
-                console.log("file Upload ", err)
-              })
-            toast.success(res.data.responseMessage, { autoClose: 2000 })
-            setTimeout(() => {
-              EditModalClose();
-              handleData();
-              setToastDisplayed(false);
-            }, 2500)
+                console.log("file Upload ", err);
+              });
+            // toast.success(res.data.responseMessage, { autoClose: 2000 })
+            // setTimeout(() => {
+            //   if ((roleID == 8 && applicationstaus == "10") || (roleID == 9 && applicationstaus == "10")) {
+
+            //     handleData();
+            //   }else{
+            //     EditModalClose();
+            //     setToastDisplayed(false);
+            //     handleData();
+            //   }
+            //   setSubmitBtnLoader(false)
+
+            // }, 2500)
           } else {
-            toast.error(res.data.responseMessage, { autoClose: 2000 })
+            toast.error(res.data.responseMessage, { autoClose: 2000 });
             setTimeout(() => {
               setToastDisplayed(false);
-            }, 2500)
+            }, 2500);
           }
         })
         .catch((err) => {
@@ -1850,12 +1964,13 @@ const ExportCircularsEditForm = ({
       if (!toastDisplayed) {
         toast.warning("Please fill all mandatory fields");
       }
-      setToastDisplayed(true);
+      if (roleID !== 8 || roleID !== 9) {
+        setToastDisplayed(true);
+      }
       // setSubmitBtnLoader(false);
     }
   };
   // End code for save form
-
 
   useEffect(() => {
     handleData();
@@ -1866,6 +1981,7 @@ const ExportCircularsEditForm = ({
     setgetCompanyName(selectedOption);
   };
 
+  console.log("errors", errors);
   const handleInputChangecompany = (input) => {
     setInputValue(input);
     if (input?.length >= 3) {
@@ -1899,13 +2015,13 @@ const ExportCircularsEditForm = ({
     }
   }, [toastDisplayed]);
 
+  console.log("Description", Description);
+
   const CCValue = applicationDetail?.copiedResponses?.length
     ? applicationDetail?.copiedResponses?.map((v, i) => (
-      <li key={i}>{v.bankName}</li>
-    ))
+        <li key={i}>{v.bankName}</li>
+      ))
     : null;
-
-
 
   // const finalArray = getBlankFile?.map((blankFile) => {
   //   const attachedFile = applicationDetail?.attachedFiles?.find(
@@ -1963,9 +2079,6 @@ const ExportCircularsEditForm = ({
       });
   };
 
-
-
-
   return (
     <>
       {/* <h3 className="export-pop-heading">
@@ -2000,7 +2113,6 @@ const ExportCircularsEditForm = ({
 
             <form className="circular-form">
               <div className={geninfoTab ? "customtab" : "d-none"}>
-
                 <div className="tab-content pt-2">
                   <div
                     className={
@@ -2008,11 +2120,10 @@ const ExportCircularsEditForm = ({
                         ? "tab-pane fade show active"
                         : "tab-pane fade show"
                     }
-                    id="analyst-justified-home"
-                    role="tabpanel"
-                    aria-labelledby="analyst"
+                    // id="analyst-justified-home"
+                    // role="tabpanel"
+                    // aria-labelledby="analyst"
                   >
-
                     <div className="inner_form_new ">
                       <label className="controlform">Name</label>
                       <div className="form-bx">
@@ -2026,19 +2137,23 @@ const ExportCircularsEditForm = ({
                             }}
                             // value={exportForm.name}
                             value={applicationDetail.name}
-                            disabled={applicationDetail?.userID !== UserID.replace(/"/g, "") ? true : false}
+                            disabled={
+                              applicationDetail?.userID !==
+                              UserID.replace(/"/g, "")
+                                ? true
+                                : false
+                            }
                           />
                           <span className="sspan"></span>
                         </label>
                         {errors?.name ? (
-                          <span className="errormsg">
-                            {errors?.name}
-                          </span>
-                        ) : ""}
+                          <span className="errormsg">{errors?.name}</span>
+                        ) : (
+                          ""
+                        )}
                       </div>
                     </div>
                     {/* end form-bx  */}
-
 
                     <div
                       className={
@@ -2046,20 +2161,20 @@ const ExportCircularsEditForm = ({
                           ? "inner_form_new align-items-start mt-2"
                           : "d-none"
                       }
-
                     >
                       <label className="controlform">Content</label>
-                      <div className="form-bx editorFieldBox" >
-                        {applicationDetail?.userID == UserID.replace(/"/g, "") ?
+                      <div className="form-bx editorFieldBox">
+                        {applicationDetail?.userID ==
+                        UserID.replace(/"/g, "") ? (
                           <div className="mt-2 py-1">
                             <MenuBar editor={editorAnalyst} />
                             <EditorContent editor={editorAnalyst} />
 
                             <span className="sspan"></span>
                             {(errors.Description && Description == " ") ||
-                              Description == null ||
-                              Description == "<p></p>" ||
-                              !Description ? (
+                            Description == null ||
+                            Description == "<p></p>" ||
+                            !Description ? (
                               <small
                                 className="errormsg"
                                 style={{ bottom: "-13px" }}
@@ -2070,9 +2185,18 @@ const ExportCircularsEditForm = ({
                               ""
                             )}
                           </div>
-                          : <div className="form-bxx ">
-                            <p className="showData analyst_desc mt-2 py-1" dangerouslySetInnerHTML={applicationDetail?.content ? { __html: applicationDetail.content } : { __html: "-" }}></p>
-                          </div>}
+                        ) : (
+                          <div className="form-bxx ">
+                            <p
+                              className="showData analyst_desc mt-2 py-1"
+                              dangerouslySetInnerHTML={
+                                applicationDetail?.content
+                                  ? { __html: applicationDetail.content }
+                                  : { __html: "-" }
+                              }
+                            ></p>
+                          </div>
+                        )}
                       </div>
                     </div>
                     {/* end form-bx  */}
@@ -2161,8 +2285,8 @@ const ExportCircularsEditForm = ({
                         </span>
 
                         {userfiles?.length &&
-                          userfiles?.find((f) => f.id === "other" + index)
-                            ?.file?.name ? (
+                        userfiles?.find((f) => f.id === "other" + index)?.file
+                          ?.name ? (
                           <button
                             type="button"
                             className="remove-file"
@@ -2214,10 +2338,14 @@ const ExportCircularsEditForm = ({
                             value={selectedBanks}
                             isSelectAll={true}
                             menuPlacement={"bottom"}
-                            disabled={applicationDetail?.userID !== UserID.replace(/"/g, "") ? true : false}
+                            disabled={
+                              applicationDetail?.userID !==
+                              UserID.replace(/"/g, "")
+                                ? true
+                                : false
+                            }
                           />
                         </div>
-
                       </div>
                     </div>
                     {/* end form-bx  */}
@@ -2233,33 +2361,30 @@ const ExportCircularsEditForm = ({
                               changeHandelForm(e);
                             }}
                             value={applicationDetail.subject}
-                            disabled={applicationDetail?.userID !== UserID.replace(/"/g, "") ? true : false}
+                            disabled={
+                              applicationDetail?.userID !==
+                              UserID.replace(/"/g, "")
+                                ? true
+                                : false
+                            }
                           />
                           <span className="sspan"></span>
                         </label>
                         {errors?.subject ? (
-                          <span className="errormsg">
-                            {errors?.subject}
-                          </span>
-                        ) : ""}
+                          <span className="errormsg">{errors?.subject}</span>
+                        ) : (
+                          ""
+                        )}
                       </div>
                     </div>
 
                     {/* end form-bx  */}
-                    <div className="inner_form_new ">
+                    {/* <div className="inner_form_new ">
                       <label className="controlform">Directives</label>
+
                       <div className="cccto">
                         <div className="flex justify-content-center multiSelect">
-                          {/* <MultiSelect
-                            value={selectedDirectives}
-                            onChange={(e) => setSelectedDirectives(e.value)}
-                            options={DirectiveOption}
-                            optionLabel="name"
-                            name="directiveData"
-                            placeholder="Select Directives"
-                            display="chip"
-                            disabled={applicationDetail?.userID !== UserID.replace(/"/g, "") ? true : false}
-                          /> */}
+                     
                           <DirectiveMultiSelectComponent
                             key="multyselectprinciple"
                             options={DirectiveOption}
@@ -2270,11 +2395,146 @@ const ExportCircularsEditForm = ({
                             menuPlacement={"bottom"}
                             disabled={applicationDetail?.userID !== UserID.replace(/"/g, "") ? true : false}
                           />
-                          {/* {errors?.directiveData ? (
-                            <small className="errormsg">{errors.directiveData}</small>
+                          
+                        </div>
+                      </div>
+                    </div> */}
+
+                    <div className="inner_form_new">
+                      <label className="controlform">Directives</label>
+                      <div className="cccto position-relative">
+                        <div className="multiselect d-flex justify-content-between align-items-end">
+                          <div className="adddirectiveBox">
+                            <ul className="newdirectivelist">
+                              {selectedDirectives?.length ? (
+                                selectedDirectives?.map((res) => {
+                                  return <li>{res?.label}</li>;
+                                })
+                              ) : (
+                                <li className="disabletext">
+                                  Select Directives
+                                </li>
+                              )}
+                            </ul>
+                          </div>
+                          <Button
+                            variant="primary"
+                            className="addDirectiveBtn"
+                            onClick={handleGenInfoDirectiveModalShow}
+                            disabled={
+                              applicationDetail?.userID !==
+                              UserID.replace(/"/g, "")
+                                ? true
+                                : false
+                            }
+                          >
+                            Add Directives
+                          </Button>
+                          {errors?.selectedDirectives &&
+                          selectedDirectives.length == 0 ? (
+                            <small className="errormsg directiveErrormsg">
+                              {errors.selectedDirectives}
+                            </small>
                           ) : (
                             ""
-                          )} */}
+                          )}
+                          <Modal
+                            size="lg"
+                            show={showGenInfoDirectiveModal}
+                            onHide={handleGenInfoDirectiveClose}
+                            backdrop="static"
+                            className="directiveModal"
+                          >
+                            <div className="application-box">
+                              <div className="login_inner">
+                                <div className="login_form ">
+                                  <h5>
+                                    <Modal.Header closeButton className="p-0">
+                                      <Modal.Title>
+                                        Add Directives
+                                        {/* <big>{applicationDetail?.circularReferenceNumber}</big> */}
+                                      </Modal.Title>
+                                    </Modal.Header>
+                                  </h5>
+                                </div>
+                                <div className="login_form_panel">
+                                  <Modal.Body className="p-0">
+                                    <DirectiveMultiSelectComponent
+                                      key="multyselectprinciple"
+                                      placeholder="Select Directives"
+                                      options={DirectiveOption}
+                                      onChange={(e) => handleChangeDirective(e)}
+                                      value={selectedDirectives}
+                                      isSelectAll={true}
+                                      menuPlacement={"bottom"}
+                                    />
+
+                                    <div className="directiveFileData-field">
+                                      <div className="directiveFileData-show">
+                                        {selectedDirectives?.length > 0 ? (
+                                          selectedDirectives.map((item) => {
+                                            const firstTagName =
+                                              item.tagName.split(",")[0]; // Extract the first tag name
+                                            return (
+                                              <>
+                                                {item?.filePath.length > 0 ? (
+                                                  <div
+                                                    className="directiveFileBox"
+                                                    key={item.value}
+                                                  >
+                                                    {/* <div>{firstTagName}</div> Display the first tag name */}
+                                                    {item.filePath.map(
+                                                      (fileItem, index) => (
+                                                        <a
+                                                          target="_blank"
+                                                          href={
+                                                            fileItem.filePath
+                                                          }
+                                                          key={fileItem.id}
+                                                          style={{
+                                                            marginBottom: "3px",
+                                                            letterSpacing:
+                                                              "0.01px",
+                                                            fontSize: "14px",
+                                                            fontWeight: "400",
+                                                            display: "block",
+                                                            padding: "0px 5px",
+                                                            color: "#4154f1",
+                                                            // borderBottom:"1px solid #ddd"
+                                                          }}
+                                                        >
+                                                          {firstTagName +
+                                                            (index + 1)}
+                                                          {/* {fileItem.filePath} */}
+                                                        </a>
+                                                      )
+                                                    )}
+                                                  </div>
+                                                ) : (
+                                                  ""
+                                                )}
+                                              </>
+                                            );
+                                          })
+                                        ) : (
+                                          <></>
+                                        )}
+                                      </div>
+                                    </div>
+                                  </Modal.Body>
+                                </div>
+                                <Modal.Footer className="justify-content-end">
+                                  <Button
+                                    variant="secondary"
+                                    onClick={handleGenInfoDirectiveClose}
+                                  >
+                                    Close
+                                  </Button>
+                                  {/* <Button variant="primary" onClick={handleDirectiveClose}>Add</Button> */}
+                                </Modal.Footer>
+                              </div>
+                            </div>
+                          </Modal>
                         </div>
                       </div>
                     </div>
@@ -2286,7 +2546,11 @@ const ExportCircularsEditForm = ({
                           ref={FrequencyDateRef}
                           placeholderText="Select Releasing Date"
                           closeOnScroll={(e) => e.target === document}
-                          selected={releasingDate ? releasingDate : applicationDetail.releasingDate}
+                          selected={
+                            releasingDate
+                              ? releasingDate
+                              : applicationDetail.releasingDate
+                          }
                           onChange={(date) => setReleasingDate(date)}
                           peekNextMonth
                           showMonthDropdown
@@ -2294,40 +2558,56 @@ const ExportCircularsEditForm = ({
                           minDate={new Date()}
                           dropdownMode="select"
                           dateFormat="dd/MMMM/yyyy"
-                          disabled={applicationDetail?.userID !== UserID.replace(/"/g, "") ? true : false}
+                          disabled={
+                            applicationDetail?.userID !==
+                            UserID.replace(/"/g, "")
+                              ? true
+                              : false
+                          }
                         />
-                        {
-                          errors?.releasingDate ? (
-                            <small className="errormsg">{errors.releasingDate}</small>
-                          ) : (" ")
-                        }
+                        {errors?.releasingDate ? (
+                          <small className="errormsg">
+                            {errors.releasingDate}
+                          </small>
+                        ) : (
+                          " "
+                        )}
                       </div>
                     </div>
                     {/* end form-bx  */}
-                    {applicationDetail?.userID == UserID.replace(/"/g, "") ?
+                    {applicationDetail?.userID == UserID.replace(/"/g, "") ? (
                       <div className="inner_form_new ">
-                        <label className="controlform">Assign to Next Level</label>
+                        <label className="controlform">
+                          Assign to Next Level
+                        </label>
                         <input
                           type="checkbox"
                           onChange={HandelSupervisorcheck}
                           checked={checkSupervisor}
-                          disabled={applicationDetail?.userID !== UserID.replace(/"/g, "") ? true : false}
-
+                          disabled={
+                            applicationDetail?.userID !==
+                            UserID.replace(/"/g, "")
+                              ? true
+                              : false
+                          }
                         />
                       </div>
-                      : ""}
-
-
-
+                    ) : (
+                      ""
+                    )}
 
                     {roleID >= "5" && checkSupervisor == true ? (
                       <>
                         <div className="inner_form_new">
                           {/* <label className="controlform">Select Analyst</label> */}
                           <label className="controlform">
-                            {
-                              roleID == "5" ? " Senior Analyst" : roleID == "6" ? " Principal Analyst" : roleID == "7" ? " Deputy Director" : " Director"
-                            }
+                            {roleID == "5"
+                              ? " Senior Analyst"
+                              : roleID == "6"
+                              ? " Principal Analyst"
+                              : roleID == "7"
+                              ? " Deputy Director"
+                              : " Director"}
                           </label>
                           <div className="form-bx">
                             <label>
@@ -2336,13 +2616,20 @@ const ExportCircularsEditForm = ({
                                 name="assignedTo"
                                 onChange={supervisorHangechangeBankuser}
                                 className={
-                                  errors.assignedTo && !AssignUserID ? "error" : ""
+                                  errors.assignedTo && !AssignUserID
+                                    ? "error"
+                                    : ""
                                 }
                               >
                                 <option value="">
-                                  {
-                                    roleID == "5" ? " Senior Analyst" : roleID == "6" ? " Principal Analyst" : roleID == "7" ? " Deputy Director" : " Director"
-                                  }
+                                  Select
+                                  {roleID == "5"
+                                    ? " Senior Analyst"
+                                    : roleID == "6"
+                                    ? " Principal Analyst"
+                                    : roleID == "7"
+                                    ? " Deputy Director"
+                                    : " Director"}
                                 </option>
                                 {Supervisors?.map((item, index) => {
                                   return (
@@ -2350,7 +2637,8 @@ const ExportCircularsEditForm = ({
                                       key={index}
                                       value={JSON?.stringify(item)}
                                       selected={
-                                        item.userID == applicationDetail?.assignedTo
+                                        item.userID ==
+                                        applicationDetail?.assignedTo
                                       }
                                     >
                                       {item.name}
@@ -2373,11 +2661,12 @@ const ExportCircularsEditForm = ({
                     ) : (
                       ""
                     )}
-                    {applicationDetail?.userID !== UserID.replace(/"/g, "") ?
+                    {applicationDetail?.userID !== UserID.replace(/"/g, "") ? (
                       <div
-                        class=
-                        {
-                          applicationDetail?.circularStatus == 0 ? "d-none" : "row"
+                        class={
+                          applicationDetail?.circularStatus == 0
+                            ? "d-none"
+                            : "row"
                         }
                       >
                         <div class="col-md-6">
@@ -2401,7 +2690,9 @@ const ExportCircularsEditForm = ({
                         </div>
                         <div class="col-md-6">
                           <div class="inner_form_new-sm ">
-                            <label class="controlform-sm">Assigned To User</label>
+                            <label class="controlform-sm">
+                              Assigned To User
+                            </label>
                             <div class="form-bx-sm">
                               <label>
                                 <input
@@ -2419,67 +2710,65 @@ const ExportCircularsEditForm = ({
                           </div>
                         </div>
                       </div>
-                      : " "}
+                    ) : (
+                      " "
+                    )}
                     {/* previous edit form end   */}
                     {/* upload file Data Start */}
 
-
                     <h5 className="section_top_subheading mt-2">Attachments</h5>
 
-                    {applicationDetail?.attachedFiles.length > 0 ? (
-                      applicationDetail?.attachedFiles?.map((item) => {
-                        return (
-                          < div
-                            className={
-                              item?.filePath != null
-                                ? "attachemt_form-bx"
-                                : "d-none"
-                            }
-                          >
-                            <label
-                              style={{
-                                background: "#d9edf7",
-                                padding: "9px 3px",
-                                border: "0px",
-                              }}
+                    {applicationDetail?.attachedFiles?.length > 0
+                      ? applicationDetail?.attachedFiles?.map((item) => {
+                          return (
+                            <div
+                              className={
+                                item?.filePath != null
+                                  ? "attachemt_form-bx"
+                                  : "d-none"
+                              }
                             >
-                              {item?.fileName ? (
-                                <span style={{ fontWeight: "500" }}>
-                                  {/* {item?.fileName}  */}
-                                  {item?.label ? item?.label : item?.fileName}
+                              <label
+                                style={{
+                                  background: "#d9edf7",
+                                  padding: "9px 3px",
+                                  border: "0px",
+                                }}
+                              >
+                                {item?.fileName ? (
+                                  <span style={{ fontWeight: "500" }}>
+                                    {/* {item?.fileName}  */}
+                                    {item?.label ? item?.label : item?.fileName}
+                                  </span>
+                                ) : (
+                                  <span style={{ fontWeight: "500" }}>
+                                    Cover Letter
+                                  </span>
+                                )}
+                              </label>
+                              {item?.filePath ? (
+                                <span className="filename">
+                                  <Link
+                                    to={item?.filePath}
+                                    target="_blank"
+                                    className={
+                                      item?.filePath
+                                        ? "viewbtn_file"
+                                        : "viewbtn_file pe-none"
+                                    }
+                                  >
+                                    View File
+                                  </Link>
                                 </span>
                               ) : (
-                                <span style={{ fontWeight: "500" }}>Cover Letter</span>
+                                <span className="disabletext">Not Found</span>
                               )}
-                            </label>
-                            {item?.filePath ? (
-                              <span className="filename">
-                                <Link
-                                  to={item?.filePath}
-                                  target="_blank"
-                                  className={
-                                    item?.filePath
-                                      ? "viewbtn_file"
-                                      : "viewbtn_file pe-none"
-                                  }
-                                >
-                                  View File
-                                </Link>
-                              </span>
-                            ) : (
-                              <span className="disabletext">Not Found</span>
-                            )}
-                          </div>
-                        )
-                      })
-
-                    ) : (
-                      ""
-                    )}
+                            </div>
+                          );
+                        })
+                      : ""}
                   </div>
-
                 </div>
-
               </div>
               {/* -------------start next level------- */}
               {/* analyst analyst code start */}
@@ -2500,8 +2789,6 @@ const ExportCircularsEditForm = ({
                     </span>
                   </h5>
                   <div className={analystTab ? "customtab" : "d-none"}>
-
-
                     {allcomment?.map((cur, i) => {
                       if (cur.assignedToRoleID == 5) {
                         return (
@@ -2524,8 +2811,8 @@ const ExportCircularsEditForm = ({
                                     : "nav-link w-100 border-radius0"
                                 }
                                 id="analyst"
-                                data-bs-toggle="tab"
-                                data-bs-target="#analyst-justified-home"
+                              data-bs-toggle="tab"
+                              data-bs-target="#analyst-justified-home"
                                 type="button"
                                 role="tab"
                                 aria-controls="home"
@@ -2556,7 +2843,6 @@ const ExportCircularsEditForm = ({
                                       aria-controls="home"
                                       aria-selected="true"
                                     >
-
                                       Response{" "}
                                       {cur?.circularActivityData?.length -
                                         index}
@@ -2567,14 +2853,12 @@ const ExportCircularsEditForm = ({
                           </ul>
                         );
                       }
-                    })
-
-                    }
+                    })}
 
                     <div className="tab-content pt-2">
                       <div
                         className={
-                          roleID >= 5
+                          roleID == 5
                             ? "tab-pane fade show active"
                             : "tab-pane fade show"
                         }
@@ -2582,16 +2866,15 @@ const ExportCircularsEditForm = ({
                         role="tabpanel"
                         aria-labelledby="analyst"
                       >
+                        
                         {Actiondata?.map((cur) => {
-
-                          const firstItem = cur?.circularActivityData?.[0];
-                          // Accessing the first element directly
+                          const firstItem = cur?.circularActivityData?.[0]; // Accessing the first element directly
 
                           if (cur?.assignedToRoleID === 5 && firstItem) {
                             // Check if firstItem exists
                             return (
                               <div className="bakgroundaction">
-                                <div key={firstItem.actionID}>
+                                <div key={firstItem.circularID}>
                                   {" "}
                                   {/* Remember to add a unique key */}
                                   <div className="row">
@@ -2611,13 +2894,13 @@ const ExportCircularsEditForm = ({
                                               value={
                                                 firstItem?.actionStatusName ==
                                                   "Approved" ||
-                                                  firstItem?.actionStatusName ==
+                                                firstItem?.actionStatusName ==
                                                   "Reject" ||
-                                                  firstItem?.actionStatusName ==
-                                                  "Cancelled" ||
-                                                  firstItem?.actionStatusName ==
-                                                  "Draft"
-                                                  ? "Assigned"
+                                                firstItem?.actionStatusName ==
+                                                  "Cancelled"
+                                                  ? "Assigned" ||
+                                                    firstItem?.actionStatusName ==
+                                                      "Draft"
                                                   : firstItem?.actionStatusName
                                               }
                                             />
@@ -2654,9 +2937,9 @@ const ExportCircularsEditForm = ({
                                         <label className="controlform-sm">
                                           {firstItem?.actionStatusName ==
                                             "Approved" ||
-                                            firstItem?.actionStatusName ==
+                                          firstItem?.actionStatusName ==
                                             "Reject" ||
-                                            firstItem?.actionStatusName ==
+                                          firstItem?.actionStatusName ==
                                             "Cancelled"
                                             ? "Assigned"
                                             : firstItem?.actionStatusName}{" "}
@@ -2726,389 +3009,15 @@ const ExportCircularsEditForm = ({
                             );
                           }
                         })}
-                        {/* previous edit form start  */}
-                        {/* <div className="inner_form_new ">
-                          <label className="controlform">Name</label>
-                          <div className="form-bx">
-                            <label>
-                              <input
-                                type="text"
-                                name="name"
-                                placeholder="Name"
-                                onChange={(e) => {
-                                  changeHandelForm(e);
-                                }}
-                                // value={exportForm.name}
-                                value={applicationDetail.name}
-                                disabled={roleID > 5}
-                              />
-                              <span className="sspan"></span>
-                            </label>
-                            {errors?.name ? (
-                              <span className="errormsg">
-                                {errors?.name}
-                              </span>
-                            ) : ""}
-                          </div>
-                        </div>
-                     
-                        <div
-                          className={
-                            roleID == 5
-                              ? "inner_form_new align-items-start mt-2"
-                              : "d-none"
-                          }
-                        >
-                          <label className="controlform">Content</label>
-                          <div className="form-bx editorFieldBox">
-                            <div className="mt-2 py-1">
-                              <MenuBar editor={editorAnalyst} />
-                              <EditorContent editor={editorAnalyst} />
-
-                              <span className="sspan"></span>
-                              {(errors.Description && Description == " ") ||
-                                Description == null ||
-                                Description == "<p></p>" ||
-                                !Description ? (
-                                <small
-                                  className="errormsg"
-                                  style={{ bottom: "-13px" }}
-                                >
-                                  {errors.Description}
-                                </small>
-                              ) : (
-                                ""
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                    
-
-                        {attachmentData?.map((items, index) => {
-                          return (
-                            <div
-                              className="attachemt_form-bx  mt-2"
-                              key={items.id}
-                            >
-                              <label
-                                style={{
-                                  background: "#d9edf7",
-                                  padding: "9px 3px",
-                                  border: "0px",
-                                }}
-                              >
-                                <span style={{ fontWeight: "500" }}>
-                                  {items.filename}
-                                </span>
-                              </label>
-                              <div className="browse-btn">
-                                Browse
-                                <input
-                                  type="file"
-                                  onChange={(e) =>
-                                    handleuserFileChange(e, "circular" + (index + 1))
-                                  }
-                                />
-                              </div>
-                              <span className="filename">
-                                {userfiles?.find(
-                                  (f) => f.id === "circular" + (index + 1)
-                                )?.file?.name || "No file chosen"}
-                              </span>
-                              {userfiles?.length &&
-                                userfiles?.find((f) => f.id === "circular" + (index + 1))
-                                  ?.file?.name ? (
-                                <button
-                                  type="button"
-                                  className="remove-file"
-                                  onClick={() =>
-                                    removeUserImage(index, "circular" + (index + 1))
-                                  }
-                                >
-                                  Remove
-                                </button>
-                              ) : (
-                                ""
-                              )}
-                            </div>
-                          );
-                        })}
-
-                        {otheruserfiles.map((file, index) => (
-                          <div
-                            key={"other" + (index + 1)}
-                            className="attachemt_form-bx"
-                          >
-                            <label
-                              style={{
-                                background: "#d9edf7",
-                                padding: "9px 3px",
-                                border: "0px",
-                              }}
-                            >
-                              <b>
-                                Other File
-                                {index + 1}
-                              </b>
-                            </label>
-                            <div className="browse-btn">
-                              Browse{" "}
-                              <input
-                                type="file"
-                                onChange={(e) => {
-                                  handleuserFileChange(e, "other" + index);
-                                  handleOthrefile(e, `other ${index}`);
-                                }}
-                              />
-                            </div>
-                            <span className="filename">
-                              {userfiles?.find((f) => f.id === "other" + index)
-                                ?.file?.name || "No file chosen"}
-                            </span>
-
-                            {userfiles?.length &&
-                              userfiles?.find((f) => f.id === "other" + index)
-                                ?.file?.name ? (
-                              <button
-                                type="button"
-                                className="remove-file"
-                                onClick={() =>
-                                  removeUserImage(index, "other" + index)
-                                }
-                              >
-                                Remove
-                              </button>
-                            ) : (
-                              ""
-                            )}
-                          </div>
-                        ))}
-
-                        {otheruserfiles?.length || userfiles?.length ? (
-                          <div className="attachemt_form-bx">
-                            <label style={{ border: "0px" }}>{""}</label>
-                            <button
-                              type="button"
-                              className="addmore-btn mt-0"
-                              onClick={(e) => handleuserAddMore(e)}
-                            >
-                              {" "}
-                              Add More File{" "}
-                            </button>
-                          </div>
-                        ) : (
-                          ""
-                        )}
-                        <div className="inner_form_new">
-                          <label className="controlform">Bank</label>
-                          <div className="form-bx">
-                            <div className="multiselect flex justify-content-center">
-                              <MultiSelect
-                                value={selectedBanks}
-                                onChange={(e) => setSelectedBanks(e.value)}
-                                options={vOption}
-                                optionLabel="name"
-                                // selected={applicationDetail?.bankData?.map((item) => item.bankName == vOption.name)}
-                                onShow={onShow}
-                                placeholder="Select Banks"
-                                display="chip"
-                                disabled={roleID > 5}
-                              />
-                            </div>
-
-                          </div>
-                        </div>
-                     
-                        <div className="inner_form_new ">
-                          <label className="controlform">Subject</label>
-                          <div className="form-bx">
-                            <label>
-                              <input
-                                type="text"
-                                name="subject"
-                                placeholder="Subject"
-                                onChange={(e) => {
-                                  changeHandelForm(e);
-                                }}
-                                value={applicationDetail.subject}
-                                disabled={roleID > 5}
-                              />
-                              <span className="sspan"></span>
-                            </label>
-                            {errors?.subject ? (
-                              <span className="errormsg">
-                                {errors?.subject}
-                              </span>
-                            ) : ""}
-                          </div>
-                        </div>
-
-                      
-                        <div className="inner_form_new ">
-                          <label className="controlform">Directives</label>
-                          <div className="form-bx">
-                            <div className="multiselect flex justify-content-center">
-                              <MultiSelect
-                                value={selectedDirectives}
-                                onChange={(e) => setSelectedDirectives(e.value)}
-                                options={DirectiveOption}
-                                optionLabel="name"
-                                name="directiveData"
-                                placeholder="Select Directives"
-                                display="chip"
-                                disabled={roleID > 5}
-                              />
-                              {errors?.directiveData ? (
-                                <small className="errormsg">{errors.directiveData}</small>
-                              ) : (
-                                ""
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                     
-                        <div className="inner_form_new ">
-                          <label className="controlform">Releasing Date</label>
-                          <div className="form-bx">
-                            <DatePicker
-                              placeholderText="Select Releasing Date"
-                              closeOnScroll={(e) => e.target === document}
-                              selected={releasingDate}
-                              onChange={(date) => setReleasingDate(date)}
-                              peekNextMonth
-                              showMonthDropdown
-                              showYearDropdown
-                              minDate={new Date()}
-                              dropdownMode="select"
-                              dateFormat="dd/MMMM/yyyy"
-                              disabled={roleID > 5}
-                            />
-                            {
-                              errors?.releasingDate ? (
-                                <small className="errormsg">{errors.releasingDate}</small>
-                              ) : (" ")
-                            }
-                          </div>
-                        </div>
-                     
-                        <div className="inner_form_new ">
-                          <label className="controlform">Assign to Next Level</label>
-                          <input
-                            type="checkbox"
-                            onChange={HandelSupervisorcheck}
-                            checked={checkSupervisor}
-                            // disabled={roleID >= 6 ? true : false}
-                            disabled={roleID > 5}
-                          />
-                        </div>
-                      
-
-
-                        {roleID == "5" && checkSupervisor == true ? (
-                          <>
-                            <div className="inner_form_new">
-                              <label className="controlform">Select Analyst</label>
-                              <div className="form-bx">
-                                <label>
-                                  <select
-                                    ref={assignedToRef}
-                                    name="assignedTo"
-                                    onChange={supervisorHangechangeBankuser}
-                                    className={
-                                      errors.assignedTo && !AssignUserID ? "error" : ""
-                                    }
-                                  >
-                                    <option value="">Select Analyst</option>
-                                    {Supervisors?.map((item, index) => {
-                                      return (
-                                        <option
-                                          key={index}
-                                          value={JSON?.stringify(item)}
-                                          selected={
-                                            item.userID == applicationDetail?.assignedTo
-                                          }
-                                        >
-                                          {item.name}
-                                        </option>
-                                      );
-                                    })}
-                                  </select>
-                                  <span className="sspan"></span>
-                                  {errors.assignedTo && !AssignUserID ? (
-                                    <small className="errormsg">
-                                      {errors.assignedTo}
-                                    </small>
-                                  ) : (
-                                    ""
-                                  )}
-                                </label>
-                              </div>
-                            </div>
-                          </>
-                        ) : (
-                          ""
-                        )}
-
-                      <h5 className="section_top_subheading mt-2">Attachments</h5>
-
-                        {applicationDetail?.attachedFiles.length > 0 ? (
-                          applicationDetail?.attachedFiles?.map((item) => {
-                            return (
-                              < div
-                                className={
-                                  item?.filePath != null
-                                    ? "attachemt_form-bx"
-                                    : "d-none"
-                                }
-                              >
-                                <label
-                                  style={{
-                                    background: "#d9edf7",
-                                    padding: "9px 3px",
-                                    border: "0px",
-                                  }}
-                                >
-                                  {item?.fileName ? (
-                                    <span style={{ fontWeight: "500" }}>
-                                      {item?.fileName}
-                                    </span>
-                                  ) : (
-                                    <span style={{ fontWeight: "500" }}>Cover Letter</span>
-                                  )}
-                                </label>
-                                {item?.filePath ? (
-                                  <span className="filename">
-                                    <Link
-                                      to={item?.filePath}
-                                      target="_blank"
-                                      className={
-                                        item?.filePath
-                                          ? "viewbtn_file"
-                                          : "viewbtn_file pe-none"
-                                      }
-                                    >
-                                      View File
-                                    </Link>
-                                  </span>
-                                ) : (
-                                  <span className="disabletext">Not Found</span>
-                                )}
-                              </div>
-                            )
-                          })
-
-                        ) : (
-                          ""
-                        )} */}
-
+                         
                       </div>
-                      {allcomment?.map((cur) => {
 
+
+                      {allcomment?.map((cur) => {
                         return cur?.circularActivityData
                           ?.slice()
                           ?.reverse()
                           .map((item, index) => {
-
                             if (cur?.assignedToRoleID == 5) {
                               return (
                                 <>
@@ -3116,14 +3025,20 @@ const ExportCircularsEditForm = ({
                                     key={index}
                                     className={
                                       index == 0 && roleID != 5
-                                        ? "tab-pane fade show active"
-                                        : "tab-pane fade show  "
+                                        ?  "tab-pane fade show active"
+                                      : "tab-pane fade show  "
                                     }
                                     id={"analyst-justified-home" + index}
                                     role="tabpanel"
                                     aria-labelledby={"analyst" + index}
                                   >
-                                    <div className={item?.actionStatusName ? "bakgroundaction" : "d-none"}>
+                                    <div
+                                      className={
+                                        item?.actionStatusName
+                                          ? "bakgroundaction"
+                                          : "d-none"
+                                      }
+                                    >
                                       <div className="row">
                                         <div className="col-md-6">
                                           <div className="inner_form_new ">
@@ -3137,16 +3052,15 @@ const ExportCircularsEditForm = ({
                                                   className=""
                                                   disabled
                                                   value={
-
                                                     item?.actionStatusName ==
                                                       "Approved" ||
-                                                      item?.actionStatusName ==
+                                                    item?.actionStatusName ==
                                                       "Reject" ||
-                                                      item?.actionStatusName ==
+                                                    item?.actionStatusName ==
                                                       "Cancelled"
                                                       ? "Assigned" ||
-                                                      item?.actionStatusName ==
-                                                      "Draft"
+                                                        item?.actionStatusName ==
+                                                          "Draft"
                                                       : item?.actionStatusName
                                                   }
                                                 />
@@ -3182,9 +3096,9 @@ const ExportCircularsEditForm = ({
                                             <label className="controlform-sm">
                                               {item?.actionStatusName ==
                                                 "Approved" ||
-                                                item?.actionStatusName ==
+                                              item?.actionStatusName ==
                                                 "Reject" ||
-                                                item?.actionStatusName ==
+                                              item?.actionStatusName ==
                                                 "Cancelled"
                                                 ? "Assigned"
                                                 : item?.actionStatusName}{" "}
@@ -3247,8 +3161,6 @@ const ExportCircularsEditForm = ({
                                       </div>
                                     </div>
 
-
-
                                     <div className="inner_form_new ">
                                       <label className="controlform">
                                         Name
@@ -3277,12 +3189,20 @@ const ExportCircularsEditForm = ({
                                         value={item?.content}
                                         disabled
                                       /> */}
-                                          <p className="showData" dangerouslySetInnerHTML={applicationDetail?.content ? { __html: applicationDetail.content } : { __html: "-" }}></p>
+                                          <p
+                                            className="showData"
+                                            dangerouslySetInnerHTML={
+                                              applicationDetail?.content
+                                                ? {
+                                                    __html:
+                                                      applicationDetail.content,
+                                                  }
+                                                : { __html: "-" }
+                                            }
+                                          ></p>
                                         </label>
                                       </div>
                                     </div>
-
-
 
                                     <div className="inner_form_new ">
                                       <label className="controlform">
@@ -3349,15 +3269,10 @@ const ExportCircularsEditForm = ({
                                       <div className="form-bx">
                                         <label>
                                           <ul className="nalist">
-                                            {item?.bankData
-                                              ?.length ? (
-                                              item?.bankData?.map(
-                                                (res) => {
-                                                  return (
-                                                    <li>{res?.bankName}</li>
-                                                  );
-                                                }
-                                              )
+                                            {item?.bankData?.length ? (
+                                              item?.bankData?.map((res) => {
+                                                return <li>{res?.bankName}</li>;
+                                              })
                                             ) : (
                                               <li className="disabletext">
                                                 N/A
@@ -3391,13 +3306,13 @@ const ExportCircularsEditForm = ({
                                       <div className="form-bx">
                                         <label>
                                           <ul className="nalist">
-                                            {item?.directiveData
-                                              ?.length ? (
+                                            {item?.directiveData?.length ? (
                                               item?.directiveData?.map(
                                                 (res) => {
                                                   return (
-                                                    <li>{res?.directiveName
-                                                    }</li>
+                                                    <li>
+                                                      {res?.directiveName}
+                                                    </li>
                                                   );
                                                 }
                                               )
@@ -3456,11 +3371,10 @@ const ExportCircularsEditForm = ({
                                   </div>
                                 </div> */}
 
-
                                     <div
                                       className={
                                         item?.assignedToName == null &&
-                                          item?.assignedToName == null
+                                        item?.assignedToName == null
                                           ? "d-none"
                                           : "row"
                                       }
@@ -3514,20 +3428,134 @@ const ExportCircularsEditForm = ({
                             }
                           });
                       })}
-                      {/* {noDataComment?.map((data, i) => {
+                      {noDataComment?.map((data, i) => {
                         if (data.roleID == 5 && data.isDataAvailable == 0) {
                           return (
                             <div
-                              className={
-                                analystTab ? "customtab" : "d-none"
-                              }
+                              className={analystTab ? "customtab" : "d-none"}
                               key={i}
                             >
                               <div className="text-center">No Data Found</div>
                             </div>
                           );
                         }
-                      })} */}
+                      })}
+
+                      <div
+                        className={
+                          applicationDetail?.assignedTo ==
+                            UserID.replace(/"/g, "") &&
+                          applicationDetail?.actionStatus == 15 &&
+                          applicationDetail?.actionStatusName ==
+                            "Referred Back" &&
+                          applicationDetail.userID != UserID.replace(/"/g, "")
+                            ? ""
+                            : "d-none"
+                        }
+                      >
+                        <div className="inner_form_new align-items-start mt-2">
+                          <label className="controlform">Recommendation</label>
+                          <div className="form-bx editorFieldBox">
+                            <div className="mt-2 py-1">
+                              <MenuBar editor={referbackUser} />
+                              <EditorContent editor={referbackUser} />
+
+                              <span className="sspan"></span>
+                              {(errors.Description && Description == " ") ||
+                              Description == null ||
+                              Description == "<p></p>" ||
+                              !Description ? (
+                                <small
+                                  className="errormsg"
+                                  style={{ bottom: "-13px" }}
+                                >
+                                  {errors.Description}
+                                </small>
+                              ) : (
+                                ""
+                              )}
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="inner_form_new ">
+                          <label className="controlform">
+                            Assign to Next Level
+                          </label>
+                          <input
+                            type="checkbox"
+                            onChange={HandelSupervisorcheck}
+                            checked={checkSupervisor}
+                          />
+                        </div>
+
+                        <div
+                          className={
+                            checkSupervisor ? "inner_form_new" : "d-none"
+                          }
+                        >
+                          {/* <label className="controlform">Select Analyst</label> */}
+                          <label className="controlform">
+                            {roleID == "5"
+                              ? " Senior Analyst"
+                              : roleID == "6"
+                              ? " Principal Analyst"
+                              : roleID == "7"
+                              ? " Deputy Director"
+                              : " Director"}
+                          </label>
+                          <div className="form-bx">
+                            <label>
+                              <select
+                                ref={assignedToRef}
+                                name="assignedTo"
+                                onChange={supervisorHangechangeBankuser}
+                                className={
+                                  errors.assignedTo && !AssignUserID
+                                    ? "error"
+                                    : ""
+                                }
+                              >
+                                <option value="">
+                                  Select
+                                  {roleID == "5"
+                                    ? " Senior Analyst"
+                                    : roleID == "6"
+                                    ? " Principal Analyst"
+                                    : roleID == "7"
+                                    ? " Deputy Director"
+                                    : " Director"}
+                                </option>
+                                {Supervisors?.map((item, index) => {
+                                  return (
+                                    <option
+                                      key={index}
+                                      value={JSON?.stringify(item)}
+                                      selected={
+                                        item.userID ==
+                                        applicationDetail?.assignedTo
+                                      }
+                                    >
+                                      {item.name}
+                                    </option>
+                                  );
+                                })}
+                              </select>
+                              <span className="sspan"></span>
+                              {errors.assignedTo && !AssignUserID ? (
+                                <small
+                                  className="errormsg"
+                                  style={{ marginBottom: "-5px" }}
+                                >
+                                  {errors.assignedTo}
+                                </small>
+                              ) : (
+                                ""
+                              )}
+                            </label>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </>
@@ -3535,7 +3563,6 @@ const ExportCircularsEditForm = ({
                 ""
               )}
               {/* analyst analyst code end */}
-
 
               {/* senior analyst code start */}
               {roleID >= 6 ? (
@@ -3549,18 +3576,15 @@ const ExportCircularsEditForm = ({
                     onClick={() => setsranalystTab(!sranalystTab)}
                   >
                     Senior Analyst{" "}
-
                     <span className="btn-collapse">
                       <i className="bi bi-caret-down-fill"></i>
                     </span>
                   </h5>
 
                   <div className={sranalystTab ? "customtab" : "d-none"}>
-
                     {/* {applicationDetail?.id != 6 && applicationDetail && roleID != 6 ? <ExportCirculargenInfo applicationDetail={applicationDetail}  /> : ""} */}
 
                     {allcomment?.map((cur, i) => {
-
                       if (cur.assignedToRoleID == 6) {
                         return (
                           <ul
@@ -3615,7 +3639,6 @@ const ExportCircularsEditForm = ({
                                       aria-controls="home"
                                       aria-selected="true"
                                     >
-
                                       Response{" "}
                                       {cur?.circularActivityData?.length -
                                         index}
@@ -3633,7 +3656,6 @@ const ExportCircularsEditForm = ({
                         //   )
                         // }
                       }
-
                     })}
 
                     <div className="tab-content pt-2">
@@ -3647,152 +3669,155 @@ const ExportCircularsEditForm = ({
                         role="tabpanel"
                         aria-labelledby="sranalystab"
                       >
-                        {Actiondata?.map((cur) => {
-                          const firstItem = cur?.circularActivityData?.[0]; // Accessing the first element directly
+                        {/* next level data show and assign behalf of not equal userID  start*/}
+                        {applicationDetail?.userID !==
+                          UserID.replace(/"/g, "") && roleID == 6 ? (
+                          <>
+                            {Actiondata?.map((cur) => {
+                              const firstItem = cur?.circularActivityData?.[0]; // Accessing the first element directly
 
-                          if (cur?.assignedToRoleID === 6 && firstItem) {
-                            // Check if firstItem exists
-                            return (
-                              <div className="bakgroundaction">
-                                <div key={firstItem.actionID}>
-                                  {" "}
-                                  {/* Remember to add a unique key */}
-                                  <div className="row">
-                                    <div className="col-md-6">
-                                      <div className="inner_form_new">
+                              if (cur?.assignedToRoleID === 6 && firstItem) {
+                                // Check if firstItem exists
+                                return (
+                                  <div className="bakgroundaction">
+                                    <div key={firstItem.circularID}>
+                                      {" "}
+                                      {/* Remember to add a unique key */}
+                                      <div className="row">
+                                        <div className="col-md-6">
+                                          <div className="inner_form_new">
+                                            <label className="controlform">
+                                              Action Type
+                                            </label>
+                                            <div className="form-bx">
+                                              <label>
+                                                {" "}
+                                                <input
+                                                  type="text"
+                                                  className=""
+                                                  disabled
+                                                  // value={firstItem?.actionStatusName}
+                                                  value={
+                                                    firstItem?.actionStatusName ==
+                                                      "Approved" ||
+                                                    firstItem?.actionStatusName ==
+                                                      "Reject" ||
+                                                    firstItem?.actionStatusName ==
+                                                      "Cancelled"
+                                                      ? "Assigned" ||
+                                                        firstItem?.actionStatusName ==
+                                                          "Draft"
+                                                      : firstItem?.actionStatusName
+                                                  }
+                                                />
+                                              </label>
+                                            </div>
+                                          </div>
+                                        </div>
+
+                                        <div className="col-md-3">
+                                          <div className="inner_form_new-sm">
+                                            <label className="controlform-sm">
+                                              User{" "}
+                                              <i
+                                                className="bi bi-info-circle icons-info"
+                                                title={`Role : ${firstItem?.actionRoleName}`}
+                                              ></i>
+                                            </label>
+                                            <div className="form-bx-sm">
+                                              <label>
+                                                {" "}
+                                                <input
+                                                  type="text"
+                                                  className=""
+                                                  disabled
+                                                  value={
+                                                    firstItem?.actionUserName
+                                                  }
+                                                />
+                                              </label>
+                                            </div>
+                                          </div>
+                                        </div>
+
+                                        <div className="col-md-3">
+                                          <div className="inner_form_new-sm">
+                                            <label className="controlform-sm">
+                                              {firstItem?.actionStatusName ==
+                                                "Approved" ||
+                                              firstItem?.actionStatusName ==
+                                                "Reject" ||
+                                              firstItem?.actionStatusName ==
+                                                "Cancelled"
+                                                ? "Assigned"
+                                                : firstItem?.actionStatusName}{" "}
+                                              Date
+                                            </label>
+                                            <div className="form-bx-sm">
+                                              <label>
+                                                <input
+                                                  type="text"
+                                                  className=""
+                                                  disabled
+                                                  value={moment(
+                                                    firstItem?.createdDate
+                                                  ).format("DD/MMM/yyyy")}
+                                                />
+                                              </label>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <div
+                                        className={
+                                          firstItem?.actionNotes
+                                            ? "inner_form_new"
+                                            : "d-none"
+                                        }
+                                      >
                                         <label className="controlform">
-                                          Action Type
+                                          Action Note
                                         </label>
                                         <div className="form-bx">
                                           <label>
                                             {" "}
-                                            <input
+                                            <textarea
                                               type="text"
                                               className=""
                                               disabled
-                                              // value={firstItem?.actionStatusName}
-                                              value={
-                                                firstItem?.actionStatusName ==
-                                                  "Approved" ||
-                                                  firstItem?.actionStatusName ==
-                                                  "Reject" ||
-                                                  firstItem?.actionStatusName ==
-                                                  "Cancelled"
-                                                  ? "Assigned" ||
-                                                  firstItem?.actionStatusName ==
-                                                  "Draft"
-                                                  : firstItem?.actionStatusName
-                                              }
+                                              value={firstItem?.actionNotes}
                                             />
                                           </label>
                                         </div>
                                       </div>
-                                    </div>
-
-                                    <div className="col-md-3">
-                                      <div className="inner_form_new-sm">
-                                        <label className="controlform-sm">
-                                          User{" "}
-                                          <i
-                                            className="bi bi-info-circle icons-info"
-                                            title={`Role : ${firstItem?.actionRoleName}`}
-                                          ></i>
+                                      <div
+                                        className={
+                                          firstItem?.actionComment
+                                            ? "inner_form_new"
+                                            : "d-none"
+                                        }
+                                      >
+                                        <label className="controlform">
+                                          Action Comment
                                         </label>
-                                        <div className="form-bx-sm">
+                                        <div className="form-bx">
                                           <label>
                                             {" "}
-                                            <input
+                                            <textarea
                                               type="text"
                                               className=""
                                               disabled
-                                              value={firstItem?.actionUserName}
-                                            />
-                                          </label>
-                                        </div>
-                                      </div>
-                                    </div>
-
-                                    <div className="col-md-3">
-                                      <div className="inner_form_new-sm">
-                                        <label className="controlform-sm">
-                                          {firstItem?.actionStatusName ==
-                                            "Approved" ||
-                                            firstItem?.actionStatusName ==
-                                            "Reject" ||
-                                            firstItem?.actionStatusName ==
-                                            "Cancelled"
-                                            ? "Assigned"
-                                            : firstItem?.actionStatusName}{" "}
-                                          Date
-                                        </label>
-                                        <div className="form-bx-sm">
-                                          <label>
-                                            <input
-                                              type="text"
-                                              className=""
-                                              disabled
-                                              value={moment(
-                                                firstItem?.createdDate
-                                              ).format("DD/MMM/yyyy")}
+                                              value={firstItem?.actionComment}
                                             />
                                           </label>
                                         </div>
                                       </div>
                                     </div>
                                   </div>
-                                  <div
-                                    className={
-                                      firstItem?.actionNotes
-                                        ? "inner_form_new"
-                                        : "d-none"
-                                    }
-                                  >
-                                    <label className="controlform">
-                                      Action Note
-                                    </label>
-                                    <div className="form-bx">
-                                      <label>
-                                        {" "}
-                                        <textarea
-                                          type="text"
-                                          className=""
-                                          disabled
-                                          value={firstItem?.actionNotes}
-                                        />
-                                      </label>
-                                    </div>
-                                  </div>
-                                  <div
-                                    className={
-                                      firstItem?.actionComment
-                                        ? "inner_form_new"
-                                        : "d-none"
-                                    }
-                                  >
-                                    <label className="controlform">
-                                      Action Comment
-                                    </label>
-                                    <div className="form-bx">
-                                      <label>
-                                        {" "}
-                                        <textarea
-                                          type="text"
-                                          className=""
-                                          disabled
-                                          value={firstItem?.actionComment}
-                                        />
-                                      </label>
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                            );
-                          }
-                        })}
+                                );
+                              }
+                            })}
 
-                        {/* next level data show and assign behalf of not equal userID  start*/}
-                        {applicationDetail?.userID !== UserID.replace(/"/g, "") && roleID == 6 ?
-                          <>
                             <div
                               className={
                                 roleID == 6
@@ -3804,7 +3829,6 @@ const ExportCircularsEditForm = ({
                               <div className="row">
                                 <div className="col-md-12 my-2">
                                   <div className="hidden-toggles">
-
                                     <input
                                       type="radio"
                                       id="srasignto"
@@ -3857,14 +3881,15 @@ const ExportCircularsEditForm = ({
                                     >
                                       Refer Back
                                     </label>
-
                                   </div>
                                 </div>
                               </div>
                             </div>
 
                             <div
-                              className={checkSupervisor == true ? "row" : "d-none"}
+                              className={
+                                checkSupervisor == true ? "row" : "d-none"
+                              }
                             >
                               <div className="col-md-12 d-flex c-gap">
                                 <div
@@ -3875,7 +3900,9 @@ const ExportCircularsEditForm = ({
                                   {checkSupervisor == true && roleID == 6 ? (
                                     <>
                                       <div className="inner_form_new">
-                                        <label className="controlform">Role </label>
+                                        <label className="controlform">
+                                          Role{" "}
+                                        </label>
 
                                         <div className="form-bx">
                                           <label>
@@ -3888,12 +3915,14 @@ const ExportCircularsEditForm = ({
                                               }}
                                               className={
                                                 errors.assignedTo &&
-                                                  !SupervisorRoleId
+                                                !SupervisorRoleId
                                                   ? "error"
                                                   : ""
                                               }
                                             >
-                                              <option value="">Select Role</option>
+                                              <option value="">
+                                                Select Role
+                                              </option>
                                               {userRole?.map((item, index) => {
                                                 return (
                                                   <option
@@ -3906,12 +3935,11 @@ const ExportCircularsEditForm = ({
                                               })}
                                             </select>
                                             <span className="sspan"></span>
-                                            {errors.SupervisorRoleId &&
-                                              (
-                                                <small className="errormsg">
-                                                  Role is required{" "}
-                                                </small>
-                                              )}
+                                            {errors.SupervisorRoleId && (
+                                              <small className="errormsg">
+                                                Role is required{" "}
+                                              </small>
+                                            )}
                                           </label>
                                         </div>
                                       </div>
@@ -3929,7 +3957,9 @@ const ExportCircularsEditForm = ({
                                   {roleID == 6 && recomdAnalyst != "121" ? (
                                     <>
                                       <div className="inner_form_new">
-                                        <label className="controlform">User </label>
+                                        <label className="controlform">
+                                          User{" "}
+                                        </label>
 
                                         <div className="form-bx">
                                           <label>
@@ -3940,12 +3970,15 @@ const ExportCircularsEditForm = ({
                                                 supervisorHangechange(e)
                                               }
                                               className={
-                                                errors.assignUserID && !AssignUserID
+                                                errors.assignUserID &&
+                                                !AssignUserID
                                                   ? "error"
                                                   : ""
                                               }
                                             >
-                                              <option value="">Select User</option>
+                                              <option value="">
+                                                Select User
+                                              </option>
                                               {asignUser?.map((item, index) => {
                                                 return (
                                                   <option
@@ -3958,12 +3991,11 @@ const ExportCircularsEditForm = ({
                                               })}
                                             </select>
                                             <span className="sspan"></span>
-                                            {errors.assignUserID &&
-                                              (
-                                                <small className="errormsg">
-                                                  {errors.assignUserID}
-                                                </small>
-                                              )}
+                                            {errors.assignUserID && (
+                                              <small className="errormsg">
+                                                {errors.assignUserID}
+                                              </small>
+                                            )}
                                           </label>
                                         </div>
                                       </div>
@@ -3977,12 +4009,70 @@ const ExportCircularsEditForm = ({
                                 {/* end form-bx  */}
                               </div>
                             </div>
-                            {roleID == 6 && <p>
-                              {attachmentData?.map((items, index) => {
-                                return (
+                            {roleID == 6 && (
+                              <p>
+                                {attachmentData?.map((items, index) => {
+                                  return (
+                                    <div
+                                      className="attachemt_form-bx  mt-2"
+                                      key={items.id}
+                                    >
+                                      <label
+                                        style={{
+                                          background: "#d9edf7",
+                                          padding: "9px 3px",
+                                          border: "0px",
+                                        }}
+                                      >
+                                        <span style={{ fontWeight: "500" }}>
+                                          {items.filename}
+                                        </span>
+                                      </label>
+                                      <div className="browse-btn">
+                                        Browse
+                                        <input
+                                          type="file"
+                                          onChange={(e) =>
+                                            handleuserFileChange(
+                                              e,
+                                              "circular" + (index + 1)
+                                            )
+                                          }
+                                        />
+                                      </div>
+                                      <span className="filename">
+                                        {userfiles?.find(
+                                          (f) =>
+                                            f.id === "circular" + (index + 1)
+                                        )?.file?.name || "No file chosen"}
+                                      </span>
+                                      {userfiles?.length &&
+                                      userfiles?.find(
+                                        (f) => f.id === "circular" + (index + 1)
+                                      )?.file?.name ? (
+                                        <button
+                                          type="button"
+                                          className="remove-file"
+                                          onClick={() =>
+                                            removeUserImage(
+                                              index,
+                                              "circular" + (index + 1)
+                                            )
+                                          }
+                                        >
+                                          Remove
+                                        </button>
+                                      ) : (
+                                        ""
+                                      )}
+                                    </div>
+                                  );
+                                })}
+
+                                {otheruserfiles.map((file, index) => (
                                   <div
-                                    className="attachemt_form-bx  mt-2"
-                                    key={items.id}
+                                    key={"other" + (index + 1)}
+                                    className="attachemt_form-bx"
                                   >
                                     <label
                                       style={{
@@ -3991,32 +4081,42 @@ const ExportCircularsEditForm = ({
                                         border: "0px",
                                       }}
                                     >
-                                      <span style={{ fontWeight: "500" }}>
-                                        {items.filename}
-                                      </span>
+                                      <b>
+                                        Other File
+                                        {index + 1}
+                                      </b>
                                     </label>
                                     <div className="browse-btn">
-                                      Browse
+                                      Browse{" "}
                                       <input
                                         type="file"
-                                        onChange={(e) =>
-                                          handleuserFileChange(e, "circular" + (index + 1))
-                                        }
+                                        onChange={(e) => {
+                                          handleuserFileChange(
+                                            e,
+                                            "other" + index
+                                          );
+                                          handleOthrefile(e, `other ${index}`);
+                                        }}
                                       />
                                     </div>
                                     <span className="filename">
                                       {userfiles?.find(
-                                        (f) => f.id === "circular" + (index + 1)
+                                        (f) => f.id === "other" + index
                                       )?.file?.name || "No file chosen"}
                                     </span>
+
                                     {userfiles?.length &&
-                                      userfiles?.find((f) => f.id === "circular" + (index + 1))
-                                        ?.file?.name ? (
+                                    userfiles?.find(
+                                      (f) => f.id === "other" + index
+                                    )?.file?.name ? (
                                       <button
                                         type="button"
                                         className="remove-file"
                                         onClick={() =>
-                                          removeUserImage(index, "circular" + (index + 1))
+                                          removeUserImage(
+                                            index,
+                                            "other" + index
+                                          )
                                         }
                                       >
                                         Remove
@@ -4025,76 +4125,27 @@ const ExportCircularsEditForm = ({
                                       ""
                                     )}
                                   </div>
-                                );
-                              })}
+                                ))}
 
-                              {otheruserfiles.map((file, index) => (
-                                <div
-                                  key={"other" + (index + 1)}
-                                  className="attachemt_form-bx"
-                                >
-                                  <label
-                                    style={{
-                                      background: "#d9edf7",
-                                      padding: "9px 3px",
-                                      border: "0px",
-                                    }}
-                                  >
-                                    <b>
-                                      Other File
-                                      {index + 1}
-                                    </b>
-                                  </label>
-                                  <div className="browse-btn">
-                                    Browse{" "}
-                                    <input
-                                      type="file"
-                                      onChange={(e) => {
-                                        handleuserFileChange(e, "other" + index);
-                                        handleOthrefile(e, `other ${index}`);
-                                      }}
-                                    />
-                                  </div>
-                                  <span className="filename">
-                                    {userfiles?.find((f) => f.id === "other" + index)
-                                      ?.file?.name || "No file chosen"}
-                                  </span>
-
-                                  {userfiles?.length &&
-                                    userfiles?.find((f) => f.id === "other" + index)
-                                      ?.file?.name ? (
+                                {otheruserfiles?.length || userfiles?.length ? (
+                                  <div className="attachemt_form-bx">
+                                    <label style={{ border: "0px" }}>
+                                      {""}
+                                    </label>
                                     <button
                                       type="button"
-                                      className="remove-file"
-                                      onClick={() =>
-                                        removeUserImage(index, "other" + index)
-                                      }
+                                      className="addmore-btn mt-0"
+                                      onClick={(e) => handleuserAddMore(e)}
                                     >
-                                      Remove
+                                      {" "}
+                                      Add More File{" "}
                                     </button>
-                                  ) : (
-                                    ""
-                                  )}
-                                </div>
-                              ))}
-
-                              {otheruserfiles?.length || userfiles?.length ? (
-                                <div className="attachemt_form-bx">
-                                  <label style={{ border: "0px" }}>{""}</label>
-                                  <button
-                                    type="button"
-                                    className="addmore-btn mt-0"
-                                    onClick={(e) => handleuserAddMore(e)}
-                                  >
-                                    {" "}
-                                    Add More File{" "}
-                                  </button>
-                                </div>
-                              ) : (
-                                ""
-                              )
-                              }
-                            </p>}
+                                  </div>
+                                ) : (
+                                  ""
+                                )}
+                              </p>
+                            )}
                             {/* end form-bx  */}
 
                             <div
@@ -4104,7 +4155,9 @@ const ExportCircularsEditForm = ({
                                   : "d-none"
                               }
                             >
-                              <label className="controlform">Recommendation</label>
+                              <label className="controlform">
+                                Recommendation
+                              </label>
                               <div className="form-bx editorFieldBox">
                                 <div className="mt-2 py-1">
                                   <MenuBar editor={editorSrAnalyst} />
@@ -4112,9 +4165,9 @@ const ExportCircularsEditForm = ({
 
                                   <span className="sspan"></span>
                                   {(errors.Description && Description == " ") ||
-                                    Description == null ||
-                                    Description == "<p></p>" ||
-                                    !Description ? (
+                                  Description == null ||
+                                  Description == "<p></p>" ||
+                                  !Description ? (
                                     <small
                                       className="errormsg"
                                       style={{ bottom: "-13px" }}
@@ -4129,15 +4182,16 @@ const ExportCircularsEditForm = ({
                             </div>
 
                             <div
-                              className={roleID == 6 ? "inner_form_new " : "d-none"}
+                              className={
+                                roleID == 6 ? "inner_form_new " : "d-none"
+                              }
                             >
                               <label className="controlform">
                                 {nextlevelvalue == "10"
                                   ? "Assign Notes"
-
                                   : nextlevelvalue == "15"
-                                    ? "Refer Back Notes"
-                                    : "Notes"}
+                                  ? "Refer Back Notes"
+                                  : "Notes"}
                               </label>
 
                               <div className="form-bx">
@@ -4151,8 +4205,8 @@ const ExportCircularsEditForm = ({
                                       nextlevelvalue == "10"
                                         ? "Assign Notes"
                                         : nextlevelvalue == "15"
-                                          ? "Refer Back Notes"
-                                          : "Notes"
+                                        ? "Refer Back Notes"
+                                        : "Notes"
                                     }
                                     className={errors.Notes ? "error" : ""}
                                     value={asignnextLeveldata.Notes}
@@ -4163,12 +4217,12 @@ const ExportCircularsEditForm = ({
                                       {nextlevelvalue == "10"
                                         ? "Assign notes is required"
                                         : nextlevelvalue == "20"
-                                          ? "Delegate notes is required"
-                                          : nextlevelvalue == "35"
-                                            ? "Referred to other department notes is required"
-                                            : nextlevelvalue == "15"
-                                              ? "Refer back notes is required"
-                                              : "Notes is required"}
+                                        ? "Delegate notes is required"
+                                        : nextlevelvalue == "35"
+                                        ? "Referred to other department notes is required"
+                                        : nextlevelvalue == "15"
+                                        ? "Refer back notes is required"
+                                        : "Notes is required"}
                                     </small>
                                   ) : (
                                     ""
@@ -4179,18 +4233,20 @@ const ExportCircularsEditForm = ({
                             {/* end form-bx  */}
 
                             <div
-                              className={roleID == 6 ? "inner_form_new " : "d-none"}
+                              className={
+                                roleID == 6 ? "inner_form_new " : "d-none"
+                              }
                             >
                               <label className="controlform">
                                 {nextlevelvalue == "10"
                                   ? "Assign Comments"
                                   : nextlevelvalue == "20"
-                                    ? "Delegate Comments"
-                                    : nextlevelvalue == "35"
-                                      ? "Referred to Other Department Comments"
-                                      : nextlevelvalue == "15"
-                                        ? "Refer Back Comments"
-                                        : "Comments"}
+                                  ? "Delegate Comments"
+                                  : nextlevelvalue == "35"
+                                  ? "Referred to Other Department Comments"
+                                  : nextlevelvalue == "15"
+                                  ? "Refer Back Comments"
+                                  : "Comments"}
                               </label>
 
                               <div className="form-bx">
@@ -4204,12 +4260,12 @@ const ExportCircularsEditForm = ({
                                       nextlevelvalue == "10"
                                         ? "Assign Comments"
                                         : nextlevelvalue == "20"
-                                          ? "Delegate Comments"
-                                          : nextlevelvalue == "35"
-                                            ? "Referred to Other Department Comments"
-                                            : nextlevelvalue == "15"
-                                              ? "Refer Back Comments"
-                                              : "Comments"
+                                        ? "Delegate Comments"
+                                        : nextlevelvalue == "35"
+                                        ? "Referred to Other Department Comments"
+                                        : nextlevelvalue == "15"
+                                        ? "Refer Back Comments"
+                                        : "Comments"
                                     }
                                     className={errors.Comment ? "error" : ""}
                                     value={asignnextLeveldata.Comment}
@@ -4220,12 +4276,12 @@ const ExportCircularsEditForm = ({
                                       {nextlevelvalue == "10"
                                         ? "Assign comments is required"
                                         : nextlevelvalue == "20"
-                                          ? "Delegate comments is required"
-                                          : nextlevelvalue == "35"
-                                            ? "Referred to other department comments is required"
-                                            : nextlevelvalue == "15"
-                                              ? "Refer back comments is required"
-                                              : "Comments is required"}
+                                        ? "Delegate comments is required"
+                                        : nextlevelvalue == "35"
+                                        ? "Referred to other department comments is required"
+                                        : nextlevelvalue == "15"
+                                        ? "Refer back comments is required"
+                                        : "Comments is required"}
                                     </small>
                                   ) : (
                                     ""
@@ -4234,7 +4290,13 @@ const ExportCircularsEditForm = ({
                               </div>
                             </div>
 
-                            <div className={roleID == 6 ? "inner_form_new align-items-center" : "d-none"}>
+                            <div
+                              className={
+                                roleID == 6
+                                  ? "inner_form_new align-items-center"
+                                  : "d-none"
+                              }
+                            >
                               <label className="controlform">Bank</label>
                               <div className=" cccto">
                                 <div className="flex justify-content-center multiSelect">
@@ -4245,16 +4307,18 @@ const ExportCircularsEditForm = ({
                                     value={selectedBanks}
                                     isSelectAll={true}
                                     menuPlacement={"bottom"}
-
                                   />
-
                                 </div>
                               </div>
                             </div>
                             {/* end form-bx  */}
-                            <div className={roleID == 6 ? "inner_form_new " : "d-none"}>
+                            <div
+                              className={
+                                roleID == 6 ? "inner_form_new " : "d-none"
+                              }
+                            >
                               <label className="controlform">Directives</label>
-                              <div className="cccto">
+                              {/* <div className="cccto">
                                 <div className="flex justify-content-center multiSelect">
                                   <DirectiveMultiSelectComponent
                                     key="multyselectprinciple"
@@ -4271,17 +4335,178 @@ const ExportCircularsEditForm = ({
                                     ""
                                   )}
                                 </div>
+                              </div> */}
+                              <div className="cccto position-relative">
+                                <div className="multiselect d-flex justify-content-between align-items-end">
+                                  <div className="adddirectiveBox">
+                                    <ul className="newdirectivelist">
+                                      {selectedDirectives?.length ? (
+                                        selectedDirectives?.map((res) => {
+                                          return <li>{res?.label}</li>;
+                                        })
+                                      ) : (
+                                        <li className="disabletext">
+                                          Select Directives
+                                        </li>
+                                      )}
+                                    </ul>
+                                  </div>
+                                  <Button
+                                    variant="primary"
+                                    className="addDirectiveBtn"
+                                    onClick={handleDirectiveModalShow}
+                                  >
+                                    Add Directives
+                                  </Button>
+                                  {errors?.selectedDirectives &&
+                                  selectedDirectives.length == 0 ? (
+                                    <small className="errormsg directiveErrormsg">
+                                      {errors.selectedDirectives}
+                                    </small>
+                                  ) : (
+                                    ""
+                                  )}
+                                  <Modal
+                                    size="lg"
+                                    show={showDirectiveModal}
+                                    onHide={handleDirectiveClose}
+                                    backdrop="static"
+                                    className="directiveModal"
+                                  >
+                                    <div className="application-box">
+                                      <div className="login_inner">
+                                        <div className="login_form ">
+                                          <h5>
+                                            <Modal.Header
+                                              closeButton
+                                              className="p-0"
+                                            >
+                                              <Modal.Title>
+                                                Add Directives
+                                                {/* <big>{applicationDetail?.circularReferenceNumber}</big> */}
+                                              </Modal.Title>
+                                            </Modal.Header>
+                                          </h5>
+                                        </div>
+                                        <div className="login_form_panel">
+                                          <Modal.Body className="p-0">
+                                            <DirectiveMultiSelectComponent
+                                              key="multyselectprinciple"
+                                              options={DirectiveOption}
+                                              onChange={(e) =>
+                                                handleChangeDirective(e)
+                                              }
+                                              value={selectedDirectives}
+                                              isSelectAll={true}
+                                              menuPlacement={"bottom"}
+                                            />
+
+                                            <div className="directiveFileData-field">
+                                              <div className="directiveFileData-show">
+                                                {selectedDirectives?.length >
+                                                0 ? (
+                                                  selectedDirectives.map(
+                                                    (item) => {
+                                                      const firstTagName =
+                                                        item.tagName.split(
+                                                          ","
+                                                        )[0]; // Extract the first tag name
+                                                      return (
+                                                        <>
+                                                          {item?.filePath
+                                                            .length > 0 ? (
+                                                            <div
+                                                              className="directiveFileBox"
+                                                              key={item.value}
+                                                            >
+                                                              {/* <div>{firstTagName}</div> Display the first tag name */}
+                                                              {item.filePath.map(
+                                                                (
+                                                                  fileItem,
+                                                                  index
+                                                                ) => (
+                                                                  <a
+                                                                    target="_blank"
+                                                                    href={
+                                                                      fileItem.filePath
+                                                                    }
+                                                                    key={
+                                                                      fileItem.id
+                                                                    }
+                                                                    style={{
+                                                                      marginBottom:
+                                                                        "3px",
+                                                                      letterSpacing:
+                                                                        "0.01px",
+                                                                      fontSize:
+                                                                        "14px",
+                                                                      fontWeight:
+                                                                        "400",
+                                                                      display:
+                                                                        "block",
+                                                                      padding:
+                                                                        "0px 5px",
+                                                                      color:
+                                                                        "#4154f1",
+                                                                      // borderBottom:"1px solid #ddd"
+                                                                    }}
+                                                                  >
+                                                                    {firstTagName +
+                                                                      (index +
+                                                                        1)}
+                                                                    {/* {fileItem.filePath} */}
+                                                                  </a>
+                                                                )
+                                                              )}
+                                                            </div>
+                                                          ) : (
+                                                            ""
+                                                          )}
+                                                        </>
+                                                      );
+                                                    }
+                                                  )
+                                                ) : (
+                                                  <></>
+                                                )}
+                                              </div>
+                                            </div>
+                                          </Modal.Body>
+                                        </div>
+                                        <Modal.Footer className="justify-content-end">
+                                          <Button
+                                            variant="secondary"
+                                            onClick={handleDirectiveClose}
+                                          >
+                                            Close
+                                          </Button>
+                                          {/* <Button variant="primary" onClick={handleDirectiveClose}>Add</Button> */}
+                                        </Modal.Footer>
+                                      </div>
+                                    </div>
+                                  </Modal>
+                                </div>
                               </div>
                             </div>
                             {/* end form-bx  */}
                             {/* end form-bx  */}
-                            <div className={roleID == 6 ? "inner_form_new " : "d-none"}>
-                              <label className="controlform">Releasing Date </label>
+                            <div
+                              className={
+                                roleID == 6 ? "inner_form_new " : "d-none"
+                              }
+                            >
+                              <label className="controlform">
+                                Releasing Date{" "}
+                              </label>
                               <div className="form-bx">
                                 <DatePicker
                                   placeholderText="Select Releasing Date"
                                   closeOnScroll={(e) => e.target === document}
-                                  selected={releasingDate ? releasingDate : applicationDetail.releasingDate}
+                                  selected={
+                                    releasingDate
+                                      ? releasingDate
+                                      : applicationDetail.releasingDate
+                                  }
                                   onChange={(date) => setReleasingDate(date)}
                                   peekNextMonth
                                   showMonthDropdown
@@ -4290,34 +4515,165 @@ const ExportCircularsEditForm = ({
                                   dropdownMode="select"
                                   dateFormat="dd/MMMM/yyyy"
                                 />
-                                {
-                                  errors?.releasingDate ? (
-                                    <small className="errormsg">{errors.releasingDate}</small>
-                                  ) : (" ")
-                                }
+                                {errors?.releasingDate ? (
+                                  <small className="errormsg">
+                                    {errors.releasingDate}
+                                  </small>
+                                ) : (
+                                  " "
+                                )}
                               </div>
                             </div>
                             {/* end form-bx  */}
                           </>
-                          : (
-                            <span>
-                              {/* {noDataComment?.map((data, i) => {
-                                if (data.roleID == 6 && data.isDataAvailable == 0) {
-                                  return (
-                                    <div
-                                      className={
-                                        sranalystTab ? "customtab" : "d-none"
-                                      }
-                                      key={i}
-                                    >
-                                      <div className="text-center">No Data Found</div>
+                        ) : (
+                          <>
+                            {Actiondata?.map((cur) => {
+                              const firstItem = cur?.circularActivityData?.[0]; // Accessing the first element directly
+
+                              if (cur?.assignedToRoleID === 6 && firstItem) {
+                                // Check if firstItem exists
+                                return (
+                                  <div className="bakgroundaction">
+                                    <div key={firstItem.circularID}>
+                                      {" "}
+                                      {/* Remember to add a unique key */}
+                                      <div className="row">
+                                        <div className="col-md-6">
+                                          <div className="inner_form_new">
+                                            <label className="controlform">
+                                              Action Type
+                                            </label>
+                                            <div className="form-bx">
+                                              <label>
+                                                {" "}
+                                                <input
+                                                  type="text"
+                                                  className=""
+                                                  disabled
+                                                  // value={firstItem?.actionStatusName}
+                                                  value={
+                                                    firstItem?.actionStatusName ==
+                                                      "Approved" ||
+                                                    firstItem?.actionStatusName ==
+                                                      "Reject" ||
+                                                    firstItem?.actionStatusName ==
+                                                      "Cancelled"
+                                                      ? "Assigned" ||
+                                                        firstItem?.actionStatusName ==
+                                                          "Draft"
+                                                      : firstItem?.actionStatusName
+                                                  }
+                                                />
+                                              </label>
+                                            </div>
+                                          </div>
+                                        </div>
+
+                                        <div className="col-md-3">
+                                          <div className="inner_form_new-sm">
+                                            <label className="controlform-sm">
+                                              User{" "}
+                                              <i
+                                                className="bi bi-info-circle icons-info"
+                                                title={`Role : ${firstItem?.actionRoleName}`}
+                                              ></i>
+                                            </label>
+                                            <div className="form-bx-sm">
+                                              <label>
+                                                {" "}
+                                                <input
+                                                  type="text"
+                                                  className=""
+                                                  disabled
+                                                  value={
+                                                    firstItem?.actionUserName
+                                                  }
+                                                />
+                                              </label>
+                                            </div>
+                                          </div>
+                                        </div>
+
+                                        <div className="col-md-3">
+                                          <div className="inner_form_new-sm">
+                                            <label className="controlform-sm">
+                                              {firstItem?.actionStatusName ==
+                                                "Approved" ||
+                                              firstItem?.actionStatusName ==
+                                                "Reject" ||
+                                              firstItem?.actionStatusName ==
+                                                "Cancelled"
+                                                ? "Assigned"
+                                                : firstItem?.actionStatusName}{" "}
+                                              Date
+                                            </label>
+                                            <div className="form-bx-sm">
+                                              <label>
+                                                <input
+                                                  type="text"
+                                                  className=""
+                                                  disabled
+                                                  value={moment(
+                                                    firstItem?.createdDate
+                                                  ).format("DD/MMM/yyyy")}
+                                                />
+                                              </label>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <div
+                                        className={
+                                          firstItem?.actionNotes
+                                            ? "inner_form_new"
+                                            : "d-none"
+                                        }
+                                      >
+                                        <label className="controlform">
+                                          Action Note
+                                        </label>
+                                        <div className="form-bx">
+                                          <label>
+                                            {" "}
+                                            <textarea
+                                              type="text"
+                                              className=""
+                                              disabled
+                                              value={firstItem?.actionNotes}
+                                            />
+                                          </label>
+                                        </div>
+                                      </div>
+                                      <div
+                                        className={
+                                          firstItem?.actionComment
+                                            ? "inner_form_new"
+                                            : "d-none"
+                                        }
+                                      >
+                                        <label className="controlform">
+                                          Action Comment
+                                        </label>
+                                        <div className="form-bx">
+                                          <label>
+                                            {" "}
+                                            <textarea
+                                              type="text"
+                                              className=""
+                                              disabled
+                                              value={firstItem?.actionComment}
+                                            />
+                                          </label>
+                                        </div>
+                                      </div>
                                     </div>
-                                  );
-                                }
-                              })} */}
-                            </span>
-                          )
-                        }
+                                  </div>
+                                );
+                              }
+                            })}
+                          </>
+                        )}
                         {/* next level data show and assign behalf of not equal userID  end*/}
                       </div>
                       {allcomment?.map((cur) => {
@@ -4325,7 +4681,6 @@ const ExportCircularsEditForm = ({
                           ?.slice()
                           ?.reverse()
                           .map((item, index) => {
-
                             if (cur?.assignedToRoleID == 6) {
                               return (
                                 <>
@@ -4340,7 +4695,13 @@ const ExportCircularsEditForm = ({
                                     role="tabpanel"
                                     aria-labelledby={"sranalystab" + index}
                                   >
-                                    <div className={item?.actionStatusName ? "bakgroundaction" : "d-none"}>
+                                    <div
+                                      className={
+                                        item?.actionStatusName
+                                          ? "bakgroundaction"
+                                          : "d-none"
+                                      }
+                                    >
                                       <div className="row">
                                         <div className="col-md-6">
                                           <div className="inner_form_new ">
@@ -4357,13 +4718,13 @@ const ExportCircularsEditForm = ({
                                                   value={
                                                     item?.actionStatusName ==
                                                       "Approved" ||
-                                                      item?.actionStatusName ==
+                                                    item?.actionStatusName ==
                                                       "Reject" ||
-                                                      item?.actionStatusName ==
+                                                    item?.actionStatusName ==
                                                       "Cancelled"
                                                       ? "Assigned" ||
-                                                      item?.actionStatusName ==
-                                                      "Draft"
+                                                        item?.actionStatusName ==
+                                                          "Draft"
                                                       : item?.actionStatusName
                                                   }
                                                 />
@@ -4399,9 +4760,9 @@ const ExportCircularsEditForm = ({
                                             <label className="controlform-sm">
                                               {item?.actionStatusName ==
                                                 "Approved" ||
-                                                item?.actionStatusName ==
+                                              item?.actionStatusName ==
                                                 "Reject" ||
-                                                item?.actionStatusName ==
+                                              item?.actionStatusName ==
                                                 "Cancelled"
                                                 ? "Assigned"
                                                 : item?.actionStatusName}{" "}
@@ -4675,11 +5036,10 @@ const ExportCircularsEditForm = ({
                                       </div>
                                     </div> */}
 
-
                                     <div
                                       className={
                                         item?.assignedToName == null &&
-                                          item?.assignedToName == null
+                                        item?.assignedToName == null
                                           ? "d-none"
                                           : "row"
                                       }
@@ -4733,7 +5093,134 @@ const ExportCircularsEditForm = ({
                             }
                           });
                       })}
+                      {noDataComment?.map((data, i) => {
+                        if (data.roleID == 6 && data.isDataAvailable == 0) {
+                          return (
+                            <div
+                              className={sranalystTab ? "customtab" : "d-none"}
+                              key={i}
+                            >
+                              <div className="text-center">No Data Found</div>
+                            </div>
+                          );
+                        }
+                      })}
 
+                      {/* <div
+                        className={
+                          applicationDetail?.assignedTo ==
+                            UserID.replace(/"/g, "") &&
+                          applicationDetail?.actionStatus == 15 &&
+                          applicationDetail?.actionStatusName ==
+                            "Referred Back" &&
+                          applicationDetail.userID != UserID.replace(/"/g, "")
+                            ? ""
+                            : "d-none"
+                        }
+                      >
+                        <div className="inner_form_new align-items-start mt-2">
+                          <label className="controlform">Recommendation</label>
+                          <div className="form-bx editorFieldBox">
+                            <div className="mt-2 py-1">
+                              <MenuBar editor={referbacksrUser} />
+                              <EditorContent editor={referbacksrUser} />
+
+                              <span className="sspan"></span>
+                              {(errors.Description && Description == " ") ||
+                              Description == null ||
+                              Description == "<p></p>" ||
+                              !Description ? (
+                                <small
+                                  className="errormsg"
+                                  style={{ bottom: "-13px" }}
+                                >
+                                  {errors.Description}
+                                </small>
+                              ) : (
+                                ""
+                              )}
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="inner_form_new ">
+                          <label className="controlform">
+                            Assign to Next Level
+                          </label>
+                          <input
+                            type="checkbox"
+                            onChange={HandelSupervisorcheck}
+                            checked={checkSupervisor}
+                          />
+                        </div>
+
+                        <div
+                          className={
+                            checkSupervisor ? "inner_form_new" : "d-none"
+                          }
+                        >
+                         
+                          <label className="controlform">
+                            {roleID == "5"
+                              ? " Senior Analyst"
+                              : roleID == "6"
+                              ? " Principal Analyst"
+                              : roleID == "7"
+                              ? " Deputy Director"
+                              : " Director"}
+                          </label>
+                          <div className="form-bx">
+                            <label>
+                              <select
+                                ref={assignedToRef}
+                                name="assignedTo"
+                                onChange={supervisorHangechangeBankuser}
+                                className={
+                                  errors.assignedTo && !AssignUserID
+                                    ? "error"
+                                    : ""
+                                }
+                              >
+                                <option value="">
+                                  Select
+                                  {roleID == "5"
+                                    ? " Senior Analyst"
+                                    : roleID == "6"
+                                    ? " Principal Analyst"
+                                    : roleID == "7"
+                                    ? " Deputy Director"
+                                    : " Director"}
+                                </option>
+                                {Supervisors?.map((item, index) => {
+                                  return (
+                                    <option
+                                      key={index}
+                                      value={JSON?.stringify(item)}
+                                      selected={
+                                        item.userID ==
+                                        applicationDetail?.assignedTo
+                                      }
+                                    >
+                                      {item.name}
+                                    </option>
+                                  );
+                                })}
+                              </select>
+                              <span className="sspan"></span>
+                              {errors.assignedTo && !AssignUserID ? (
+                                <small
+                                  className="errormsg"
+                                  style={{ marginBottom: "-5px" }}
+                                >
+                                  {errors.assignedTo}
+                                </small>
+                              ) : (
+                                ""
+                              )}
+                            </label>
+                          </div>
+                        </div>
+                      </div> */}
                     </div>
                   </div>
                 </>
@@ -4754,14 +5241,12 @@ const ExportCircularsEditForm = ({
                     onClick={() => setprincipalanalystTab(!principalanalystTab)}
                   >
                     Principal Analyst{" "}
-
                     <span className="btn-collapse">
                       <i className="bi bi-caret-down-fill"></i>
                     </span>
                   </h5>
 
                   <div className={principalanalystTab ? "customtab" : "d-none"}>
-
                     {allcomment?.map((cur, i) => {
                       if (cur.assignedToRoleID == 7) {
                         return (
@@ -4817,7 +5302,6 @@ const ExportCircularsEditForm = ({
                                       aria-controls="home"
                                       aria-selected="true"
                                     >
-
                                       Response{" "}
                                       {cur?.circularActivityData?.length -
                                         index}
@@ -4828,14 +5312,12 @@ const ExportCircularsEditForm = ({
                           </ul>
                         );
                       }
-
                     })}
-
 
                     <div className="tab-content pt-2">
                       <div
                         className={
-                          roleID >= 7
+                          roleID == 7
                             ? "tab-pane fade show active"
                             : "tab-pane fade show "
                         }
@@ -4843,150 +5325,154 @@ const ExportCircularsEditForm = ({
                         role="tabpanel"
                         aria-labelledby="pranalyst"
                       >
-                        {Actiondata?.map((cur) => {
-                          const firstItem = cur?.circularActivityData?.[0]; // Accessing the first element directly
-                          if (cur?.assignedToRoleID === 7 && firstItem) {
-                            // Check if firstItem exists
-                            return (
-                              <div className="bakgroundaction">
-                                <div key={firstItem.circularID}>
-                                  {" "}
-                                  {/* Remember to add a unique key */}
-                                  <div className="row">
-                                    <div className="col-md-6">
-                                      <div className="inner_form_new">
+                        {/* next level data show and assign behalf of not equal userID  start*/}
+                        {applicationDetail?.userID !==
+                          UserID.replace(/"/g, "") && roleID == 7 ? (
+                          <>
+                            {Actiondata?.map((cur) => {
+                              const firstItem = cur?.circularActivityData?.[0]; // Accessing the first element directly
+                              if (cur?.assignedToRoleID === 7 && firstItem) {
+                                // Check if firstItem exists
+                                return (
+                                  <div className="bakgroundaction">
+                                    <div key={firstItem.circularID}>
+                                      {" "}
+                                      {/* Remember to add a unique key */}
+                                      <div className="row">
+                                        <div className="col-md-6">
+                                          <div className="inner_form_new">
+                                            <label className="controlform">
+                                              Action Type
+                                            </label>
+                                            <div className="form-bx">
+                                              <label>
+                                                {" "}
+                                                <input
+                                                  type="text"
+                                                  className=""
+                                                  disabled
+                                                  // value={firstItem?.actionStatusName}
+                                                  value={
+                                                    firstItem?.actionStatusName ==
+                                                      "Approved" ||
+                                                    firstItem?.actionStatusName ==
+                                                      "Reject" ||
+                                                    firstItem?.actionStatusName ==
+                                                      "Cancelled" ||
+                                                    firstItem?.actionStatusName ==
+                                                      "Draft"
+                                                      ? "Assigned"
+                                                      : firstItem?.actionStatusName
+                                                  }
+                                                />
+                                              </label>
+                                            </div>
+                                          </div>
+                                        </div>
+
+                                        <div className="col-md-3">
+                                          <div className="inner_form_new-sm">
+                                            <label className="controlform-sm">
+                                              User{" "}
+                                              <i
+                                                className="bi bi-info-circle icons-info"
+                                                title={`Role : ${firstItem?.actionRoleName}`}
+                                              ></i>
+                                            </label>
+                                            <div className="form-bx-sm">
+                                              <label>
+                                                {" "}
+                                                <input
+                                                  type="text"
+                                                  className=""
+                                                  disabled
+                                                  value={
+                                                    firstItem?.actionUserName
+                                                  }
+                                                />
+                                              </label>
+                                            </div>
+                                          </div>
+                                        </div>
+
+                                        <div className="col-md-3">
+                                          <div className="inner_form_new-sm">
+                                            <label className="controlform-sm">
+                                              {firstItem?.actionStatusName ==
+                                                "Approved" ||
+                                              firstItem?.actionStatusName ==
+                                                "Reject" ||
+                                              firstItem?.actionStatusName ==
+                                                "Cancelled"
+                                                ? "Assigned"
+                                                : firstItem?.actionStatusName}{" "}
+                                              Date
+                                            </label>
+                                            <div className="form-bx-sm">
+                                              <label>
+                                                <input
+                                                  type="text"
+                                                  className=""
+                                                  disabled
+                                                  value={moment(
+                                                    firstItem?.createdDate
+                                                  ).format("DD/MMM/yyyy")}
+                                                />
+                                              </label>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <div
+                                        className={
+                                          firstItem?.actionNotes
+                                            ? "inner_form_new"
+                                            : "d-none"
+                                        }
+                                      >
                                         <label className="controlform">
-                                          Action Type
+                                          Action Note
                                         </label>
                                         <div className="form-bx">
                                           <label>
                                             {" "}
-                                            <input
+                                            <textarea
                                               type="text"
                                               className=""
                                               disabled
-                                              // value={firstItem?.actionStatusName}
-                                              value={
-                                                firstItem?.actionStatusName ==
-                                                  "Approved" ||
-                                                  firstItem?.actionStatusName ==
-                                                  "Reject" ||
-                                                  firstItem?.actionStatusName ==
-                                                  "Cancelled" ||
-                                                  firstItem?.actionStatusName ==
-                                                  "Draft"
-                                                  ? "Assigned"
-                                                  : firstItem?.actionStatusName
-                                              }
+                                              value={firstItem?.actionNotes}
                                             />
                                           </label>
                                         </div>
                                       </div>
-                                    </div>
-
-                                    <div className="col-md-3">
-                                      <div className="inner_form_new-sm">
-                                        <label className="controlform-sm">
-                                          User{" "}
-                                          <i
-                                            className="bi bi-info-circle icons-info"
-                                            title={`Role : ${firstItem?.actionRoleName}`}
-                                          ></i>
+                                      <div
+                                        className={
+                                          firstItem?.actionComment
+                                            ? "inner_form_new"
+                                            : "d-none"
+                                        }
+                                      >
+                                        <label className="controlform">
+                                          Action Comment
                                         </label>
-                                        <div className="form-bx-sm">
+                                        <div className="form-bx">
                                           <label>
                                             {" "}
-                                            <input
+                                            <textarea
                                               type="text"
                                               className=""
                                               disabled
-                                              value={firstItem?.actionUserName}
+                                              value={firstItem?.actionComment}
                                             />
                                           </label>
                                         </div>
                                       </div>
                                     </div>
+                                  </div>
+                                );
+                              }
+                            })}
 
-                                    <div className="col-md-3">
-                                      <div className="inner_form_new-sm">
-                                        <label className="controlform-sm">
-                                          {firstItem?.actionStatusName ==
-                                            "Approved" ||
-                                            firstItem?.actionStatusName ==
-                                            "Reject" ||
-                                            firstItem?.actionStatusName ==
-                                            "Cancelled"
-                                            ? "Assigned"
-                                            : firstItem?.actionStatusName}{" "}
-                                          Date
-                                        </label>
-                                        <div className="form-bx-sm">
-                                          <label>
-                                            <input
-                                              type="text"
-                                              className=""
-                                              disabled
-                                              value={moment(
-                                                firstItem?.createdDate
-                                              ).format("DD/MMM/yyyy")}
-                                            />
-                                          </label>
-                                        </div>
-                                      </div>
-                                    </div>
-                                  </div>
-                                  <div
-                                    className={
-                                      firstItem?.actionNotes
-                                        ? "inner_form_new"
-                                        : "d-none"
-                                    }
-                                  >
-                                    <label className="controlform">
-                                      Action Note
-                                    </label>
-                                    <div className="form-bx">
-                                      <label>
-                                        {" "}
-                                        <textarea
-                                          type="text"
-                                          className=""
-                                          disabled
-                                          value={firstItem?.actionNotes}
-                                        />
-                                      </label>
-                                    </div>
-                                  </div>
-                                  <div
-                                    className={
-                                      firstItem?.actionComment
-                                        ? "inner_form_new"
-                                        : "d-none"
-                                    }
-                                  >
-                                    <label className="controlform">
-                                      Action Comment
-                                    </label>
-                                    <div className="form-bx">
-                                      <label>
-                                        {" "}
-                                        <textarea
-                                          type="text"
-                                          className=""
-                                          disabled
-                                          value={firstItem?.actionComment}
-                                        />
-                                      </label>
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                            );
-                          }
-                        })}
-                        {/* next level data show and assign behalf of not equal userID  start*/}
-                        {applicationDetail?.userID !== UserID.replace(/"/g, "") && roleID == 7 ?
-                          <>
                             <div
                               className={
                                 roleID == 7
@@ -4998,7 +5484,6 @@ const ExportCircularsEditForm = ({
                               <div className="row">
                                 <div className="col-md-12 my-2">
                                   <div className="hidden-toggles">
-
                                     <input
                                       type="radio"
                                       id="prasignto"
@@ -5049,15 +5534,15 @@ const ExportCircularsEditForm = ({
                                     >
                                       Refer Back
                                     </label>
-
-
                                   </div>
                                 </div>
                               </div>
                             </div>
 
                             <div
-                              className={checkSupervisor == true ? "row" : "d-none"}
+                              className={
+                                checkSupervisor == true ? "row" : "d-none"
+                              }
                             >
                               <div className="col-md-12 d-flex c-gap">
                                 <div
@@ -5066,11 +5551,13 @@ const ExportCircularsEditForm = ({
                                   }
                                 >
                                   {checkSupervisor == true &&
-                                    roleID == 7 &&
-                                    recomdAnalyst != "121" ? (
+                                  roleID == 7 &&
+                                  recomdAnalyst != "121" ? (
                                     <>
                                       <div className="inner_form_new">
-                                        <label className="controlform">Role</label>
+                                        <label className="controlform">
+                                          Role
+                                        </label>
 
                                         <div className="form-bx">
                                           <label>
@@ -5083,12 +5570,14 @@ const ExportCircularsEditForm = ({
                                               }}
                                               className={
                                                 errors.SupervisorRoleId &&
-                                                  !SupervisorRoleId
+                                                !SupervisorRoleId
                                                   ? "error"
                                                   : ""
                                               }
                                             >
-                                              <option value="">Select Role</option>
+                                              <option value="">
+                                                Select Role
+                                              </option>
                                               {userRole?.map((item, index) => {
                                                 return (
                                                   <option
@@ -5102,7 +5591,7 @@ const ExportCircularsEditForm = ({
                                             </select>
                                             <span className="sspan"></span>
                                             {errors.assignedTo &&
-                                              !SupervisorRoleId ? (
+                                            !SupervisorRoleId ? (
                                               <small className="errormsg">
                                                 Role is required{" "}
                                               </small>
@@ -5126,7 +5615,9 @@ const ExportCircularsEditForm = ({
                                   {roleID == 7 && recomdAnalyst != "121" ? (
                                     <>
                                       <div className="inner_form_new">
-                                        <label className="controlform">User</label>
+                                        <label className="controlform">
+                                          User
+                                        </label>
 
                                         <div className="form-bx">
                                           <label>
@@ -5137,12 +5628,15 @@ const ExportCircularsEditForm = ({
                                                 supervisorHangechange(e)
                                               }
                                               className={
-                                                errors.assignUserID && !AssignUserID
+                                                errors.assignUserID &&
+                                                !AssignUserID
                                                   ? "error"
                                                   : ""
                                               }
                                             >
-                                              <option value="">Select User</option>
+                                              <option value="">
+                                                Select User
+                                              </option>
                                               {asignUser?.map((item, index) => {
                                                 return (
                                                   <option
@@ -5156,7 +5650,7 @@ const ExportCircularsEditForm = ({
                                             </select>
                                             <span className="sspan"></span>
                                             {errors.assignUserID &&
-                                              !AssignUserID ? (
+                                            !AssignUserID ? (
                                               <small className="errormsg">
                                                 {errors.assignUserID}
                                               </small>
@@ -5176,12 +5670,70 @@ const ExportCircularsEditForm = ({
                                 {/* end form-bx  */}
                               </div>
                             </div>
-                            {roleID == 7 && <p>
-                              {attachmentData?.map((items, index) => {
-                                return (
+                            {roleID == 7 && (
+                              <p>
+                                {attachmentData?.map((items, index) => {
+                                  return (
+                                    <div
+                                      className="attachemt_form-bx  mt-2"
+                                      key={items.id}
+                                    >
+                                      <label
+                                        style={{
+                                          background: "#d9edf7",
+                                          padding: "9px 3px",
+                                          border: "0px",
+                                        }}
+                                      >
+                                        <span style={{ fontWeight: "500" }}>
+                                          {items.filename}
+                                        </span>
+                                      </label>
+                                      <div className="browse-btn">
+                                        Browse
+                                        <input
+                                          type="file"
+                                          onChange={(e) =>
+                                            handleuserFileChange(
+                                              e,
+                                              "circular" + (index + 1)
+                                            )
+                                          }
+                                        />
+                                      </div>
+                                      <span className="filename">
+                                        {userfiles?.find(
+                                          (f) =>
+                                            f.id === "circular" + (index + 1)
+                                        )?.file?.name || "No file chosen"}
+                                      </span>
+                                      {userfiles?.length &&
+                                      userfiles?.find(
+                                        (f) => f.id === "circular" + (index + 1)
+                                      )?.file?.name ? (
+                                        <button
+                                          type="button"
+                                          className="remove-file"
+                                          onClick={() =>
+                                            removeUserImage(
+                                              index,
+                                              "circular" + (index + 1)
+                                            )
+                                          }
+                                        >
+                                          Remove
+                                        </button>
+                                      ) : (
+                                        ""
+                                      )}
+                                    </div>
+                                  );
+                                })}
+
+                                {otheruserfiles.map((file, index) => (
                                   <div
-                                    className="attachemt_form-bx  mt-2"
-                                    key={items.id}
+                                    key={"other" + (index + 1)}
+                                    className="attachemt_form-bx"
                                   >
                                     <label
                                       style={{
@@ -5190,32 +5742,42 @@ const ExportCircularsEditForm = ({
                                         border: "0px",
                                       }}
                                     >
-                                      <span style={{ fontWeight: "500" }}>
-                                        {items.filename}
-                                      </span>
+                                      <b>
+                                        Other File
+                                        {index + 1}
+                                      </b>
                                     </label>
                                     <div className="browse-btn">
-                                      Browse
+                                      Browse{" "}
                                       <input
                                         type="file"
-                                        onChange={(e) =>
-                                          handleuserFileChange(e, "circular" + (index + 1))
-                                        }
+                                        onChange={(e) => {
+                                          handleuserFileChange(
+                                            e,
+                                            "other" + index
+                                          );
+                                          handleOthrefile(e, `other ${index}`);
+                                        }}
                                       />
                                     </div>
                                     <span className="filename">
                                       {userfiles?.find(
-                                        (f) => f.id === "circular" + (index + 1)
+                                        (f) => f.id === "other" + index
                                       )?.file?.name || "No file chosen"}
                                     </span>
+
                                     {userfiles?.length &&
-                                      userfiles?.find((f) => f.id === "circular" + (index + 1))
-                                        ?.file?.name ? (
+                                    userfiles?.find(
+                                      (f) => f.id === "other" + index
+                                    )?.file?.name ? (
                                       <button
                                         type="button"
                                         className="remove-file"
                                         onClick={() =>
-                                          removeUserImage(index, "circular" + (index + 1))
+                                          removeUserImage(
+                                            index,
+                                            "other" + index
+                                          )
                                         }
                                       >
                                         Remove
@@ -5224,75 +5786,27 @@ const ExportCircularsEditForm = ({
                                       ""
                                     )}
                                   </div>
-                                );
-                              })}
+                                ))}
 
-                              {otheruserfiles.map((file, index) => (
-                                <div
-                                  key={"other" + (index + 1)}
-                                  className="attachemt_form-bx"
-                                >
-                                  <label
-                                    style={{
-                                      background: "#d9edf7",
-                                      padding: "9px 3px",
-                                      border: "0px",
-                                    }}
-                                  >
-                                    <b>
-                                      Other File
-                                      {index + 1}
-                                    </b>
-                                  </label>
-                                  <div className="browse-btn">
-                                    Browse{" "}
-                                    <input
-                                      type="file"
-                                      onChange={(e) => {
-                                        handleuserFileChange(e, "other" + index);
-                                        handleOthrefile(e, `other ${index}`);
-                                      }}
-                                    />
-                                  </div>
-                                  <span className="filename">
-                                    {userfiles?.find((f) => f.id === "other" + index)
-                                      ?.file?.name || "No file chosen"}
-                                  </span>
-
-                                  {userfiles?.length &&
-                                    userfiles?.find((f) => f.id === "other" + index)
-                                      ?.file?.name ? (
+                                {otheruserfiles?.length || userfiles?.length ? (
+                                  <div className="attachemt_form-bx">
+                                    <label style={{ border: "0px" }}>
+                                      {""}
+                                    </label>
                                     <button
                                       type="button"
-                                      className="remove-file"
-                                      onClick={() =>
-                                        removeUserImage(index, "other" + index)
-                                      }
+                                      className="addmore-btn mt-0"
+                                      onClick={(e) => handleuserAddMore(e)}
                                     >
-                                      Remove
+                                      {" "}
+                                      Add More File{" "}
                                     </button>
-                                  ) : (
-                                    ""
-                                  )}
-                                </div>
-                              ))}
-
-                              {otheruserfiles?.length || userfiles?.length ? (
-                                <div className="attachemt_form-bx">
-                                  <label style={{ border: "0px" }}>{""}</label>
-                                  <button
-                                    type="button"
-                                    className="addmore-btn mt-0"
-                                    onClick={(e) => handleuserAddMore(e)}
-                                  >
-                                    {" "}
-                                    Add More File{" "}
-                                  </button>
-                                </div>
-                              ) : (
-                                ""
-                              )}
-                            </p>}
+                                  </div>
+                                ) : (
+                                  ""
+                                )}
+                              </p>
+                            )}
                             <div
                               className={
                                 roleID == 7
@@ -5300,17 +5814,21 @@ const ExportCircularsEditForm = ({
                                   : "d-none"
                               }
                             >
-                              <label className="controlform">Recommendation</label>
+                              <label className="controlform">
+                                Recommendation
+                              </label>
                               <div className="form-bx editorFieldBox">
                                 <div className="mt-2 py-1">
                                   <MenuBar editor={editorPrincipleAnalyst} />
-                                  <EditorContent editor={editorPrincipleAnalyst} />
+                                  <EditorContent
+                                    editor={editorPrincipleAnalyst}
+                                  />
 
                                   <span className="sspan"></span>
                                   {(errors.Description && Description == " ") ||
-                                    Description == null ||
-                                    Description == "<p></p>" ||
-                                    !Description ? (
+                                  Description == null ||
+                                  Description == "<p></p>" ||
+                                  !Description ? (
                                     <small className="errormsg">
                                       {errors.Description}
                                     </small>
@@ -5322,18 +5840,20 @@ const ExportCircularsEditForm = ({
                             </div>
 
                             <div
-                              className={roleID == 7 ? "inner_form_new " : "d-none"}
+                              className={
+                                roleID == 7 ? "inner_form_new " : "d-none"
+                              }
                             >
                               <label className="controlform">
                                 {nextlevelvalue == "10"
                                   ? "Assign Notes"
                                   : nextlevelvalue == "20"
-                                    ? "Delegate Notes"
-                                    : nextlevelvalue == "35"
-                                      ? "Referred to Other Department Notes"
-                                      : nextlevelvalue == "15"
-                                        ? "Refer Back Notes"
-                                        : "Notes"}
+                                  ? "Delegate Notes"
+                                  : nextlevelvalue == "35"
+                                  ? "Referred to Other Department Notes"
+                                  : nextlevelvalue == "15"
+                                  ? "Refer Back Notes"
+                                  : "Notes"}
                               </label>
 
                               <div className="form-bx">
@@ -5347,12 +5867,12 @@ const ExportCircularsEditForm = ({
                                       nextlevelvalue == "10"
                                         ? "Assign Notes"
                                         : nextlevelvalue == "20"
-                                          ? "Delegate Notes"
-                                          : nextlevelvalue == "35"
-                                            ? "Referred to Other Department Notes"
-                                            : nextlevelvalue == "15"
-                                              ? "Refer Back Notes"
-                                              : "Notes"
+                                        ? "Delegate Notes"
+                                        : nextlevelvalue == "35"
+                                        ? "Referred to Other Department Notes"
+                                        : nextlevelvalue == "15"
+                                        ? "Refer Back Notes"
+                                        : "Notes"
                                     }
                                     className={errors.Notes ? "error" : ""}
                                     value={asignnextLeveldata.Notes}
@@ -5363,12 +5883,12 @@ const ExportCircularsEditForm = ({
                                       {nextlevelvalue == "10"
                                         ? "Assign notes is required"
                                         : nextlevelvalue == "20"
-                                          ? "Delegate notes is required"
-                                          : nextlevelvalue == "35"
-                                            ? "Referred to other department notes is required"
-                                            : nextlevelvalue == "15"
-                                              ? "Refer back notes is required"
-                                              : "Notes is required"}
+                                        ? "Delegate notes is required"
+                                        : nextlevelvalue == "35"
+                                        ? "Referred to other department notes is required"
+                                        : nextlevelvalue == "15"
+                                        ? "Refer back notes is required"
+                                        : "Notes is required"}
                                     </small>
                                   ) : (
                                     ""
@@ -5379,18 +5899,20 @@ const ExportCircularsEditForm = ({
                             {/* end form-bx  */}
 
                             <div
-                              className={roleID == 7 ? "inner_form_new " : "d-none"}
+                              className={
+                                roleID == 7 ? "inner_form_new " : "d-none"
+                              }
                             >
                               <label className="controlform">
                                 {nextlevelvalue == "10"
                                   ? "Assign Comments"
                                   : nextlevelvalue == "20"
-                                    ? "Delegate Comments"
-                                    : nextlevelvalue == "35"
-                                      ? "Referred to Other Department Comments"
-                                      : nextlevelvalue == "15"
-                                        ? "Refer Back Comments"
-                                        : "Comments"}
+                                  ? "Delegate Comments"
+                                  : nextlevelvalue == "35"
+                                  ? "Referred to Other Department Comments"
+                                  : nextlevelvalue == "15"
+                                  ? "Refer Back Comments"
+                                  : "Comments"}
                               </label>
 
                               <div className="form-bx">
@@ -5404,12 +5926,12 @@ const ExportCircularsEditForm = ({
                                       nextlevelvalue == "10"
                                         ? "Assign Comments"
                                         : nextlevelvalue == "20"
-                                          ? "Delegate Comments"
-                                          : nextlevelvalue == "35"
-                                            ? "Referred to Other Department Comments"
-                                            : nextlevelvalue == "15"
-                                              ? "Refer Back Comments"
-                                              : "Comments"
+                                        ? "Delegate Comments"
+                                        : nextlevelvalue == "35"
+                                        ? "Referred to Other Department Comments"
+                                        : nextlevelvalue == "15"
+                                        ? "Refer Back Comments"
+                                        : "Comments"
                                     }
                                     className={errors.Comment ? "error" : ""}
                                     value={asignnextLeveldata.Comment}
@@ -5420,12 +5942,12 @@ const ExportCircularsEditForm = ({
                                       {nextlevelvalue == "10"
                                         ? "Assign comments is required"
                                         : nextlevelvalue == "20"
-                                          ? "Delegate comments is required"
-                                          : nextlevelvalue == "35"
-                                            ? "Referred to other department comments is required"
-                                            : nextlevelvalue == "15"
-                                              ? "Refer back comments is required"
-                                              : "Comments is required"}
+                                        ? "Delegate comments is required"
+                                        : nextlevelvalue == "35"
+                                        ? "Referred to other department comments is required"
+                                        : nextlevelvalue == "15"
+                                        ? "Refer back comments is required"
+                                        : "Comments is required"}
                                     </small>
                                   ) : (
                                     ""
@@ -5434,7 +5956,13 @@ const ExportCircularsEditForm = ({
                               </div>
                             </div>
 
-                            <div className={roleID == 7 ? "inner_form_new align-items-center" : "d-none"} >
+                            <div
+                              className={
+                                roleID == 7
+                                  ? "inner_form_new align-items-center"
+                                  : "d-none"
+                              }
+                            >
                               <label className="controlform">Bank </label>
                               <div className=" cccto">
                                 <div className="flex justify-content-center multiSelect">
@@ -5445,16 +5973,18 @@ const ExportCircularsEditForm = ({
                                     value={selectedBanks}
                                     isSelectAll={true}
                                     menuPlacement={"bottom"}
-
                                   />
-
                                 </div>
                               </div>
                             </div>
                             {/* end form-bx  */}
-                            <div className={roleID == 7 ? "inner_form_new" : "d-none"}>
+                            <div
+                              className={
+                                roleID == 7 ? "inner_form_new" : "d-none"
+                              }
+                            >
                               <label className="controlform">Directives</label>
-                              <div className="cccto">
+                              {/* <div className="cccto">
                                 <div className="flex justify-content-center multiSelect">
                                   <DirectiveMultiSelectComponent
                                     key="multyselectprinciple"
@@ -5467,17 +5997,173 @@ const ExportCircularsEditForm = ({
 
                                   />
                                 </div>
+                              </div> */}
+                              <div className="cccto position-relative">
+                                <div className="multiselect d-flex justify-content-between align-items-end">
+                                  <div className="adddirectiveBox">
+                                    <ul className="newdirectivelist">
+                                      {selectedDirectives?.length ? (
+                                        selectedDirectives?.map((res) => {
+                                          return <li>{res?.label}</li>;
+                                        })
+                                      ) : (
+                                        <li className="disabletext">
+                                          Select Directives
+                                        </li>
+                                      )}
+                                    </ul>
+                                  </div>
+                                  <Button
+                                    variant="primary"
+                                    className="addDirectiveBtn"
+                                    onClick={handleDirectiveModalShow}
+                                  >
+                                    Add Directives
+                                  </Button>
+                                  {errors?.selectedDirectives &&
+                                  selectedDirectives.length == 0 ? (
+                                    <small className="errormsg directiveErrormsg">
+                                      {errors.selectedDirectives}
+                                    </small>
+                                  ) : (
+                                    ""
+                                  )}
+                                  <Modal
+                                    size="lg"
+                                    show={showDirectiveModal}
+                                    onHide={handleDirectiveClose}
+                                    backdrop="static"
+                                    className="directiveModal"
+                                  >
+                                    <div className="application-box">
+                                      <div className="login_inner">
+                                        <div className="login_form ">
+                                          <h5>
+                                            <Modal.Header
+                                              closeButton
+                                              className="p-0"
+                                            >
+                                              <Modal.Title>
+                                                Add Directives
+                                              </Modal.Title>
+                                            </Modal.Header>
+                                          </h5>
+                                        </div>
+                                        <div className="login_form_panel">
+                                          <Modal.Body className="p-0">
+                                            <DirectiveMultiSelectComponent
+                                              key="multyselectprinciple"
+                                              placeholder="ss"
+                                              options={DirectiveOption}
+                                              onChange={(e) =>
+                                                handleChangeDirective(e)
+                                              }
+                                              value={selectedDirectives}
+                                              isSelectAll={true}
+                                            />
+
+                                            <div className="directiveFileData-field">
+                                              <div className="directiveFileData-show">
+                                                {selectedDirectives?.length >
+                                                0 ? (
+                                                  selectedDirectives.map(
+                                                    (item) => {
+                                                      const firstTagName =
+                                                        item.tagName.split(
+                                                          ","
+                                                        )[0];
+                                                      return (
+                                                        <>
+                                                          {item?.filePath
+                                                            .length > 0 ? (
+                                                            <div
+                                                              className="directiveFileBox"
+                                                              key={item.value}
+                                                            >
+                                                              {item.filePath.map(
+                                                                (
+                                                                  fileItem,
+                                                                  index
+                                                                ) => (
+                                                                  <a
+                                                                    target="_blank"
+                                                                    href={
+                                                                      fileItem.filePath
+                                                                    }
+                                                                    key={
+                                                                      fileItem.id
+                                                                    }
+                                                                    style={{
+                                                                      marginBottom:
+                                                                        "3px",
+                                                                      letterSpacing:
+                                                                        "0.01px",
+                                                                      fontSize:
+                                                                        "14px",
+                                                                      fontWeight:
+                                                                        "400",
+                                                                      display:
+                                                                        "block",
+                                                                      padding:
+                                                                        "0px 5px",
+                                                                      color:
+                                                                        "#4154f1",
+                                                                    }}
+                                                                  >
+                                                                    {firstTagName +
+                                                                      (index +
+                                                                        1)}
+                                                                  </a>
+                                                                )
+                                                              )}
+                                                            </div>
+                                                          ) : (
+                                                            ""
+                                                          )}
+                                                        </>
+                                                      );
+                                                    }
+                                                  )
+                                                ) : (
+                                                  <></>
+                                                )}
+                                              </div>
+                                            </div>
+                                          </Modal.Body>
+                                        </div>
+                                        <Modal.Footer className="justify-content-end">
+                                          <Button
+                                            variant="secondary"
+                                            onClick={handleDirectiveClose}
+                                          >
+                                            Close
+                                          </Button>
+                                        </Modal.Footer>
+                                      </div>
+                                    </div>
+                                  </Modal>
+                                </div>
                               </div>
                             </div>
                             {/* end form-bx  */}
                             {/* end form-bx  */}
-                            <div className={roleID == 7 ? "inner_form_new" : "d-none"}>
-                              <label className="controlform">Releasing Date</label>
+                            <div
+                              className={
+                                roleID == 7 ? "inner_form_new" : "d-none"
+                              }
+                            >
+                              <label className="controlform">
+                                Releasing Date
+                              </label>
                               <div className="form-bx">
                                 <DatePicker
                                   placeholderText="Select Releasing Date"
                                   closeOnScroll={(e) => e.target === document}
-                                  selected={releasingDate ? releasingDate : applicationDetail.releasingDate}
+                                  selected={
+                                    releasingDate
+                                      ? releasingDate
+                                      : applicationDetail.releasingDate
+                                  }
                                   onChange={(date) => setReleasingDate(date)}
                                   peekNextMonth
                                   showMonthDropdown
@@ -5486,31 +6172,164 @@ const ExportCircularsEditForm = ({
                                   dropdownMode="select"
                                   dateFormat="dd/MMMM/yyyy"
                                 />
-                                {
-                                  errors?.releasingDate ? (
-                                    <small className="errormsg">{errors.releasingDate}</small>
-                                  ) : (" ")
-                                }
+                                {errors?.releasingDate ? (
+                                  <small className="errormsg">
+                                    {errors.releasingDate}
+                                  </small>
+                                ) : (
+                                  " "
+                                )}
                               </div>
                             </div>
                             {/* end form-bx  */}
+                          </>
+                        ) : (
+                          <>
+                            {Actiondata?.map((cur) => {
+                              const firstItem = cur?.circularActivityData?.[0]; // Accessing the first element directly
+                              if (cur?.assignedToRoleID === 7 && firstItem) {
+                                // Check if firstItem exists
+                                return (
+                                  <div className="bakgroundaction">
+                                    <div key={firstItem.circularID}>
+                                      {" "}
+                                      {/* Remember to add a unique key */}
+                                      <div className="row">
+                                        <div className="col-md-6">
+                                          <div className="inner_form_new">
+                                            <label className="controlform">
+                                              Action Type
+                                            </label>
+                                            <div className="form-bx">
+                                              <label>
+                                                {" "}
+                                                <input
+                                                  type="text"
+                                                  className=""
+                                                  disabled
+                                                  // value={firstItem?.actionStatusName}
+                                                  value={
+                                                    firstItem?.actionStatusName ==
+                                                      "Approved" ||
+                                                    firstItem?.actionStatusName ==
+                                                      "Reject" ||
+                                                    firstItem?.actionStatusName ==
+                                                      "Cancelled" ||
+                                                    firstItem?.actionStatusName ==
+                                                      "Draft"
+                                                      ? "Assigned"
+                                                      : firstItem?.actionStatusName
+                                                  }
+                                                />
+                                              </label>
+                                            </div>
+                                          </div>
+                                        </div>
 
-                          </> : (
-                            <span>
-                              {/* {noDataComment?.map((v, i) => {
-                          if (v.roleID == 7 && v.isDataAvailable == 0) {
-                            return (
-                              <div
-                                className={principalanalystTab ? "customtab" : "d-none"}
-                              >
-                                <div class="text-center">No Data Found</div>
-                              </div>
-                            );
-                          }
-                        })} */}
-                            </span>
-                          )
-                        }
+                                        <div className="col-md-3">
+                                          <div className="inner_form_new-sm">
+                                            <label className="controlform-sm">
+                                              User{" "}
+                                              <i
+                                                className="bi bi-info-circle icons-info"
+                                                title={`Role : ${firstItem?.actionRoleName}`}
+                                              ></i>
+                                            </label>
+                                            <div className="form-bx-sm">
+                                              <label>
+                                                {" "}
+                                                <input
+                                                  type="text"
+                                                  className=""
+                                                  disabled
+                                                  value={
+                                                    firstItem?.actionUserName
+                                                  }
+                                                />
+                                              </label>
+                                            </div>
+                                          </div>
+                                        </div>
+
+                                        <div className="col-md-3">
+                                          <div className="inner_form_new-sm">
+                                            <label className="controlform-sm">
+                                              {firstItem?.actionStatusName ==
+                                                "Approved" ||
+                                              firstItem?.actionStatusName ==
+                                                "Reject" ||
+                                              firstItem?.actionStatusName ==
+                                                "Cancelled"
+                                                ? "Assigned"
+                                                : firstItem?.actionStatusName}{" "}
+                                              Date
+                                            </label>
+                                            <div className="form-bx-sm">
+                                              <label>
+                                                <input
+                                                  type="text"
+                                                  className=""
+                                                  disabled
+                                                  value={moment(
+                                                    firstItem?.createdDate
+                                                  ).format("DD/MMM/yyyy")}
+                                                />
+                                              </label>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <div
+                                        className={
+                                          firstItem?.actionNotes
+                                            ? "inner_form_new"
+                                            : "d-none"
+                                        }
+                                      >
+                                        <label className="controlform">
+                                          Action Note
+                                        </label>
+                                        <div className="form-bx">
+                                          <label>
+                                            {" "}
+                                            <textarea
+                                              type="text"
+                                              className=""
+                                              disabled
+                                              value={firstItem?.actionNotes}
+                                            />
+                                          </label>
+                                        </div>
+                                      </div>
+                                      <div
+                                        className={
+                                          firstItem?.actionComment
+                                            ? "inner_form_new"
+                                            : "d-none"
+                                        }
+                                      >
+                                        <label className="controlform">
+                                          Action Comment
+                                        </label>
+                                        <div className="form-bx">
+                                          <label>
+                                            {" "}
+                                            <textarea
+                                              type="text"
+                                              className=""
+                                              disabled
+                                              value={firstItem?.actionComment}
+                                            />
+                                          </label>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                );
+                              }
+                            })}
+                          </>
+                        )}
                         {/* next level data show and assign behalf of not equal userID  end*/}
                       </div>
                       {allcomment?.map((cur) => {
@@ -5532,7 +6351,13 @@ const ExportCircularsEditForm = ({
                                     role="tabpanel"
                                     aria-labelledby={"pranalyst" + index}
                                   >
-                                    <div className={item?.actionStatusName ? "bakgroundaction" : "d-none"}>
+                                    <div
+                                      className={
+                                        item?.actionStatusName
+                                          ? "bakgroundaction"
+                                          : "d-none"
+                                      }
+                                    >
                                       <div className="row">
                                         <div className="col-md-6">
                                           <div className="inner_form_new ">
@@ -5549,11 +6374,11 @@ const ExportCircularsEditForm = ({
                                                   value={
                                                     item?.actionStatusName ==
                                                       "Approved" ||
-                                                      item?.actionStatusName ==
+                                                    item?.actionStatusName ==
                                                       "Reject" ||
-                                                      item?.actionStatusName ==
+                                                    item?.actionStatusName ==
                                                       "Cancelled" ||
-                                                      item?.actionStatusName ==
+                                                    item?.actionStatusName ==
                                                       "Draft"
                                                       ? "Assigned"
                                                       : item?.actionStatusName
@@ -5591,9 +6416,9 @@ const ExportCircularsEditForm = ({
                                             <label className="controlform-sm">
                                               {item?.actionStatusName ==
                                                 "Approved" ||
-                                                item?.actionStatusName ==
+                                              item?.actionStatusName ==
                                                 "Reject" ||
-                                                item?.actionStatusName ==
+                                              item?.actionStatusName ==
                                                 "Cancelled"
                                                 ? "Assigned"
                                                 : item?.actionStatusName}{" "}
@@ -5659,7 +6484,6 @@ const ExportCircularsEditForm = ({
                                         </div>
                                       </div>
                                     </div>
-
 
                                     <div className="inner_form_new">
                                       <label className="controlform">
@@ -5731,7 +6555,6 @@ const ExportCircularsEditForm = ({
                                                   key={items.id}
                                                 >
                                                   <label className="mb-2 mb-0 pt-2 pb-2">
-
                                                     {items?.fileName
                                                       ? items?.fileName
                                                       : `FileUpload ${index}`}
@@ -5846,7 +6669,7 @@ const ExportCircularsEditForm = ({
                                     <div
                                       className={
                                         item?.assignedToName == null &&
-                                          item?.assignedToName == null
+                                        item?.assignedToName == null
                                           ? "d-none"
                                           : "row"
                                       }
@@ -5900,7 +6723,135 @@ const ExportCircularsEditForm = ({
                             }
                           });
                       })}
+                      {noDataComment?.map((v, i) => {
+                        if (v.roleID == 7 && v.isDataAvailable == 0) {
+                          return (
+                            <div
+                              className={
+                                principalanalystTab ? "customtab" : "d-none"
+                              }
+                            >
+                              <div class="text-center">No Data Found</div>
+                            </div>
+                          );
+                        }
+                      })}
 
+                      {/* <div
+                        className={
+                          applicationDetail?.assignedTo ==
+                            UserID.replace(/"/g, "") &&
+                          applicationDetail?.actionStatus == 15 &&
+                          applicationDetail?.actionStatusName ==
+                            "Referred Back" &&
+                          applicationDetail.userID != UserID.replace(/"/g, "")
+                            ? ""
+                            : "d-none"
+                        }
+                      >
+                        <div className="inner_form_new align-items-start mt-2">
+                          <label className="controlform">Recommendation</label>
+                          <div className="form-bx editorFieldBox">
+                            <div className="mt-2 py-1">
+                              <MenuBar editor={referbackprUser} />
+                              <EditorContent editor={referbackprUser} />
+
+                              <span className="sspan"></span>
+                              {(errors.Description && Description == " ") ||
+                              Description == null ||
+                              Description == "<p></p>" ||
+                              !Description ? (
+                                <small
+                                  className="errormsg"
+                                  style={{ bottom: "-13px" }}
+                                >
+                                  {errors.Description}
+                                </small>
+                              ) : (
+                                ""
+                              )}
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="inner_form_new ">
+                          <label className="controlform">
+                            Assign to Next Level
+                          </label>
+                          <input
+                            type="checkbox"
+                            onChange={HandelSupervisorcheck}
+                            checked={checkSupervisor}
+                          />
+                        </div>
+
+                        <div
+                          className={
+                            checkSupervisor ? "inner_form_new" : "d-none"
+                          }
+                        >
+                         
+                          <label className="controlform">
+                            {roleID == "5"
+                              ? " Senior Analyst"
+                              : roleID == "6"
+                              ? " Principal Analyst"
+                              : roleID == "7"
+                              ? " Deputy Director"
+                              : " Director"}
+                          </label>
+                          <div className="form-bx">
+                            <label>
+                              <select
+                                ref={assignedToRef}
+                                name="assignedTo"
+                                onChange={supervisorHangechangeBankuser}
+                                className={
+                                  errors.assignedTo && !AssignUserID
+                                    ? "error"
+                                    : ""
+                                }
+                              >
+                                <option value="">
+                                  Select
+                                  {roleID == "5"
+                                    ? " Senior Analyst"
+                                    : roleID == "6"
+                                    ? " Principal Analyst"
+                                    : roleID == "7"
+                                    ? " Deputy Director"
+                                    : " Director"}
+                                </option>
+                                {Supervisors?.map((item, index) => {
+                                  return (
+                                    <option
+                                      key={index}
+                                      value={JSON?.stringify(item)}
+                                      selected={
+                                        item.userID ==
+                                        applicationDetail?.assignedTo
+                                      }
+                                    >
+                                      {item.name}
+                                    </option>
+                                  );
+                                })}
+                              </select>
+                              <span className="sspan"></span>
+                              {errors.assignedTo && !AssignUserID ? (
+                                <small
+                                  className="errormsg"
+                                  style={{ marginBottom: "-5px" }}
+                                >
+                                  {errors.assignedTo}
+                                </small>
+                              ) : (
+                                ""
+                              )}
+                            </label>
+                          </div>
+                        </div>
+                      </div> */}
                     </div>
                   </div>
                 </>
@@ -5921,15 +6872,12 @@ const ExportCircularsEditForm = ({
                     onClick={() => setdeputyTab(!deputyTab)}
                   >
                     Deputy Director{" "}
-
                     <span className="btn-collapse">
                       <i className="bi bi-caret-down-fill"></i>
                     </span>
                   </h5>
 
                   <div className={deputyTab ? "customtab" : "d-none"}>
-
-
                     {allcomment?.map((cur, i) => {
                       if (cur.assignedToRoleID == 8) {
                         return (
@@ -5985,7 +6933,6 @@ const ExportCircularsEditForm = ({
                                       aria-controls="home"
                                       aria-selected="true"
                                     >
-
                                       Response{" "}
                                       {cur?.circularActivityData?.length -
                                         index}
@@ -5996,8 +6943,7 @@ const ExportCircularsEditForm = ({
                           </ul>
                         );
                       }
-                    })
-                    }
+                    })}
 
                     <div className="tab-content pt-2">
                       <div
@@ -6010,151 +6956,156 @@ const ExportCircularsEditForm = ({
                         role="tabpanel"
                         aria-labelledby="deputy"
                       >
-                        {Actiondata?.map((cur) => {
-                          const firstItem = cur?.circularActivityData?.[0]; // Accessing the first element directly
+                        {/* next level data show and assign behalf of not equal userID  start*/}
 
-                          if (cur?.assignedToRoleID === 8 && firstItem) {
-                            // Check if firstItem exists
-                            return (
-                              <div className="bakgroundaction">
-                                <div key={firstItem.actionID}>
-                                  {" "}
-                                  {/* Remember to add a unique key */}
-                                  <div className="row">
-                                    <div className="col-md-6">
-                                      <div className="inner_form_new">
+                        {applicationDetail?.userID !==
+                          UserID.replace(/"/g, "") && roleID == 8 ? (
+                          <>
+                            {Actiondata?.map((cur) => {
+                              const firstItem = cur?.circularActivityData?.[0]; // Accessing the first element directly
+
+                              if (cur?.assignedToRoleID === 8 && firstItem) {
+                                // Check if firstItem exists
+                                return (
+                                  <div className="bakgroundaction">
+                                    <div key={firstItem.actionID}>
+                                      {" "}
+                                      {/* Remember to add a unique key */}
+                                      <div className="row">
+                                        <div className="col-md-6">
+                                          <div className="inner_form_new">
+                                            <label className="controlform">
+                                              Action Type
+                                            </label>
+                                            <div className="form-bx">
+                                              <label>
+                                                {" "}
+                                                <input
+                                                  type="text"
+                                                  className=""
+                                                  disabled
+                                                  // value={firstItem?.actionStatusName}
+                                                  value={
+                                                    firstItem?.actionStatusName ==
+                                                      "Approved" ||
+                                                    firstItem?.actionStatusName ==
+                                                      "Reject" ||
+                                                    firstItem?.actionStatusName ==
+                                                      "Cancelled" ||
+                                                    firstItem?.actionStatusName ==
+                                                      "Draft"
+                                                      ? "Assigned"
+                                                      : firstItem?.actionStatusName
+                                                  }
+                                                />
+                                              </label>
+                                            </div>
+                                          </div>
+                                        </div>
+
+                                        <div className="col-md-3">
+                                          <div className="inner_form_new-sm">
+                                            <label className="controlform-sm">
+                                              User{" "}
+                                              <i
+                                                className="bi bi-info-circle icons-info"
+                                                title={`Role : ${firstItem?.actionRoleName}`}
+                                              ></i>
+                                            </label>
+                                            <div className="form-bx-sm">
+                                              <label>
+                                                {" "}
+                                                <input
+                                                  type="text"
+                                                  className=""
+                                                  disabled
+                                                  value={
+                                                    firstItem?.actionUserName
+                                                  }
+                                                />
+                                              </label>
+                                            </div>
+                                          </div>
+                                        </div>
+
+                                        <div className="col-md-3">
+                                          <div className="inner_form_new-sm">
+                                            <label className="controlform-sm">
+                                              {firstItem?.actionStatusName ==
+                                                "Approved" ||
+                                              firstItem?.actionStatusName ==
+                                                "Reject" ||
+                                              firstItem?.actionStatusName ==
+                                                "Cancelled"
+                                                ? "Assigned"
+                                                : firstItem?.actionStatusName}{" "}
+                                              Date
+                                            </label>
+                                            <div className="form-bx-sm">
+                                              <label>
+                                                <input
+                                                  type="text"
+                                                  className=""
+                                                  disabled
+                                                  value={moment(
+                                                    firstItem?.createdDate
+                                                  ).format("DD/MMM/yyyy")}
+                                                />
+                                              </label>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <div
+                                        className={
+                                          firstItem?.actionNotes
+                                            ? "inner_form_new"
+                                            : "d-none"
+                                        }
+                                      >
                                         <label className="controlform">
-                                          Action Type
+                                          Action Note
                                         </label>
                                         <div className="form-bx">
                                           <label>
                                             {" "}
-                                            <input
+                                            <textarea
                                               type="text"
                                               className=""
                                               disabled
-                                              // value={firstItem?.actionStatusName}
-                                              value={
-                                                firstItem?.actionStatusName ==
-                                                  "Approved" ||
-                                                  firstItem?.actionStatusName ==
-                                                  "Reject" ||
-                                                  firstItem?.actionStatusName ==
-                                                  "Cancelled" ||
-                                                  firstItem?.actionStatusName ==
-                                                  "Draft"
-                                                  ? "Assigned"
-                                                  : firstItem?.actionStatusName
-                                              }
+                                              value={firstItem?.actionNotes}
                                             />
                                           </label>
                                         </div>
                                       </div>
-                                    </div>
-
-                                    <div className="col-md-3">
-                                      <div className="inner_form_new-sm">
-                                        <label className="controlform-sm">
-                                          User{" "}
-                                          <i
-                                            className="bi bi-info-circle icons-info"
-                                            title={`Role : ${firstItem?.actionRoleName}`}
-                                          ></i>
+                                      <div
+                                        className={
+                                          firstItem?.actionComment
+                                            ? "inner_form_new"
+                                            : "d-none"
+                                        }
+                                      >
+                                        <label className="controlform">
+                                          Action Comment
                                         </label>
-                                        <div className="form-bx-sm">
+                                        <div className="form-bx">
                                           <label>
                                             {" "}
-                                            <input
+                                            <textarea
                                               type="text"
                                               className=""
                                               disabled
-                                              value={firstItem?.actionUserName}
+                                              value={firstItem?.actionComment}
                                             />
                                           </label>
                                         </div>
                                       </div>
                                     </div>
+                                  </div>
+                                );
+                              }
+                            })}
 
-                                    <div className="col-md-3">
-                                      <div className="inner_form_new-sm">
-                                        <label className="controlform-sm">
-                                          {firstItem?.actionStatusName ==
-                                            "Approved" ||
-                                            firstItem?.actionStatusName ==
-                                            "Reject" ||
-                                            firstItem?.actionStatusName ==
-                                            "Cancelled"
-                                            ? "Assigned"
-                                            : firstItem?.actionStatusName}{" "}
-                                          Date
-                                        </label>
-                                        <div className="form-bx-sm">
-                                          <label>
-                                            <input
-                                              type="text"
-                                              className=""
-                                              disabled
-                                              value={moment(
-                                                firstItem?.createdDate
-                                              ).format("DD/MMM/yyyy")}
-                                            />
-                                          </label>
-                                        </div>
-                                      </div>
-                                    </div>
-                                  </div>
-                                  <div
-                                    className={
-                                      firstItem?.actionNotes
-                                        ? "inner_form_new"
-                                        : "d-none"
-                                    }
-                                  >
-                                    <label className="controlform">
-                                      Action Note
-                                    </label>
-                                    <div className="form-bx">
-                                      <label>
-                                        {" "}
-                                        <textarea
-                                          type="text"
-                                          className=""
-                                          disabled
-                                          value={firstItem?.actionNotes}
-                                        />
-                                      </label>
-                                    </div>
-                                  </div>
-                                  <div
-                                    className={
-                                      firstItem?.actionComment
-                                        ? "inner_form_new"
-                                        : "d-none"
-                                    }
-                                  >
-                                    <label className="controlform">
-                                      Action Comment
-                                    </label>
-                                    <div className="form-bx">
-                                      <label>
-                                        {" "}
-                                        <textarea
-                                          type="text"
-                                          className=""
-                                          disabled
-                                          value={firstItem?.actionComment}
-                                        />
-                                      </label>
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                            );
-                          }
-                        })}
-                        {/* next level data show and assign behalf of not equal userID  start*/}
-                        {applicationDetail?.userID !== UserID.replace(/"/g, "") && roleID == 8 ?
-                          <>
                             <div
                               className={
                                 roleID == 8
@@ -6179,6 +7130,7 @@ const ExportCircularsEditForm = ({
                                         setRecomdAnalyst("121");
                                         setnextlevelvalue("");
                                         setAssignUserID("");
+                                        setcheckSupervisor(false);
                                         setSupervisorRoleId("");
                                         setAsignUser([]);
                                         setapplicationstaus(
@@ -6189,7 +7141,7 @@ const ExportCircularsEditForm = ({
                                       className={
                                         applicationDetail?.analystRecommendation ==
                                           "" ||
-                                          applicationDetail?.analystRecommendation ==
+                                        applicationDetail?.analystRecommendation ==
                                           "0"
                                           ? "d-none"
                                           : "hidden-toggles__input"
@@ -6204,7 +7156,7 @@ const ExportCircularsEditForm = ({
                                       className={
                                         applicationDetail?.analystRecommendation ==
                                           "" ||
-                                          applicationDetail?.analystRecommendation ==
+                                        applicationDetail?.analystRecommendation ==
                                           "0"
                                           ? "d-none"
                                           : "hidden-toggles__label"
@@ -6219,6 +7171,7 @@ const ExportCircularsEditForm = ({
                                       onChange={(e) => {
                                         setcheckSupervisor(true);
                                         supervisorHangechangeRole(e);
+
                                         ChangeNextlevelHandle(e);
                                         setAssignUserID("");
                                         GetRoleHandle(10);
@@ -6262,15 +7215,15 @@ const ExportCircularsEditForm = ({
                                     >
                                       Refer Back
                                     </label>
-
-
                                   </div>
                                 </div>
                               </div>
                             </div>
 
                             <div
-                              className={checkSupervisor == true ? "row" : "d-none"}
+                              className={
+                                checkSupervisor == true ? "row" : "d-none"
+                              }
                             >
                               <div className="col-md-12 d-flex c-gap">
                                 <div
@@ -6281,7 +7234,9 @@ const ExportCircularsEditForm = ({
                                   {checkSupervisor == true && roleID == 8 ? (
                                     <>
                                       <div className="inner_form_new">
-                                        <label className="controlform">Role </label>
+                                        <label className="controlform">
+                                          Role{" "}
+                                        </label>
 
                                         <div className="form-bx">
                                           <label>
@@ -6294,12 +7249,14 @@ const ExportCircularsEditForm = ({
                                               }}
                                               className={
                                                 errors.SupervisorRoleId &&
-                                                  !SupervisorRoleId
+                                                !SupervisorRoleId
                                                   ? "error"
                                                   : ""
                                               }
                                             >
-                                              <option value="">Select Role</option>
+                                              <option value="">
+                                                Select Role
+                                              </option>
                                               {userRole?.map((item, index) => {
                                                 return (
                                                   <option
@@ -6313,7 +7270,7 @@ const ExportCircularsEditForm = ({
                                             </select>
                                             <span className="sspan"></span>
                                             {errors.assignedTo &&
-                                              !SupervisorRoleId ? (
+                                            !SupervisorRoleId ? (
                                               <small className="errormsg">
                                                 Role is required{" "}
                                               </small>
@@ -6337,7 +7294,9 @@ const ExportCircularsEditForm = ({
                                   {roleID == 8 && recomdAnalyst != "121" ? (
                                     <>
                                       <div className="inner_form_new">
-                                        <label className="controlform">User</label>
+                                        <label className="controlform">
+                                          User
+                                        </label>
 
                                         <div className="form-bx">
                                           <label>
@@ -6348,12 +7307,15 @@ const ExportCircularsEditForm = ({
                                                 supervisorHangechange(e)
                                               }
                                               className={
-                                                errors.assignUserID && !AssignUserID
+                                                errors.assignUserID &&
+                                                !AssignUserID
                                                   ? "error"
                                                   : ""
                                               }
                                             >
-                                              <option value="">Select User</option>
+                                              <option value="">
+                                                Select User
+                                              </option>
                                               {asignUser?.map((item, index) => {
                                                 return (
                                                   <option
@@ -6367,7 +7329,7 @@ const ExportCircularsEditForm = ({
                                             </select>
                                             <span className="sspan"></span>
                                             {errors.assignUserID &&
-                                              !AssignUserID ? (
+                                            !AssignUserID ? (
                                               <small className="errormsg">
                                                 {errors.assignUserID}
                                               </small>
@@ -6387,12 +7349,70 @@ const ExportCircularsEditForm = ({
                                 {/* end form-bx  */}
                               </div>
                             </div>
-                            {roleID == 8 && <p>
-                              {attachmentData?.map((items, index) => {
-                                return (
+                            {roleID == 8 && (
+                              <p>
+                                {attachmentData?.map((items, index) => {
+                                  return (
+                                    <div
+                                      className="attachemt_form-bx  mt-2"
+                                      key={items.id}
+                                    >
+                                      <label
+                                        style={{
+                                          background: "#d9edf7",
+                                          padding: "9px 3px",
+                                          border: "0px",
+                                        }}
+                                      >
+                                        <span style={{ fontWeight: "500" }}>
+                                          {items.filename}
+                                        </span>
+                                      </label>
+                                      <div className="browse-btn">
+                                        Browse
+                                        <input
+                                          type="file"
+                                          onChange={(e) =>
+                                            handleuserFileChange(
+                                              e,
+                                              "circular" + (index + 1)
+                                            )
+                                          }
+                                        />
+                                      </div>
+                                      <span className="filename">
+                                        {userfiles?.find(
+                                          (f) =>
+                                            f.id === "circular" + (index + 1)
+                                        )?.file?.name || "No file chosen"}
+                                      </span>
+                                      {userfiles?.length &&
+                                      userfiles?.find(
+                                        (f) => f.id === "circular" + (index + 1)
+                                      )?.file?.name ? (
+                                        <button
+                                          type="button"
+                                          className="remove-file"
+                                          onClick={() =>
+                                            removeUserImage(
+                                              index,
+                                              "circular" + (index + 1)
+                                            )
+                                          }
+                                        >
+                                          Remove
+                                        </button>
+                                      ) : (
+                                        ""
+                                      )}
+                                    </div>
+                                  );
+                                })}
+
+                                {otheruserfiles.map((file, index) => (
                                   <div
-                                    className="attachemt_form-bx  mt-2"
-                                    key={items.id}
+                                    key={"other" + (index + 1)}
+                                    className="attachemt_form-bx"
                                   >
                                     <label
                                       style={{
@@ -6401,32 +7421,42 @@ const ExportCircularsEditForm = ({
                                         border: "0px",
                                       }}
                                     >
-                                      <span style={{ fontWeight: "500" }}>
-                                        {items.filename}
-                                      </span>
+                                      <b>
+                                        Other File
+                                        {index + 1}
+                                      </b>
                                     </label>
                                     <div className="browse-btn">
-                                      Browse
+                                      Browse{" "}
                                       <input
                                         type="file"
-                                        onChange={(e) =>
-                                          handleuserFileChange(e, "circular" + (index + 1))
-                                        }
+                                        onChange={(e) => {
+                                          handleuserFileChange(
+                                            e,
+                                            "other" + index
+                                          );
+                                          // handleOthrefile(e,   `other ${index}`);
+                                        }}
                                       />
                                     </div>
                                     <span className="filename">
                                       {userfiles?.find(
-                                        (f) => f.id === "circular" + (index + 1)
+                                        (f) => f.id === "other" + index
                                       )?.file?.name || "No file chosen"}
                                     </span>
+
                                     {userfiles?.length &&
-                                      userfiles?.find((f) => f.id === "circular" + (index + 1))
-                                        ?.file?.name ? (
+                                    userfiles?.find(
+                                      (f) => f.id === "other" + index
+                                    )?.file?.name ? (
                                       <button
                                         type="button"
                                         className="remove-file"
                                         onClick={() =>
-                                          removeUserImage(index, "circular" + (index + 1))
+                                          removeUserImage(
+                                            index,
+                                            "other" + index
+                                          )
                                         }
                                       >
                                         Remove
@@ -6435,90 +7465,48 @@ const ExportCircularsEditForm = ({
                                       ""
                                     )}
                                   </div>
-                                );
-                              })}
+                                ))}
 
-                              {otheruserfiles.map((file, index) => (
-                                <div
-                                  key={"other" + (index + 1)}
-                                  className="attachemt_form-bx"
-                                >
-                                  <label
-                                    style={{
-                                      background: "#d9edf7",
-                                      padding: "9px 3px",
-                                      border: "0px",
-                                    }}
-                                  >
-                                    <b>
-                                      Other File
-                                      {index + 1}
-                                    </b>
-                                  </label>
-                                  <div className="browse-btn">
-                                    Browse{" "}
-                                    <input
-                                      type="file"
-                                      onChange={(e) => {
-                                        handleuserFileChange(e, "other" + index);
-                                        // handleOthrefile(e,   `other ${index}`);
-                                      }}
-                                    />
-                                  </div>
-                                  <span className="filename">
-                                    {userfiles?.find((f) => f.id === "other" + index)
-                                      ?.file?.name || "No file chosen"}
-                                  </span>
-
-                                  {userfiles?.length &&
-                                    userfiles?.find((f) => f.id === "other" + index)
-                                      ?.file?.name ? (
+                                {otheruserfiles?.length || userfiles?.length ? (
+                                  <div className="attachemt_form-bx">
+                                    <label style={{ border: "0px" }}>
+                                      {""}
+                                    </label>
                                     <button
                                       type="button"
-                                      className="remove-file"
-                                      onClick={() =>
-                                        removeUserImage(index, "other" + index)
-                                      }
+                                      className="addmore-btn mt-0"
+                                      onClick={(e) => handleuserAddMore(e)}
                                     >
-                                      Remove
+                                      {" "}
+                                      Add More File{" "}
                                     </button>
-                                  ) : (
-                                    ""
-                                  )}
-                                </div>
-                              ))}
-
-                              {otheruserfiles?.length || userfiles?.length ? (
-                                <div className="attachemt_form-bx">
-                                  <label style={{ border: "0px" }}>{""}</label>
-                                  <button
-                                    type="button"
-                                    className="addmore-btn mt-0"
-                                    onClick={(e) => handleuserAddMore(e)}
-                                  >
-                                    {" "}
-                                    Add More File{" "}
-                                  </button>
-                                </div>
-                              ) : (
-                                ""
-                              )}
-                            </p>}
+                                  </div>
+                                ) : (
+                                  ""
+                                )}
+                              </p>
+                            )}
                             {/* end form-bx  */}
 
                             <div
-                              className={roleID == 8 ? "inner_form_new align-items-start" : "d-none"}
+                              className={
+                                roleID == 8
+                                  ? "inner_form_new align-items-start"
+                                  : "d-none"
+                              }
                             >
-                              <label className="controlform">Recommendation</label>
+                              <label className="controlform">
+                                Recommendation
+                              </label>
                               <div className="form-bx editorFieldBox">
                                 <div className="mt-2 py-1">
                                   <MenuBar editor={editorDeputy} />
                                   <EditorContent editor={editorDeputy} />
                                   <span className="sspan"></span>
                                   {(errors.Description && Description == " ") ||
-                                    Description == null ||
-                                    Description == "<p></p>" ||
-                                    !Description ? (
+                                  Description == null ||
+                                  Description == "<p></p>" ||
+                                  !Description ? (
                                     <small className="errormsg">
                                       {errors.Description}
                                     </small>
@@ -6530,18 +7518,20 @@ const ExportCircularsEditForm = ({
                             </div>
 
                             <div
-                              className={roleID == 8 ? "inner_form_new " : "d-none"}
+                              className={
+                                roleID == 8 ? "inner_form_new " : "d-none"
+                              }
                             >
                               <label className="controlform">
                                 {nextlevelvalue == "10"
                                   ? "Assign Notes"
                                   : nextlevelvalue == "20"
-                                    ? "Delegate Notes"
-                                    : nextlevelvalue == "35"
-                                      ? "Referred to Other Department Notes"
-                                      : nextlevelvalue == "15"
-                                        ? "Refer Back Notes"
-                                        : "Notes"}
+                                  ? "Delegate Notes"
+                                  : nextlevelvalue == "35"
+                                  ? "Referred to Other Department Notes"
+                                  : nextlevelvalue == "15"
+                                  ? "Refer Back Notes"
+                                  : "Notes"}
                               </label>
 
                               <div className="form-bx">
@@ -6555,12 +7545,12 @@ const ExportCircularsEditForm = ({
                                       nextlevelvalue == "10"
                                         ? "Assign Notes"
                                         : nextlevelvalue == "20"
-                                          ? "Delegate Notes"
-                                          : nextlevelvalue == "35"
-                                            ? "Referred to Other Department Notes"
-                                            : nextlevelvalue == "15"
-                                              ? "Refer Back Notes"
-                                              : "Notes"
+                                        ? "Delegate Notes"
+                                        : nextlevelvalue == "35"
+                                        ? "Referred to Other Department Notes"
+                                        : nextlevelvalue == "15"
+                                        ? "Refer Back Notes"
+                                        : "Notes"
                                     }
                                     className={errors.Notes ? "error" : ""}
                                     value={asignnextLeveldata.Notes}
@@ -6571,12 +7561,12 @@ const ExportCircularsEditForm = ({
                                       {nextlevelvalue == "10"
                                         ? "Assign notes is required"
                                         : nextlevelvalue == "20"
-                                          ? "Delegate notes is required"
-                                          : nextlevelvalue == "35"
-                                            ? "Referred to other department notes is required"
-                                            : nextlevelvalue == "15"
-                                              ? "Refer back notes is required"
-                                              : "Notes is required"}
+                                        ? "Delegate notes is required"
+                                        : nextlevelvalue == "35"
+                                        ? "Referred to other department notes is required"
+                                        : nextlevelvalue == "15"
+                                        ? "Refer back notes is required"
+                                        : "Notes is required"}
                                     </small>
                                   ) : (
                                     ""
@@ -6587,18 +7577,20 @@ const ExportCircularsEditForm = ({
                             {/* end form-bx  */}
 
                             <div
-                              className={roleID == 8 ? "inner_form_new " : "d-none"}
+                              className={
+                                roleID == 8 ? "inner_form_new " : "d-none"
+                              }
                             >
                               <label className="controlform">
                                 {nextlevelvalue == "10"
                                   ? "Assign Comments"
                                   : nextlevelvalue == "20"
-                                    ? "Delegate Comments"
-                                    : nextlevelvalue == "35"
-                                      ? "Referred to Other Department Comments"
-                                      : nextlevelvalue == "15"
-                                        ? "Refer Back Comments"
-                                        : "Comments"}
+                                  ? "Delegate Comments"
+                                  : nextlevelvalue == "35"
+                                  ? "Referred to Other Department Comments"
+                                  : nextlevelvalue == "15"
+                                  ? "Refer Back Comments"
+                                  : "Comments"}
                               </label>
 
                               <div className="form-bx">
@@ -6612,12 +7604,12 @@ const ExportCircularsEditForm = ({
                                       nextlevelvalue == "10"
                                         ? "Assign Comments"
                                         : nextlevelvalue == "20"
-                                          ? "Delegate Comments"
-                                          : nextlevelvalue == "35"
-                                            ? "Referred to Other Department Comments"
-                                            : nextlevelvalue == "15"
-                                              ? "Refer Back Comments"
-                                              : "Comments"
+                                        ? "Delegate Comments"
+                                        : nextlevelvalue == "35"
+                                        ? "Referred to Other Department Comments"
+                                        : nextlevelvalue == "15"
+                                        ? "Refer Back Comments"
+                                        : "Comments"
                                     }
                                     className={errors.Comment ? "error" : ""}
                                     value={asignnextLeveldata.Comment}
@@ -6628,12 +7620,12 @@ const ExportCircularsEditForm = ({
                                       {nextlevelvalue == "10"
                                         ? "Assign comments is required"
                                         : nextlevelvalue == "20"
-                                          ? "Delegate comments is required"
-                                          : nextlevelvalue == "35"
-                                            ? "Referred to other department comments is required"
-                                            : nextlevelvalue == "15"
-                                              ? "Refer back comments is required"
-                                              : "Comments is required"}
+                                        ? "Delegate comments is required"
+                                        : nextlevelvalue == "35"
+                                        ? "Referred to other department comments is required"
+                                        : nextlevelvalue == "15"
+                                        ? "Refer back comments is required"
+                                        : "Comments is required"}
                                     </small>
                                   ) : (
                                     ""
@@ -6642,7 +7634,13 @@ const ExportCircularsEditForm = ({
                               </div>
                             </div>
 
-                            <div className={roleID == 8 ? "inner_form_new align-items-start" : "d-none"}>
+                            <div
+                              className={
+                                roleID == 8
+                                  ? "inner_form_new align-items-start"
+                                  : "d-none"
+                              }
+                            >
                               <label className="controlform">Bank</label>
                               <div className=" cccto">
                                 <div className="flex justify-content-center multiSelect">
@@ -6653,41 +7651,185 @@ const ExportCircularsEditForm = ({
                                     value={selectedBanks}
                                     isSelectAll={true}
                                     menuPlacement={"bottom"}
-
                                   />
-
-
                                 </div>
                               </div>
                             </div>
                             {/* end form-bx  */}
-                            <div className={roleID == 8 ? "inner_form_new" : "d-none"}>
+                            <div
+                              className={
+                                roleID == 8 ? "inner_form_new" : "d-none"
+                              }
+                            >
                               <label className="controlform">Directives</label>
-                              <div className="cccto">
-                                <div className="flex justify-content-center multiSelect">
-                                  <DirectiveMultiSelectComponent
-                                    key="multyselectprinciple"
-                                    options={DirectiveOption}
-                                    onChange={(e) => handleChangeDirective(e)}
-                                    value={selectedDirectives}
-                                    isSelectAll={true}
+                              <div className="cccto position-relative">
+                                <div className="multiselect d-flex justify-content-between align-items-end">
+                                  <div className="adddirectiveBox">
+                                    <ul className="newdirectivelist">
+                                      {selectedDirectives?.length ? (
+                                        selectedDirectives?.map((res) => {
+                                          return <li>{res?.label}</li>;
+                                        })
+                                      ) : (
+                                        <li className="disabletext">
+                                          Select Directives
+                                        </li>
+                                      )}
+                                    </ul>
+                                  </div>
+                                  <Button
+                                    variant="primary"
+                                    className="addDirectiveBtn"
+                                    onClick={handleDirectiveModalShow}
+                                  >
+                                    Add Directives
+                                  </Button>
+                                  {errors?.selectedDirectives &&
+                                  selectedDirectives.length == 0 ? (
+                                    <small className="errormsg directiveErrormsg">
+                                      {errors.selectedDirectives}
+                                    </small>
+                                  ) : (
+                                    ""
+                                  )}
+                                  <Modal
+                                    size="lg"
+                                    show={showDirectiveModal}
+                                    onHide={handleDirectiveClose}
+                                    backdrop="static"
+                                    className="directiveModal"
+                                  >
+                                    <div className="application-box">
+                                      <div className="login_inner">
+                                        <div className="login_form ">
+                                          <h5>
+                                            <Modal.Header
+                                              closeButton
+                                              className="p-0"
+                                            >
+                                              <Modal.Title>
+                                                Add Directives
+                                              </Modal.Title>
+                                            </Modal.Header>
+                                          </h5>
+                                        </div>
+                                        <div className="login_form_panel">
+                                          <Modal.Body className="p-0">
+                                            <DirectiveMultiSelectComponent
+                                              key="multyselectprinciple"
+                                              placeholder="Select Directives"
+                                              options={DirectiveOption}
+                                              onChange={(e) =>
+                                                handleChangeDirective(e)
+                                              }
+                                              value={selectedDirectives}
+                                              isSelectAll={true}
+                                              menuPlacement={"bottom"}
+                                            />
 
-                                    menuPlacement={"bottom"}
-
-                                  />
+                                            <div className="directiveFileData-field">
+                                              <div className="directiveFileData-show">
+                                                {selectedDirectives?.length >
+                                                0 ? (
+                                                  selectedDirectives.map(
+                                                    (item) => {
+                                                      const firstTagName =
+                                                        item.tagName.split(
+                                                          ","
+                                                        )[0];
+                                                      return (
+                                                        <>
+                                                          {item?.filePath
+                                                            .length > 0 ? (
+                                                            <div
+                                                              className="directiveFileBox"
+                                                              key={item.value}
+                                                            >
+                                                              {item.filePath.map(
+                                                                (
+                                                                  fileItem,
+                                                                  index
+                                                                ) => (
+                                                                  <a
+                                                                    target="_blank"
+                                                                    href={
+                                                                      fileItem.filePath
+                                                                    }
+                                                                    key={
+                                                                      fileItem.id
+                                                                    }
+                                                                    style={{
+                                                                      marginBottom:
+                                                                        "3px",
+                                                                      letterSpacing:
+                                                                        "0.01px",
+                                                                      fontSize:
+                                                                        "14px",
+                                                                      fontWeight:
+                                                                        "400",
+                                                                      display:
+                                                                        "block",
+                                                                      padding:
+                                                                        "0px 5px",
+                                                                      color:
+                                                                        "#4154f1",
+                                                                    }}
+                                                                  >
+                                                                    {firstTagName +
+                                                                      (index +
+                                                                        1)}
+                                                                  </a>
+                                                                )
+                                                              )}
+                                                            </div>
+                                                          ) : (
+                                                            ""
+                                                          )}
+                                                        </>
+                                                      );
+                                                    }
+                                                  )
+                                                ) : (
+                                                  <></>
+                                                )}
+                                              </div>
+                                            </div>
+                                          </Modal.Body>
+                                        </div>
+                                        <Modal.Footer className="justify-content-end">
+                                          <Button
+                                            variant="secondary"
+                                            onClick={handleDirectiveClose}
+                                          >
+                                            Close
+                                          </Button>
+                                        </Modal.Footer>
+                                      </div>
+                                    </div>
+                                  </Modal>
                                 </div>
                               </div>
                             </div>
                             {/* end form-bx  */}
 
                             {/* end form-bx  */}
-                            <div className={roleID == 8 ? "inner_form_new" : "d-none"}>
-                              <label className="controlform">Releasing Date</label>
+                            <div
+                              className={
+                                roleID == 8 ? "inner_form_new" : "d-none"
+                              }
+                            >
+                              <label className="controlform">
+                                Releasing Date
+                              </label>
                               <div className="form-bx">
                                 <DatePicker
                                   placeholderText="Select Releasing Date"
                                   closeOnScroll={(e) => e.target === document}
-                                  selected={releasingDate ? releasingDate : applicationDetail.releasingDate}
+                                  selected={
+                                    releasingDate
+                                      ? releasingDate
+                                      : applicationDetail.releasingDate
+                                  }
                                   onChange={(date) => setReleasingDate(date)}
                                   peekNextMonth
                                   showMonthDropdown
@@ -6696,11 +7838,13 @@ const ExportCircularsEditForm = ({
                                   dropdownMode="select"
                                   dateFormat="dd/MMMM/yyyy"
                                 />
-                                {
-                                  errors?.releasingDate ? (
-                                    <small className="errormsg">{errors.releasingDate}</small>
-                                  ) : (" ")
-                                }
+                                {errors?.releasingDate ? (
+                                  <small className="errormsg">
+                                    {errors.releasingDate}
+                                  </small>
+                                ) : (
+                                  " "
+                                )}
                               </div>
                             </div>
                             {/* end form-bx  */}
@@ -6708,7 +7852,7 @@ const ExportCircularsEditForm = ({
                             <div
                               className={
                                 (roleID == 8 && nextlevelvalue == "") ||
-                                  recomdAnalyst == "121"
+                                recomdAnalyst == "121"
                                   ? "inner_form_new align-items-center"
                                   : "d-none"
                               }
@@ -6786,7 +7930,6 @@ const ExportCircularsEditForm = ({
                                       id="srcoloration-Cancelled"
                                       onChange={(e) => {
                                         ChangeApplicationStatus(e);
-
                                       }}
                                       name="applicationstausdp"
                                       value="25"
@@ -6805,20 +7948,156 @@ const ExportCircularsEditForm = ({
                                 </div>
                               </div>
                             </div>
-                          </> : (
-                            <span>
-                              {/* {noDataComment?.map((v, i) => {
-                              if (v.roleID == 8 && v.isDataAvailable == 0) {
+                          </>
+                        ) : (
+                          <>
+                            {Actiondata?.map((cur) => {
+                              const firstItem = cur?.circularActivityData?.[0]; // Accessing the first element directly
+
+                              if (cur?.assignedToRoleID === 8 && firstItem) {
+                                // Check if firstItem exists
                                 return (
-                                  <div className={deputyTab ? "customtab" : "d-none"}>
-                                    <div class="text-center">No Data Found</div>
+                                  <div className="bakgroundaction">
+                                    <div key={firstItem.actionID}>
+                                      {" "}
+                                      {/* Remember to add a unique key */}
+                                      <div className="row">
+                                        <div className="col-md-6">
+                                          <div className="inner_form_new">
+                                            <label className="controlform">
+                                              Action Type
+                                            </label>
+                                            <div className="form-bx">
+                                              <label>
+                                                {" "}
+                                                <input
+                                                  type="text"
+                                                  className=""
+                                                  disabled
+                                                  // value={firstItem?.actionStatusName}
+                                                  value={
+                                                    firstItem?.actionStatusName ==
+                                                      "Approved" ||
+                                                    firstItem?.actionStatusName ==
+                                                      "Reject" ||
+                                                    firstItem?.actionStatusName ==
+                                                      "Cancelled" ||
+                                                    firstItem?.actionStatusName ==
+                                                      "Draft"
+                                                      ? "Assigned"
+                                                      : firstItem?.actionStatusName
+                                                  }
+                                                />
+                                              </label>
+                                            </div>
+                                          </div>
+                                        </div>
+
+                                        <div className="col-md-3">
+                                          <div className="inner_form_new-sm">
+                                            <label className="controlform-sm">
+                                              User{" "}
+                                              <i
+                                                className="bi bi-info-circle icons-info"
+                                                title={`Role : ${firstItem?.actionRoleName}`}
+                                              ></i>
+                                            </label>
+                                            <div className="form-bx-sm">
+                                              <label>
+                                                {" "}
+                                                <input
+                                                  type="text"
+                                                  className=""
+                                                  disabled
+                                                  value={
+                                                    firstItem?.actionUserName
+                                                  }
+                                                />
+                                              </label>
+                                            </div>
+                                          </div>
+                                        </div>
+
+                                        <div className="col-md-3">
+                                          <div className="inner_form_new-sm">
+                                            <label className="controlform-sm">
+                                              {firstItem?.actionStatusName ==
+                                                "Approved" ||
+                                              firstItem?.actionStatusName ==
+                                                "Reject" ||
+                                              firstItem?.actionStatusName ==
+                                                "Cancelled"
+                                                ? "Assigned"
+                                                : firstItem?.actionStatusName}{" "}
+                                              Date
+                                            </label>
+                                            <div className="form-bx-sm">
+                                              <label>
+                                                <input
+                                                  type="text"
+                                                  className=""
+                                                  disabled
+                                                  value={moment(
+                                                    firstItem?.createdDate
+                                                  ).format("DD/MMM/yyyy")}
+                                                />
+                                              </label>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <div
+                                        className={
+                                          firstItem?.actionNotes
+                                            ? "inner_form_new"
+                                            : "d-none"
+                                        }
+                                      >
+                                        <label className="controlform">
+                                          Action Note
+                                        </label>
+                                        <div className="form-bx">
+                                          <label>
+                                            {" "}
+                                            <textarea
+                                              type="text"
+                                              className=""
+                                              disabled
+                                              value={firstItem?.actionNotes}
+                                            />
+                                          </label>
+                                        </div>
+                                      </div>
+                                      <div
+                                        className={
+                                          firstItem?.actionComment
+                                            ? "inner_form_new"
+                                            : "d-none"
+                                        }
+                                      >
+                                        <label className="controlform">
+                                          Action Comment
+                                        </label>
+                                        <div className="form-bx">
+                                          <label>
+                                            {" "}
+                                            <textarea
+                                              type="text"
+                                              className=""
+                                              disabled
+                                              value={firstItem?.actionComment}
+                                            />
+                                          </label>
+                                        </div>
+                                      </div>
+                                    </div>
                                   </div>
                                 );
                               }
-                            })} */}
-                            </span>
-                          )
-                        }
+                            })}
+                          </>
+                        )}
+
                         {/* next level data show and assign behalf of not equal userID  end*/}
                       </div>
 
@@ -6841,7 +8120,13 @@ const ExportCircularsEditForm = ({
                                     role="tabpanel"
                                     aria-labelledby={"deputy" + index}
                                   >
-                                    <div className={item?.actionStatusName ? "bakgroundaction" : "d-none"}>
+                                    <div
+                                      className={
+                                        item?.actionStatusName
+                                          ? "bakgroundaction"
+                                          : "d-none"
+                                      }
+                                    >
                                       <div className="row">
                                         <div className="col-md-6">
                                           <div className="inner_form_new ">
@@ -6858,11 +8143,11 @@ const ExportCircularsEditForm = ({
                                                   value={
                                                     item?.actionStatusName ==
                                                       "Approved" ||
-                                                      item?.actionStatusName ==
+                                                    item?.actionStatusName ==
                                                       "Reject" ||
-                                                      item?.actionStatusName ==
+                                                    item?.actionStatusName ==
                                                       "Cancelled" ||
-                                                      item?.actionStatusName ==
+                                                    item?.actionStatusName ==
                                                       "Draft"
                                                       ? "Assigned"
                                                       : item?.actionStatusName
@@ -6900,9 +8185,9 @@ const ExportCircularsEditForm = ({
                                             <label className="controlform-sm">
                                               {item?.actionStatusName ==
                                                 "Approved" ||
-                                                item?.actionStatusName ==
+                                              item?.actionStatusName ==
                                                 "Reject" ||
-                                                item?.actionStatusName ==
+                                              item?.actionStatusName ==
                                                 "Cancelled"
                                                 ? "Assigned"
                                                 : item?.actionStatusName}{" "}
@@ -6964,8 +8249,6 @@ const ExportCircularsEditForm = ({
                                         </div>
                                       </div>
                                     </div>
-
-
 
                                     <div className="inner_form_new">
                                       <label className="controlform">
@@ -7151,7 +8434,7 @@ const ExportCircularsEditForm = ({
                                     <div
                                       className={
                                         item?.assignedToName == null &&
-                                          item?.assignedToName == null
+                                        item?.assignedToName == null
                                           ? "d-none"
                                           : "row"
                                       }
@@ -7205,7 +8488,133 @@ const ExportCircularsEditForm = ({
                             }
                           });
                       })}
+                      {noDataComment?.map((v, i) => {
+                        if (v.roleID == 8 && v.isDataAvailable == 0) {
+                          return (
+                            <div
+                              className={deputyTab ? "customtab" : "d-none"}
+                              key={v.roleID}
+                            >
+                              <div class="text-center">No Data Found</div>
+                            </div>
+                          );
+                        }
+                      })}
 
+                      {/* <div
+                        className={
+                          applicationDetail?.assignedTo ==
+                            UserID.replace(/"/g, "") &&
+                          applicationDetail?.actionStatus == 15 &&
+                          applicationDetail?.actionStatusName ==
+                            "Referred Back" &&
+                          applicationDetail.userID != UserID.replace(/"/g, "")
+                            ? ""
+                            : "d-none"
+                        }
+                      >
+                        <div className="inner_form_new align-items-start mt-2">
+                          <label className="controlform">Recommendation</label>
+                          <div className="form-bx editorFieldBox">
+                            <div className="mt-2 py-1">
+                              <MenuBar editor={referbackduptyUser} />
+                              <EditorContent editor={referbackduptyUser} />
+
+                              <span className="sspan"></span>
+                              {(errors.Description && Description == " ") ||
+                              Description == null ||
+                              Description == "<p></p>" ||
+                              !Description ? (
+                                <small
+                                  className="errormsg"
+                                  style={{ bottom: "-13px" }}
+                                >
+                                  {errors.Description}
+                                </small>
+                              ) : (
+                                ""
+                              )}
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="inner_form_new ">
+                          <label className="controlform">
+                            Assign to Next Level
+                          </label>
+                          <input
+                            type="checkbox"
+                            onChange={HandelSupervisorcheck}
+                            checked={checkSupervisor}
+                          />
+                        </div>
+
+                        <div
+                          className={
+                            checkSupervisor ? "inner_form_new" : "d-none"
+                          }
+                        > 
+                          <label className="controlform">
+                            {roleID == "5"
+                              ? " Senior Analyst"
+                              : roleID == "6"
+                              ? " Principal Analyst"
+                              : roleID == "7"
+                              ? " Deputy Director"
+                              : " Director"}
+                          </label>
+                          <div className="form-bx">
+                            <label>
+                              <select
+                                ref={assignedToRef}
+                                name="assignedTo"
+                                onChange={supervisorHangechangeBankuser}
+                                className={
+                                  errors.assignedTo && !AssignUserID
+                                    ? "error"
+                                    : ""
+                                }
+                              >
+                                <option value="">
+                                  Select
+                                  {roleID == "5"
+                                    ? " Senior Analyst"
+                                    : roleID == "6"
+                                    ? " Principal Analyst"
+                                    : roleID == "7"
+                                    ? " Deputy Director"
+                                    : " Director"}
+                                </option>
+                                {Supervisors?.map((item, index) => {
+                                  return (
+                                    <option
+                                      key={index}
+                                      value={JSON?.stringify(item)}
+                                      selected={
+                                        item.userID ==
+                                        applicationDetail?.assignedTo
+                                      }
+                                    >
+                                      {item.name}
+                                    </option>
+                                  );
+                                })}
+                              </select>
+                              <span className="sspan"></span>
+                              {errors.assignedTo && !AssignUserID ? (
+                                <small
+                                  className="errormsg"
+                                  style={{ marginBottom: "-5px" }}
+                                >
+                                  {errors.assignedTo}
+                                </small>
+                              ) : (
+                                ""
+                              )}
+                            </label>
+                          </div>
+                        </div>
+                      </div> */}
                     </div>
                   </div>
                 </>
@@ -7227,16 +8636,12 @@ const ExportCircularsEditForm = ({
                     onClick={() => setdirector(!director)}
                   >
                     Director{" "}
-
                     <span className="btn-collapse">
                       <i className="bi bi-caret-down-fill"></i>
                     </span>
                   </h5>
 
                   <div className={director ? "customtab mb-3" : "d-none"}>
-
-
-
                     {allcomment?.map((cur, i) => {
                       if (cur.assignedToRoleID == 9) {
                         return (
@@ -7292,7 +8697,6 @@ const ExportCircularsEditForm = ({
                                       aria-controls="home"
                                       aria-selected="true"
                                     >
-
                                       Response{" "}
                                       {cur?.circularActivityData?.length -
                                         index}
@@ -7303,9 +8707,7 @@ const ExportCircularsEditForm = ({
                           </ul>
                         );
                       }
-                    })
-                    }
-
+                    })}
 
                     <div className="tab-content pt-2 mb-2">
                       <div
@@ -7345,11 +8747,11 @@ const ExportCircularsEditForm = ({
                                               value={
                                                 firstItem?.actionStatusName ==
                                                   "Approved" ||
-                                                  firstItem?.actionStatusName ==
+                                                firstItem?.actionStatusName ==
                                                   "Reject" ||
-                                                  firstItem?.actionStatusName ==
+                                                firstItem?.actionStatusName ==
                                                   "Cancelled" ||
-                                                  firstItem?.actionStatusName ==
+                                                firstItem?.actionStatusName ==
                                                   "Draft"
                                                   ? "Assigned"
                                                   : firstItem?.actionStatusName
@@ -7388,9 +8790,9 @@ const ExportCircularsEditForm = ({
                                         <label className="controlform-sm">
                                           {firstItem?.actionStatusName ==
                                             "Approved" ||
-                                            firstItem?.actionStatusName ==
+                                          firstItem?.actionStatusName ==
                                             "Reject" ||
-                                            firstItem?.actionStatusName ==
+                                          firstItem?.actionStatusName ==
                                             "Cancelled"
                                             ? "Assigned"
                                             : firstItem?.actionStatusName}{" "}
@@ -7461,563 +8863,756 @@ const ExportCircularsEditForm = ({
                           }
                         })}
                         {/* next level data show and assign behalf of not equal userID  start*/}
-                        {applicationDetail?.userID !== UserID.replace(/"/g, "") && roleID == 9 ? <>
-                          <div
-                            className={
-                              roleID == 9
-                                ? "inner_form_new align-items-center"
-                                : "d-none"
-                            }
-                          >
-                            <label className="controlform">Next Action</label>
-                            <div className="row">
-                              <div className="col-md-12 my-2">
-                                <div className="hidden-toggles">
-                                  <input
-                                    type="radio"
-                                    id="direcotsrecomndByAnalyst"
-                                    name="nextactionbuton"
-                                    onClick={() => {
-                                      setRecomdAnalyst("121");
-                                      setnextlevelvalue("");
-                                      setAssignUserID("");
-                                      setSupervisorRoleId("");
-                                      setAsignUser([]);
-                                      setapplicationstaus(
-                                        applicationDetail?.analystRecommendation
-                                      );
-                                    }}
-                                    className={
-                                      applicationDetail?.analystRecommendation ==
-                                        "" ||
+                        {applicationDetail?.userID !==
+                          UserID.replace(/"/g, "") && roleID == 9 ? (
+                          <>
+                            <div
+                              className={
+                                roleID == 9
+                                  ? "inner_form_new align-items-center"
+                                  : "d-none"
+                              }
+                            >
+                              <label className="controlform">Next Action</label>
+                              <div className="row">
+                                <div className="col-md-12 my-2">
+                                  <div className="hidden-toggles">
+                                    <input
+                                      type="radio"
+                                      id="direcotsrecomndByAnalyst"
+                                      name="nextactionbuton"
+                                      onClick={() => {
+                                        setRecomdAnalyst("121");
+                                        setnextlevelvalue("");
+                                        setAssignUserID("");
+                                        setcheckSupervisor(false);
+                                        setSupervisorRoleId("");
+                                        setAsignUser([]);
+                                        setapplicationstaus(
+                                          applicationDetail?.analystRecommendation
+                                        );
+                                      }}
+                                      className={
                                         applicationDetail?.analystRecommendation ==
-                                        "0"
-                                        ? "d-none"
-                                        : "hidden-toggles__input"
-                                    }
-                                    value="121"
-                                    checked={
-                                      recomdAnalyst == "121" ? true : false
-                                    }
-                                  />
-                                  <label
-                                    for="direcotsrecomndByAnalyst"
-                                    className={
-                                      applicationDetail?.analystRecommendation ==
-                                        "" ||
+                                          "" ||
                                         applicationDetail?.analystRecommendation ==
-                                        "0"
-                                        ? "d-none"
-                                        : "hidden-toggles__label"
-                                    }
-                                  >
-                                    As Recommended by Analyst
-                                  </label>
+                                          "0"
+                                          ? "d-none"
+                                          : "hidden-toggles__input"
+                                      }
+                                      value="121"
+                                      checked={
+                                        recomdAnalyst == "121" ? true : false
+                                      }
+                                    />
+                                    <label
+                                      for="direcotsrecomndByAnalyst"
+                                      className={
+                                        applicationDetail?.analystRecommendation ==
+                                          "" ||
+                                        applicationDetail?.analystRecommendation ==
+                                          "0"
+                                          ? "d-none"
+                                          : "hidden-toggles__label"
+                                      }
+                                    >
+                                      As Recommended by Analyst
+                                    </label>
 
-                                  <input
-                                    type="radio"
-                                    id="direcotsRefer"
-                                    onChange={(e) => {
-                                      ChangeNextlevelHandle(e);
-                                      // ChangeApplicationStatus(e);
-                                      setcheckSupervisor(true);
-                                      GetRoleHandle(15);
-                                      setapplicationstaus(
-                                        applicationDetail?.analystRecommendation
-                                      );
-                                    }}
-                                    name="nextactionbuton"
-                                    onClick={() => setRecomdAnalyst("")}
-                                    value="15"
-                                    className="hidden-toggles__input"
-                                  />
-                                  <label
-                                    for="direcotsRefer"
-                                    className="hidden-toggles__label"
-                                  >
-                                    Refer Back
-                                  </label>
-
-
+                                    <input
+                                      type="radio"
+                                      id="direcotsRefer"
+                                      onChange={(e) => {
+                                        ChangeNextlevelHandle(e);
+                                        // ChangeApplicationStatus(e);
+                                        setcheckSupervisor(true);
+                                        GetRoleHandle(15);
+                                        setapplicationstaus(
+                                          applicationDetail?.analystRecommendation
+                                        );
+                                      }}
+                                      name="nextactionbuton"
+                                      onClick={() => setRecomdAnalyst("")}
+                                      value="15"
+                                      className="hidden-toggles__input"
+                                    />
+                                    <label
+                                      for="direcotsRefer"
+                                      className="hidden-toggles__label"
+                                    >
+                                      Refer Back
+                                    </label>
+                                  </div>
                                 </div>
                               </div>
                             </div>
-                          </div>
 
-                          <div
-                            className={checkSupervisor == true ? "row" : "d-none"}
-                          >
-                            <div className="col-md-12 d-flex c-gap">
-                              <div
-                                className={
-                                  nextlevelvalue == 15 ? "w-50" : "d-none"
-                                }
-                              >
-                                {checkSupervisor == true && roleID == 9 ? (
-                                  <>
-                                    <div className="inner_form_new">
-                                      <label className="controlform">Role </label>
-
-                                      <div className="form-bx">
-                                        <label>
-                                          <select
-                                            ref={assignedToRef}
-                                            name="SupervisorRoleId"
-                                            onChange={(e) => {
-                                              supervisorHangechangeRole(e);
-                                              handleUserRole(e);
-                                            }}
-                                            className={
-                                              errors.SupervisorRoleId &&
-                                                !SupervisorRoleId
-                                                ? "error"
-                                                : ""
-                                            }
-                                          >
-                                            <option value="">Select Role</option>
-                                            {userRole?.map((item, index) => {
-                                              return (
-                                                <option
-                                                  key={index}
-                                                  value={item.id}
-                                                >
-                                                  {item.designation}
-                                                </option>
-                                              );
-                                            })}
-                                          </select>
-                                          <span className="sspan"></span>
-                                          {errors.SupervisorRoleId &&
-                                            !SupervisorRoleId ? (
-                                            <small className="errormsg">
-                                              Role is required{" "}
-                                            </small>
-                                          ) : (
-                                            ""
-                                          )}
-                                        </label>
-                                      </div>
-                                    </div>
-                                    {/* end form-bx  */}
-                                  </>
-                                ) : (
-                                  ""
-                                )}
-                              </div>
-                              <div
-                                className={
-                                  nextlevelvalue == 15 ? "w-50" : "w-100"
-                                }
-                              >
-                                {roleID == 9 && recomdAnalyst != "121" ? (
-                                  <>
-                                    <div className="inner_form_new">
-                                      <label className="controlform">User</label>
-
-                                      <div className="form-bx">
-                                        <label>
-                                          <select
-                                            ref={assignedToRef}
-                                            name="AssignUserID"
-                                            onChange={(e) =>
-                                              supervisorHangechange(e)
-                                            }
-                                            className={
-                                              errors.assignUserID && !AssignUserID
-                                                ? "error"
-                                                : ""
-                                            }
-                                          >
-                                            <option value="">Select User</option>
-                                            {asignUser?.map((item, index) => {
-                                              return (
-                                                <option
-                                                  key={index}
-                                                  value={item.userID}
-                                                >
-                                                  {item.name}
-                                                </option>
-                                              );
-                                            })}
-                                          </select>
-                                          <span className="sspan"></span>
-                                          {errors.assignUserID &&
-                                            !AssignUserID ? (
-                                            <small className="errormsg">
-                                              {errors.assignUserID}
-                                            </small>
-                                          ) : (
-                                            ""
-                                          )}
-                                        </label>
-                                      </div>
-                                    </div>
-                                    {/* end form-bx  */}
-                                  </>
-                                ) : (
-                                  ""
-                                )}
-                              </div>
-
-                              {/* end form-bx  */}
-                            </div>
-                          </div>
-                          {roleID == 9 && <p>
-                            {attachmentData?.map((items, index) => {
-                              return (
+                            <div
+                              className={
+                                checkSupervisor == true ? "row" : "d-none"
+                              }
+                            >
+                              <div className="col-md-12 d-flex c-gap">
                                 <div
-                                  className="attachemt_form-bx  mt-2"
-                                  key={items.id}
+                                  className={
+                                    nextlevelvalue == 15 ? "w-50" : "d-none"
+                                  }
                                 >
-                                  <label
-                                    style={{
-                                      background: "#d9edf7",
-                                      padding: "9px 3px",
-                                      border: "0px",
-                                    }}
-                                  >
-                                    <span style={{ fontWeight: "500" }}>
-                                      {items.filename}
-                                    </span>
-                                  </label>
-                                  <div className="browse-btn">
-                                    Browse
-                                    <input
-                                      type="file"
-                                      onChange={(e) =>
-                                        handleuserFileChange(e, "circular" + (index + 1))
-                                      }
-                                    />
-                                  </div>
-                                  <span className="filename">
-                                    {userfiles?.find(
-                                      (f) => f.id === "circular" + (index + 1)
-                                    )?.file?.name || "No file chosen"}
-                                  </span>
-                                  {userfiles?.length &&
-                                    userfiles?.find((f) => f.id === "circular" + (index + 1))
-                                      ?.file?.name ? (
-                                    <button
-                                      type="button"
-                                      className="remove-file"
-                                      onClick={() =>
-                                        removeUserImage(index, "circular" + (index + 1))
-                                      }
-                                    >
-                                      Remove
-                                    </button>
+                                  {checkSupervisor == true && roleID == 9 ? (
+                                    <>
+                                      <div className="inner_form_new">
+                                        <label className="controlform">
+                                          Role{" "}
+                                        </label>
+
+                                        <div className="form-bx">
+                                          <label>
+                                            <select
+                                              ref={assignedToRef}
+                                              name="SupervisorRoleId"
+                                              onChange={(e) => {
+                                                supervisorHangechangeRole(e);
+                                                handleUserRole(e);
+                                              }}
+                                              className={
+                                                errors.SupervisorRoleId &&
+                                                !SupervisorRoleId
+                                                  ? "error"
+                                                  : ""
+                                              }
+                                            >
+                                              <option value="">
+                                                Select Role
+                                              </option>
+                                              {userRole?.map((item, index) => {
+                                                return (
+                                                  <option
+                                                    key={index}
+                                                    value={item.id}
+                                                  >
+                                                    {item.designation}
+                                                  </option>
+                                                );
+                                              })}
+                                            </select>
+                                            <span className="sspan"></span>
+                                            {errors.SupervisorRoleId &&
+                                            !SupervisorRoleId ? (
+                                              <small className="errormsg">
+                                                Role is required{" "}
+                                              </small>
+                                            ) : (
+                                              ""
+                                            )}
+                                          </label>
+                                        </div>
+                                      </div>
+                                      {/* end form-bx  */}
+                                    </>
                                   ) : (
                                     ""
                                   )}
                                 </div>
-                              );
-                            })}
-
-                            {otheruserfiles.map((file, index) => (
-                              <div
-                                key={"other" + (index + 1)}
-                                className="attachemt_form-bx"
-                              >
-                                <label
-                                  style={{
-                                    background: "#d9edf7",
-                                    padding: "9px 3px",
-                                    border: "0px",
-                                  }}
+                                <div
+                                  className={
+                                    nextlevelvalue == 15 ? "w-50" : "w-100"
+                                  }
                                 >
-                                  <b>
-                                    Other File
-                                    {index + 1}
-                                  </b>
-                                </label>
-                                <div className="browse-btn">
-                                  Browse{" "}
-                                  <input
-                                    type="file"
-                                    onChange={(e) => {
-                                      handleuserFileChange(e, "other" + index);
-                                      handleOthrefile(e, `other ${index}`);
-                                    }}
-                                  />
-                                </div>
-                                <span className="filename">
-                                  {userfiles?.find((f) => f.id === "other" + index)
-                                    ?.file?.name || "No file chosen"}
-                                </span>
+                                  {roleID == 9 && recomdAnalyst != "121" ? (
+                                    <>
+                                      <div className="inner_form_new">
+                                        <label className="controlform">
+                                          User
+                                        </label>
 
-                                {userfiles?.length &&
-                                  userfiles?.find((f) => f.id === "other" + index)
-                                    ?.file?.name ? (
-                                  <button
-                                    type="button"
-                                    className="remove-file"
-                                    onClick={() =>
-                                      removeUserImage(index, "other" + index)
-                                    }
+                                        <div className="form-bx">
+                                          <label>
+                                            <select
+                                              ref={assignedToRef}
+                                              name="AssignUserID"
+                                              onChange={(e) =>
+                                                supervisorHangechange(e)
+                                              }
+                                              className={
+                                                errors.assignUserID &&
+                                                !AssignUserID
+                                                  ? "error"
+                                                  : ""
+                                              }
+                                            >
+                                              <option value="">
+                                                Select User
+                                              </option>
+                                              {asignUser?.map((item, index) => {
+                                                return (
+                                                  <option
+                                                    key={index}
+                                                    value={item.userID}
+                                                  >
+                                                    {item.name}
+                                                  </option>
+                                                );
+                                              })}
+                                            </select>
+                                            <span className="sspan"></span>
+                                            {errors.assignUserID &&
+                                            !AssignUserID ? (
+                                              <small className="errormsg">
+                                                {errors.assignUserID}
+                                              </small>
+                                            ) : (
+                                              ""
+                                            )}
+                                          </label>
+                                        </div>
+                                      </div>
+                                      {/* end form-bx  */}
+                                    </>
+                                  ) : (
+                                    ""
+                                  )}
+                                </div>
+
+                                {/* end form-bx  */}
+                              </div>
+                            </div>
+                            {roleID == 9 && (
+                              <p>
+                                {attachmentData?.map((items, index) => {
+                                  return (
+                                    <div
+                                      className="attachemt_form-bx  mt-2"
+                                      key={items.id}
+                                    >
+                                      <label
+                                        style={{
+                                          background: "#d9edf7",
+                                          padding: "9px 3px",
+                                          border: "0px",
+                                        }}
+                                      >
+                                        <span style={{ fontWeight: "500" }}>
+                                          {items.filename}
+                                        </span>
+                                      </label>
+                                      <div className="browse-btn">
+                                        Browse
+                                        <input
+                                          type="file"
+                                          onChange={(e) =>
+                                            handleuserFileChange(
+                                              e,
+                                              "circular" + (index + 1)
+                                            )
+                                          }
+                                        />
+                                      </div>
+                                      <span className="filename">
+                                        {userfiles?.find(
+                                          (f) =>
+                                            f.id === "circular" + (index + 1)
+                                        )?.file?.name || "No file chosen"}
+                                      </span>
+                                      {userfiles?.length &&
+                                      userfiles?.find(
+                                        (f) => f.id === "circular" + (index + 1)
+                                      )?.file?.name ? (
+                                        <button
+                                          type="button"
+                                          className="remove-file"
+                                          onClick={() =>
+                                            removeUserImage(
+                                              index,
+                                              "circular" + (index + 1)
+                                            )
+                                          }
+                                        >
+                                          Remove
+                                        </button>
+                                      ) : (
+                                        ""
+                                      )}
+                                    </div>
+                                  );
+                                })}
+
+                                {otheruserfiles.map((file, index) => (
+                                  <div
+                                    key={"other" + (index + 1)}
+                                    className="attachemt_form-bx"
                                   >
-                                    Remove
-                                  </button>
+                                    <label
+                                      style={{
+                                        background: "#d9edf7",
+                                        padding: "9px 3px",
+                                        border: "0px",
+                                      }}
+                                    >
+                                      <b>
+                                        Other File
+                                        {index + 1}
+                                      </b>
+                                    </label>
+                                    <div className="browse-btn">
+                                      Browse{" "}
+                                      <input
+                                        type="file"
+                                        onChange={(e) => {
+                                          handleuserFileChange(
+                                            e,
+                                            "other" + index
+                                          );
+                                          handleOthrefile(e, `other ${index}`);
+                                        }}
+                                      />
+                                    </div>
+                                    <span className="filename">
+                                      {userfiles?.find(
+                                        (f) => f.id === "other" + index
+                                      )?.file?.name || "No file chosen"}
+                                    </span>
+
+                                    {userfiles?.length &&
+                                    userfiles?.find(
+                                      (f) => f.id === "other" + index
+                                    )?.file?.name ? (
+                                      <button
+                                        type="button"
+                                        className="remove-file"
+                                        onClick={() =>
+                                          removeUserImage(
+                                            index,
+                                            "other" + index
+                                          )
+                                        }
+                                      >
+                                        Remove
+                                      </button>
+                                    ) : (
+                                      ""
+                                    )}
+                                  </div>
+                                ))}
+
+                                {otheruserfiles?.length || userfiles?.length ? (
+                                  <div className="attachemt_form-bx">
+                                    <label style={{ border: "0px" }}>
+                                      {""}
+                                    </label>
+                                    <button
+                                      type="button"
+                                      className="addmore-btn mt-0"
+                                      onClick={(e) => handleuserAddMore(e)}
+                                    >
+                                      {" "}
+                                      Add More File{" "}
+                                    </button>
+                                  </div>
                                 ) : (
                                   ""
                                 )}
-                              </div>
-                            ))}
-
-                            {otheruserfiles?.length || userfiles?.length ? (
-                              <div className="attachemt_form-bx">
-                                <label style={{ border: "0px" }}>{""}</label>
-                                <button
-                                  type="button"
-                                  className="addmore-btn mt-0"
-                                  onClick={(e) => handleuserAddMore(e)}
-                                >
-                                  {" "}
-                                  Add More File{" "}
-                                </button>
-                              </div>
-                            ) : (
-                              ""
+                              </p>
                             )}
-                          </p>}
-                          <div
-                            className={
-                              roleID == 9
-                                ? "inner_form_new align-items-start mt-2"
-                                : "d-none"
-                            }
-                          >
-                            <label className="controlform">Recommendation</label>
-                            <div className="form-bx editorFieldBox">
-                              <div className="mt-2 py-1">
-                                <MenuBar editor={editorDirector} />
-                                <EditorContent editor={editorDirector} />
-                                <span className="sspan"></span>
-                                {(errors.Description && Description == " ") ||
+                            <div
+                              className={
+                                roleID == 9
+                                  ? "inner_form_new align-items-start mt-2"
+                                  : "d-none"
+                              }
+                            >
+                              <label className="controlform">
+                                Recommendation
+                              </label>
+                              <div className="form-bx editorFieldBox">
+                                <div className="mt-2 py-1">
+                                  <MenuBar editor={editorDirector} />
+                                  <EditorContent editor={editorDirector} />
+                                  <span className="sspan"></span>
+                                  {(errors.Description && Description == " ") ||
                                   Description == null ||
                                   Description == "<p></p>" ||
                                   !Description ||
                                   Description == "<p><br></p>" ? (
-                                  <small
-                                    className="errormsg"
-                                    style={{ bottom: "-13px" }}
-                                  >
-                                    {errors.Description}
-                                  </small>
-                                ) : (
-                                  ""
-                                )}
+                                    <small
+                                      className="errormsg"
+                                      style={{ bottom: "-13px" }}
+                                    >
+                                      {errors.Description}
+                                    </small>
+                                  ) : (
+                                    ""
+                                  )}
+                                </div>
                               </div>
                             </div>
-                          </div>
 
-                          <div
-                            className={roleID == 9 ? "inner_form_new " : "d-none"}
-                          >
-                            <label className="controlform">
-                              {nextlevelvalue == "10"
-                                ? "Assign Notes"
-                                : nextlevelvalue == "20"
+                            <div
+                              className={
+                                roleID == 9 ? "inner_form_new " : "d-none"
+                              }
+                            >
+                              <label className="controlform">
+                                {nextlevelvalue == "10"
+                                  ? "Assign Notes"
+                                  : nextlevelvalue == "20"
                                   ? "Delegate Notes"
                                   : nextlevelvalue == "35"
-                                    ? "Referred to Other Department Notes"
-                                    : nextlevelvalue == "15"
-                                      ? "Refer Back Notes"
-                                      : "Notes"}
-                            </label>
+                                  ? "Referred to Other Department Notes"
+                                  : nextlevelvalue == "15"
+                                  ? "Refer Back Notes"
+                                  : "Notes"}
+                              </label>
 
-                            <div className="form-bx">
-                              <label>
-                                <textarea
-                                  name="Notes"
-                                  onChange={(e) => {
-                                    HandleNextleveldata(e);
-                                  }}
-                                  placeholder={
-                                    nextlevelvalue == "10"
-                                      ? "Assign Notes"
-                                      : nextlevelvalue == "20"
+                              <div className="form-bx">
+                                <label>
+                                  <textarea
+                                    name="Notes"
+                                    onChange={(e) => {
+                                      HandleNextleveldata(e);
+                                    }}
+                                    placeholder={
+                                      nextlevelvalue == "10"
+                                        ? "Assign Notes"
+                                        : nextlevelvalue == "20"
                                         ? "Delegate Notes"
                                         : nextlevelvalue == "35"
-                                          ? "Referred to Other Department Notes"
-                                          : nextlevelvalue == "15"
-                                            ? "Refer Back Notes"
-                                            : "Notes"
-                                  }
-                                  className={errors.Notes ? "error" : ""}
-                                  value={asignnextLeveldata.Notes}
-                                />
-                                <span className="sspan"></span>
-                                {errors.Notes ? (
-                                  <small className="errormsg">
-                                    {nextlevelvalue == "10"
-                                      ? "Assign notes is required"
-                                      : nextlevelvalue == "20"
+                                        ? "Referred to Other Department Notes"
+                                        : nextlevelvalue == "15"
+                                        ? "Refer Back Notes"
+                                        : "Notes"
+                                    }
+                                    className={errors.Notes ? "error" : ""}
+                                    value={asignnextLeveldata.Notes}
+                                  />
+                                  <span className="sspan"></span>
+                                  {errors.Notes ? (
+                                    <small className="errormsg">
+                                      {nextlevelvalue == "10"
+                                        ? "Assign notes is required"
+                                        : nextlevelvalue == "20"
                                         ? "Delegate notes is required"
                                         : nextlevelvalue == "35"
-                                          ? "Referred to other department notes is required"
-                                          : nextlevelvalue == "15"
-                                            ? "Refer back notes is required"
-                                            : "Notes is required"}
-                                  </small>
-                                ) : (
-                                  ""
-                                )}
-                              </label>
+                                        ? "Referred to other department notes is required"
+                                        : nextlevelvalue == "15"
+                                        ? "Refer back notes is required"
+                                        : "Notes is required"}
+                                    </small>
+                                  ) : (
+                                    ""
+                                  )}
+                                </label>
+                              </div>
                             </div>
-                          </div>
-                          {/* end form-bx  */}
+                            {/* end form-bx  */}
 
-                          <div
-                            className={roleID == 9 ? "inner_form_new " : "d-none"}
-                          >
-                            <label className="controlform">
-                              {nextlevelvalue == "10"
-                                ? "Assign Comments"
-                                : nextlevelvalue == "20"
+                            <div
+                              className={
+                                roleID == 9 ? "inner_form_new " : "d-none"
+                              }
+                            >
+                              <label className="controlform">
+                                {nextlevelvalue == "10"
+                                  ? "Assign Comments"
+                                  : nextlevelvalue == "20"
                                   ? "Delegate Comments"
                                   : nextlevelvalue == "35"
-                                    ? "Referred to Other Department Comments"
-                                    : nextlevelvalue == "15"
-                                      ? "Refer Back Comments"
-                                      : "Comments"}
-                            </label>
+                                  ? "Referred to Other Department Comments"
+                                  : nextlevelvalue == "15"
+                                  ? "Refer Back Comments"
+                                  : "Comments"}
+                              </label>
 
-                            <div className="form-bx">
-                              <label>
-                                <textarea
-                                  name="Comment"
-                                  onChange={(e) => {
-                                    HandleNextleveldata(e);
-                                  }}
-                                  placeholder={
-                                    nextlevelvalue == "10"
-                                      ? "Assign Comments"
-                                      : nextlevelvalue == "20"
+                              <div className="form-bx">
+                                <label>
+                                  <textarea
+                                    name="Comment"
+                                    onChange={(e) => {
+                                      HandleNextleveldata(e);
+                                    }}
+                                    placeholder={
+                                      nextlevelvalue == "10"
+                                        ? "Assign Comments"
+                                        : nextlevelvalue == "20"
                                         ? "Delegate Comments"
                                         : nextlevelvalue == "35"
-                                          ? "Referred to Other Department Comments"
-                                          : nextlevelvalue == "15"
-                                            ? "Refer Back Comments"
-                                            : "Comments"
-                                  }
-                                  className={errors.Comment ? "error" : ""}
-                                  value={asignnextLeveldata.Comment}
-                                />
-                                <span className="sspan"></span>
-                                {errors.Comment ? (
-                                  <small className="errormsg">
-                                    {nextlevelvalue == "10"
-                                      ? "Assign comments is required"
-                                      : nextlevelvalue == "20"
+                                        ? "Referred to Other Department Comments"
+                                        : nextlevelvalue == "15"
+                                        ? "Refer Back Comments"
+                                        : "Comments"
+                                    }
+                                    className={errors.Comment ? "error" : ""}
+                                    value={asignnextLeveldata.Comment}
+                                  />
+                                  <span className="sspan"></span>
+                                  {errors.Comment ? (
+                                    <small className="errormsg">
+                                      {nextlevelvalue == "10"
+                                        ? "Assign comments is required"
+                                        : nextlevelvalue == "20"
                                         ? "Delegate comments is required"
                                         : nextlevelvalue == "35"
-                                          ? "Referred to other department comments is required"
-                                          : nextlevelvalue == "15"
-                                            ? "Refer back comments is required"
-                                            : "Comments is required"}
+                                        ? "Referred to other department comments is required"
+                                        : nextlevelvalue == "15"
+                                        ? "Refer back comments is required"
+                                        : "Comments is required"}
+                                    </small>
+                                  ) : (
+                                    ""
+                                  )}
+                                </label>
+                              </div>
+                            </div>
+
+                            <div
+                              className={
+                                roleID == 9
+                                  ? "inner_form_new align-items-center"
+                                  : "d-none"
+                              }
+                            >
+                              <label className="controlform">Bank</label>
+                              <div className="cccto">
+                                <div className="flex justify-content-center multiSelect">
+                                  <CustomBankMultiSelect
+                                    key="multyselectprinciple"
+                                    options={vOption}
+                                    onChange={(e) => handleChangeBank(e)}
+                                    value={selectedBanks}
+                                    isSelectAll={true}
+                                    menuPlacement={"bottom"}
+                                  />
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* end form-bx  */}
+                            <div
+                              className={
+                                roleID == 9 ? "inner_form_new" : "d-none"
+                              }
+                            >
+                              <label className="controlform">Directives</label>
+                              <div className="cccto position-relative">
+                                <div className="multiselect d-flex justify-content-between align-items-end">
+                                  <div className="adddirectiveBox">
+                                    <ul className="newdirectivelist">
+                                      {selectedDirectives?.length ? (
+                                        selectedDirectives?.map((res) => {
+                                          return <li>{res?.label}</li>;
+                                        })
+                                      ) : (
+                                        <li className="disabletext">
+                                          Select Directives
+                                        </li>
+                                      )}
+                                    </ul>
+                                  </div>
+                                  <Button
+                                    variant="primary"
+                                    className="addDirectiveBtn"
+                                    onClick={handleDirectiveModalShow}
+                                  >
+                                    Add Directives
+                                  </Button>
+                                  {errors?.selectedDirectives &&
+                                  selectedDirectives.length == 0 ? (
+                                    <small className="errormsg directiveErrormsg">
+                                      {errors.selectedDirectives}
+                                    </small>
+                                  ) : (
+                                    ""
+                                  )}
+                                  <Modal
+                                    size="lg"
+                                    show={showDirectiveModal}
+                                    onHide={handleDirectiveClose}
+                                    backdrop="static"
+                                    className="directiveModal"
+                                  >
+                                    <div className="application-box">
+                                      <div className="login_inner">
+                                        <div className="login_form ">
+                                          <h5>
+                                            <Modal.Header
+                                              closeButton
+                                              className="p-0"
+                                            >
+                                              <Modal.Title>
+                                                Add Directives
+                                              </Modal.Title>
+                                            </Modal.Header>
+                                          </h5>
+                                        </div>
+                                        <div className="login_form_panel">
+                                          <Modal.Body className="p-0">
+                                            <DirectiveMultiSelectComponent
+                                              key="multyselectprinciple"
+                                              placeholder="Select Directives"
+                                              options={DirectiveOption}
+                                              onChange={(e) =>
+                                                handleChangeDirective(e)
+                                              }
+                                              value={selectedDirectives}
+                                              isSelectAll={true}
+                                              menuPlacement={"bottom"}
+                                            />
+
+                                            <div className="directiveFileData-field">
+                                              <div className="directiveFileData-show">
+                                                {selectedDirectives?.length >
+                                                0 ? (
+                                                  selectedDirectives.map(
+                                                    (item) => {
+                                                      const firstTagName =
+                                                        item.tagName.split(
+                                                          ","
+                                                        )[0];
+                                                      return (
+                                                        <>
+                                                          {item?.filePath
+                                                            .length > 0 ? (
+                                                            <div
+                                                              className="directiveFileBox"
+                                                              key={item.value}
+                                                            >
+                                                              {item.filePath.map(
+                                                                (
+                                                                  fileItem,
+                                                                  index
+                                                                ) => (
+                                                                  <a
+                                                                    target="_blank"
+                                                                    href={
+                                                                      fileItem.filePath
+                                                                    }
+                                                                    key={
+                                                                      fileItem.id
+                                                                    }
+                                                                    style={{
+                                                                      marginBottom:
+                                                                        "3px",
+                                                                      letterSpacing:
+                                                                        "0.01px",
+                                                                      fontSize:
+                                                                        "14px",
+                                                                      fontWeight:
+                                                                        "400",
+                                                                      display:
+                                                                        "block",
+                                                                      padding:
+                                                                        "0px 5px",
+                                                                      color:
+                                                                        "#4154f1",
+                                                                    }}
+                                                                  >
+                                                                    {firstTagName +
+                                                                      (index +
+                                                                        1)}
+                                                                  </a>
+                                                                )
+                                                              )}
+                                                            </div>
+                                                          ) : (
+                                                            ""
+                                                          )}
+                                                        </>
+                                                      );
+                                                    }
+                                                  )
+                                                ) : (
+                                                  <></>
+                                                )}
+                                              </div>
+                                            </div>
+                                          </Modal.Body>
+                                        </div>
+                                        <Modal.Footer className="justify-content-end">
+                                          <Button
+                                            variant="secondary"
+                                            onClick={handleDirectiveClose}
+                                          >
+                                            Close
+                                          </Button>
+                                        </Modal.Footer>
+                                      </div>
+                                    </div>
+                                  </Modal>
+                                </div>
+                              </div>
+                            </div>
+                            {/* end form-bx  */}
+
+                            {/* end form-bx  */}
+                            <div
+                              className={
+                                roleID == 9 ? "inner_form_new" : "d-none"
+                              }
+                            >
+                              <label className="controlform">
+                                Releasing Date
+                              </label>
+                              <div className="form-bx">
+                                <DatePicker
+                                  placeholderText="Select Releasing Date"
+                                  closeOnScroll={(e) => e.target === document}
+                                  selected={
+                                    releasingDate
+                                      ? releasingDate
+                                      : applicationDetail.releasingDate
+                                  }
+                                  onChange={(date) => setReleasingDate(date)}
+                                  peekNextMonth
+                                  showMonthDropdown
+                                  showYearDropdown
+                                  minDate={new Date()}
+                                  dropdownMode="select"
+                                  dateFormat="dd/MMMM/yyyy"
+                                />
+                                {errors?.releasingDate ? (
+                                  <small className="errormsg">
+                                    {errors.releasingDate}
                                   </small>
                                 ) : (
-                                  ""
+                                  " "
                                 )}
-                              </label>
-                            </div>
-                          </div>
-
-                          <div className={roleID == 9 ? "inner_form_new align-items-center" : "d-none"}>
-                            <label className="controlform">Bank</label>
-                            <div className="cccto">
-                              <div className="flex justify-content-center multiSelect">
-                                <CustomBankMultiSelect
-                                  key="multyselectprinciple"
-                                  options={vOption}
-                                  onChange={(e) => handleChangeBank(e)}
-                                  value={selectedBanks}
-                                  isSelectAll={true}
-                                  menuPlacement={"bottom"}
-                                />
                               </div>
                             </div>
-                          </div>
-
-                          {/* end form-bx  */}
-                          <div className={roleID == 9 ? "inner_form_new" : "d-none"}>
-                            <label className="controlform">Directives</label>
-                            <div className="cccto">
-                              <div className="flex justify-content-center multiSelect">
-                                <DirectiveMultiSelectComponent
-                                  key="multyselectprinciple"
-                                  options={DirectiveOption}
-                                  onChange={(e) => handleChangeDirective(e)}
-                                  value={selectedDirectives}
-                                  isSelectAll={true}
-
-                                  menuPlacement={"bottom"}
-
-                                />
-                              </div>
-                            </div>
-                          </div>
-                          {/* end form-bx  */}
-
-                          {/* end form-bx  */}
-                          <div className={roleID == 9 ? "inner_form_new" : "d-none"}>
-                            <label className="controlform">Releasing Date</label>
-                            <div className="form-bx">
-                              <DatePicker
-                                placeholderText="Select Releasing Date"
-                                closeOnScroll={(e) => e.target === document}
-                                selected={releasingDate ? releasingDate : applicationDetail.releasingDate}
-                                onChange={(date) => setReleasingDate(date)}
-                                peekNextMonth
-                                showMonthDropdown
-                                showYearDropdown
-                                minDate={new Date()}
-                                dropdownMode="select"
-                                dateFormat="dd/MMMM/yyyy"
-                              />
-                              {
-                                errors?.releasingDate ? (
-                                  <small className="errormsg">{errors.releasingDate}</small>
-                                ) : (" ")
-                              }
-                            </div>
-                          </div>
-                          {/* end form-bx  */}
-                          <div
-                            className={
-                              (roleID == 9 && nextlevelvalue == "") ||
+                            {/* end form-bx  */}
+                            <div
+                              className={
+                                (roleID == 9 && nextlevelvalue == "") ||
                                 recomdAnalyst == "121"
-                                ? "inner_form_new align-items-center"
-                                : "d-none"
-                            }
-                          >
-                            <label className="controlform">Decision</label>
-                            <div className="row">
-                              <div className="col-md-12">
-                                <div className="hidden-toggles">
-                                  <input
-                                    type="radio"
-                                    id="srcoloration-Approvedved5"
-                                    value="10"
-                                    onChange={(e) => {
-                                      ChangeApplicationStatus(e);
-                                      GetRoleHandle(10);
-                                      // supervisorHangechangeRole(e);
-                                    }}
-                                    name="applicationstausdir"
-                                    className="hidden-toggles__input"
-                                    checked={
-                                      applicationstaus == "10" ? true : false
-                                    }
-                                  />
-                                  <label
-                                    for="srcoloration-Approvedved5"
-                                    className="hidden-toggles__label"
-                                  >
-                                    Approved
-                                  </label>
+                                  ? "inner_form_new align-items-center"
+                                  : "d-none"
+                              }
+                            >
+                              <label className="controlform">Decision</label>
+                              <div className="row">
+                                <div className="col-md-12">
+                                  <div className="hidden-toggles">
+                                    <input
+                                      type="radio"
+                                      id="srcoloration-Approvedved5"
+                                      value="10"
+                                      onChange={(e) => {
+                                        ChangeApplicationStatus(e);
+                                        GetRoleHandle(10);
+                                        // supervisorHangechangeRole(e);
+                                      }}
+                                      name="applicationstausdir"
+                                      className="hidden-toggles__input"
+                                      checked={
+                                        applicationstaus == "10" ? true : false
+                                      }
+                                    />
+                                    <label
+                                      for="srcoloration-Approvedved5"
+                                      className="hidden-toggles__label"
+                                    >
+                                      Approved
+                                    </label>
 
-                                  {/* <input
+                                    {/* <input
                                   type="radio"
                                   id="srcoloration-Rejected"
                                   value="30"
@@ -8038,7 +9633,7 @@ const ExportCircularsEditForm = ({
                                   Rejected
                                 </label> */}
 
-                                  {/* <input
+                                    {/* <input
                                   type="radio"
                                   id="srcoloration-Deferred"
                                   onChange={(e) => {
@@ -8059,44 +9654,33 @@ const ExportCircularsEditForm = ({
                                   Deferred
                                 </label> */}
 
-                                  <input
-                                    type="radio"
-                                    id="srcoloration-Cancelled"
-                                    onChange={(e) => {
-                                      ChangeApplicationStatus(e);
-
-                                    }}
-                                    name="applicationstausdir"
-                                    value="25"
-                                    className="hidden-toggles__input"
-                                    checked={
-                                      applicationstaus == "25" ? true : false
-                                    }
-                                  />
-                                  <label
-                                    for="srcoloration-Cancelled"
-                                    className="hidden-toggles__label"
-                                  >
-                                    Cancelled
-                                  </label>
+                                    <input
+                                      type="radio"
+                                      id="srcoloration-Cancelled"
+                                      onChange={(e) => {
+                                        ChangeApplicationStatus(e);
+                                      }}
+                                      name="applicationstausdir"
+                                      value="25"
+                                      className="hidden-toggles__input"
+                                      checked={
+                                        applicationstaus == "25" ? true : false
+                                      }
+                                    />
+                                    <label
+                                      for="srcoloration-Cancelled"
+                                      className="hidden-toggles__label"
+                                    >
+                                      Cancelled
+                                    </label>
+                                  </div>
                                 </div>
                               </div>
                             </div>
-                          </div>
-                        </> : (<span>
-                          {/* {noDataComment?.map((data, i) => {
-                            if (data.roleID == 9 && data.isDataAvailable == 0) {
-                              return (
-                                <div
-                                  className={director ? "customtab" : "d-none"}
-                                  key={i}
-                                >
-                                  <div class="text-center">No Data Found</div>
-                                </div>
-                              );
-                            }
-                          })} */}
-                        </span>)}
+                          </>
+                        ) : (
+                          <span></span>
+                        )}
                         {/* next level data show and assign behalf of not equal userID  start*/}
                       </div>
 
@@ -8119,7 +9703,13 @@ const ExportCircularsEditForm = ({
                                     role="tabpanel"
                                     aria-labelledby={"director" + index}
                                   >
-                                    <div className={item?.actionStatusName ? "bakgroundaction" : "d-none"}>
+                                    <div
+                                      className={
+                                        item?.actionStatusName
+                                          ? "bakgroundaction"
+                                          : "d-none"
+                                      }
+                                    >
                                       <div className="row">
                                         <div className="col-md-6">
                                           <div className="inner_form_new ">
@@ -8136,11 +9726,11 @@ const ExportCircularsEditForm = ({
                                                   value={
                                                     item?.actionStatusName ==
                                                       "Approved" ||
-                                                      item?.actionStatusName ==
+                                                    item?.actionStatusName ==
                                                       "Reject" ||
-                                                      item?.actionStatusName ==
+                                                    item?.actionStatusName ==
                                                       "Cancelled" ||
-                                                      item?.actionStatusName ==
+                                                    item?.actionStatusName ==
                                                       "Draft"
                                                       ? "Assigned"
                                                       : item?.actionStatusName
@@ -8190,9 +9780,9 @@ const ExportCircularsEditForm = ({
                                             <label className="controlform-sm">
                                               {item?.actionStatusName ==
                                                 "Approved" ||
-                                                item?.actionStatusName ==
+                                              item?.actionStatusName ==
                                                 "Reject" ||
-                                                item?.actionStatusName ==
+                                              item?.actionStatusName ==
                                                 "Cancelled"
                                                 ? "Assigned"
                                                 : item?.actionStatusName}{" "}
@@ -8365,56 +9955,7 @@ const ExportCircularsEditForm = ({
                                         )}
                                       </div>
                                     </div>
-                                    <div className="inner_form_new ">
-                                      <label className="controlform">
-                                        Bank
-                                      </label>
-                                      <div className="form-bx">
-                                        <label>
-                                          <ul className="nalist">
-                                            {item?.bankData
-                                              ?.length ? (
-                                              item?.bankData?.map(
-                                                (res) => {
-                                                  return (
-                                                    <li>{res?.bankName}</li>
-                                                  );
-                                                }
-                                              )
-                                            ) : (
-                                              <li className="disabletext">
-                                                N/A
-                                              </li>
-                                            )}
-                                          </ul>
-                                        </label>
-                                      </div>
-                                    </div>
-                                    <div className="inner_form_new ">
-                                      <label className="controlform">
-                                        Directives
-                                      </label>
-                                      <div className="form-bx">
-                                        <label>
-                                          <ul className="nalist">
-                                            {item?.directiveData
-                                              ?.length ? (
-                                              item?.directiveData?.map(
-                                                (res) => {
-                                                  return (
-                                                    <li>{res?.directiveName}</li>
-                                                  );
-                                                }
-                                              )
-                                            ) : (
-                                              <li className="disabletext">
-                                                N/A
-                                              </li>
-                                            )}
-                                          </ul>
-                                        </label>
-                                      </div>
-                                    </div>
+
                                     <div className="inner_form_new">
                                       <label className="controlform">
                                         Releasing Date
@@ -8461,11 +10002,10 @@ const ExportCircularsEditForm = ({
                                       </div>
                                     </div> */}
 
-
                                     <div
                                       className={
                                         item?.assignedToName == null &&
-                                          item?.assignedToName == null
+                                        item?.assignedToName == null
                                           ? "d-none"
                                           : "row"
                                       }
@@ -8513,15 +10053,28 @@ const ExportCircularsEditForm = ({
                                         </div>
                                       </div>
                                     </div>
-
-
                                   </div>
                                 </>
                               );
                             }
                           });
                       })}
-
+                      {noDataComment?.map((data, i) => {
+                        if (
+                          data.roleID == 9 &&
+                          data.isDataAvailable == 0 &&
+                          i == 8
+                        ) {
+                          return (
+                            <div
+                              className={director ? "customtab" : "d-none"}
+                              key={i}
+                            >
+                              <div class="text-center">No Data Found</div>
+                            </div>
+                          );
+                        }
+                      })}
                     </div>
                   </div>
                 </>
@@ -8542,16 +10095,8 @@ const ExportCircularsEditForm = ({
                 </button>
 
                 <div>
-                  {/* {(roleID > 5 &&
-                    recomdAnalyst == "121" &&
-                    applicationstaus != "25") ||
-                    (roleID == 3 &&
-                      applicationstaus &&
-                      applicationstaus != 0 &&
-                      applicationstaus != "25") ||
-                    (roleID == 3 &&
-                      nextlevelvalue == "10" &&
-                      applicationstaus != "25") ? (
+                  {(roleID == 8 && applicationstaus == "10") ||
+                  (roleID == 9 && applicationstaus == "10") ? (
                     <>
                       <button
                         type="button"
@@ -8568,36 +10113,69 @@ const ExportCircularsEditForm = ({
                     </>
                   ) : (
                     ""
-                  )} */}
+                  )}
 
                   <button
                     type="button"
-
                     onClick={(e) => {
                       HandleSubmit(e);
                     }}
                     className="login"
                     // disabled={(roleID == "6" || roleID == "7") && nextlevelvalue.length == 0 ? true : false}
-                    disabled={nextlevelvalue == "" &&
-                      (roleID == 6 && (applicationDetail.userID != UserID.replace(/"/g, ""))) ||
-                      (nextlevelvalue == "" && roleID == 7 && (applicationDetail.userID != UserID.replace(/"/g, ""))) ||
-                      ((applicationstaus == "0" || applicationstaus == undefined) &&
-                        (roleID == 8) && (nextlevelvalue == "") && (applicationDetail.userID != UserID.replace(/"/g, ""))) ||
-                      (SubmitBtnLoader == true) || (nextlevelvalue == "" && checkSupervisor == false && (applicationstaus == "0" && roleID == 9)) ||
-                      (applicationstaus == "0" && roleID == 9)
-                      ? true
-                      : false
+                    disabled={
+                      (nextlevelvalue == "" &&
+                        roleID == 6 &&
+                        applicationDetail.userID != UserID.replace(/"/g, "")) ||
+                      (nextlevelvalue == "" &&
+                        roleID == 7 &&
+                        applicationDetail.userID != UserID.replace(/"/g, "")) ||
+                      ((applicationstaus == "0" ||
+                        applicationstaus == undefined) &&
+                        roleID == 8 &&
+                        nextlevelvalue == "" &&
+                        applicationDetail.userID != UserID.replace(/"/g, "")) ||
+                      SubmitBtnLoader == true ||
+                      (nextlevelvalue == "" &&
+                        checkSupervisor == false &&
+                        (applicationstaus == "0" ||
+                          applicationstaus == undefined) &&
+                        roleID == 9) ||
+                      (applicationDetail?.assignedTo ==
+                        UserID.replace(/"/g, "") &&
+                        applicationDetail?.actionStatus == 15 &&
+                        applicationDetail?.actionStatusName ==
+                          "Referred Back" &&
+                        applicationDetail.userID != UserID.replace(/"/g, "") &&
+                        checkSupervisor == false)
+                        ? // ||
+                          // (checkSupervisor == false && applicationstaus == "0" && roleID == 9)  applicationstaus == "0" && roleID == 9)
+                          true
+                        : false
                     }
                   >
-                    Submit
+                    {(roleID == 8 &&
+                      checkSupervisor == false &&
+                      nextlevelvalue == "") ||
+                    (roleID == 9 &&
+                      checkSupervisor == false &&
+                      nextlevelvalue == "")
+                      ? "Submit & Close"
+                      : "Submit"}{" "}
+                    {SubmitBtnLoader == true ? (
+                      <div className="smallloader"></div>
+                    ) : (
+                      ""
+                    )}
+                    {/* Submit */}
                   </button>
                 </div>
               </div>
-              {/* pdf-preview data start Arun Verma Final Pdf Generation and Preview */}
+
+              {/* Pdf  Preview */}
               <div className="login_inner" style={{ display: "none" }}>
                 <div className="login_form_panel" style={{ display: "none" }}>
                   <div
-                    ref={PdftargetRef}
+                    ref={PdfPrivewRef}
                     className="p-5"
                     style={{ position: "relative" }}
                   >
@@ -8611,9 +10189,7 @@ const ExportCircularsEditForm = ({
                             fontWeight: "800",
                           }}
                         >
-                          Exchange &nbsp; Control &nbsp; Ref
-                          <br />
-                          Previous &nbsp; Exchange &nbsp; Control &nbsp; Ref
+                          Reference Number
                         </td>
                         <td>
                           <p
@@ -8626,8 +10202,7 @@ const ExportCircularsEditForm = ({
                               letterSpacing: "0.01px",
                             }}
                           >
-                            : {applicationDetail?.rbzReferenceNumber}
-                            <br />: N/A
+                            : {applicationDetail?.circularReferenceNumber}
                           </p>
                         </td>
                       </tr>
@@ -8645,83 +10220,10 @@ const ExportCircularsEditForm = ({
                           }}
                         >
                           {moment(
-                            applicationDetail?.applicationSubmittedDate
+                            releasingDate
+                              ? releasingDate
+                              : applicationDetail.releasingDate
                           ).format("DD MMMM YYYY")}
-                        </td>
-                      </tr>
-                      <tr>
-                        <td colSpan="2">&nbsp;</td>
-                      </tr>
-                      <tr>
-                        <td
-                          colSpan="2"
-                          style={{
-                            color: "#000",
-                            fontSize: "18px",
-                            fontWeight: "600",
-                            letterSpacing: "0.01px",
-                          }}
-                        >
-                          The Head - Exchange Control
-                          <br />
-                          {applicationDetail?.bankName}
-                          <br />
-                          {applicationDetail?.bankAddress1 != null ||
-                            applicationDetail?.bankAddress1 != ""
-                            ? applicationDetail?.bankAddress1 + "," + " "
-                            : ""}
-                          <br></br>
-                          {applicationDetail?.bankAddress2 != null ||
-                            applicationDetail?.bankAddress2 != ""
-                            ? applicationDetail?.bankAddress2 + "," + " "
-                            : ""}
-                          <br></br>
-                          {applicationDetail?.bankAddress3 != null ||
-                            applicationDetail?.bankAddress3 != ""
-                            ? applicationDetail?.bankAddress3
-                            : ""}
-                          <br />
-                          {/* <span
-                            style={{
-                              borderBottom: "1px solid #000",
-                              fontWeight: "800",
-                              fontSize: "18px",
-                              letterSpacing: "0.01px"
-                            }}
-                            className="text-uppercase"
-                          >
-                            {applicationDetail?.bankCity != null ||
-                            applicationDetail?.bankCity != ""
-                              ? applicationDetail?.bankCity
-                              : ""}
-                          </span> */}
-                        </td>
-                      </tr>
-                      <tr>
-                        <td colSpan="2">&nbsp;</td>
-                      </tr>
-                      <tr>
-                        <td
-                          colSpan="2"
-                          style={{
-                            color: "#000",
-                            fontSize: "18px",
-                            fontWeight: "600",
-                            letterSpacing: "0.01px",
-                          }}
-                        >
-                          Dear{" "}
-                          {/* {applicationDetail?.applicantType == 1
-                            ? applicationDetail?.companyName
-                            : applicationDetail?.applicantType == 2
-                            ? applicationDetail?.name
-                            : applicationDetail?.applicantType == 3
-                            ? applicationDetail?.agencyName
-                            : " "} */}
-                          {applicationDetail?.companyName == null ||
-                            applicationDetail?.companyName == ""
-                            ? applicationDetail?.name
-                            : applicationDetail?.companyName}
                         </td>
                       </tr>
                       <tr>
@@ -8731,292 +10233,99 @@ const ExportCircularsEditForm = ({
                         <td colSpan="2">
                           <table width="100%">
                             <tr>
-                              <td colSpan="2">
-                                <p
+                              <td
+                                style={{
+                                  color: "#000",
+                                  fontSize: "18px",
+                                  fontWeight: "800",
+                                }}
+                              >
+                                Circular
+                              </td>
+                              <td
+                                style={{
+                                  color: "#000",
+                                  fontSize: "18px",
+                                  fontWeight: "400",
+                                  letterSpacing: "0.01px",
+                                }}
+                              >
+                                : {applicationDetail?.name}
+                              </td>
+                            </tr>
+
+                            <tr>
+                              <td
+                                style={{
+                                  color: "#000",
+                                  fontSize: "18px",
+                                  fontWeight: "800",
+                                  letterSpacing: "0.01px",
+                                }}
+                              >
+                                Subject
+                              </td>
+                              <td
+                                style={{
+                                  color: "#000",
+                                  fontSize: "18px",
+                                  fontWeight: "400",
+                                }}
+                              >
+                                :{" "}
+                                <span
                                   style={{
+                                    minWidth: "45px",
+                                    display: "inline-block",
+                                    paddingRight: "5px",
+
                                     color: "#000",
-                                    fontSize: "18px",
-                                    fontWeight: "800",
-                                    borderBottom: "1px solid #000",
-                                    marginBottom: "0px",
-                                    letterSpacing: "0.01px",
-                                  }}
-                                >
-                                  RE &nbsp;:&nbsp;{" "}
-                                  {applicationDetail?.applicationType}
-                                </p>
-                              </td>
-                            </tr>
-                            <tr>
-                              <td colSpan="2">&nbsp;</td>
-                            </tr>
-                            <tr>
-                              <td
-                                style={{
-                                  color: "#000",
-                                  fontSize: "18px",
-                                  fontWeight: "400",
-                                }}
-                              >
-                                Exporter
-                              </td>
-                              <td
-                                style={{
-                                  color: "#000",
-                                  fontSize: "18px",
-                                  fontWeight: "800",
-                                  letterSpacing: "0.01px",
-                                }}
-                              >
-                                :{" "}
-                                {applicationDetail?.companyName == null ||
-                                  applicationDetail?.companyName == ""
-                                  ? applicationDetail?.name
-                                  : applicationDetail?.companyName}
-                              </td>
-                            </tr>
-                            <tr>
-                              <td
-                                style={{
-                                  color: "#000",
-                                  fontSize: "18px",
-                                  fontWeight: "400",
-                                  letterSpacing: "0.01px",
-                                }}
-                              >
-                                Date Submitted
-                              </td>
-                              <td
-                                style={{
-                                  color: "#000",
-                                  fontSize: "18px",
-                                  fontWeight: "800",
-                                  letterSpacing: "0.01px",
-                                }}
-                              >
-                                :{" "}
-                                {moment(
-                                  applicationDetail?.applicationSubmittedDate
-                                ).format("DD MMMM YYYY")}
-                              </td>
-                            </tr>
-                            <tr>
-                              <td
-                                style={{
-                                  color: "#000",
-                                  fontSize: "18px",
-                                  fontWeight: "400",
-                                  letterSpacing: "0.01px",
-                                }}
-                              >
-                                Currency and Amount
-                              </td>
-                              <td
-                                style={{
-                                  color: "#000",
-                                  fontSize: "18px",
-                                  fontWeight: "800",
-                                }}
-                              >
-                                :{" "}
-                                <span
-                                  style={{
-                                    minWidth: "45px",
-                                    display: "inline-block",
-                                    paddingRight: "5px",
-                                    fontWeight: "800",
-                                  }}
-                                >
-                                  {applicationDetail?.currencyCode}
-                                </span>
-                                <span
-                                  style={{
-                                    fontSize: "18px",
-                                    fontWeight: "800",
-                                  }}
-                                >
-                                  {applicationDetail?.amount}
-                                </span>
-                              </td>
-                            </tr>
-                            <tr>
-                              <td
-                                style={{
-                                  color: "#000",
-                                  fontSize: "18px",
-                                  fontWeight: "400",
-                                  letterSpacing: "0.01px",
-                                }}
-                              >
-                                USD Equivalent
-                              </td>
-                              <td
-                                style={{
-                                  color: "#000",
-                                  fontSize: "18px",
-                                  fontWeight: "800",
-                                }}
-                              >
-                                :{" "}
-                                <span
-                                  style={{
-                                    minWidth: "45px",
-                                    display: "inline-block",
-                                    paddingRight: "5px",
-                                    fontWeight: "800",
-                                  }}
-                                >
-                                  USD
-                                </span>
-                                <span
-                                  style={{
-                                    fontSize: "18px",
-                                    fontWeight: "800",
-                                  }}
-                                >
-                                  {applicationDetail?.usdEquivalent}
-                                </span>
-                              </td>
-                            </tr>
-                            <tr>
-                              <td
-                                style={{
-                                  color: "#000",
-                                  fontSize: "18px",
-                                  fontWeight: "400",
-                                  letterSpacing: "0.01px",
-                                }}
-                              >
-                                Status/Decision
-                              </td>
-                              <td
-                                style={{
-                                  color: "#000",
-                                  fontSize: "18px",
-                                  fontWeight: "800",
-                                  letterSpacing: "0.01px",
-                                }}
-                              >
-                                :{" "}
-                                {applicationstaus == "10"
-                                  ? "Approved"
-                                  : applicationstaus == "30"
-                                    ? "Rejected"
-                                    : applicationstaus == "40"
-                                      ? "Deferred"
-                                      : applicationstaus == "25"
-                                        ? "Cancelled"
-                                        : ""}
-                                {/* {applicationDetail?.statusName} */}
-                              </td>
-                            </tr>
-                            <tr
-                              className={
-                                applicationDetail?.expiringDate == null ||
-                                  applicationDetail?.expiringDate == ""
-                                  ? "d-none"
-                                  : ""
-                              }
-                            >
-                              <td
-                                style={{
-                                  color: "#000",
-                                  fontSize: "18px",
-                                  fontWeight: "400",
-                                  letterSpacing: "0.01px",
-                                }}
-                              >
-                                Expiry Date
-                              </td>
-                              <td
-                                style={{
-                                  color: "#000",
-                                  fontSize: "18px",
-                                  fontWeight: "800",
-                                  letterSpacing: "0.01px",
-                                }}
-                              >
-                                :{" "}
-                                {applicationDetail?.expiringDate == null ||
-                                  applicationDetail?.expiringDate == "" ||
-                                  applicationDetail?.expiringDate ==
-                                  "0001-01-01T00:00:00"
-                                  ? "N/A"
-                                  : moment(
-                                    applicationDetail?.expiringDate
-                                  ).format("DD MMMM YYYY")}
-                              </td>
-                            </tr>
-                            <tr
-                              className={
-                                applicationDetail?.returnFrequencyName ==
-                                  null ||
-                                  applicationDetail?.returnFrequencyName == ""
-                                  ? "d-none"
-                                  : ""
-                              }
-                            >
-                              <td
-                                style={{
-                                  fontSize: "18px",
-                                  fontWeight: "400",
-                                  color: "#000",
-                                  letterSpacing: "0.01px",
-                                }}
-                              >
-                                Returns Frequency
-                              </td>
-                              <td
-                                style={{
-                                  color: "#000",
-                                  fontSize: "18px",
-                                  fontWeight: "800",
-                                  letterSpacing: "0.01px",
-                                }}
-                              >
-                                :{" "}
-                                {applicationDetail?.returnFrequencyName ==
-                                  null ||
-                                  applicationDetail?.returnFrequencyName == ""
-                                  ? "N/A"
-                                  : applicationDetail?.returnFrequencyName}
-                              </td>
-                            </tr>
-                            {applicationDetail?.returnFrequencyName ==
-                              "Once" ? (
-                              <tr>
-                                <td
-                                  style={{
                                     fontSize: "18px",
                                     fontWeight: "400",
-                                    color: "#000",
-                                    letterSpacing: "0.01px",
                                   }}
                                 >
-                                  Returns Date
-                                </td>
-                                <td
-                                  style={{
-                                    color: "#000",
-                                    fontSize: "18px",
-                                    fontWeight: "800",
-                                    letterSpacing: "0.01px",
-                                  }}
-                                >
-                                  :{" "}
-                                  {applicationDetail?.returnDate == null ||
-                                    applicationDetail?.returnDate == "" ||
-                                    applicationDetail?.returnDate ==
-                                    "0001-01-01T00:00:00"
-                                    ? "N/A"
-                                    : moment(
-                                      applicationDetail?.returnDate
-                                    ).format("DD MMMM YYYY")}
-                                </td>
-                              </tr>
-                            ) : (
-                              ""
-                            )}
+                                  {applicationDetail?.subject}
+                                </span>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td
+                                style={{
+                                  color: "#000",
+                                  fontSize: "18px",
+                                  fontWeight: "800",
+                                }}
+                              >
+                                To
+                              </td>
+                              <td>
+                                <div>
+                                  {selectedBanks?.length > 0 ? (
+                                    <>
+                                      :{" "}
+                                      {selectedBanks.map((item) => {
+                                        return (
+                                          <span
+                                            style={{
+                                              marginBottom: "3px",
+                                              letterSpacing: "0.01px",
+                                              fontSize: "18px",
+                                              fontWeight: "400",
+                                              display: "inline-block",
+                                              padding: "0px 5px",
+                                            }}
+                                          >
+                                            {item.label},
+                                          </span>
+                                        );
+                                      })}
+                                    </>
+                                  ) : (
+                                    ""
+                                  )}
+                                </div>
+                              </td>
+                            </tr>
                           </table>
                         </td>
                       </tr>
@@ -9025,41 +10334,18 @@ const ExportCircularsEditForm = ({
                       </tr>
                       <tr>
                         <td colSpan="2">
-                          <table>
+                          <table width="100%">
                             <tr>
-                              <td colSpan="2">
-                                <table width="100%">
-                                  <tr>
-                                    <td
-                                      style={{
-                                        color: "#000",
-                                        fontSize: "18px",
-                                        fontWeight: "400",
-                                      }}
-                                    >
-                                      <div>
-                                        <span
-                                          style={{
-                                            fontWeight: "800",
-                                            padding: "15px 0px 15px",
-                                            letterSpacing: "0.01px",
-                                          }}
-                                        >
-                                          Response / Conditions
-                                        </span>
-                                      </div>
-                                      <div
-                                        className="tableEditorData"
-                                        dangerouslySetInnerHTML={{
-                                          __html: Description
-                                            ? Description
-                                            : applicationDetail?.content,
-                                        }}
-                                        style={{ letterSpacing: "0.01px" }}
-                                      />
-                                    </td>
-                                  </tr>
-                                </table>
+                              <td
+                                colSpan="2"
+                                style={{
+                                  color: "#000",
+                                  fontSize: "18px",
+                                  fontWeight: "600",
+                                  letterSpacing: "0.01px",
+                                }}
+                              >
+                                Dear All,
                               </td>
                             </tr>
                             <tr>
@@ -9074,422 +10360,187 @@ const ExportCircularsEditForm = ({
                                   fontWeight: "400",
                                 }}
                               >
-                                <span
+                                <p
                                   style={{
-                                    color: "#000",
+                                    marginBottom: "0px",
                                     fontSize: "18px",
                                     fontWeight: "400",
-                                    display: "inline-block",
-                                    letterSpacing: "0.01px",
                                   }}
                                 >
                                   {" "}
-                                  Yours Sincerely,
-                                </span>
-                                <img
-                                  src={
-                                    applicationDetail?.getUserData?.filePath
-                                      ? applicationDetail?.getUserData.filePath
-                                      : NoSign
-                                  }
-                                  alt="Signature"
-                                  style={{
-                                    width: "120px",
-                                    height: "50px",
-                                    display: "block",
-                                    objectFit: "contain",
-                                  }}
-                                />
-                                <p
-                                  style={{
-                                    marginBottom: "0px",
-                                    color: "#000",
-                                    fontSize: "14px",
-                                    fontWeight: "400",
-                                    padding: "15px 0px 3px",
-                                    lineHeight: "13px",
-                                    letterSpacing: "0.01px",
-                                  }}
-                                >
-                                  {PdfUsername
-                                    ? PdfUsername.replace(/"/g, "")
-                                    : "N/A"}
+                                  Circular Vide No,{" "}
+                                  <b>
+                                    {applicationDetail?.circularReferenceNumber}
+                                  </b>{" "}
+                                  is only released on{" "}
+                                  <b>
+                                    {" "}
+                                    {moment(
+                                      releasingDate
+                                        ? releasingDate
+                                        : applicationDetail.releasingDate
+                                    ).format("DD MMMM YYYY")}
+                                  </b>{" "}
+                                  pertained to:-
                                 </p>
-                                <p
-                                  style={{
-                                    marginBottom: "0px",
-                                    color: "#000",
-                                    fontSize: "14px",
-                                    fontWeight: "400",
-                                    padding: "5px 0px",
-                                    lineHeight: "13px",
-                                    letterSpacing: "0.01px",
-                                  }}
-                                >
-                                  {PdfRolename
-                                    ? PdfRolename.replace(/"/g, "")
-                                    : "N/A"}
-                                </p>
-                                <h3
-                                  style={{
-                                    color: "#000",
-                                    fontSize: "18px",
-                                    fontWeight: "800",
-                                  }}
-                                >
-                                  EXCHANGE &nbsp; CONTROL
-                                </h3>
-                                <div
-                                  style={{
-                                    marginBottom: "0px",
-                                    color: "#000",
-                                    fontSize: "18px",
-                                    fontWeight: "400",
-                                    padding: "25px 0px 5px",
-                                    lineHeight: "13px",
-                                    display: "flex",
-                                  }}
-                                >
-                                  {applicationDetail?.copiedResponses?.length >
-                                    0 ? (
-                                    <>
-                                      <p
-                                        style={{
-                                          marginBottom: "0px",
-                                          fontSize: "18px",
-                                          fontWeight: "400",
-                                          paddingRight: "10px",
-                                        }}
-                                      >
-                                        CC:
-                                      </p>
-                                      <div>
-                                        {selectedBanks.map((item) => {
-                                          return (
-                                            <p
-                                              style={{
-                                                marginBottom: "3px",
-                                                letterSpacing: "0.01px",
-                                                fontSize: "18px",
-                                                fontWeight: "400",
-                                              }}
-                                            >
-                                              {item.name}
-                                            </p>
-                                          );
-                                        })}
-                                      </div>
-                                    </>
-                                  ) : (
-                                    ""
-                                  )}
-                                </div>
                               </td>
                             </tr>
-                          </table>
-                        </td>
-                      </tr>
-                    </table>
-                  </div>
-                </div>
-              </div>
-              {/* pdf-preview data end */}
-
-              {/* Supervisor level final close application Arun Verma */}
-              <div className="login_inner" style={{ display: "none" }}>
-                <div className="login_form_panel" style={{ display: "none" }}>
-                  <div
-                    ref={CoverigLetterRef}
-                    className="p-5"
-                    style={{ position: "relative" }}
-                  >
-                    <table width="100%">
-                      <tr>
-                        <td
-                          style={{
-                            marginBottom: "0px",
-                            color: "#000",
-                            fontSize: "18px",
-                            fontWeight: "800",
-                          }}
-                        >
-                          Exchange &nbsp; Control &nbsp; Ref
-                          <br />
-                          Previous &nbsp; Exchange &nbsp; Control &nbsp; Ref
-                        </td>
-                        <td>
-                          <p
-                            style={{
-                              marginBottom: "0px",
-                              color: "#000",
-                              fontSize: "18px",
-                              textAlign: "left",
-                              fontWeight: "800",
-                              letterSpacing: "0.01px",
-                            }}
-                          >
-                            : {applicationDetail?.rbzReferenceNumber}
-                            <br />: N/A
-                          </p>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td colSpan="2">&nbsp;</td>
-                      </tr>
-                      <tr>
-                        <td
-                          colSpan="2"
-                          style={{
-                            color: "#000",
-                            fontSize: "18px",
-                            fontWeight: "600",
-                            letterSpacing: "0.01px",
-                          }}
-                        >
-                          {moment(
-                            applicationDetail?.applicationSubmittedDate
-                          ).format("DD MMMM YYYY")}
-                        </td>
-                      </tr>
-                      <tr>
-                        <td colSpan="2">&nbsp;</td>
-                      </tr>
-                      <tr>
-                        <td
-                          colSpan="2"
-                          style={{
-                            color: "#000",
-                            fontSize: "18px",
-                            fontWeight: "600",
-                            letterSpacing: "0.01px",
-                          }}
-                        >
-                          The Head - Exchange Control
-                          <br />
-                          {applicationDetail?.bankName}
-                          <br />
-                          {applicationDetail?.bankAddress1 != null ||
-                            applicationDetail?.bankAddress1 != ""
-                            ? applicationDetail?.bankAddress1 + "," + " "
-                            : ""}
-                          <br></br>
-                          {applicationDetail?.bankAddress2 != null ||
-                            applicationDetail?.bankAddress2 != ""
-                            ? applicationDetail?.bankAddress2 + "," + " "
-                            : ""}
-                          <br></br>
-                          {applicationDetail?.bankAddress3 != null ||
-                            applicationDetail?.bankAddress3 != ""
-                            ? applicationDetail?.bankAddress3
-                            : ""}
-                          <br />
-                        </td>
-                      </tr>
-                      <tr>
-                        <td colSpan="2">&nbsp;</td>
-                      </tr>
-                      <tr>
-                        <td
-                          colSpan="2"
-                          style={{
-                            color: "#000",
-                            fontSize: "18px",
-                            fontWeight: "600",
-                            letterSpacing: "0.01px",
-                          }}
-                        >
-                          Dear{" "}
-                          {applicationDetail?.companyName == null ||
-                            applicationDetail?.companyName == ""
-                            ? applicationDetail?.name
-                            : applicationDetail?.companyName}
-                          ,
-                        </td>
-                      </tr>
-                      <tr>
-                        <td colSpan="2">&nbsp;</td>
-                      </tr>
-                      <tr>
-                        <td colSpan="2">
-                          <table width="100%">
                             <tr>
                               <td colSpan="2">
-                                <p
-                                  style={{
-                                    color: "#000",
-                                    fontSize: "18px",
-                                    fontWeight: "800",
-                                    borderBottom: "1px solid #000",
-                                    marginBottom: "0px",
-                                    letterSpacing: "0.01px",
-                                  }}
-                                >
-                                  RE &nbsp;:&nbsp;{" "}
-                                  {applicationDetail?.applicationType}
-                                </p>
-                              </td>
-                            </tr>
-                            <tr>
-                              <td colSpan="2">&nbsp;</td>
-                            </tr>
-                            <tr>
-                              <td
-                                style={{
-                                  color: "#000",
-                                  fontSize: "18px",
-                                  fontWeight: "400",
-                                }}
-                              >
-                                Exporter
-                              </td>
-                              <td
-                                style={{
-                                  color: "#000",
-                                  fontSize: "18px",
-                                  fontWeight: "800",
-                                  letterSpacing: "0.01px",
-                                }}
-                              >
-                                :{" "}
-                                {applicationDetail?.companyName == null ||
-                                  applicationDetail?.companyName == ""
-                                  ? applicationDetail?.name
-                                  : applicationDetail?.companyName}
-                              </td>
-                            </tr>
-                            <tr>
-                              <td
-                                style={{
-                                  color: "#000",
-                                  fontSize: "18px",
-                                  fontWeight: "400",
-                                  letterSpacing: "0.01px",
-                                }}
-                              >
-                                Date Submitted
-                              </td>
-                              <td
-                                style={{
-                                  color: "#000",
-                                  fontSize: "18px",
-                                  fontWeight: "800",
-                                  letterSpacing: "0.01px",
-                                }}
-                              >
-                                :{" "}
-                                {moment(
-                                  applicationDetail?.applicationSubmittedDate
-                                ).format("DD MMMM YYYY")}
-                              </td>
-                            </tr>
-                            <tr>
-                              <td
-                                style={{
-                                  color: "#000",
-                                  fontSize: "18px",
-                                  fontWeight: "400",
-                                  letterSpacing: "0.01px",
-                                }}
-                              >
-                                Currency and Amount
-                              </td>
-                              <td
-                                style={{
-                                  color: "#000",
-                                  fontSize: "18px",
-                                  fontWeight: "800",
-                                }}
-                              >
-                                :{" "}
-                                <span
-                                  style={{
-                                    minWidth: "45px",
-                                    display: "inline-block",
-                                    paddingRight: "5px",
-                                    fontWeight: "800",
-                                  }}
-                                >
-                                  {applicationDetail?.currencyCode}
-                                </span>
-                                <span
-                                  style={{
-                                    fontSize: "18px",
-                                    fontWeight: "800",
-                                  }}
-                                >
-                                  {applicationDetail?.amount}
-                                </span>
-                              </td>
-                            </tr>
-                            <tr>
-                              <td
-                                style={{
-                                  color: "#000",
-                                  fontSize: "18px",
-                                  fontWeight: "400",
-                                  letterSpacing: "0.01px",
-                                }}
-                              >
-                                USD Equivalent
-                              </td>
-                              <td
-                                style={{
-                                  color: "#000",
-                                  fontSize: "18px",
-                                  fontWeight: "800",
-                                }}
-                              >
-                                :{" "}
-                                <span
-                                  style={{
-                                    minWidth: "45px",
-                                    display: "inline-block",
-                                    paddingRight: "5px",
-                                    fontWeight: "800",
-                                  }}
-                                >
-                                  USD
-                                </span>
-                                <span
-                                  style={{
-                                    fontSize: "18px",
-                                    fontWeight: "800",
-                                  }}
-                                >
-                                  {applicationDetail?.usdEquivalent}
-                                </span>
-                              </td>
-                            </tr>
-                            <tr>
-                              <td
-                                style={{
-                                  color: "#000",
-                                  fontSize: "18px",
-                                  fontWeight: "400",
-                                  letterSpacing: "0.01px",
-                                }}
-                              >
-                                Status/Decision
-                              </td>
-                              <td
-                                style={{
-                                  color: "#000",
-                                  fontSize: "18px",
-                                  fontWeight: "800",
-                                  letterSpacing: "0.01px",
-                                }}
-                              >
-                                :{" "}
-                                {applicationstaus == "10"
-                                  ? "Approved"
-                                  : applicationstaus == "30"
-                                    ? "Rejected"
-                                    : applicationstaus == "40"
-                                      ? "Deferred"
-                                      : applicationstaus == "25"
-                                        ? "Cancelled"
-                                        : ""}
-                                {/* {applicationDetail?.statusName} */}
+                                <table width="100%">
+                                  <tr>
+                                    <td
+                                      style={{
+                                        color: "#000",
+                                        fontSize: "18px",
+                                        fontWeight: "800",
+                                      }}
+                                    >
+                                      Title
+                                    </td>
+                                    <td
+                                      style={{
+                                        color: "#000",
+                                        fontSize: "18px",
+                                        fontWeight: "400",
+                                        letterSpacing: "0.01px",
+                                      }}
+                                    >
+                                      : {applicationDetail?.name}
+                                    </td>
+                                  </tr>
+
+                                  <tr>
+                                    <td
+                                      style={{
+                                        color: "#000",
+                                        fontSize: "18px",
+                                        fontWeight: "800",
+                                        letterSpacing: "0.01px",
+                                      }}
+                                    >
+                                      Subject
+                                    </td>
+                                    <td
+                                      style={{
+                                        color: "#000",
+                                        fontSize: "18px",
+                                        fontWeight: "400",
+                                      }}
+                                    >
+                                      :{" "}
+                                      <span
+                                        style={{
+                                          minWidth: "45px",
+                                          display: "inline-block",
+                                          paddingRight: "5px",
+
+                                          color: "#000",
+                                          fontSize: "18px",
+                                          fontWeight: "400",
+                                        }}
+                                      >
+                                        {applicationDetail?.subject}
+                                      </span>
+                                    </td>
+                                  </tr>
+                                  <tr>
+                                    <td
+                                      style={{
+                                        color: "#000",
+                                        fontSize: "18px",
+                                        fontWeight: "800",
+                                        verticalAlign: "top",
+                                      }}
+                                    >
+                                      Directive
+                                    </td>
+                                    <td
+                                      style={{
+                                        verticalAlign: "top",
+                                      }}
+                                    >
+                                      <div
+                                        style={{
+                                          display: "flex",
+                                        }}
+                                      >
+                                        {selectedDirectives?.length > 0 ? (
+                                          <>
+                                            :{" "}
+                                            <table
+                                              border="1"
+                                              className="directiveTable"
+                                            >
+                                              {selectedDirectives.map(
+                                                (item) => {
+                                                  return (
+                                                    <tr>
+                                                      <td>
+                                                        <span
+                                                          style={{
+                                                            marginBottom: "3px",
+                                                            letterSpacing:
+                                                              "0.01px",
+                                                            fontSize: "18px",
+                                                            fontWeight: "400",
+                                                            display:
+                                                              "inline-block",
+                                                            padding: "0px 5px",
+                                                          }}
+                                                        >
+                                                          {item.label}
+                                                        </span>
+                                                      </td>
+                                                      <td>
+                                                        {item?.filePath?.map(
+                                                          (fileitem) => {
+                                                            if (
+                                                              item.value ==
+                                                              fileitem.directiveID
+                                                            ) {
+                                                              return (
+                                                                <span
+                                                                  style={{
+                                                                    marginBottom:
+                                                                      "3px",
+                                                                    letterSpacing:
+                                                                      "0.01px",
+                                                                    fontSize:
+                                                                      "14px",
+                                                                    fontWeight:
+                                                                      "400",
+                                                                    display:
+                                                                      "inline-block",
+                                                                    padding:
+                                                                      "0px 5px",
+                                                                    marginBottom:
+                                                                      "0",
+                                                                  }}
+                                                                >
+                                                                  {
+                                                                    fileitem.filePath
+                                                                  }
+                                                                  ,
+                                                                </span>
+                                                              );
+                                                            }
+                                                          }
+                                                        )}
+                                                      </td>
+                                                    </tr>
+                                                  );
+                                                }
+                                              )}
+                                            </table>
+                                          </>
+                                        ) : (
+                                          ""
+                                        )}
+                                      </div>
+                                    </td>
+                                  </tr>
+                                </table>
                               </td>
                             </tr>
                           </table>
@@ -9526,9 +10577,8 @@ const ExportCircularsEditForm = ({
                                       <div
                                         className="tableEditorData"
                                         dangerouslySetInnerHTML={{
-                                          __html: asignnextLeveldata
-                                            ? // ? asignnextLeveldata.Notes
-                                            Description
+                                          __html: Description
+                                            ? Description
                                             : "",
                                         }}
                                         style={{
@@ -9583,7 +10633,7 @@ const ExportCircularsEditForm = ({
                                   style={{
                                     marginBottom: "0px",
                                     color: "#000",
-                                    fontSize: "14px",
+                                    fontSize: "16px",
                                     fontWeight: "400",
                                     padding: "15px 0px 3px",
                                     lineHeight: "13px",
@@ -9591,14 +10641,14 @@ const ExportCircularsEditForm = ({
                                   }}
                                 >
                                   {PdfUsername
-                                    ? PdfUsername.replace(/"/g, "")
+                                    ? PdfUsername?.replace(/"/g, "")
                                     : "N/A"}
                                 </p>
                                 <p
                                   style={{
                                     marginBottom: "0px",
                                     color: "#000",
-                                    fontSize: "14px",
+                                    fontSize: "16px",
                                     fontWeight: "400",
                                     padding: "5px 0px",
                                     lineHeight: "13px",
@@ -9606,19 +10656,9 @@ const ExportCircularsEditForm = ({
                                   }}
                                 >
                                   {PdfRolename
-                                    ? PdfRolename.replace(/"/g, "")
+                                    ? PdfRolename?.replace(/"/g, "")
                                     : "N/A"}
                                 </p>
-                                <h3
-                                  style={{
-                                    color: "#000",
-                                    fontSize: "18px",
-                                    fontWeight: "800",
-                                    letterSpacing: "0.01px",
-                                  }}
-                                >
-                                  {applicationDetail?.bankName}
-                                </h3>
                               </td>
                             </tr>
                           </table>
@@ -9628,12 +10668,12 @@ const ExportCircularsEditForm = ({
                   </div>
                 </div>
               </div>
-              {/* coveri letter data end Arun Verma */}
-
+              {/* pdf-preview data end */}
+              {/* Pdf Generation */}
               <div className="login_inner" style={{ display: "none" }}>
                 <div className="login_form_panel" style={{ display: "none" }}>
                   <div
-                    ref={PdfPrivewRef}
+                    ref={PdftargetRef}
                     className="p-5"
                     style={{ position: "relative" }}
                   >
@@ -9647,9 +10687,7 @@ const ExportCircularsEditForm = ({
                             fontWeight: "800",
                           }}
                         >
-                          Exchange &nbsp; Control &nbsp; Ref
-                          <br />
-                          Previous &nbsp; Exchange &nbsp; Control &nbsp; Ref
+                          Reference Number
                         </td>
                         <td>
                           <p
@@ -9662,8 +10700,7 @@ const ExportCircularsEditForm = ({
                               letterSpacing: "0.01px",
                             }}
                           >
-                            : {applicationDetail?.rbzReferenceNumber}
-                            <br />: N/A
+                            : {applicationDetail?.circularReferenceNumber}
                           </p>
                         </td>
                       </tr>
@@ -9680,96 +10717,116 @@ const ExportCircularsEditForm = ({
                             letterSpacing: "0.01px",
                           }}
                         >
-                          {moment(
-                            applicationDetail?.applicationSubmittedDate
-                          ).format("DD MMMM YYYY")}
-                        </td>
-                      </tr>
-                      <tr>
-                        <td colSpan="2">&nbsp;</td>
-                      </tr>
-                      <tr>
-                        <td
-                          colSpan="2"
-                          style={{
-                            color: "#000",
-                            fontSize: "18px",
-                            fontWeight: "600",
-                            letterSpacing: "0.01px",
-                          }}
-                        >
-                          The Head - Exchange Control
-                          <br />
-                          {applicationDetail?.bankName
-                            ? applicationDetail?.bankName
-                            : ""}
-                          {applicationDetail?.bankName == null ? (
-                            <span>
-                              Reserve Bank of Zimbabwe. 80 Samora Machel Avenue,{" "}
-                              <br /> P.O. Box 1283, Harare, Zimbabwe.
-                            </span>
-                          ) : (
-                            <>
-                              <br />
-                              {applicationDetail?.bankAddress1 != null ||
-                                applicationDetail?.bankAddress1 != ""
-                                ? applicationDetail?.bankAddress1 + "," + " "
-                                : ""}
-                              <br></br>
-                              {applicationDetail?.bankAddress2 != null ||
-                                applicationDetail?.bankAddress2 != ""
-                                ? applicationDetail?.bankAddress2 + "," + " "
-                                : ""}
-                              <br></br>
-                              {applicationDetail?.bankAddress3 != null ||
-                                applicationDetail?.bankAddress3 != ""
-                                ? applicationDetail?.bankAddress3
-                                : ""}
-                              <br />
-                            </>
+                          {moment(applicationDetail?.releasingDate).format(
+                            "DD MMMM YYYY"
                           )}
-                          {/* <span
-                            style={{
-                              borderBottom: "1px solid #000",
-                              fontWeight: "800",
-                              fontSize: "18px",
-                              letterSpacing: "0.01px"
-                            }}
-                            className="text-uppercase"
-                          >
-                            {applicationDetail?.bankCity != null ||
-                            applicationDetail?.bankCity != ""
-                              ? applicationDetail?.bankCity
-                              : ""}
-                          </span> */}
                         </td>
                       </tr>
                       <tr>
                         <td colSpan="2">&nbsp;</td>
                       </tr>
-                      <tr>
-                        <td
-                          colSpan="2"
-                          style={{
-                            color: "#000",
-                            fontSize: "18px",
-                            fontWeight: "600",
-                            letterSpacing: "0.01px",
-                          }}
-                        >
-                          Dear{" "}
-                          {/* {applicationDetail?.applicantType == 1
-                            ? applicationDetail?.companyName
-                            : applicationDetail?.applicantType == 2
-                            ? applicationDetail?.name
-                            : applicationDetail?.applicantType == 3
-                            ? applicationDetail?.agencyName
-                            : " "} */}
-                          {applicationDetail?.companyName == null ||
-                            applicationDetail?.companyName == ""
-                            ? applicationDetail?.name
-                            : applicationDetail?.companyName}
 
+                      <tr>
+                        <td colSpan="2">
+                          <table width="100%">
+                            <tr>
+                              <td
+                                style={{
+                                  color: "#000",
+                                  fontSize: "18px",
+                                  fontWeight: "800",
+                                }}
+                              >
+                                Circular
+                              </td>
+                              <td
+                                style={{
+                                  color: "#000",
+                                  fontSize: "18px",
+                                  fontWeight: "400",
+                                  letterSpacing: "0.01px",
+                                }}
+                              >
+                                : {applicationDetail?.name}
+                              </td>
+                            </tr>
+
+                            <tr>
+                              <td
+                                style={{
+                                  color: "#000",
+                                  fontSize: "18px",
+                                  fontWeight: "800",
+                                  letterSpacing: "0.01px",
+                                }}
+                              >
+                                Subject
+                              </td>
+                              <td
+                                style={{
+                                  color: "#000",
+                                  fontSize: "18px",
+                                  fontWeight: "400",
+                                }}
+                              >
+                                :{" "}
+                                <span
+                                  style={{
+                                    minWidth: "45px",
+                                    display: "inline-block",
+                                    paddingRight: "5px",
+
+                                    color: "#000",
+                                    fontSize: "18px",
+                                    fontWeight: "400",
+                                  }}
+                                >
+                                  {applicationDetail?.subject}
+                                </span>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td
+                                style={{
+                                  color: "#000",
+                                  fontSize: "18px",
+                                  fontWeight: "800",
+                                }}
+                              >
+                                To
+                              </td>
+                              <td>
+                                <div>
+                                  {applicationDetail?.bankData?.length > 0 ? (
+                                    <>
+                                      :{" "}
+                                      {(
+                                        applicationDetail?.bankData ||
+                                        selectedBanks
+                                      ).map((item) => {
+                                        return (
+                                          <span
+                                            style={{
+                                              marginBottom: "3px",
+                                              letterSpacing: "0.01px",
+                                              fontSize: "18px",
+                                              fontWeight: "400",
+                                              display: "inline-block",
+                                              padding: "0px 5px",
+                                            }}
+                                          >
+                                            {item.bankName},
+                                          </span>
+                                        );
+                                      })}
+                                    </>
+                                  ) : (
+                                    ""
+                                  )}
+                                </div>
+                              </td>
+                            </tr>
+                          </table>
                         </td>
                       </tr>
                       <tr>
@@ -9779,334 +10836,16 @@ const ExportCircularsEditForm = ({
                         <td colSpan="2">
                           <table width="100%">
                             <tr>
-                              <td colSpan="2">
-                                <p
-                                  style={{
-                                    color: "#000",
-                                    fontSize: "18px",
-                                    fontWeight: "800",
-                                    borderBottom: "1px solid #000",
-                                    marginBottom: "0px",
-                                    letterSpacing: "0.01px",
-                                  }}
-                                >
-                                  RE &nbsp;:&nbsp;{" "}
-                                  {applicationDetail?.applicationType}
-                                </p>
-                              </td>
-                            </tr>
-                            <tr>
-                              <td colSpan="2">&nbsp;</td>
-                            </tr>
-                            <tr>
                               <td
+                                colSpan="2"
                                 style={{
                                   color: "#000",
                                   fontSize: "18px",
-                                  fontWeight: "400",
-                                }}
-                              >
-                                Exporter
-                              </td>
-                              <td
-                                style={{
-                                  color: "#000",
-                                  fontSize: "18px",
-                                  fontWeight: "800",
+                                  fontWeight: "600",
                                   letterSpacing: "0.01px",
                                 }}
                               >
-                                :{" "}
-                                {applicationDetail?.companyName == null ||
-                                  applicationDetail?.companyName == ""
-                                  ? applicationDetail?.name
-                                  : applicationDetail?.companyName}
-
-                              </td>
-                            </tr>
-                            <tr>
-                              <td
-                                style={{
-                                  color: "#000",
-                                  fontSize: "18px",
-                                  fontWeight: "400",
-                                }}
-                              >
-                                Date Submitted
-                              </td>
-                              <td
-                                style={{
-                                  color: "#000",
-                                  fontSize: "18px",
-                                  fontWeight: "800",
-                                  letterSpacing: "0.01px",
-                                }}
-                              >
-                                :{" "}
-                                {moment(
-                                  applicationDetail?.applicationSubmittedDate
-                                ).format("DD MMMM  YYYY")}
-                              </td>
-                            </tr>
-                            <tr>
-                              <td
-                                style={{
-                                  color: "#000",
-                                  fontSize: "18px",
-                                  fontWeight: "400",
-                                  letterSpacing: "0.01px",
-                                }}
-                              >
-                                Currency and Amount
-                              </td>
-                              <td
-                                style={{
-                                  color: "#000",
-                                  fontSize: "18px",
-                                  fontWeight: "800",
-                                }}
-                              >
-                                :{" "}
-                                <span
-                                  style={{
-                                    minWidth: "45px",
-                                    display: "inline-block",
-                                    paddingRight: "5px",
-                                    fontWeight: "800",
-                                  }}
-                                >
-                                  {applicationDetail?.currencyCode}
-                                </span>
-                                <span
-                                  style={{
-                                    fontSize: "18px",
-                                    fontWeight: "800",
-                                  }}
-                                >
-                                  {applicationDetail?.amount}
-                                </span>
-                              </td>
-                            </tr>
-                            <tr>
-                              <td
-                                style={{
-                                  color: "#000",
-                                  fontSize: "18px",
-                                  fontWeight: "400",
-                                }}
-                              >
-                                USD &nbsp; Equivalent
-                              </td>
-                              <td
-                                style={{
-                                  color: "#000",
-                                  fontSize: "18px",
-                                  fontWeight: "800",
-                                }}
-                              >
-                                :{" "}
-                                <span
-                                  style={{
-                                    minWidth: "45px",
-                                    display: "inline-block",
-                                    paddingRight: "5px",
-                                    fontWeight: "800",
-                                  }}
-                                >
-                                  USD
-                                </span>
-                                <span
-                                  style={{
-                                    fontSize: "18px",
-                                    fontWeight: "800",
-                                  }}
-                                >
-                                  {applicationDetail?.usdEquivalent}
-                                </span>
-                              </td>
-                            </tr>
-                            <tr>
-                              <td
-                                style={{
-                                  color: "#000",
-                                  fontSize: "18px",
-                                  fontWeight: "400",
-                                  letterSpacing: "0.01px",
-                                }}
-                              >
-                                Status/Decision
-                              </td>
-                              <td
-                                style={{
-                                  color: "#000",
-                                  fontSize: "18px",
-                                  fontWeight: "800",
-                                  letterSpacing: "0.01px",
-                                }}
-                              >
-                                :{" "}
-                                {applicationstaus == "10"
-                                  ? "Approved"
-                                  : applicationstaus == "30"
-                                    ? "Rejected"
-                                    : applicationstaus == "40"
-                                      ? "Deferred"
-                                      : applicationstaus == "25"
-                                        ? "Cancelled"
-                                        : ""}
-                                {/* {applicationDetail?.statusName} */}
-                              </td>
-                            </tr>
-                            <tr
-                              className={
-                                applicationDetail?.expiringDate == null ||
-                                  applicationDetail?.expiringDate == ""
-                                  ? "d-none"
-                                  : ""
-                              }
-                            >
-                              <td
-                                style={{
-                                  color: "#000",
-                                  fontSize: "18px",
-                                  fontWeight: "400",
-                                  letterSpacing: "0.01px",
-                                }}
-                              >
-                                Expiry Date
-                              </td>
-                              <td
-                                style={{
-                                  color: "#000",
-                                  fontSize: "18px",
-                                  fontWeight: "800",
-                                  letterSpacing: "0.01px",
-                                }}
-                              >
-                                :{" "}
-                                {applicationDetail?.expiringDate == null ||
-                                  applicationDetail?.expiringDate == "" ||
-                                  applicationDetail?.expiringDate ==
-                                  "0001-01-01T00:00:00"
-                                  ? "N/A"
-                                  : moment(
-                                    applicationDetail?.expiringDate
-                                  ).format("DD MMMM YYYY")}
-                              </td>
-                            </tr>
-                            <tr
-                              className={
-                                applicationDetail?.returnFrequencyName ==
-                                  null ||
-                                  applicationDetail?.returnFrequencyName == ""
-                                  ? "d-none"
-                                  : ""
-                              }
-                            >
-                              <td
-                                style={{
-                                  fontSize: "18px",
-                                  fontWeight: "400",
-                                  color: "#000",
-                                  letterSpacing: "0.01px",
-                                }}
-                              >
-                                Returns Frequency
-                              </td>
-                              <td
-                                style={{
-                                  color: "#000",
-                                  fontSize: "18px",
-                                  fontWeight: "800",
-                                }}
-                              >
-                                :{" "}
-                                {applicationDetail?.returnFrequencyName ==
-                                  null ||
-                                  applicationDetail?.returnFrequencyName == ""
-                                  ? "N/A"
-                                  : applicationDetail?.returnFrequencyName}
-                              </td>
-                            </tr>
-                            {applicationDetail?.returnFrequencyName ==
-                              "Once" ? (
-                              <tr>
-                                <td
-                                  style={{
-                                    fontSize: "18px",
-                                    fontWeight: "400",
-                                    color: "#000",
-                                  }}
-                                >
-                                  Returns Date
-                                </td>
-                                <td
-                                  style={{
-                                    color: "#000",
-                                    fontSize: "18px",
-                                    fontWeight: "800",
-                                    letterSpacing: "0.01px",
-                                  }}
-                                >
-                                  :{" "}
-                                  {applicationDetail?.returnDate == null ||
-                                    applicationDetail?.returnDate == "" ||
-                                    applicationDetail?.returnDate ==
-                                    "0001-01-01T00:00:00"
-                                    ? "N/A"
-                                    : moment(
-                                      applicationDetail?.returnDate
-                                    ).format("DD MMMM  YYYY")}
-                                </td>
-                              </tr>
-                            ) : (
-                              ""
-                            )}
-                          </table>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td colSpan="2">&nbsp;</td>
-                      </tr>
-                      <tr>
-                        <td colSpan="2">
-                          <table>
-                            <tr>
-                              <td colSpan="2">
-                                <table width="100%">
-                                  <tr>
-                                    <td
-                                      style={{
-                                        color: "#000",
-                                        fontSize: "18px",
-                                        fontWeight: "400",
-                                      }}
-                                    >
-                                      <div>
-                                        <span
-                                          style={{
-                                            fontWeight: "800",
-                                            padding: "15px 0px 15px",
-                                          }}
-                                        >
-                                          Response &nbsp;/&nbsp; Conditions
-                                        </span>
-                                      </div>
-                                      <div
-                                        className="tableEditorData"
-                                        dangerouslySetInnerHTML={{
-                                          __html: Description
-                                            ? Description
-                                            : applicationDetail?.content,
-                                        }}
-                                        style={{
-                                          paddingBottom: "60px",
-                                          letterSpacing: "0.01px",
-                                        }}
-                                      />
-                                    </td>
-                                  </tr>
-                                </table>
+                                Dear All,
                               </td>
                             </tr>
                             <tr>
@@ -10121,341 +10860,182 @@ const ExportCircularsEditForm = ({
                                   fontWeight: "400",
                                 }}
                               >
-                                <span
+                                <p
                                   style={{
-                                    color: "#000",
+                                    marginBottom: "0px",
                                     fontSize: "18px",
                                     fontWeight: "400",
-                                    display: "inline-block",
                                   }}
                                 >
                                   {" "}
-                                  Yours Sincerely,
-                                </span>
-                                <img
-                                  src={
-                                    applicationDetail?.getUserData?.filePath
-                                      ? applicationDetail?.getUserData.filePath
-                                      : NoSign
-                                  }
-                                  alt="Signature"
-                                  style={{
-                                    width: "120px",
-                                    height: "50px",
-                                    display: "block",
-                                    objectFit: "contain",
-                                  }}
-                                />
-                                <p
-                                  style={{
-                                    marginBottom: "0px",
-                                    color: "#000",
-                                    fontSize: "14px",
-                                    fontWeight: "400",
-                                    padding: "15px 0px 3px",
-                                    lineHeight: "13px",
-                                    letterSpacing: "0.01px",
-                                  }}
-                                >
-                                  {PdfUsername
-                                    ? PdfUsername.replace(/"/g, "")
-                                    : "N/A"}
+                                  Circular Vide No,{" "}
+                                  <b>
+                                    {applicationDetail?.circularReferenceNumber}
+                                  </b>{" "}
+                                  is only released on{" "}
+                                  <b>
+                                    {" "}
+                                    {moment(
+                                      applicationDetail?.releasingDate
+                                    ).format("DD MMMM YYYY")}
+                                  </b>{" "}
+                                  pertained to:-
                                 </p>
-                                <p
-                                  style={{
-                                    marginBottom: "0px",
-                                    color: "#000",
-                                    fontSize: "14px",
-                                    fontWeight: "400",
-                                    padding: "5px 0px",
-                                    lineHeight: "13px",
-                                    letterSpacing: "0.01px",
-                                  }}
-                                >
-                                  {PdfRolename
-                                    ? PdfRolename.replace(/"/g, "")
-                                    : "N/A"}
-                                </p>
-                                <h3
-                                  style={{
-                                    color: "#000",
-                                    fontSize: "18px",
-                                    fontWeight: "800",
-                                  }}
-                                >
-                                  EXCHANGE &nbsp; CONTROL
-                                </h3>
-                                <div
-                                  style={{
-                                    marginBottom: "0px",
-                                    color: "#000",
-                                    fontSize: "18px",
-                                    fontWeight: "400",
-                                    padding: "25px 0px 5px",
-                                    lineHeight: "13px",
-                                    display: "flex",
-                                  }}
-                                >
-                                  {applicationDetail?.copiedResponses?.length >
-                                    0 ? (
-                                    <>
-                                      <p
-                                        style={{
-                                          marginBottom: "0px",
-                                          fontSize: "18px",
-                                          fontWeight: "400",
-                                          paddingRight: "10px",
-                                          letterSpacing: "0.01px",
-                                        }}
-                                      >
-                                        CC:
-                                      </p>
-                                      <div>
-                                        {selectedBanks.map((item) => {
-                                          return (
-                                            <p
-                                              style={{
-                                                marginBottom: "3px",
-                                                letterSpacing: "0.01px",
-                                                fontSize: "18px",
-                                                fontWeight: "400",
-                                              }}
-                                            >
-                                              {item.name}
-                                            </p>
-                                          );
-                                        })}
-                                      </div>
-                                    </>
-                                  ) : (
-                                    ""
-                                  )}
-                                </div>
                               </td>
                             </tr>
-                          </table>
-                        </td>
-                      </tr>
-                    </table>
-                  </div>
-                </div>
-              </div>
-
-              <div className="login_inner" style={{ display: "none" }}>
-                <div className="login_form_panel" style={{ display: "none" }}>
-                  <div
-                    ref={PdfPrivewsupervisorRef}
-                    className="p-5"
-                    style={{ position: "relative" }}
-                  >
-                    <table width="100%">
-                      <tr>
-                        <td
-                          style={{
-                            marginBottom: "0px",
-                            color: "#000",
-                            fontSize: "18px",
-                            fontWeight: "800",
-                          }}
-                        >
-                          Exchange &nbsp; Control &nbsp; Ref
-                          <br />
-                          Previous &nbsp; Exchange &nbsp; Control &nbsp; Ref
-                        </td>
-                        <td>
-                          <p
-                            style={{
-                              marginBottom: "0px",
-                              color: "#000",
-                              fontSize: "18px",
-                              textAlign: "left",
-                              fontWeight: "800",
-                              letterSpacing: "0.01px",
-                            }}
-                          >
-                            : {applicationDetail?.rbzReferenceNumber}
-                            <br />: N/A
-                          </p>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td colSpan="2">&nbsp;</td>
-                      </tr>
-                      <tr>
-                        <td
-                          colSpan="2"
-                          style={{
-                            color: "#000",
-                            fontSize: "18px",
-                            fontWeight: "600",
-                            letterSpacing: "0.01px",
-                          }}
-                        >
-                          {moment(
-                            applicationDetail?.applicationSubmittedDate
-                          ).format("DD MMMM YYYY")}
-                        </td>
-                      </tr>
-                      <tr>
-                        <td colSpan="2">&nbsp;</td>
-                      </tr>
-                      <tr>
-                        <td
-                          colSpan="2"
-                          style={{
-                            color: "#000",
-                            fontSize: "18px",
-                            fontWeight: "600",
-                            letterSpacing: "0.01px",
-                          }}
-                        >
-                          The Head - Exchange Control
-                          <br />
-                          {applicationDetail?.bankName
-                            ? applicationDetail?.bankName
-                            : ""}
-                          {applicationDetail?.bankName == null ? (
-                            <span>
-                              Reserve Bank of Zimbabwe. 80 Samora Machel Avenue,{" "}
-                              <br /> P.O. Box 1283, Harare, Zimbabwe.
-                            </span>
-                          ) : (
-                            <>
-                              <br />
-                              {applicationDetail?.bankAddress1 != null ||
-                                applicationDetail?.bankAddress1 != ""
-                                ? applicationDetail?.bankAddress1 + "," + " "
-                                : ""}
-                              <br></br>
-                              {applicationDetail?.bankAddress2 != null ||
-                                applicationDetail?.bankAddress2 != ""
-                                ? applicationDetail?.bankAddress2 + "," + " "
-                                : ""}
-                              <br></br>
-                              {applicationDetail?.bankAddress3 != null ||
-                                applicationDetail?.bankAddress3 != ""
-                                ? applicationDetail?.bankAddress3
-                                : ""}
-                              <br />
-                            </>
-                          )}
-                          {/* <span
-                            style={{
-                              borderBottom: "1px solid #000",
-                              fontWeight: "800",
-                              fontSize: "18px",
-                              letterSpacing: "0.01px"
-                            }}
-                            className="text-uppercase"
-                          >
-                            {applicationDetail?.bankCity != null ||
-                            applicationDetail?.bankCity != ""
-                              ? applicationDetail?.bankCity
-                              : ""}
-                          </span> */}
-                        </td>
-                      </tr>
-                      <tr>
-                        <td colSpan="2">&nbsp;</td>
-                      </tr>
-                      <tr>
-                        <td
-                          colSpan="2"
-                          style={{
-                            color: "#000",
-                            fontSize: "18px",
-                            fontWeight: "600",
-                            letterSpacing: "0.01px",
-                          }}
-                        >
-                          Dear{" "}
-                          {/* {applicationDetail?.applicantType == 1
-                            ? applicationDetail?.companyName
-                            : applicationDetail?.applicantType == 2
-                            ? applicationDetail?.name
-                            : applicationDetail?.applicantType == 3
-                            ? applicationDetail?.agencyName
-                            : " "} */}
-                          {applicationDetail?.companyName == null ||
-                            applicationDetail?.companyName == ""
-                            ? applicationDetail?.name
-                            : applicationDetail?.companyName}
-
-                        </td>
-                      </tr>
-                      <tr>
-                        <td colSpan="2">&nbsp;</td>
-                      </tr>
-                      <tr>
-                        <td colSpan="2">
-                          <table width="100%">
                             <tr>
                               <td colSpan="2">
-                                <p
-                                  style={{
-                                    color: "#000",
-                                    fontSize: "18px",
-                                    fontWeight: "800",
-                                    borderBottom: "1px solid #000",
-                                    marginBottom: "0px",
-                                    letterSpacing: "0.01px",
-                                  }}
-                                >
-                                  RE &nbsp;:&nbsp;{" "}
-                                  {applicationDetail?.applicationType}
-                                </p>
-                              </td>
-                            </tr>
-                            <tr>
-                              <td colSpan="2">&nbsp;</td>
-                            </tr>
-                            {/* <tr>
-                              <td
-                                style={{
-                                  color: "#000",
-                                  fontSize: "18px",
-                                  fontWeight: "400",
-                                }}
-                              >
-                                Exporter
-                              </td>
-                              <td
-                                style={{
-                                  color: "#000",
-                                  fontSize: "18px",
-                                  fontWeight: "800",
-                                  letterSpacing: "0.01px"
-                                }}
-                              >
-                                :{" "}
-                                {applicationDetail?.companyName == null || applicationDetail?.companyName == ""
-                                  ? applicationDetail?.name
-                                  : applicationDetail?.companyName} 
-                                 
-                              </td>
-                            </tr> */}
-                            <tr>
-                              <td
-                                style={{
-                                  color: "#000",
-                                  fontSize: "18px",
-                                  fontWeight: "400",
-                                }}
-                              >
-                                Date Submitted
-                              </td>
-                              <td
-                                style={{
-                                  color: "#000",
-                                  fontSize: "18px",
-                                  fontWeight: "800",
-                                  letterSpacing: "0.01px",
-                                }}
-                              >
-                                :{" "}
-                                {moment(
-                                  applicationDetail?.applicationSubmittedDate
-                                ).format("DD MMMM  YYYY")}
+                                <table width="100%">
+                                  <tr>
+                                    <td
+                                      style={{
+                                        color: "#000",
+                                        fontSize: "18px",
+                                        fontWeight: "800",
+                                      }}
+                                    >
+                                      Title
+                                    </td>
+                                    <td
+                                      style={{
+                                        color: "#000",
+                                        fontSize: "18px",
+                                        fontWeight: "400",
+                                        letterSpacing: "0.01px",
+                                      }}
+                                    >
+                                      : {applicationDetail?.name}
+                                    </td>
+                                  </tr>
+
+                                  <tr>
+                                    <td
+                                      style={{
+                                        color: "#000",
+                                        fontSize: "18px",
+                                        fontWeight: "800",
+                                        letterSpacing: "0.01px",
+                                      }}
+                                    >
+                                      Subject
+                                    </td>
+                                    <td
+                                      style={{
+                                        color: "#000",
+                                        fontSize: "18px",
+                                        fontWeight: "400",
+                                      }}
+                                    >
+                                      :{" "}
+                                      <span
+                                        style={{
+                                          minWidth: "45px",
+                                          display: "inline-block",
+                                          paddingRight: "5px",
+
+                                          color: "#000",
+                                          fontSize: "18px",
+                                          fontWeight: "400",
+                                        }}
+                                      >
+                                        {applicationDetail?.subject}
+                                      </span>
+                                    </td>
+                                  </tr>
+                                  <tr>
+                                    <td
+                                      style={{
+                                        color: "#000",
+                                        fontSize: "18px",
+                                        fontWeight: "800",
+                                        verticalAlign: "top",
+                                      }}
+                                    >
+                                      Directive
+                                    </td>
+                                    <td
+                                      style={{
+                                        verticalAlign: "top",
+                                      }}
+                                    >
+                                      <div>
+                                        {applicationDetail?.directiveData
+                                          ?.length > 0 ? (
+                                          <>
+                                            :{" "}
+                                            <table
+                                              border="1"
+                                              className="directiveTable"
+                                            >
+                                              {applicationDetail?.directiveData.map(
+                                                (item) => {
+                                                  return (
+                                                    <tr>
+                                                      <td>
+                                                        <span
+                                                          style={{
+                                                            marginBottom: "3px",
+                                                            letterSpacing:
+                                                              "0.01px",
+                                                            fontSize: "18px",
+                                                            fontWeight: "400",
+                                                            display:
+                                                              "inline-block",
+                                                            padding: "0px 5px",
+                                                          }}
+                                                        >
+                                                          {item.directiveName}
+                                                        </span>
+                                                      </td>
+                                                      <td>
+                                                        {item?.directiveFiles?.map(
+                                                          (fileitem) => {
+                                                            if (
+                                                              item.id ==
+                                                              fileitem.directiveID
+                                                            ) {
+                                                              return (
+                                                                <span
+                                                                  style={{
+                                                                    marginBottom:
+                                                                      "3px",
+                                                                    letterSpacing:
+                                                                      "0.01px",
+                                                                    fontSize:
+                                                                      "14px",
+                                                                    fontWeight:
+                                                                      "400",
+                                                                    display:
+                                                                      "inline-block",
+                                                                    padding:
+                                                                      "0px 5px",
+                                                                    marginBottom:
+                                                                      "0",
+                                                                  }}
+                                                                >
+                                                                  {
+                                                                    fileitem.filePath
+                                                                  }
+                                                                  ,
+                                                                </span>
+                                                              );
+                                                            }
+                                                          }
+                                                        )}
+                                                      </td>
+                                                    </tr>
+                                                  );
+                                                }
+                                              )}
+                                            </table>
+                                          </>
+                                        ) : (
+                                          ""
+                                        )}
+                                      </div>
+                                    </td>
+                                  </tr>
+                                </table>
                               </td>
                             </tr>
                           </table>
@@ -10483,6 +11063,7 @@ const ExportCircularsEditForm = ({
                                           style={{
                                             fontWeight: "800",
                                             padding: "15px 0px 15px",
+                                            letterSpacing: "0.01px",
                                           }}
                                         >
                                           Description
@@ -10491,9 +11072,9 @@ const ExportCircularsEditForm = ({
                                       <div
                                         className="tableEditorData"
                                         dangerouslySetInnerHTML={{
-                                          __html: Description
-                                            ? Description
-                                            : applicationDetail?.content,
+                                          __html: applicationDetail?.content
+                                            ? applicationDetail?.content
+                                            : "",
                                         }}
                                         style={{
                                           paddingBottom: "60px",
@@ -10523,6 +11104,7 @@ const ExportCircularsEditForm = ({
                                     fontSize: "18px",
                                     fontWeight: "400",
                                     display: "inline-block",
+                                    letterSpacing: "0.01px",
                                   }}
                                 >
                                   {" "}
@@ -10546,7 +11128,7 @@ const ExportCircularsEditForm = ({
                                   style={{
                                     marginBottom: "0px",
                                     color: "#000",
-                                    fontSize: "14px",
+                                    fontSize: "16px",
                                     fontWeight: "400",
                                     padding: "15px 0px 3px",
                                     lineHeight: "13px",
@@ -10554,14 +11136,14 @@ const ExportCircularsEditForm = ({
                                   }}
                                 >
                                   {PdfUsername
-                                    ? PdfUsername.replace(/"/g, "")
+                                    ? PdfUsername?.replace(/"/g, "")
                                     : "N/A"}
                                 </p>
                                 <p
                                   style={{
                                     marginBottom: "0px",
                                     color: "#000",
-                                    fontSize: "14px",
+                                    fontSize: "16px",
                                     fontWeight: "400",
                                     padding: "5px 0px",
                                     lineHeight: "13px",
@@ -10569,64 +11151,9 @@ const ExportCircularsEditForm = ({
                                   }}
                                 >
                                   {PdfRolename
-                                    ? PdfRolename.replace(/"/g, "")
+                                    ? PdfRolename?.replace(/"/g, "")
                                     : "N/A"}
                                 </p>
-                                <h3
-                                  style={{
-                                    color: "#000",
-                                    fontSize: "18px",
-                                    fontWeight: "800",
-                                  }}
-                                >
-                                  EXCHANGE &nbsp; CONTROL
-                                </h3>
-                                <div
-                                  style={{
-                                    marginBottom: "0px",
-                                    color: "#000",
-                                    fontSize: "18px",
-                                    fontWeight: "400",
-                                    padding: "25px 0px 5px",
-                                    lineHeight: "13px",
-                                    display: "flex",
-                                  }}
-                                >
-                                  {applicationDetail?.copiedResponses?.length >
-                                    0 ? (
-                                    <>
-                                      <p
-                                        style={{
-                                          marginBottom: "0px",
-                                          fontSize: "18px",
-                                          fontWeight: "400",
-                                          paddingRight: "10px",
-                                          letterSpacing: "0.01px",
-                                        }}
-                                      >
-                                        CC:
-                                      </p>
-                                      <div>
-                                        {selectedBanks.map((item) => {
-                                          return (
-                                            <p
-                                              style={{
-                                                marginBottom: "3px",
-                                                letterSpacing: "0.01px",
-                                                fontSize: "18px",
-                                                fontWeight: "400",
-                                              }}
-                                            >
-                                              {item.name}
-                                            </p>
-                                          );
-                                        })}
-                                      </div>
-                                    </>
-                                  ) : (
-                                    ""
-                                  )}
-                                </div>
                               </td>
                             </tr>
                           </table>
@@ -10636,7 +11163,7 @@ const ExportCircularsEditForm = ({
                   </div>
                 </div>
               </div>
-
+              {/* pdf-generate */}
               {updatepopup == true ? (
                 <UpdatePopupMessage
                   heading={heading}

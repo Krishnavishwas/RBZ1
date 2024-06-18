@@ -312,7 +312,7 @@ const ExportDashboardEditDetails = ({
               .run()
           }
         >
-          <i class="bi bi-table"></i>
+          <i className="bi bi-table"></i>
         </button>
         <button
           type="button"
@@ -320,7 +320,7 @@ const ExportDashboardEditDetails = ({
           onClick={() => editor.chain().focus().addColumnBefore().run()}
           disabled={!editor.can().addColumnBefore()}
         >
-          <i class="bi bi-list-columns-reverse"></i>
+          <i className="bi bi-list-columns-reverse"></i>
         </button>
         <button
           type="button"
@@ -328,49 +328,49 @@ const ExportDashboardEditDetails = ({
           onClick={() => editor.chain().focus().addColumnAfter().run()}
           disabled={!editor.can().addColumnAfter()}
         >
-          <i class="bi bi-list-columns"></i>
+          <i className="bi bi-list-columns"></i>
         </button>
         <button
           type="button"
           onClick={() => editor.chain().focus().deleteColumn().run()}
           disabled={!editor.can().deleteColumn()}
         >
-          <i class="bi bi-archive"></i>
+          <i className="bi bi-archive"></i>
         </button>
         <button
           type="button"
           onClick={() => editor.chain().focus().addRowBefore().run()}
           disabled={!editor.can().addRowBefore()}
         >
-          <i class="bi bi-arrow-bar-up"></i>
+          <i className="bi bi-arrow-bar-up"></i>
         </button>
         <button
           type="button"
           onClick={() => editor.chain().focus().addRowAfter().run()}
           disabled={!editor.can().addRowAfter()}
         >
-          <i class="bi bi-arrow-bar-down"></i>
+          <i className="bi bi-arrow-bar-down"></i>
         </button>
         <button
           type="button"
           onClick={() => editor.chain().focus().deleteRow().run()}
           disabled={!editor.can().deleteRow()}
         >
-          <i class="bi bi-archive"></i>
+          <i className="bi bi-archive"></i>
         </button>
         <button
           type="button"
           onClick={() => editor.chain().focus().deleteTable().run()}
           disabled={!editor.can().deleteTable()}
         >
-          <i class="bi bi-archive"></i>
+          <i className="bi bi-archive"></i>
         </button>
         <button
           type="button"
           onClick={() => editor.chain().focus().mergeCells().run()}
           disabled={!editor.can().mergeCells()}
         >
-          <i class="bi bi-union"></i>
+          <i className="bi bi-union"></i>
         </button>
         <button
           type="button"
@@ -384,28 +384,28 @@ const ExportDashboardEditDetails = ({
           onClick={() => editor.chain().focus().toggleHeaderColumn().run()}
           disabled={!editor.can().toggleHeaderColumn()}
         >
-          <i class="bi bi-layout-split"></i>
+          <i className="bi bi-layout-split"></i>
         </button>
         <button
           type="button"
           onClick={() => editor.chain().focus().toggleHeaderRow().run()}
           disabled={!editor.can().toggleHeaderRow()}
         >
-          <i class="bi bi-toggle-off"></i>
+          <i className="bi bi-toggle-off"></i>
         </button>
         <button
           type="button"
           onClick={() => editor.chain().focus().toggleHeaderCell().run()}
           disabled={!editor.can().toggleHeaderCell()}
         >
-          <i class="bi bi-toggle-off"></i>
+          <i className="bi bi-toggle-off"></i>
         </button>
         <button
           type="button"
           onClick={() => editor.chain().focus().mergeOrSplit().run()}
           disabled={!editor.can().mergeOrSplit()}
         >
-          <i class="bi bi-subtract"></i>
+          <i className="bi bi-subtract"></i>
         </button>
         <button
           type="button"
@@ -420,28 +420,28 @@ const ExportDashboardEditDetails = ({
             !editor.can().setCellAttribute("backgroundColor", "#FAF594")
           }
         >
-          <i class="bi bi-kanban"></i>
+          <i className="bi bi-kanban"></i>
         </button>
         <button
           type="button"
           onClick={() => editor.chain().focus().fixTables().run()}
           disabled={!editor.can().fixTables()}
         >
-          <i class="bi bi-file-spreadsheet"></i>
+          <i className="bi bi-file-spreadsheet"></i>
         </button>
         <button
           type="button"
           onClick={() => editor.chain().focus().goToNextCell().run()}
           disabled={!editor.can().goToNextCell()}
         >
-          <i class="bi bi-arrow-right-square"></i>
+          <i className="bi bi-arrow-right-square"></i>
         </button>
         <button
           type="button"
           onClick={() => editor.chain().focus().goToPreviousCell().run()}
           disabled={!editor.can().goToPreviousCell()}
         >
-          <i class="bi bi-arrow-left-square"></i>
+          <i className="bi bi-arrow-left-square"></i>
         </button>
         <button
           type="button"
@@ -450,7 +450,7 @@ const ExportDashboardEditDetails = ({
           disabled={!editor.can().chain().focus().toggleBold().run()}
           className={editor.isActive("bold") ? "is-active" : ""}
         >
-          <i class="bi bi-type-bold"></i>
+          <i className="bi bi-type-bold"></i>
         </button>
         <button
           type="button"
@@ -459,7 +459,7 @@ const ExportDashboardEditDetails = ({
           disabled={!editor.can().chain().focus().toggleItalic().run()}
           className={editor.isActive("italic") ? "is-active" : ""}
         >
-          <i class="bi bi-type-italic"></i>
+          <i className="bi bi-type-italic"></i>
         </button>
         <button
           type="button"
@@ -468,7 +468,7 @@ const ExportDashboardEditDetails = ({
           disabled={!editor.can().chain().focus().toggleStrike().run()}
           className={editor.isActive("strike") ? "is-active" : ""}
         >
-          <i class="bi bi-type-strikethrough"></i>
+          <i className="bi bi-type-strikethrough"></i>
         </button>
         <button
           type="button"
@@ -476,7 +476,7 @@ const ExportDashboardEditDetails = ({
           disabled={!editor.can().chain().focus().toggleCode().run()}
           className={editor.isActive("code") ? "is-active" : ""}
         >
-          <i class="bi bi-code-slash"></i>
+          <i className="bi bi-code-slash"></i>
         </button>
         <button
           type="button"
@@ -484,7 +484,7 @@ const ExportDashboardEditDetails = ({
           onClick={() => editor.chain().focus().setParagraph().run()}
           className={editor.isActive("paragraph") ? "is-active" : ""}
         >
-          <i class="bi bi-paragraph"></i>
+          <i className="bi bi-paragraph"></i>
         </button>
         <button
           type="button"
@@ -496,7 +496,7 @@ const ExportDashboardEditDetails = ({
             editor.isActive("heading", { level: 1 }) ? "is-active" : ""
           }
         >
-          <i class="bi bi-type-h1"></i>
+          <i className="bi bi-type-h1"></i>
         </button>
         <button
           type="button"
@@ -508,7 +508,7 @@ const ExportDashboardEditDetails = ({
             editor.isActive("heading", { level: 2 }) ? "is-active" : ""
           }
         >
-          <i class="bi bi-type-h2"></i>
+          <i className="bi bi-type-h2"></i>
         </button>
         <button
           type="button"
@@ -520,7 +520,7 @@ const ExportDashboardEditDetails = ({
             editor.isActive("heading", { level: 3 }) ? "is-active" : ""
           }
         >
-          <i class="bi bi-type-h3"></i>
+          <i className="bi bi-type-h3"></i>
         </button>
         <button
           type="button"
@@ -532,7 +532,7 @@ const ExportDashboardEditDetails = ({
             editor.isActive("heading", { level: 4 }) ? "is-active" : ""
           }
         >
-          <i class="bi bi-type-h4"></i>
+          <i className="bi bi-type-h4"></i>
         </button>
         <button
           type="button"
@@ -544,7 +544,7 @@ const ExportDashboardEditDetails = ({
             editor.isActive("heading", { level: 5 }) ? "is-active" : ""
           }
         >
-          <i class="bi bi-type-h5"></i>
+          <i className="bi bi-type-h5"></i>
         </button>
         <button
           type="button"
@@ -556,7 +556,7 @@ const ExportDashboardEditDetails = ({
             editor.isActive("heading", { level: 6 }) ? "is-active" : ""
           }
         >
-          <i class="bi bi-type-h6"></i>
+          <i className="bi bi-type-h6"></i>
         </button>
         <button
           type="button"
@@ -564,7 +564,7 @@ const ExportDashboardEditDetails = ({
           onClick={() => editor.chain().focus().toggleBulletList().run()}
           className={editor.isActive("bulletList") ? "is-active" : ""}
         >
-          <i class="bi bi-list-ul"></i>
+          <i className="bi bi-list-ul"></i>
         </button>
         <button
           type="button"
@@ -572,7 +572,7 @@ const ExportDashboardEditDetails = ({
           onClick={() => editor.chain().focus().toggleOrderedList().run()}
           className={editor.isActive("orderedList") ? "is-active" : ""}
         >
-          <i class="bi bi-list-ol"></i>
+          <i className="bi bi-list-ol"></i>
         </button>
         <button
           type="button"
@@ -580,28 +580,28 @@ const ExportDashboardEditDetails = ({
           onClick={() => editor.chain().focus().toggleBlockquote().run()}
           className={editor.isActive("blockquote") ? "is-active" : ""}
         >
-          <i class="bi bi-quote"></i>
+          <i className="bi bi-quote"></i>
         </button>
         <button
           type="button"
           title="Horizontal Rule"
           onClick={() => editor.chain().focus().setHorizontalRule().run()}
         >
-          <i class="bi bi-hr"></i>
+          <i className="bi bi-hr"></i>
         </button>
         <button
           type="button"
           title="Hard Break"
           onClick={() => editor.chain().focus().setHardBreak().run()}
         >
-          <i class="bi bi-file-break"></i>
+          <i className="bi bi-file-break"></i>
         </button>
         <button
           type="button"
           onClick={() => editor.chain().focus().setTextAlign("left").run()}
           className={editor.isActive({ textAlign: "left" }) ? "is-active" : ""}
         >
-          <i class="bi bi-text-left"></i>
+          <i className="bi bi-text-left"></i>
         </button>
         <button
           type="button"
@@ -610,14 +610,14 @@ const ExportDashboardEditDetails = ({
             editor.isActive({ textAlign: "center" }) ? "is-active" : ""
           }
         >
-          <i class="bi bi-text-center"></i>
+          <i className="bi bi-text-center"></i>
         </button>
         <button
           type="button"
           onClick={() => editor.chain().focus().setTextAlign("right").run()}
           className={editor.isActive({ textAlign: "right" }) ? "is-active" : ""}
         >
-          <i class="bi bi-text-right"></i>
+          <i className="bi bi-text-right"></i>
         </button>
         <button
           type="button"
@@ -626,7 +626,7 @@ const ExportDashboardEditDetails = ({
             editor.isActive({ textAlign: "justify" }) ? "is-active" : ""
           }
         >
-          <i class="bi bi-justify"></i>
+          <i className="bi bi-justify"></i>
         </button>
         <span className="setcolorcss">
           <input
@@ -643,7 +643,7 @@ const ExportDashboardEditDetails = ({
             onClick={() => editor.chain().focus().unsetColor().run()}
             data-testid="unsetColor"
           >
-            <i class="bi bi-palette-fill"></i>
+            <i className="bi bi-palette-fill"></i>
           </button>
         </span>
       </>
@@ -1358,7 +1358,7 @@ const ExportDashboardEditDetails = ({
           if (response.data.responseCode === "200") {
             if (
               response.data.responseData?.headerFooterData["0"]?.fileType ==
-              "HeaderFile"
+              "Header"
             ) {
               var headerImage =
                 response.data.responseData.headerFooterData["0"].filePath;
@@ -1369,7 +1369,7 @@ const ExportDashboardEditDetails = ({
             }
             if (
               response.data.responseData?.headerFooterData["1"]?.fileType ==
-              "FooterFile"
+              "Footer"
             ) {
               var footerImage =
                 response.data.responseData.headerFooterData["1"].filePath;
@@ -1410,7 +1410,9 @@ const ExportDashboardEditDetails = ({
                 }
               } else {
                 if (headerImage != "") {
+                  console.log("hii ")
                   const pageCount = doc.internal.getNumberOfPages();
+                  let pageHeight = doc.internal.pageSize.height;
                   var pagewidth = doc.internal.pageSize.width;
                   if (pagewidth > headerImagewidth) {
                     var diff = parseInt(pagewidth) - parseInt(headerImagewidth);
@@ -1422,13 +1424,26 @@ const ExportDashboardEditDetails = ({
                   for (var i = 1; i <= pageCount; i++) {
                     doc.setPage(i);
                     doc.addImage(
-                      headerImage,
-                      "png",
-                      positionLeft,
-                      10,
-                      80,
-                      80,
+                      headerImage, //image
+                      "png", //format
+                      // positionLeft, //x, y, width, height, alias, compression, rotation
+                      0,
+                      0,
+                      pagewidth,
+                      100,
                       "Header",
+                      "NONE",
+                      0
+                    );
+                    doc.addImage(
+                      footerImage, //image
+                      "png", //format
+                      // positionLeft, //x, y, width, height, alias, compression, rotation
+                      0,
+                      pageHeight - 100,
+                      pagewidth,
+                      100,
+                      "Footer",
                       "NONE",
                       0
                     );
@@ -1473,7 +1488,8 @@ const ExportDashboardEditDetails = ({
               y: 12,
               width: 513,
               height: doc.internal.pageSize.getHeight(),
-              margin: [110, 80, 60, 35],
+              // margin: [110, 80, 60, 35],
+              margin: [110, 80, 140, 35], 
               windowWidth: 1000,
               pagebreak: true,
               async callback(doc) {
@@ -2073,7 +2089,7 @@ const ExportDashboardEditDetails = ({
                     if (response.data.responseCode === "200") {
                       if (
                         response.data.responseData?.headerFooterData["0"]
-                          ?.fileType == "HeaderFile"
+                          ?.fileType == "Header"
                       ) {
                         var headerImage =
                           response.data.responseData.headerFooterData["0"]
@@ -2086,7 +2102,7 @@ const ExportDashboardEditDetails = ({
                       }
                       if (
                         response.data.responseData?.headerFooterData["1"]
-                          ?.fileType == "FooterFile"
+                          ?.fileType == "Footer"
                       ) {
                         var footerImage =
                           response.data.responseData.headerFooterData["1"]
@@ -2154,6 +2170,7 @@ const ExportDashboardEditDetails = ({
                         } else {
                           if (headerImage != "") {
                             const pageCount = doc.internal.getNumberOfPages();
+                            let pageHeight = doc.internal.pageSize.height;
                             var pagewidth = doc.internal.pageSize.width;
                             if (pagewidth > headerImagewidth) {
                               var diff =
@@ -2169,11 +2186,23 @@ const ExportDashboardEditDetails = ({
                               doc.addImage(
                                 headerImage,
                                 "png",
-                                positionLeft,
-                                10,
-                                80,
-                                80,
+                                0,
+                                0,
+                                pagewidth,
+                                100,
                                 "Header",
+                                "NONE",
+                                0
+                              );
+                              doc.addImage(
+                                footerImage, //image
+                                "png", //format
+                                // positionLeft, //x, y, width, height, alias, compression, rotation
+                                0,
+                                pageHeight - 100,
+                                pagewidth,
+                                100,
+                                "Footer",
                                 "NONE",
                                 0
                               );
@@ -2196,7 +2225,8 @@ const ExportDashboardEditDetails = ({
                           y: 12,
                           width: 513,
                           height: doc.internal.pageSize.getHeight(),
-                          margin: [110, 80, 60, 35],
+                          // margin: [110, 80, 60, 35],
+                          margin: [110, 80, 140, 35],
                           windowWidth: 1000,
                           pagebreak: true,
                           async callback(doc) {
@@ -2258,7 +2288,7 @@ const ExportDashboardEditDetails = ({
                       if (response.data.responseCode === "200") {
                         if (
                           response.data.responseData?.headerFooterData["0"]
-                            ?.fileType == "HeaderFile"
+                            ?.fileType == "Header"
                         ) {
                           var headerImage =
                             response.data.responseData.headerFooterData["0"]
@@ -2271,7 +2301,7 @@ const ExportDashboardEditDetails = ({
                         }
                         if (
                           response.data.responseData?.headerFooterData["1"]
-                            ?.fileType == "FooterFile"
+                            ?.fileType == "Footer"
                         ) {
                           var footerImage =
                             response.data.responseData.headerFooterData["1"]
@@ -3409,18 +3439,18 @@ const ExportDashboardEditDetails = ({
               </div>
 
               <div
-                class={
+                className={
                   applicationDetail?.applicationStatus == 0 ? "d-none" : "row"
                 }
               >
-                <div class="col-md-6">
-                  <div class="inner_form_new ">
-                    <label class="controlform">Assigned To Role</label>
-                    <div class="form-bx">
+                <div className="col-md-6">
+                  <div className="inner_form_new ">
+                    <label className="controlform">Assigned To Role</label>
+                    <div className="form-bx">
                       <label>
                         <input
                           type="text"
-                          class=""
+                          className=""
                           disabled
                           value={
                             applicationDetail?.assignedToRoleName
@@ -3432,14 +3462,14 @@ const ExportDashboardEditDetails = ({
                     </div>
                   </div>
                 </div>
-                <div class="col-md-6">
-                  <div class="inner_form_new-sm ">
-                    <label class="controlform-sm">Assigned To User</label>
-                    <div class="form-bx-sm">
+                <div className="col-md-6">
+                  <div className="inner_form_new-sm ">
+                    <label className="controlform-sm">Assigned To User</label>
+                    <div className="form-bx-sm">
                       <label>
                         <input
                           type="text"
-                          class=""
+                          className=""
                           disabled
                           value={
                             applicationDetail?.assignedToName
@@ -4653,17 +4683,17 @@ const ExportDashboardEditDetails = ({
 
                                   {/* {items?.assignedToName &&
                                     items?.roleName ? ( */}
-                                  <div class="row">
-                                    <div class="col-md-6">
-                                      <div class="inner_form_new ">
-                                        <label class="controlform">
+                                  <div className="row">
+                                    <div className="col-md-6">
+                                      <div className="inner_form_new ">
+                                        <label className="controlform">
                                           Action
                                         </label>
-                                        <div class="form-bx">
+                                        <div className="form-bx">
                                           <label>
                                             <input
                                               type="text"
-                                              class=""
+                                              className=""
                                               disabled
                                               value={
                                                 item?.assignedAction ==
@@ -4680,16 +4710,16 @@ const ExportDashboardEditDetails = ({
                                         </div>
                                       </div>
                                     </div>
-                                    <div class="col-md-6">
-                                      <div class="inner_form_new ">
-                                        <label class="controlform">
+                                    <div className="col-md-6">
+                                      <div className="inner_form_new ">
+                                        <label className="controlform">
                                           Assigned To Role
                                         </label>
-                                        <div class="form-bx">
+                                        <div className="form-bx">
                                           <label>
                                             <input
                                               type="text"
-                                              class=""
+                                              className=""
                                               disabled
                                               value={
                                                 item?.roleName
@@ -4701,16 +4731,16 @@ const ExportDashboardEditDetails = ({
                                         </div>
                                       </div>
                                     </div>
-                                    {/* <div class="col-md-6">
-                                            <div class="inner_form_new-sm ">
-                                              <label class="controlform-sm">
+                                    {/* <div className="col-md-6">
+                                            <div className="inner_form_new-sm ">
+                                              <label className="controlform-sm">
                                                 Assigned To User
                                               </label>
-                                              <div class="form-bx-sm">
+                                              <div className="form-bx-sm">
                                                 <label>
                                                   <input
                                                     type="text"
-                                                    class=""
+                                                    className=""
                                                     disabled
                                                     value={
                                                       items?.assignedToName
@@ -6992,17 +7022,17 @@ const ExportDashboardEditDetails = ({
                                     </div>
                                   </div>
 
-                                  <div class="row">
-                                    <div class="col-md-12">
-                                      <div class="inner_form_new ">
-                                        <label class="controlform">
+                                  <div className="row">
+                                    <div className="col-md-12">
+                                      <div className="inner_form_new ">
+                                        <label className="controlform">
                                           Action
                                         </label>
-                                        <div class="form-bx">
+                                        <div className="form-bx">
                                           <label>
                                             <input
                                               type="text"
-                                              class=""
+                                              className=""
                                               disabled
                                               value={
                                                 item?.assignedAction ==
@@ -8939,17 +8969,17 @@ const ExportDashboardEditDetails = ({
                                     </div>
                                   </div>
 
-                                  <div class="row">
-                                    <div class="col-md-12">
-                                      <div class="inner_form_new ">
-                                        <label class="controlform">
+                                  <div className="row">
+                                    <div className="col-md-12">
+                                      <div className="inner_form_new ">
+                                        <label className="controlform">
                                           Action
                                         </label>
-                                        <div class="form-bx">
+                                        <div className="form-bx">
                                           <label>
                                             <input
                                               type="text"
-                                              class=""
+                                              className=""
                                               disabled
                                               value={
                                                 item?.assignedAction ==
@@ -10844,17 +10874,17 @@ const ExportDashboardEditDetails = ({
                                       </label>
                                     </div>
                                   </div>
-                                  <div class="row">
-                                    <div class="col-md-12">
-                                      <div class="inner_form_new ">
-                                        <label class="controlform">
+                                  <div className="row">
+                                    <div className="col-md-12">
+                                      <div className="inner_form_new ">
+                                        <label className="controlform">
                                           Action
                                         </label>
-                                        <div class="form-bx">
+                                        <div className="form-bx">
                                           <label>
                                             <input
                                               type="text"
-                                              class=""
+                                              className=""
                                               disabled
                                               value={
                                                 item?.assignedAction ==
@@ -12732,17 +12762,17 @@ const ExportDashboardEditDetails = ({
                                     </div>
                                   </div>
 
-                                  <div class="row">
-                                    <div class="col-md-12">
-                                      <div class="inner_form_new ">
-                                        <label class="controlform">
+                                  <div className="row">
+                                    <div className="col-md-12">
+                                      <div className="inner_form_new ">
+                                        <label className="controlform">
                                           Action
                                         </label>
-                                        <div class="form-bx">
+                                        <div className="form-bx">
                                           <label>
                                             <input
                                               type="text"
-                                              class=""
+                                              className=""
                                               disabled
                                               value={
                                                 item?.assignedAction ==
@@ -14477,17 +14507,17 @@ const ExportDashboardEditDetails = ({
                                       </label>
                                     </div>
                                   </div>
-                                  <div class="row">
-                                    <div class="col-md-12">
-                                      <div class="inner_form_new ">
-                                        <label class="controlform">
+                                  <div className="row">
+                                    <div className="col-md-12">
+                                      <div className="inner_form_new ">
+                                        <label className="controlform">
                                           Action
                                         </label>
-                                        <div class="form-bx">
+                                        <div className="form-bx">
                                           <label>
                                             <input
                                               type="text"
-                                              class=""
+                                              className=""
                                               disabled
                                               value={
                                                 item?.assignedAction ==
@@ -15538,8 +15568,8 @@ const ExportDashboardEditDetails = ({
                                 }
                                 alt="Signature"
                                 style={{
-                                  width: "120px",
-                                  height: "50px",
+                                  width: "100px",
+                                  height: "100px",
                                   display: "block",
                                   objectFit: "contain",
                                 }}
@@ -16017,8 +16047,8 @@ const ExportDashboardEditDetails = ({
                                 }
                                 alt="Signature"
                                 style={{
-                                  width: "120px",
-                                  height: "50px",
+                                  width: "100px",
+                                  height: "100px",
                                   display: "block",
                                   objectFit: "contain",
                                 }}
@@ -16559,8 +16589,8 @@ const ExportDashboardEditDetails = ({
                                 }
                                 alt="Signature"
                                 style={{
-                                  width: "120px",
-                                  height: "50px",
+                                  width: "100px",
+                                  height: "100px",
                                   display: "block",
                                   objectFit: "contain",
                                 }}
@@ -16869,7 +16899,7 @@ const ExportDashboardEditDetails = ({
                                           : applicationDetail?.analystDescription,
                                       }}
                                       style={{
-                                        paddingBottom: "60px",
+                                        paddingBottom: "30px",
                                         letterSpacing: "0.01px",
                                       }}
                                     />
@@ -16909,8 +16939,8 @@ const ExportDashboardEditDetails = ({
                                 }
                                 alt="Signature"
                                 style={{
-                                  width: "120px",
-                                  height: "50px",
+                                  width: "100px",
+                                  height: "100px",
                                   display: "block",
                                   objectFit: "contain",
                                 }}

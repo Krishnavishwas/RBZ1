@@ -198,6 +198,8 @@ const ExportDashboardRenewEditDetails = ({
 
   const heading = "Application Submitted Successfully!";
   const para = "Export application request submitted successfully!";
+  const heading1 = "Returns Submitted Successfully!";
+  const para1 = " Export returns request submitted successfully!";
 
   const ChangeApplicationStatus = (e) => {
     const values = e.target.value;
@@ -590,7 +592,7 @@ const ExportDashboardRenewEditDetails = ({
           className="validateCrossIcon"
           onClick={() => setValidateShow(false)}
         >
-          <i class="bi bi-x-circle"></i>
+          <i className="bi bi-x-circle"></i>
         </button>
       </div>
     );
@@ -1332,6 +1334,7 @@ const ExportDashboardRenewEditDetails = ({
             );
             shareformData.append("ApplicationID", applicationDetail?.id);
             shareformData.append("IsSharedDoc", "1");
+            shareformData.append("DepartmentID", "2");
             shareformData.append("UserID", UserID.replace(/"/g, ""));
 
             axios
@@ -1354,6 +1357,7 @@ const ExportDashboardRenewEditDetails = ({
         .catch((err) => {
           setSubmitBtnLoader(false);
           console.log(err);
+          setupdatepopup(false)
         });
     } else {
       if (!toastDisplayed) {
@@ -2250,7 +2254,7 @@ const ExportDashboardRenewEditDetails = ({
                                   className="validateCrossIcon"
                                   onClick={() => setValidateShow(false)}
                                 >
-                                  <i class="bi bi-x-circle"></i>
+                                  <i className="bi bi-x-circle"></i>
                                 </button>
                               </div>
                             )}
@@ -2736,9 +2740,9 @@ const ExportDashboardRenewEditDetails = ({
                 ""
               )}
 
-              <h5 className="section_top_subheading mt-2">Pending Returns</h5>
               {menuname === "Exports" && submenuname === "Pending Returns" ? (
                 <>
+                <h5 className="section_top_subheading mt-2">Pending Returns</h5>
                   <div className="inner_form_new ">
                     <label className="controlform">Returns Notes</label>
                     <div className="form-bx">
@@ -2758,7 +2762,9 @@ const ExportDashboardRenewEditDetails = ({
                     </div>
                   </div>
                   <div className="inner_form_new ">
-                    <label className="controlform">Returns Comments</label>
+                    <label className="controlform">
+                      Returns Comments
+                    </label>
                     <div className="form-bx">
                       <label>
                         <textarea
@@ -2901,8 +2907,7 @@ const ExportDashboardRenewEditDetails = ({
                         !PendingReturnComment) ||
                       (menuname === "Exports" &&
                         submenuname === "Pending Returns" &&
-                        !PendingReturnNote) ||
-                      !files.length
+                        !PendingReturnNote) || !files.length
                         ? true
                         : false
                     }
@@ -2930,18 +2935,21 @@ const ExportDashboardRenewEditDetails = ({
               </div>
             </div>
 
-            {updatepopup == true &&
-            menuname === "Exports" &&
-            submenuname === "Pending Returns" ? (
+            {updatepopup == true && (menuname === "Exports" && submenuname === "Pending Returns") ? (
               <UpdatePopupMessage
-                heading={heading}
-                para={para}
+                heading={heading1}
+                para={para1}
                 applicationNumber={applicationNumber}
                 closePopupHandle={closePopupHandle}
               ></UpdatePopupMessage>
-            ) : (
-              ""
-            )}
+            ) : 
+              updatepopup == true ? <UpdatePopupMessage
+              heading={heading}
+              para={para}
+              applicationNumber={applicationNumber}
+              closePopupHandle={closePopupHandle}
+            ></UpdatePopupMessage> : ""
+            }
           </form>
           {/* view model start */}
           <Modal

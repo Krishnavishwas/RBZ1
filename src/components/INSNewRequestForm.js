@@ -74,9 +74,9 @@ const INSNewRequestForm = () => {
     govtAgencie: "",
     departmentApplicantionBelongTo: "Bank/ADLA",
     BPNCode: "",
+    relatedapplicationreferenceNumber:"",
     TINNumber: "",
-    previousRBZReferenceNumber: "",
-    previousRBZReferenceNumber:"",
+    previousRBZReferenceNumber: "", 
     applicant: "",
     applicantReferenceNumber: "", 
     applicationType: "",
@@ -825,9 +825,7 @@ const [responceCount, setresponceCount] = useState([]);
             RoleID: roleID,
             ApplicationDate: moment(startDate).format("YYYY-MM-DD"),
             RBZReferenceNumber: generatedNumber,
-            ApplicantReferenceNumber:INSForm.applicantReferenceNumber,
-            RelatedApplicationReferenceNumber:
-              INSForm.relatedapplicationreferenceNumber,
+            ApplicantReferenceNumber:INSForm.relatedapplicationreferenceNumber, 
             Name:
               registerusertype === "2" && bankID !== ""
                 ? INSForm.applicant
@@ -840,7 +838,7 @@ const [responceCount, setresponceCount] = useState([]);
             AssignedToRoleID: roleID == 2 ? 3 : selectuserRole,
             ApplicationTypeID: INSForm.applicationType,
             BeneficiaryName: INSForm.BeneficiaryName,
-            previoueRBZNumber:ValidateChange.previousRBZReferenceNumber?.trim(),
+            PreviousRBZNumber:ValidateChange.previousRBZReferenceNumber?.trim().toUpperCase(),
             BeneficiaryCountry: INSForm.baneficiaryCountry,
             BPNCode: registerusertype === "1" && bankID !== ""
                 ? filtertin_bpn && filtertin_bpn.bpnNumber !== null
@@ -861,14 +859,14 @@ const [responceCount, setresponceCount] = useState([]);
             ApplicantType: registerusertype,
             ApplicantComment: INSForm.applicantComments,
             // ApplicationSubTypeID: INSForm.applicationSubType,
-            EquipmentData: EquipmentData,
-            StationeryData: StationeryData,
-            PersonnelData: PersonnelData,
-            SystemsData: SystemsData,
-            Structure_OrganogramData: OrganogramData,
-            Anti_Money_laundering_CombatingData: AntiMoneData,
+            EquipmentData: INSForm?.applicationType == "53" ? EquipmentData : [],
+            StationeryData: INSForm?.applicationType == "53" ? StationeryData : [],
+            PersonnelData: INSForm?.applicationType == "53" ? PersonnelData : [],
+            SystemsData: INSForm?.applicationType == "53" ? SystemsData : [],
+            Structure_OrganogramData: INSForm?.applicationType == "53" ?  OrganogramData : [],
+            Anti_Money_laundering_CombatingData: INSForm?.applicationType == "53" ?  AntiMoneData : [],
             // ApplicationSubTypeID: applicationsubID?.join(","),
-            ApplicationSubTypeID:exactReturnType,
+            ApplicationSubTypeID: INSForm?.applicationType == "54" ? exactReturnType : "",
             AssignedTo:
               checkSupervisor === true
                 ? INSForm.bankSupervisor
@@ -974,7 +972,7 @@ const [responceCount, setresponceCount] = useState([]);
   };
 
   console.log("ValidateChange.previousRBZReferenceNumber?.trim()", ValidateChange.previousRBZReferenceNumber?.trim())
-  console.log("INSForm.applicantReferenceNumber", INSForm.applicantReferenceNumber)
+  console.log("INSForm.relatedapplicationreferenceNumber", INSForm.relatedapplicationreferenceNumber)
   console.log("previousRBZReferenceNumber", INSForm.previousRBZReferenceNumber)
 
   const closePopupHandle = () => {
@@ -1142,7 +1140,7 @@ const [responceCount, setresponceCount] = useState([]);
           className="validateCrossIcon"
           onClick={() => setValidateShow(false)}
         >
-          <i class="bi bi-x-circle"></i>
+          <i className="bi bi-x-circle"></i>
         </button>
       </div>
     );
@@ -1742,23 +1740,23 @@ const [responceCount, setresponceCount] = useState([]);
                     <input
                       ref={applicationreferenceNumberRef}
                       type="text"
-                      name="applicantReferenceNumber"
+                      name="relatedapplicationreferenceNumber"
                       onChange={(e) => {
                         changeHandelForm(e);
                       }}
-                      value={INSForm.applicantReferenceNumber?.trim()}
+                      value={INSForm.relatedapplicationreferenceNumber?.trim()}
                       placeholder="Applicant Reference Number"
                       className={
-                        errors.applicationreferenceNumber
+                        errors.relatedapplicationreferenceNumber
                           ? "text-uppercase error"
                           : "text-uppercase"
                       }
                     />
                     <span className="sspan"></span>
-                    {errors.applicationreferenceNumber ||
-                    INSForm.applicationreferenceNumber !== "" ? (
+                    {errors.relatedapplicationreferenceNumber ||
+                    INSForm.relatedapplicationreferenceNumber !== "" ? (
                       <small className="errormsg">
-                        {errors.applicationreferenceNumber}
+                        {errors.relatedapplicationreferenceNumber}
                       </small>
                     ) : (
                       ""
@@ -1800,10 +1798,10 @@ const [responceCount, setresponceCount] = useState([]);
                       placeholder="Previous RBZ Reference Number"
                       className={
                         errors.previousRBZReferenceNumber
-                        ? "error"
+                        ? "text-uppercase error"
                         : ValidateShow.previousRBZReferenceNumber
                         ? "text-uppercase"
-                        : ""
+                        : "text-uppercase"
                       }
                     />
                     <span className="sspan"></span>
@@ -1898,7 +1896,7 @@ const [responceCount, setresponceCount] = useState([]);
                             className="validateCrossIcon"
                             onClick={() => setValidateShow(false)}
                           >
-                            <i class="bi bi-x-circle"></i>
+                            <i className="bi bi-x-circle"></i>
                           </button>
                         </div>
                       )}

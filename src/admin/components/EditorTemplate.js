@@ -12,7 +12,13 @@ import { APIURL, IMGURL, ImageAPI } from "../../constant";
 import BankMasterTable from "../tables/BankMasterTable";
 import { Storage } from "../../login/Storagesetting";
 import { toast } from "react-toastify";
+import { Cropper } from "react-cropper";
+import "cropperjs/dist/cropper.css";
 //import jsPDF from 'jspdf';
+
+const cropAreaWidthPx = 400;
+const cropAreaHeightPx = 100;
+const customAspectRatioPx = cropAreaWidthPx / cropAreaHeightPx;
 
 const EditorTemplate = ({
   bankID,
@@ -50,33 +56,46 @@ const EditorTemplate = ({
   const [footerimage, setfooterimage] = useState("");
   const [editorValue, setEditorValue] = useState("");
   const editorRef = useRef(null);
+  const [headerFileUrl, setHeaderFileUrl] = useState("");
+  const [footerFileUrl, setFooterFileUrl] = useState("");
+  const [logoImg, setLogoImg] = useState();
+  const [cropLogoImg, setCropLogoImg] = useState();
+
+  const [footerImg, setFooterImg] = useState();
+
+  const [cropFooterImg, setCropFooterImg] = useState();
   const contentRef = useRef(null);
+  const logoImgRef = useRef(null);
+  const footerImgRef = useRef(null);
   const [value, setValue] = useState("");
-  
-  useEffect(() => {    
+  const [savedLogoImg, setSavedLogoImg] = useState("");
+  const [savedFooterImg, setSavedFooterImg] = useState("");
 
-    for(var i = 0; i < getBankData?.headerFooterData.length; i++) {
-      if (getBankData?.headerFooterData[i].fileType == 'HeaderFile') {
-          setBannerimage(getBankData?.headerFooterData[i]?.filePath);
-          break;
-      }else{
-        setBannerimage('');
-      }
-    }    
-    
-    setEditorText(      
-      getBankData?.bankLetterHead ? getBankData?.bankLetterHead : ""
-    );
-
-    for(var j = 0; j < getBankData?.headerFooterData.length; j++) {
-      if (getBankData?.headerFooterData[j].fileType == 'FooterFile') {
-        setfooterimage(getBankData?.headerFooterData[j]?.filePath);
-          break;
-      }else{
-        setfooterimage('');
+  useEffect(() => {
+    console.log("getBnakData===>", getBankData);
+    for (var i = 0; i < getBankData?.headerFooterData.length; i++) {
+      if (getBankData?.headerFooterData[i].fileType == "Header") {
+        // setBannerimage(getBankData?.headerFooterData[i]?.filePath);
+        setSavedLogoImg(getBankData?.headerFooterData[i]?.filePath);
+        break;
+      } else {
+        setBannerimage("");
       }
     }
 
+    setEditorText(
+      getBankData?.bankLetterHead ? getBankData?.bankLetterHead : ""
+    );
+
+    for (var j = 0; j < getBankData?.headerFooterData.length; j++) {
+      if (getBankData?.headerFooterData[j].fileType == "Footer") {
+        // setfooterimage(getBankData?.headerFooterData[j]?.filePath);
+        setSavedFooterImg(getBankData?.headerFooterData[j]?.filePath);
+        break;
+      } else {
+        setfooterimage("");
+      }
+    }
 
     // setfooterimage(
     //   (getBankData?.headerFooterData[1]?.fileType == 'FooterFile')? getBankData?.headerFooterData[1]?.filePath : ''
@@ -137,9 +156,6 @@ const EditorTemplate = ({
     },
   };
 
-  const [headerFileUrl, setHeaderFileUrl] = useState("");
-  const [footerFileUrl, setFooterFileUrl] = useState("");
-
   //Adding banner image
   const handleBannerimg = (e) => {
     const file = e.target.files[0];
@@ -150,28 +166,136 @@ const EditorTemplate = ({
     var objectUrl = URL.createObjectURL(file);
     console.log("objectUrl", objectUrl);
     img.onload = function () {
-      width = (this.width);
-      height = (this.height);
+      width = this.width;
+      height = this.height;
 
-    formData.append("files", file);
-    formData.append("bankID", bankID);
-    formData.append("width", width);
-    formData.append("Height", height);    
-    formData.append("fileType", 'HeaderFile');
-    formData.append("Label", 'HeaderImage');
-    if (file) {
+      formData.append("files", file);
+      formData.append("bankID", bankID);
+      formData.append("width", width);
+      formData.append("Height", height);
+      formData.append("fileType", "HeaderFile");
+      formData.append("Label", "HeaderImage");
+      if (file) {
+        axios
+          .post(ImageAPI + "File/UploadFile", formData)
+          .then((res) => {
+            console.log(res.data.responseData);
+            setBannerimage(res.data.responseData.filePath);
+          })
+          .catch((error) => {
+            console.error("Error uploading file:", error);
+          });
+      }
+    };
+    img.src = objectUrl;
+  };
+  const handleLogoImg = (e) => {
+    e.preventDefault();
+    let files;
+
+    if (e.dataTransfer) {
+      files = e.dataTransfer.files;
+    } else if (e.target) {
+      files = e.target.files;
+    }
+
+    if (files && files[0]) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        setLogoImg(reader.result); 
+      };
+      reader.readAsDataURL(files[0]);
+    } else {
+      toast("No files found or the file is not valid");
+    }
+  };
+
+  const handleLogoImgSave = () => {
+    let cropedImg = logoImgRef.current?.cropper.getCroppedCanvas().toDataURL();
+    console.log(cropedImg)
+    if (typeof logoImgRef.current?.cropper !== "undefined") {
+      setCropLogoImg(cropedImg);  
+    }
+    const formData = new FormData();
+
+    formData.append("FileType", "Header");
+    formData.append("Label", "BankImage");
+    formData.append("PdfData", cropedImg);
+    formData.append("BankId", bankID);
+    formData.append("Height", "234");
+    formData.append("Width", "400");
+    if (logoImg) {
       axios
-        .post(ImageAPI + "File/UploadFile", formData)
-        .then((res) => {
-          console.log(res.data.responseData);
-          setBannerimage(res.data.responseData.filePath);
+        .post(ImageAPI + "File/UploadBankImage", formData, {
+          headers: {
+            Referer: "https://dms.getanapp.co.in/",
+          },
+        })
+        .then((res) => { 
+          setCropLogoImg(res.data.responseData.filePath);
+          setLogoImg(null);
+          toast.success("Header image has been saved");
         })
         .catch((error) => {
+          toast.error("Something went wrong", {
+            autoClose: 3000, 
+          });
           console.error("Error uploading file:", error);
         });
     }
-  }
-  img.src = objectUrl;
+  };
+  const handleFooterImg = (e) => {
+    e.preventDefault();
+    let files;
+    if (e.dataTransfer) {
+      files = e.dataTransfer.files;
+    } else if (e.target) {
+      files = e.target.files;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      setFooterImg(reader.result);
+    };
+    reader.readAsDataURL(files[0]);
+  };
+
+  const handleFooterImgSave = () => {
+    let cropedImg = footerImgRef.current?.cropper
+      .getCroppedCanvas()
+      .toDataURL();
+    if (typeof footerImgRef.current?.cropper !== "undefined") {
+      setCropFooterImg(cropedImg);
+       
+    }
+    const formData = new FormData();
+
+    formData.append("FileType", "Footer");
+    formData.append("Label", "BankImage");
+    formData.append("PdfData", cropedImg);
+    formData.append("BankId", bankID);
+    formData.append("Height", "234");
+    formData.append("Width", "400");
+    if (footerImg) {
+      axios
+        .post(ImageAPI + "File/UploadBankImage", formData, {
+          headers: {
+            Referer: "https://dms.getanapp.co.in/",
+          },
+        })
+        .then((res) => { 
+          setCropFooterImg(res.data.responseData.filePath);
+          setFooterImg(null);
+          toast.success("Footer image has been saved", {
+            autoClose: 3000, 
+          });
+        })
+        .catch((error) => {
+          toast.error("Something went wrong", {
+            autoClose: 3000, 
+          });
+          console.error("Error uploading file:", error);
+        });
+    }
   };
 
   //Adding footer image
@@ -183,28 +307,27 @@ const EditorTemplate = ({
     var objectUrl = URL.createObjectURL(file);
     img.onload = function () {
       //alert(this.width + " " + this.height);
-      width = (this.width);
-      height = (this.height);
-    
-    formData.append("bankID", bankID);
-    formData.append("files", file);
-    formData.append("width", width);
-    formData.append("Height", height);
-    formData.append("fileType", 'FooterFile');
-    formData.append("Label", 'FooterImage');
-    if (file) {
-      axios
-        .post(ImageAPI + "File/UploadFile", formData)
-        .then((res) => {
-          setfooterimage(res.data.responseData.filePath);
-        })
-        .catch((error) => {
-          console.error("Error uploading file:", error);
-        });
-    }
-    
-  }
-  img.src = objectUrl;
+      width = this.width;
+      height = this.height;
+
+      formData.append("bankID", bankID);
+      formData.append("files", file);
+      formData.append("width", width);
+      formData.append("Height", height);
+      formData.append("fileType", "FooterFile");
+      formData.append("Label", "FooterImage");
+      if (file) {
+        axios
+          .post(ImageAPI + "File/UploadFile", formData)
+          .then((res) => {
+            setfooterimage(res.data.responseData.filePath);
+          })
+          .catch((error) => {
+            console.error("Error uploading file:", error);
+          });
+      }
+    };
+    img.src = objectUrl;
   };
 
   /*const handleWatermark = (e) => {
@@ -327,9 +450,12 @@ const EditorTemplate = ({
     try {
       const letterHead = {
         ID: bankID,
+        // BankLetterHead: templateIinerPdfHTML,
+        // HeaderImageURL: bannerimage,
+        // FooterImageURL: footerimage,
         BankLetterHead: templateIinerPdfHTML,
-        HeaderImageURL: bannerimage,
-        FooterImageURL: footerimage,
+        HeaderImageURL: cropLogoImg,
+        FooterImageURL: cropFooterImg,
       };
       const updateResponse = await fetch(
         APIURL + "Admin/UpdateBankLetterHead",
@@ -343,6 +469,7 @@ const EditorTemplate = ({
       );
       const updateData = await updateResponse.json();
       if (updateData.responseCode === "200") {
+        console.log(updateData);
         setShowBankMasterTable(true);
       } else {
         console.error("Failed to update bank letter head.");
@@ -380,7 +507,7 @@ const EditorTemplate = ({
                   </div>
                 </div>
                 <div className="row">
-                  <div className="col-md-5">
+                  <div className="col-md-8">
                     <div className="form-pdf">
                       <div className="form-box-outer">
                         <h2 className="mt-0">Top Banner</h2>
@@ -393,10 +520,60 @@ const EditorTemplate = ({
                           name="bannerimage"
                           ref={fileInputRef}
                           onChange={(e) => {
-                            handleBannerimg(e);
+                            // handleBannerimg(e);
+                            handleLogoImg(e);
                           }}
                           accept=".png, .jpg, .jpeg"
                         />
+                        {logoImg && (
+                          <div className="selection_container">
+                            <div style={{ width: "60%" }}>
+                              <Cropper
+                                src={logoImg}
+                                style={{ height: 400, width: "100%" }}
+                                guides={false}
+                                ref={logoImgRef}
+                                initialAspectRatio={customAspectRatioPx}
+                                aspectRatio={customAspectRatioPx}
+                                viewMode={2}
+                                preview=".preview"
+                                dragMode="move"
+                                cropBoxResizable={false}
+                                toggleDragModeOnDblclick={false}
+                              />
+                             
+                              <button
+                                className="mt-2 me-3 template-pdf-btn"
+                                onClick={handleLogoImgSave}
+                                disabled={!logoImg}
+                              >
+                                Save
+                              </button>
+                              <button
+                                className="mt-2 me-3 template-pdf-btn"
+                                onClick={() => setLogoImg(null)}
+                              >
+                                Close
+                              </button>
+                            </div>
+                            <div
+                              style={{
+                                height: "400px",
+                                width: "300px",
+                                border: "1px solid #000",
+                              }}
+                            >
+                              <div
+                                className="preview"
+                                style={{
+                                  width: "100%",
+                                  height: "100px",
+                                  borderBottom: "1px solid",
+                                }}
+                              />
+                            </div>
+                          </div>
+                        )}
                       </div>
 
                       {/* For the time being its commented from backend */}
@@ -450,14 +627,66 @@ const EditorTemplate = ({
                           name="footerimage"
                           ref={fileInputRef4}
                           onChange={(e) => {
-                            handleFooterimg(e);
+                            // handleFooterimg(e);
+                            handleFooterImg(e);
                           }}
                           accept=".png, .jpg, .jpeg"
                         />
+                        {footerImg && (
+                          <div className="selection_container">
+                            <div style={{ width: "60%" }}>
+                              <Cropper
+                                src={footerImg}
+                                style={{ height: 400, width: "100%" }}
+                                guides={false}
+                                ref={footerImgRef}
+                                initialAspectRatio={customAspectRatioPx}
+                                aspectRatio={customAspectRatioPx}
+                                viewMode={2}
+                                preview=".preview_footer"
+                                dragMode="move"
+                                cropBoxResizable={false}
+                                toggleDragModeOnDblclick={false}
+                              />
+                          
+                              <button
+                                className="mt-2 me-3 template-pdf-btn"
+                                onClick={handleFooterImgSave}
+                                disabled={!footerImg}
+                              >
+                                Save
+                              </button>
+                              <button
+                                className="mt-2 me-3 template-pdf-btn"
+                                onClick={() => setFooterImg(null)}
+                              >
+                                Close
+                              </button>
+                            </div>
+                            <div
+                              style={{
+                                height: "400px",
+                                width: "300px",
+                                border: "1px solid #000",
+                                display: "flex",
+                                alignItems: "end",
+                              }}
+                            >
+                              <div
+                                className="preview_footer"
+                                style={{
+                                  width: "100%",
+                                  height: "100px",
+                                  borderBottom: "1px solid",
+                                }}
+                              />
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
-                  <div className="col-md-7">
+                  <div className="col-md-4" style={{}}>
                     <div className="outer-tampale-pdf">
                       <form
                         onSubmit={handleSubmitHtml}
@@ -466,13 +695,13 @@ const EditorTemplate = ({
                         <div ref={targetRef} className="template-pdf">
                           <div
                             className="header-pdf"
-                            style={{                              
+                            style={{
                               textAlign: `${templaesetting.banneralign}`,
                             }}
                           >
-                            {bannerimage && (
+                            {/* {savedLogoImg ? (
                               <img
-                                src={bannerimage}
+                                src={savedLogoImg}
                                 alt="Banner Preview"
                                 style={{
                                   width: `${templaesetting.bannerwidth + "%"}`,
@@ -481,9 +710,47 @@ const EditorTemplate = ({
                                   }`,
                                 }}
                               />
+                            ) : cropLogoImg ? (
+                              <img
+                                src={cropLogoImg}
+                                alt="Banner Preview"
+                                style={{
+                                  width: `${templaesetting.bannerwidth + "%"}`,
+                                  padding: `${
+                                    templaesetting.bannerpadding + "px"
+                                  }`,
+                                }}
+                              />
+                            ) : (
+                              <h3>logo image not present</h3>
+                            )} */}
+                            {cropLogoImg ? (
+                              <img
+                                src={cropLogoImg}
+                                alt="logo preview"
+                                style={{
+                                  width: `${templaesetting.bannerwidth + "%"}`,
+                                  padding: `${
+                                    templaesetting.bannerpadding + "px"
+                                  }`,
+                                }}
+                              />
+                            ) : savedLogoImg ? (
+                              <img
+                                src={savedLogoImg}
+                                alt="logo Preview"
+                                style={{
+                                  width: `${templaesetting.bannerwidth + "%"}`,
+                                  padding: `${
+                                    templaesetting.bannerpadding + "px"
+                                  }`,
+                                }}
+                              />
+                            ) : (
+                              <h3>logo image not present</h3>
                             )}
                           </div>
-                          <div className="template-iiner-pdf">                            
+                          <div className="template-iiner-pdf">
                             {/* {templaesetting.headingtop ? (
                               <h2
                                 style={{
@@ -531,16 +798,31 @@ const EditorTemplate = ({
                               }`,
                             }}
                           >
-                            {footerimage && (
+                       
+                             {cropFooterImg ? (
                               <img
-                                src={footerimage}
+                                src={cropFooterImg}
+                                alt="Footer Preview"
                                 style={{
-                                  width: `${templaesetting.footerwidth + "%"}`,
+                                  width: `${templaesetting.bannerwidth + "%"}`,
                                   padding: `${
-                                    templaesetting.footerpadding + "px"
+                                    templaesetting.bannerpadding + "px"
                                   }`,
                                 }}
                               />
+                            ) : savedFooterImg ? (
+                              <img
+                                src={savedFooterImg}
+                                alt="Footer Preview"
+                                style={{
+                                  width: `${templaesetting.bannerwidth + "%"}`,
+                                  padding: `${
+                                    templaesetting.bannerpadding + "px"
+                                  }`,
+                                }}
+                              />
+                            ) : (
+                              <h3>Footer image not present</h3>
                             )}
                             {templaesetting.footertext ? (
                               <h4
@@ -563,7 +845,11 @@ const EditorTemplate = ({
                         </div>
                         <button
                           className="template-pdf-btn"
-                          disabled={editorText || bannerimage || footerimage ? false : true}
+                          disabled={
+                            editorText || bannerimage || footerimage
+                              ? false
+                              : true
+                          }
                           onClick={() => successResponse()}
                         >
                           Submit
@@ -578,16 +864,16 @@ const EditorTemplate = ({
         </section>
       )}
       <>
-        <div style={{display:"none"}}>
+        <div style={{ display: "none" }}>
           <table ref={pdfTargetRef}>
             <tr>
               <td>
-                <div >&nbsp;</div>
+                <div>&nbsp;</div>
               </td>
             </tr>
           </table>
         </div>
-      </>  
+      </>
     </>
   );
 };
