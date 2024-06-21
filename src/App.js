@@ -79,16 +79,23 @@ import CircularsDashboardRequests from "./pages/CircularsDashboardRequests";
 import ImportSearch from "./pages/ImportSearch";
 import FINSearch from "./pages/FINSearch";
 import PendingReturns from "./pages/PendingReturns";
-
+import ImportPendingReturns from "./pages/ImportPendingReturns";
 import ReturnDashboardExport from "./pages/ReturnDashboardExport";
+import ImportReturnDashboard from "./pages/ImportReturnDashboard";
 import INSSubmittedRequests from "./pages/INSSubmittedRequests";
-import INSPendingRequests from './pages/INSPendingRequests'
-import INSApprovedRequests from './pages/INSApprovedRequests'
-import INSRejectedRequests from './pages/INSRejectedRequests'
-import INSDeferredRequests from './pages/INSDeferredRequests'
-import INSCancelledRequests from './pages/INSCancelledRequests'
-import InspectorateExpiredRequests from './pages/InspectorateExpiredRequests'
-import InspectorateExpiringRequests from './pages/InspectorateExpiringRequests'
+import INSPendingRequests from "./pages/INSPendingRequests";
+import INSApprovedRequests from "./pages/INSApprovedRequests";
+import INSRejectedRequests from "./pages/INSRejectedRequests";
+import INSDeferredRequests from "./pages/INSDeferredRequests";
+import INSCancelledRequests from "./pages/INSCancelledRequests";
+import InspectorateExpiredRequests from "./pages/InspectorateExpiredRequests";
+import InspectorateExpiringRequests from "./pages/InspectorateExpiringRequests";
+
+import ImportCopiedResponse from "./pages/ImportCopiedResponse";
+import FINCopiedResponse from "./pages/FINCopiedResponse";
+import INSCopiedResponse from "./pages/INSCopiedResponse";
+import INSSearch from "./pages/INSSearch";
+import ExportBankReport from "./pages/ExportBankReport";
 
 function App() {
   const loginToken = Storage.getItem("loginToken");
@@ -283,16 +290,57 @@ function App() {
               path="/ReturnDashboardExport"
               element={<ReturnDashboardExport />}
             />
-            <Route path="/INSSubmittedRequests" element={<INSSubmittedRequests />}/>
+            <Route
+              path="/ImportReturnDashboard"
+              element={<ImportReturnDashboard />}
+            />
+            <Route
+              path="/INSSubmittedRequests"
+              element={<INSSubmittedRequests />}
+            />
 
             <Route path="/PendingReturns" element={<PendingReturns />} />
-            <Route path="/INSPendingRequests" element={<INSPendingRequests />} />
-            <Route path="/INSApprovedRequests" element={<INSApprovedRequests />} />
-            <Route path="/INSRejectedRequests" element={<INSRejectedRequests />} />
-            <Route path="/INSDeferredRequests" element={<INSDeferredRequests />} />
-            <Route path="/INSCancelledRequests" element={<INSCancelledRequests />} />
-            <Route path="/InspectorateExpiredRequests" element={<InspectorateExpiredRequests />} />
-            <Route path="/InspectorateExpiringRequests" element={<InspectorateExpiringRequests /> } />
+            <Route
+              path="/ImportPendingReturns"
+              element={<ImportPendingReturns />}
+            />
+            <Route
+              path="/INSPendingRequests"
+              element={<INSPendingRequests />}
+            />
+            <Route
+              path="/INSApprovedRequests"
+              element={<INSApprovedRequests />}
+            />
+            <Route
+              path="/INSRejectedRequests"
+              element={<INSRejectedRequests />}
+            />
+            <Route
+              path="/INSDeferredRequests"
+              element={<INSDeferredRequests />}
+            />
+            <Route
+              path="/INSCancelledRequests"
+              element={<INSCancelledRequests />}
+            />
+            <Route
+              path="/InspectorateExpiredRequests"
+              element={<InspectorateExpiredRequests />}
+            />
+            <Route
+              path="/InspectorateExpiringRequests"
+              element={<InspectorateExpiringRequests />}
+            />
+            <Route
+              path="/CCResponseImport"
+              element={<ImportCopiedResponse />}
+            />
+            <Route path="/FINCopiedResponse" element={<FINCopiedResponse />} />
+            <Route path="/INSCopiedResponse" element={<INSCopiedResponse />} />
+            <Route path="/SearchINS" element={<INSSearch />} />
+            <Route path="/ExportsBankReport" element={<ExportBankReport />} />
+
             <Route path="*" element={<NotFound />} />
           </>
         ) : (

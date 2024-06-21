@@ -1141,6 +1141,11 @@ ul.labelbx li {
 
 .addDirectiveBtn {
     margin: 10px 0px;
+    background: #5e62a1;
+    color: #fff;
+    border: 0;
+    padding: 10px;
+    border-radius: 0;
 } 
 .signature_box {
     display: flex;

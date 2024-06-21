@@ -35,8 +35,8 @@ const Home = () => {
   const [fullName, setFullName] = useState(
     userData?.name ? userData?.name : ""
   );
-  const [signature, setSignature] = useState('');
-  const [signatureName, setSignatureName] = useState()
+  const [signature, setSignature] = useState("");
+  const [signatureName, setSignatureName] = useState();
   const [cropSign, setCropSign] = useState();
   const signatureRef = useRef();
 
@@ -104,9 +104,6 @@ const Home = () => {
         reader.onload = () => {
           setSignatureName(files[0].name);
           setSignature(reader.result);
-          // toast.success("Signature selected", {
-          //   autoClose: 1000,
-          // });
         };
         reader.readAsDataURL(files[0]);
       } else {
@@ -125,13 +122,10 @@ const Home = () => {
     e.preventDefault();
     let cropSignature = signatureRef.current?.cropper
       .getCroppedCanvas()
-      .toDataURL(); 
+      .toDataURL();
     if (typeof signatureRef.current?.cropper !== "undefined") {
       setCropSign(cropSignature);
       setSignature(null);
-      toast.success("Signature image cropped", {
-        autoClose: 2000,
-      });
     }
   };
   const getProfileData = async () => {
@@ -183,26 +177,8 @@ const Home = () => {
         ToDate: outTime ? outTime : outOffice === "0" ? "" : userData.toDate,
         Reason: reason ? reason : outOffice === "0" ? "" : userData.reason,
       });
-      
-      if (res.data.responseCode === "200") {
-        
-        // formData.append("files", cropSign);
-        // formData.append("UserID", UserID.replace(/"/g, ""));
-        // formData.append("FileType", "SignatureImage");
 
-        // axios
-        //   .post(ImageAPI + "File/UploadFile", formData, {
-        //     headers: {
-        //       Referer: "https://dms.getanapp.co.in/",
-        //     },
-        //   })
-        //   .then((res) => {
-        //     console.log("res--file", res);
-        //     console.log("res----data", res.data.responseData?.filePath);
-        //     if (res.data.responseCode === "Success") {
-        //       Storage.setItem("signImageURL", res.data.responseData?.filePath);
-        //     }
-        //   });
+      if (res.data.responseCode === "200") {
         formData.append("FileType", "SignatureImage");
         formData.append("Label", signatureName);
         formData.append("PdfData", cropSign);
@@ -215,7 +191,7 @@ const Home = () => {
               Referer: "https://dms.getanapp.co.in/",
             },
           })
-          .then((res) => {  
+          .then((res) => {
             if (res.data.responseCode === "Success") {
               Storage.setItem("signImageURL", res.data.responseData?.filePath);
             }
@@ -321,7 +297,7 @@ const Home = () => {
                       </div>
 
                       <div className="inner_form_new ">
-                        <label className="controlform">Signatue Upload </label>
+                        <label className="controlform">Signature Upload</label>
                         <div className="attachemt_form-bx mb-0 form-bx">
                           <div style={signature ? { width: "100%" } : null}>
                             <div
@@ -334,7 +310,7 @@ const Home = () => {
                               <label style={{ padding: "10px 0" }}>
                                 {files.length
                                   ? files[0]?.file.name
-                                  : "Signatue Upload"}
+                                  : "Signature Upload"}
                                 {error ? (
                                   <small className="errormsg">{error}</small>
                                 ) : (
@@ -379,7 +355,7 @@ const Home = () => {
                                     ref={signatureRef}
                                     initialAspectRatio={1 / 1}
                                     aspectRatio={1 / 1}
-                                    viewMode={2}
+                                    viewMode={0}
                                     preview=".preview"
                                     dragMode="move"
                                     cropBoxResizable={false}
@@ -408,22 +384,27 @@ const Home = () => {
                             )}
                           </div>
                         </div>
-                        {userData?.signImageURL ? (
-                          <div style={signature ? { display: "none" } : null}>
-                            <a href={userData?.signImageURL} target="_blank">
-                              <img
-                                className="img-fluid img-thumbnail"
-                                style={{ maxHeight: "120px" }}
-                                src={
-                                  Imageurl ? Imageurl : userData?.signImageURL
-                                }
-                                alt={userData?.signImageName}
-                              />
-                            </a>
-                          </div>
+                       
+                        {cropSign && cropSign != undefined ? (
+                          <img
+                            className="img-fluid img-thumbnail"
+                            style={{ maxHeight: "120px" }}
+                            src={cropSign}
+                            alt={"signature image"}
+                          />
+                        ) : userData?.signImageURL ? (
+                          <a href={userData?.signImageURL} target="_blank">
+                            <img
+                              className="img-fluid img-thumbnail"
+                              style={{ maxHeight: "120px" }}
+                              src={userData?.signImageURL}
+                              alt={userData?.signImageName}
+                            />
+                          </a>
                         ) : (
                           ""
                         )}
+                        
                       </div>
 
                       <div className="inner_form_new ">

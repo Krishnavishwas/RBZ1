@@ -157,12 +157,10 @@ const ImportOtherDepartmentEditDetails = ({
   const [analystTab, setanalystTab] = useState(roleID == 5 ? true : false);
   const [btnLoader, setBtnLoader] = useState(false);
   const [sranalystTab, setsranalystTab] = useState(roleID == 6 ? true : false);
-  const [ValidateShow, setValidateShow] = useState(false);
   const [principalanalystTab, setprincipalanalystTab] = useState(
     roleID == 7 ? true : false
   );
   const [deputyTab, setdeputyTab] = useState(roleID == 8 ? true : false);
-  const [director, setdirector] = useState(roleID == 9 ? true : false);
   const [inputValue, setInputValue] = useState("");
   const [viewShareFile, setviewShareFile] = useState([]);
   const [applicationType, setapplicationType] = useState([]);
@@ -175,7 +173,6 @@ const ImportOtherDepartmentEditDetails = ({
   const [options, setOptions] = useState([]);
   const [startDate, setStartDate] = useState(new Date());
   const [newData, setnewData] = useState([]);
-  const [getCompanyId, setgetCompanyId] = useState("");
   const [geninfoFile, setgeninfoFile] = useState([]);
   const [getBlankFile, setgetBlankFile] = useState([]);
   const [otheruserfiles, setOtheruserfiles] = useState([]);
@@ -197,7 +194,6 @@ const ImportOtherDepartmentEditDetails = ({
   const [IsReturn, setIsReturn] = useState("0");
   const [checksectorchange, setchecksectorchange] = useState(false);
   const [getFrequencyID, setGetFrequencyID] = useState("0");
-  const [loading, setLoading] = useState(false);
   const [AllFrequency, setAllFrequency] = useState([]);
   const [getalluser, setGetalluser] = useState([]);
   const [OtherDepartment, setOtherDepartment] = useState("");
@@ -207,7 +203,6 @@ const ImportOtherDepartmentEditDetails = ({
   const [otherDepartmentUsers, setOtherDepartmentUsers] = useState([]);
   const [OtherDepartmentPopup, setOtherDepartmentPopup] = useState(false);
   const [OtherDepartmentLoader, setOtherDepartmentLoader] = useState(false);
-  const [loader, setLoader] = useState(false);
   const [sharefiletab, setsharefiletab] = useState(false);
   const [othersharefile, setOthersharefile] = useState([]);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
@@ -455,13 +450,15 @@ const ImportOtherDepartmentEditDetails = ({
     setapplicationstaus(values);
   };
 
+  const changeOriginalDepartment = (e) => {
+    const checked = e.target.checked; 
+    setapplicationstaus(checked ? 10 : "");
+
+  };
+
   const handleChangecompany = (selectedOption) => {
     setgetCompanyName(selectedOption);
   };
-
-  console.log("error", errors);
-
-  console.log("setapplicationstaus", applicationstaus)
 
   const closePopupHandle = () => {
     handleData();
@@ -731,6 +728,7 @@ const ImportOtherDepartmentEditDetails = ({
       .post(APIURL + "Master/GetRoles", {
         RoleID: "4",
         Status: "35",
+        DepartmentID:"6"
       })
       .then((res) => {
         if (res.data.responseCode == 200) {
@@ -747,6 +745,11 @@ const ImportOtherDepartmentEditDetails = ({
   useEffect(() => {
     getRoleHandle();
   }, []);
+
+
+  console.log("OtherDepartmentPopup", OtherDepartmentPopup)
+
+console.log("updatepopup", updatepopup)
 
   const getNextvaluesupervisor = (e) => {
     const value = e.target.checked;
@@ -1749,11 +1752,13 @@ const ImportOtherDepartmentEditDetails = ({
             axios
               .post(ImageAPI + "File/UploadSharedDocs", shareformData)
               .then((res) => { 
+                setOtherDepartmentPopup(true)
               })
               .catch((err) => {
                 setSubmitBtnLoader(false);
                 console.log("sharefile Upload ", err);
               });
+             
             // handleData();
           } else {
             setSubmitBtnLoader(false);
@@ -2358,6 +2363,7 @@ const ImportOtherDepartmentEditDetails = ({
       .post(APIURL + "Master/GetRoles", {
         RoleID: roleID,
         Status: "40",
+        DepartmentID:"6"
       })
       .then((res) => {
         if (res.data.responseCode == 200) {
@@ -7891,14 +7897,14 @@ const ImportOtherDepartmentEditDetails = ({
                                   setAssignUserID("");
                                   setSupervisorRoleId("");
                                   setAsignUser([]);
-                                  setapplicationstaus(
-                                    applicationDetail?.analystRecommendation
+                                  setapplicationstaus( ""
+                                    // applicationDetail?.analystRecommendation
                                   );
                                   setOtherDepartment("");
                                   setOtherDepartmentRole("");
                                   setOtherDepartmentRoles([]);
                                   setOtherDepartmentUser("");
-                                  setOtherDepartmentUsers([]);
+                                  setOtherDepartmentUsers([]); 
                                 }}
                                 name="nextactiondupty"
                                 className={
@@ -7933,14 +7939,12 @@ const ImportOtherDepartmentEditDetails = ({
                                   ChangeNextlevelHandle(e);
                                   setcheckSupervisor(true);
                                   GetRoleHandle(15);
-                                  setapplicationstaus(
-                                    applicationDetail?.analystRecommendation
-                                  );
+                                  setapplicationstaus("");
                                   setOtherDepartment("");
                                   setOtherDepartmentRole("");
                                   setOtherDepartmentRoles([]);
                                   setOtherDepartmentUser("");
-                                  setOtherDepartmentUsers([]);
+                                  setOtherDepartmentUsers([]); 
                                 }}
                                 name="nextactiondupty"
                                 onClick={() => setRecomdAnalyst("")}
@@ -7962,9 +7966,7 @@ const ImportOtherDepartmentEditDetails = ({
                                   supervisorHangechangeRole(e);
                                   setcheckSupervisor(true);
                                   GetRoleHandle(20);
-                                  setapplicationstaus(
-                                    applicationDetail?.analystRecommendation
-                                  );
+                                  setapplicationstaus("");
                                   setOtherDepartment("");
                                   setOtherDepartmentRole("");
                                   setOtherDepartmentRoles([]);
@@ -8454,7 +8456,7 @@ const ImportOtherDepartmentEditDetails = ({
                         </div>
                       </div>
 
-                      {nextlevelvalue != "35" && (
+                      {/* {nextlevelvalue != "35" && (
                         <>
                           <div
                             className={
@@ -8553,7 +8555,31 @@ const ImportOtherDepartmentEditDetails = ({
                             </div>
                           </div>
                         </>
-                      )}
+                      )} */}
+
+<div   className="inner_form_new align-items-center" >
+                            <label className="controlform">Submit Back To Original Department</label>
+                            <div className="row">
+                              <div className="col-md-12"> 
+                                  <input
+                                      type="checkbox"
+                                      value="10"
+                                      onChange={(e) => {
+                                        changeOriginalDepartment(e); 
+                                        // if (e.target.checked) {
+                                        //   getRoleHandle(10);
+                                        // } 
+                                      }}
+                                      name="applicationStatusDepartment"
+                                    checked={
+                                      applicationstaus == "10" ? true : false
+                                    }
+                                  />
+                                   
+                              </div>
+                            </div>
+                          </div>
+
                     </div>
 
                     {allcomment?.map((cur) => {

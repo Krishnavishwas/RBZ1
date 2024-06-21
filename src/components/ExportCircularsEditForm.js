@@ -41,6 +41,7 @@ import ExportCirculargenInfo from "./ExportCirculargenInfo";
 // import MultiSelect from "react-multi-select-component";
 import CustomBankMultiSelect from "./SearchUI/CustomBankMultiSelect";
 import DirectiveMultiSelectComponent from "./SearchUI/DirectiveMultiSelectComponent";
+import CircularsDirectiveListDataTable from "../tables/CircularsDirectiveListDataTable";
 
 const ExportCircularsEditForm = ({
   applicationDetail,
@@ -1443,6 +1444,7 @@ const ExportCircularsEditForm = ({
     await axios
       .post(APIURL + "Master/GetRoles", {
         RoleID: "4",
+        DepartmentID:"2",
         Status: "35",
       })
       .then((res) => {
@@ -2459,68 +2461,10 @@ const ExportCircularsEditForm = ({
                                 </div>
                                 <div className="login_form_panel">
                                   <Modal.Body className="p-0">
-                                    <DirectiveMultiSelectComponent
-                                      key="multyselectprinciple"
-                                      placeholder="Select Directives"
-                                      options={DirectiveOption}
-                                      onChange={(e) => handleChangeDirective(e)}
-                                      value={selectedDirectives}
-                                      isSelectAll={true}
-                                      menuPlacement={"bottom"}
-                                    />
+                                   
 
-                                    <div className="directiveFileData-field">
-                                      <div className="directiveFileData-show">
-                                        {selectedDirectives?.length > 0 ? (
-                                          selectedDirectives.map((item) => {
-                                            const firstTagName =
-                                              item.tagName.split(",")[0]; // Extract the first tag name
-                                            return (
-                                              <>
-                                                {item?.filePath.length > 0 ? (
-                                                  <div
-                                                    className="directiveFileBox"
-                                                    key={item.value}
-                                                  >
-                                                    {/* <div>{firstTagName}</div> Display the first tag name */}
-                                                    {item.filePath.map(
-                                                      (fileItem, index) => (
-                                                        <a
-                                                          target="_blank"
-                                                          href={
-                                                            fileItem.filePath
-                                                          }
-                                                          key={fileItem.id}
-                                                          style={{
-                                                            marginBottom: "3px",
-                                                            letterSpacing:
-                                                              "0.01px",
-                                                            fontSize: "14px",
-                                                            fontWeight: "400",
-                                                            display: "block",
-                                                            padding: "0px 5px",
-                                                            color: "#4154f1",
-                                                            // borderBottom:"1px solid #ddd"
-                                                          }}
-                                                        >
-                                                          {firstTagName +
-                                                            (index + 1)}
-                                                          {/* {fileItem.filePath} */}
-                                                        </a>
-                                                      )
-                                                    )}
-                                                  </div>
-                                                ) : (
-                                                  ""
-                                                )}
-                                              </>
-                                            );
-                                          })
-                                        ) : (
-                                          <></>
-                                        )}
-                                      </div>
-                                    </div>
+                                  <CircularsDirectiveListDataTable DirectiveOption={DirectiveOption} setSelectedDirectives={setSelectedDirectives} selectedDirectives={selectedDirectives} />
+                                    
                                   </Modal.Body>
                                 </div>
                                 <Modal.Footer className="justify-content-end">
@@ -4356,7 +4300,7 @@ const ExportCircularsEditForm = ({
                                     className="addDirectiveBtn"
                                     onClick={handleDirectiveModalShow}
                                   >
-                                    Add Directives
+                                    Add Directives --
                                   </Button>
                                   {errors?.selectedDirectives &&
                                   selectedDirectives.length == 0 ? (
@@ -4390,87 +4334,8 @@ const ExportCircularsEditForm = ({
                                         </div>
                                         <div className="login_form_panel">
                                           <Modal.Body className="p-0">
-                                            <DirectiveMultiSelectComponent
-                                              key="multyselectprinciple"
-                                              options={DirectiveOption}
-                                              onChange={(e) =>
-                                                handleChangeDirective(e)
-                                              }
-                                              value={selectedDirectives}
-                                              isSelectAll={true}
-                                              menuPlacement={"bottom"}
-                                            />
+                                          <CircularsDirectiveListDataTable DirectiveOption={DirectiveOption} setSelectedDirectives={setSelectedDirectives} selectedDirectives={selectedDirectives} />
 
-                                            <div className="directiveFileData-field">
-                                              <div className="directiveFileData-show">
-                                                {selectedDirectives?.length >
-                                                0 ? (
-                                                  selectedDirectives.map(
-                                                    (item) => {
-                                                      const firstTagName =
-                                                        item.tagName.split(
-                                                          ","
-                                                        )[0]; // Extract the first tag name
-                                                      return (
-                                                        <>
-                                                          {item?.filePath
-                                                            .length > 0 ? (
-                                                            <div
-                                                              className="directiveFileBox"
-                                                              key={item.value}
-                                                            >
-                                                              {/* <div>{firstTagName}</div> Display the first tag name */}
-                                                              {item.filePath.map(
-                                                                (
-                                                                  fileItem,
-                                                                  index
-                                                                ) => (
-                                                                  <a
-                                                                    target="_blank"
-                                                                    href={
-                                                                      fileItem.filePath
-                                                                    }
-                                                                    key={
-                                                                      fileItem.id
-                                                                    }
-                                                                    style={{
-                                                                      marginBottom:
-                                                                        "3px",
-                                                                      letterSpacing:
-                                                                        "0.01px",
-                                                                      fontSize:
-                                                                        "14px",
-                                                                      fontWeight:
-                                                                        "400",
-                                                                      display:
-                                                                        "block",
-                                                                      padding:
-                                                                        "0px 5px",
-                                                                      color:
-                                                                        "#4154f1",
-                                                                      // borderBottom:"1px solid #ddd"
-                                                                    }}
-                                                                  >
-                                                                    {firstTagName +
-                                                                      (index +
-                                                                        1)}
-                                                                    {/* {fileItem.filePath} */}
-                                                                  </a>
-                                                                )
-                                                              )}
-                                                            </div>
-                                                          ) : (
-                                                            ""
-                                                          )}
-                                                        </>
-                                                      );
-                                                    }
-                                                  )
-                                                ) : (
-                                                  <></>
-                                                )}
-                                              </div>
-                                            </div>
                                           </Modal.Body>
                                         </div>
                                         <Modal.Footer className="justify-content-end">
@@ -6051,84 +5916,8 @@ const ExportCircularsEditForm = ({
                                         </div>
                                         <div className="login_form_panel">
                                           <Modal.Body className="p-0">
-                                            <DirectiveMultiSelectComponent
-                                              key="multyselectprinciple"
-                                              placeholder="ss"
-                                              options={DirectiveOption}
-                                              onChange={(e) =>
-                                                handleChangeDirective(e)
-                                              }
-                                              value={selectedDirectives}
-                                              isSelectAll={true}
-                                            />
+                                          <CircularsDirectiveListDataTable DirectiveOption={DirectiveOption} setSelectedDirectives={setSelectedDirectives} selectedDirectives={selectedDirectives} />
 
-                                            <div className="directiveFileData-field">
-                                              <div className="directiveFileData-show">
-                                                {selectedDirectives?.length >
-                                                0 ? (
-                                                  selectedDirectives.map(
-                                                    (item) => {
-                                                      const firstTagName =
-                                                        item.tagName.split(
-                                                          ","
-                                                        )[0];
-                                                      return (
-                                                        <>
-                                                          {item?.filePath
-                                                            .length > 0 ? (
-                                                            <div
-                                                              className="directiveFileBox"
-                                                              key={item.value}
-                                                            >
-                                                              {item.filePath.map(
-                                                                (
-                                                                  fileItem,
-                                                                  index
-                                                                ) => (
-                                                                  <a
-                                                                    target="_blank"
-                                                                    href={
-                                                                      fileItem.filePath
-                                                                    }
-                                                                    key={
-                                                                      fileItem.id
-                                                                    }
-                                                                    style={{
-                                                                      marginBottom:
-                                                                        "3px",
-                                                                      letterSpacing:
-                                                                        "0.01px",
-                                                                      fontSize:
-                                                                        "14px",
-                                                                      fontWeight:
-                                                                        "400",
-                                                                      display:
-                                                                        "block",
-                                                                      padding:
-                                                                        "0px 5px",
-                                                                      color:
-                                                                        "#4154f1",
-                                                                    }}
-                                                                  >
-                                                                    {firstTagName +
-                                                                      (index +
-                                                                        1)}
-                                                                  </a>
-                                                                )
-                                                              )}
-                                                            </div>
-                                                          ) : (
-                                                            ""
-                                                          )}
-                                                        </>
-                                                      );
-                                                    }
-                                                  )
-                                                ) : (
-                                                  <></>
-                                                )}
-                                              </div>
-                                            </div>
                                           </Modal.Body>
                                         </div>
                                         <Modal.Footer className="justify-content-end">
@@ -7715,85 +7504,8 @@ const ExportCircularsEditForm = ({
                                         </div>
                                         <div className="login_form_panel">
                                           <Modal.Body className="p-0">
-                                            <DirectiveMultiSelectComponent
-                                              key="multyselectprinciple"
-                                              placeholder="Select Directives"
-                                              options={DirectiveOption}
-                                              onChange={(e) =>
-                                                handleChangeDirective(e)
-                                              }
-                                              value={selectedDirectives}
-                                              isSelectAll={true}
-                                              menuPlacement={"bottom"}
-                                            />
+                                          <CircularsDirectiveListDataTable DirectiveOption={DirectiveOption} setSelectedDirectives={setSelectedDirectives} selectedDirectives={selectedDirectives} />
 
-                                            <div className="directiveFileData-field">
-                                              <div className="directiveFileData-show">
-                                                {selectedDirectives?.length >
-                                                0 ? (
-                                                  selectedDirectives.map(
-                                                    (item) => {
-                                                      const firstTagName =
-                                                        item.tagName.split(
-                                                          ","
-                                                        )[0];
-                                                      return (
-                                                        <>
-                                                          {item?.filePath
-                                                            .length > 0 ? (
-                                                            <div
-                                                              className="directiveFileBox"
-                                                              key={item.value}
-                                                            >
-                                                              {item.filePath.map(
-                                                                (
-                                                                  fileItem,
-                                                                  index
-                                                                ) => (
-                                                                  <a
-                                                                    target="_blank"
-                                                                    href={
-                                                                      fileItem.filePath
-                                                                    }
-                                                                    key={
-                                                                      fileItem.id
-                                                                    }
-                                                                    style={{
-                                                                      marginBottom:
-                                                                        "3px",
-                                                                      letterSpacing:
-                                                                        "0.01px",
-                                                                      fontSize:
-                                                                        "14px",
-                                                                      fontWeight:
-                                                                        "400",
-                                                                      display:
-                                                                        "block",
-                                                                      padding:
-                                                                        "0px 5px",
-                                                                      color:
-                                                                        "#4154f1",
-                                                                    }}
-                                                                  >
-                                                                    {firstTagName +
-                                                                      (index +
-                                                                        1)}
-                                                                  </a>
-                                                                )
-                                                              )}
-                                                            </div>
-                                                          ) : (
-                                                            ""
-                                                          )}
-                                                        </>
-                                                      );
-                                                    }
-                                                  )
-                                                ) : (
-                                                  <></>
-                                                )}
-                                              </div>
-                                            </div>
                                           </Modal.Body>
                                         </div>
                                         <Modal.Footer className="justify-content-end">
@@ -9445,85 +9157,8 @@ const ExportCircularsEditForm = ({
                                         </div>
                                         <div className="login_form_panel">
                                           <Modal.Body className="p-0">
-                                            <DirectiveMultiSelectComponent
-                                              key="multyselectprinciple"
-                                              placeholder="Select Directives"
-                                              options={DirectiveOption}
-                                              onChange={(e) =>
-                                                handleChangeDirective(e)
-                                              }
-                                              value={selectedDirectives}
-                                              isSelectAll={true}
-                                              menuPlacement={"bottom"}
-                                            />
+                                          <CircularsDirectiveListDataTable DirectiveOption={DirectiveOption} setSelectedDirectives={setSelectedDirectives} selectedDirectives={selectedDirectives} />
 
-                                            <div className="directiveFileData-field">
-                                              <div className="directiveFileData-show">
-                                                {selectedDirectives?.length >
-                                                0 ? (
-                                                  selectedDirectives.map(
-                                                    (item) => {
-                                                      const firstTagName =
-                                                        item.tagName.split(
-                                                          ","
-                                                        )[0];
-                                                      return (
-                                                        <>
-                                                          {item?.filePath
-                                                            .length > 0 ? (
-                                                            <div
-                                                              className="directiveFileBox"
-                                                              key={item.value}
-                                                            >
-                                                              {item.filePath.map(
-                                                                (
-                                                                  fileItem,
-                                                                  index
-                                                                ) => (
-                                                                  <a
-                                                                    target="_blank"
-                                                                    href={
-                                                                      fileItem.filePath
-                                                                    }
-                                                                    key={
-                                                                      fileItem.id
-                                                                    }
-                                                                    style={{
-                                                                      marginBottom:
-                                                                        "3px",
-                                                                      letterSpacing:
-                                                                        "0.01px",
-                                                                      fontSize:
-                                                                        "14px",
-                                                                      fontWeight:
-                                                                        "400",
-                                                                      display:
-                                                                        "block",
-                                                                      padding:
-                                                                        "0px 5px",
-                                                                      color:
-                                                                        "#4154f1",
-                                                                    }}
-                                                                  >
-                                                                    {firstTagName +
-                                                                      (index +
-                                                                        1)}
-                                                                  </a>
-                                                                )
-                                                              )}
-                                                            </div>
-                                                          ) : (
-                                                            ""
-                                                          )}
-                                                        </>
-                                                      );
-                                                    }
-                                                  )
-                                                ) : (
-                                                  <></>
-                                                )}
-                                              </div>
-                                            </div>
                                           </Modal.Body>
                                         </div>
                                         <Modal.Footer className="justify-content-end">

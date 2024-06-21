@@ -209,6 +209,8 @@ const DirectivesTables = () => {
         .includes(searchText?.toLowerCase())
   );
 
+  console.log("directiveData", directiveData)
+
   const handleFormShow = () => {
     setDirectiveName("");
     setDirectiveTag("");
