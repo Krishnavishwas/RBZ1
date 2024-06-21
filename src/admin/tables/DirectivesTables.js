@@ -112,7 +112,7 @@ const DirectivesTables = () => {
             ? row?.directiveTags?.split(",")?.map((tagName) => {
                 return (
                   <>
-                    <li class="badge bg-primary" style={{ textWrap: "wrap" }}>
+                    <li className="badge bg-primary" style={{ textWrap: "wrap" }}>
                       {tagName}
                     </li>
                     &nbsp;
@@ -180,7 +180,7 @@ const DirectivesTables = () => {
               setDatat(true);
             }}
           >
-            <i class="bi bi-pencil-square"></i>
+            <i className="bi bi-pencil-square"></i>
           </Link>
         </>
       ),
@@ -208,6 +208,8 @@ const DirectivesTables = () => {
         .toLowerCase()
         .includes(searchText?.toLowerCase())
   );
+
+  console.log("directiveData", directiveData)
 
   const handleFormShow = () => {
     setDirectiveName("");
@@ -638,7 +640,7 @@ const DirectivesTables = () => {
       <Modal show={showForm} onHide={handleFormClose} backdrop="static">
         <div className="application-box">
           <div className="login_inner">
-            <div class="login_form ">
+            <div className="login_form ">
               <h5>
                 <Modal.Header closeButton className="p-0">
                   <Modal.Title>Add Directive</Modal.Title>
@@ -726,14 +728,14 @@ const DirectivesTables = () => {
                       <div className="col-6 mb-3">
                         <div className="file-detail" key={id}>
                           <h6>{filename}</h6>
-                          <div class="form-bx">
+                          <div className="form-bx">
                             <label>
                               <input
                                 type="text"
                                 name="labelChange"
                                 placeholder="change File Name"
                                 onChange={(e) => labelHandleChange(e, id)}
-                                class="fomcontrol text-capitalize"
+                                className="fomcontrol text-capitalize"
                               />
                             </label>
                           </div>
@@ -774,7 +776,7 @@ const DirectivesTables = () => {
       <Modal show={showUpdateModal} onHide={UpdateModalClose} backdrop="static">
         <div className="application-box">
           <div className="login_inner">
-            <div class="login_form ">
+            <div className="login_form ">
               <h5>
                 <Modal.Header
                   closeButton
@@ -880,14 +882,14 @@ const DirectivesTables = () => {
                             </a>
                           </h6>
                           {label ? (
-                            <div class="form-bx">
+                            <div className="form-bx">
                               <label>
                                 <input
                                   type="text"
                                   name="labelChange"
                                   placeholder={label}
                                   disabled
-                                  class="fomcontrol text-capitalize"
+                                  className="fomcontrol text-capitalize"
                                 />
                               </label>
                             </div>
@@ -920,14 +922,14 @@ const DirectivesTables = () => {
                       <div className="col-6 mb-3">
                         <div className="file-detail" key={id}>
                           <h6>{filename}</h6>
-                          <div class="form-bx">
+                          <div className="form-bx">
                             <label>
                               <input
                                 type="text"
                                 name="labelChange"
                                 placeholder="change File Name"
                                 onChange={(e) => labelHandleChange(e, id)}
-                                class="fomcontrol text-capitalize"
+                                className="fomcontrol text-capitalize"
                               />
                             </label>
                           </div>

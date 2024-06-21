@@ -157,12 +157,10 @@ const ImportOtherDepartmentEditDetails = ({
   const [analystTab, setanalystTab] = useState(roleID == 5 ? true : false);
   const [btnLoader, setBtnLoader] = useState(false);
   const [sranalystTab, setsranalystTab] = useState(roleID == 6 ? true : false);
-  const [ValidateShow, setValidateShow] = useState(false);
   const [principalanalystTab, setprincipalanalystTab] = useState(
     roleID == 7 ? true : false
   );
   const [deputyTab, setdeputyTab] = useState(roleID == 8 ? true : false);
-  const [director, setdirector] = useState(roleID == 9 ? true : false);
   const [inputValue, setInputValue] = useState("");
   const [viewShareFile, setviewShareFile] = useState([]);
   const [applicationType, setapplicationType] = useState([]);
@@ -175,7 +173,6 @@ const ImportOtherDepartmentEditDetails = ({
   const [options, setOptions] = useState([]);
   const [startDate, setStartDate] = useState(new Date());
   const [newData, setnewData] = useState([]);
-  const [getCompanyId, setgetCompanyId] = useState("");
   const [geninfoFile, setgeninfoFile] = useState([]);
   const [getBlankFile, setgetBlankFile] = useState([]);
   const [otheruserfiles, setOtheruserfiles] = useState([]);
@@ -197,7 +194,6 @@ const ImportOtherDepartmentEditDetails = ({
   const [IsReturn, setIsReturn] = useState("0");
   const [checksectorchange, setchecksectorchange] = useState(false);
   const [getFrequencyID, setGetFrequencyID] = useState("0");
-  const [loading, setLoading] = useState(false);
   const [AllFrequency, setAllFrequency] = useState([]);
   const [getalluser, setGetalluser] = useState([]);
   const [OtherDepartment, setOtherDepartment] = useState("");
@@ -207,7 +203,6 @@ const ImportOtherDepartmentEditDetails = ({
   const [otherDepartmentUsers, setOtherDepartmentUsers] = useState([]);
   const [OtherDepartmentPopup, setOtherDepartmentPopup] = useState(false);
   const [OtherDepartmentLoader, setOtherDepartmentLoader] = useState(false);
-  const [loader, setLoader] = useState(false);
   const [sharefiletab, setsharefiletab] = useState(false);
   const [othersharefile, setOthersharefile] = useState([]);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
@@ -455,13 +450,15 @@ const ImportOtherDepartmentEditDetails = ({
     setapplicationstaus(values);
   };
 
+  const changeOriginalDepartment = (e) => {
+    const checked = e.target.checked; 
+    setapplicationstaus(checked ? 10 : "");
+
+  };
+
   const handleChangecompany = (selectedOption) => {
     setgetCompanyName(selectedOption);
   };
-
-  console.log("error", errors);
-
-  console.log("setapplicationstaus", applicationstaus)
 
   const closePopupHandle = () => {
     handleData();
@@ -731,6 +728,7 @@ const ImportOtherDepartmentEditDetails = ({
       .post(APIURL + "Master/GetRoles", {
         RoleID: "4",
         Status: "35",
+        DepartmentID:"6"
       })
       .then((res) => {
         if (res.data.responseCode == 200) {
@@ -747,6 +745,11 @@ const ImportOtherDepartmentEditDetails = ({
   useEffect(() => {
     getRoleHandle();
   }, []);
+
+
+  console.log("OtherDepartmentPopup", OtherDepartmentPopup)
+
+console.log("updatepopup", updatepopup)
 
   const getNextvaluesupervisor = (e) => {
     const value = e.target.checked;
@@ -1744,16 +1747,18 @@ const ImportOtherDepartmentEditDetails = ({
             );
             shareformData.append("ApplicationID", applicationDetail?.id);
             shareformData.append("IsSharedDoc", "1");
+            shareformData.append("DepartmentID", "6");
             shareformData.append("UserID", UserID.replace(/"/g, ""));
             axios
               .post(ImageAPI + "File/UploadSharedDocs", shareformData)
-              .then((res) => {
-                console.log("UploadSharedDocs");
+              .then((res) => { 
+                setOtherDepartmentPopup(true)
               })
               .catch((err) => {
                 setSubmitBtnLoader(false);
                 console.log("sharefile Upload ", err);
               });
+             
             // handleData();
           } else {
             setSubmitBtnLoader(false);
@@ -2015,7 +2020,7 @@ const ImportOtherDepartmentEditDetails = ({
               .run()
           }
         >
-          <i class="bi bi-table"></i>
+          <i className="bi bi-table"></i>
         </button>
         <button
           type="button"
@@ -2023,7 +2028,7 @@ const ImportOtherDepartmentEditDetails = ({
           onClick={() => editor.chain().focus().addColumnBefore().run()}
           disabled={!editor.can().addColumnBefore()}
         >
-          <i class="bi bi-list-columns-reverse"></i>
+          <i className="bi bi-list-columns-reverse"></i>
         </button>
         <button
           type="button"
@@ -2031,49 +2036,49 @@ const ImportOtherDepartmentEditDetails = ({
           onClick={() => editor.chain().focus().addColumnAfter().run()}
           disabled={!editor.can().addColumnAfter()}
         >
-          <i class="bi bi-list-columns"></i>
+          <i className="bi bi-list-columns"></i>
         </button>
         <button
           type="button"
           onClick={() => editor.chain().focus().deleteColumn().run()}
           disabled={!editor.can().deleteColumn()}
         >
-          <i class="bi bi-archive"></i>
+          <i className="bi bi-archive"></i>
         </button>
         <button
           type="button"
           onClick={() => editor.chain().focus().addRowBefore().run()}
           disabled={!editor.can().addRowBefore()}
         >
-          <i class="bi bi-arrow-bar-up"></i>
+          <i className="bi bi-arrow-bar-up"></i>
         </button>
         <button
           type="button"
           onClick={() => editor.chain().focus().addRowAfter().run()}
           disabled={!editor.can().addRowAfter()}
         >
-          <i class="bi bi-arrow-bar-down"></i>
+          <i className="bi bi-arrow-bar-down"></i>
         </button>
         <button
           type="button"
           onClick={() => editor.chain().focus().deleteRow().run()}
           disabled={!editor.can().deleteRow()}
         >
-          <i class="bi bi-archive"></i>
+          <i className="bi bi-archive"></i>
         </button>
         <button
           type="button"
           onClick={() => editor.chain().focus().deleteTable().run()}
           disabled={!editor.can().deleteTable()}
         >
-          <i class="bi bi-archive"></i>
+          <i className="bi bi-archive"></i>
         </button>
         <button
           type="button"
           onClick={() => editor.chain().focus().mergeCells().run()}
           disabled={!editor.can().mergeCells()}
         >
-          <i class="bi bi-union"></i>
+          <i className="bi bi-union"></i>
         </button>
         <button
           type="button"
@@ -2087,28 +2092,28 @@ const ImportOtherDepartmentEditDetails = ({
           onClick={() => editor.chain().focus().toggleHeaderColumn().run()}
           disabled={!editor.can().toggleHeaderColumn()}
         >
-          <i class="bi bi-layout-split"></i>
+          <i className="bi bi-layout-split"></i>
         </button>
         <button
           type="button"
           onClick={() => editor.chain().focus().toggleHeaderRow().run()}
           disabled={!editor.can().toggleHeaderRow()}
         >
-          <i class="bi bi-toggle-off"></i>
+          <i className="bi bi-toggle-off"></i>
         </button>
         <button
           type="button"
           onClick={() => editor.chain().focus().toggleHeaderCell().run()}
           disabled={!editor.can().toggleHeaderCell()}
         >
-          <i class="bi bi-toggle-off"></i>
+          <i className="bi bi-toggle-off"></i>
         </button>
         <button
           type="button"
           onClick={() => editor.chain().focus().mergeOrSplit().run()}
           disabled={!editor.can().mergeOrSplit()}
         >
-          <i class="bi bi-subtract"></i>
+          <i className="bi bi-subtract"></i>
         </button>
         <button
           type="button"
@@ -2123,28 +2128,28 @@ const ImportOtherDepartmentEditDetails = ({
             !editor.can().setCellAttribute("backgroundColor", "#FAF594")
           }
         >
-          <i class="bi bi-kanban"></i>
+          <i className="bi bi-kanban"></i>
         </button>
         <button
           type="button"
           onClick={() => editor.chain().focus().fixTables().run()}
           disabled={!editor.can().fixTables()}
         >
-          <i class="bi bi-file-spreadsheet"></i>
+          <i className="bi bi-file-spreadsheet"></i>
         </button>
         <button
           type="button"
           onClick={() => editor.chain().focus().goToNextCell().run()}
           disabled={!editor.can().goToNextCell()}
         >
-          <i class="bi bi-arrow-right-square"></i>
+          <i className="bi bi-arrow-right-square"></i>
         </button>
         <button
           type="button"
           onClick={() => editor.chain().focus().goToPreviousCell().run()}
           disabled={!editor.can().goToPreviousCell()}
         >
-          <i class="bi bi-arrow-left-square"></i>
+          <i className="bi bi-arrow-left-square"></i>
         </button>
         <button
           type="button"
@@ -2153,7 +2158,7 @@ const ImportOtherDepartmentEditDetails = ({
           disabled={!editor.can().chain().focus().toggleBold().run()}
           className={editor.isActive("bold") ? "is-active" : ""}
         >
-          <i class="bi bi-type-bold"></i>
+          <i className="bi bi-type-bold"></i>
         </button>
         <button
           type="button"
@@ -2162,7 +2167,7 @@ const ImportOtherDepartmentEditDetails = ({
           disabled={!editor.can().chain().focus().toggleItalic().run()}
           className={editor.isActive("italic") ? "is-active" : ""}
         >
-          <i class="bi bi-type-italic"></i>
+          <i className="bi bi-type-italic"></i>
         </button>
         <button
           type="button"
@@ -2171,7 +2176,7 @@ const ImportOtherDepartmentEditDetails = ({
           disabled={!editor.can().chain().focus().toggleStrike().run()}
           className={editor.isActive("strike") ? "is-active" : ""}
         >
-          <i class="bi bi-type-strikethrough"></i>
+          <i className="bi bi-type-strikethrough"></i>
         </button>
         <button
           type="button"
@@ -2179,7 +2184,7 @@ const ImportOtherDepartmentEditDetails = ({
           disabled={!editor.can().chain().focus().toggleCode().run()}
           className={editor.isActive("code") ? "is-active" : ""}
         >
-          <i class="bi bi-code-slash"></i>
+          <i className="bi bi-code-slash"></i>
         </button>
         <button
           type="button"
@@ -2187,7 +2192,7 @@ const ImportOtherDepartmentEditDetails = ({
           onClick={() => editor.chain().focus().setParagraph().run()}
           className={editor.isActive("paragraph") ? "is-active" : ""}
         >
-          <i class="bi bi-paragraph"></i>
+          <i className="bi bi-paragraph"></i>
         </button>
         <button
           type="button"
@@ -2199,7 +2204,7 @@ const ImportOtherDepartmentEditDetails = ({
             editor.isActive("heading", { level: 1 }) ? "is-active" : ""
           }
         >
-          <i class="bi bi-type-h1"></i>
+          <i className="bi bi-type-h1"></i>
         </button>
         <button
           type="button"
@@ -2211,7 +2216,7 @@ const ImportOtherDepartmentEditDetails = ({
             editor.isActive("heading", { level: 2 }) ? "is-active" : ""
           }
         >
-          <i class="bi bi-type-h2"></i>
+          <i className="bi bi-type-h2"></i>
         </button>
         <button
           type="button"
@@ -2223,7 +2228,7 @@ const ImportOtherDepartmentEditDetails = ({
             editor.isActive("heading", { level: 3 }) ? "is-active" : ""
           }
         >
-          <i class="bi bi-type-h3"></i>
+          <i className="bi bi-type-h3"></i>
         </button>
         <button
           type="button"
@@ -2235,7 +2240,7 @@ const ImportOtherDepartmentEditDetails = ({
             editor.isActive("heading", { level: 4 }) ? "is-active" : ""
           }
         >
-          <i class="bi bi-type-h4"></i>
+          <i className="bi bi-type-h4"></i>
         </button>
         <button
           type="button"
@@ -2247,7 +2252,7 @@ const ImportOtherDepartmentEditDetails = ({
             editor.isActive("heading", { level: 5 }) ? "is-active" : ""
           }
         >
-          <i class="bi bi-type-h5"></i>
+          <i className="bi bi-type-h5"></i>
         </button>
         <button
           type="button"
@@ -2259,7 +2264,7 @@ const ImportOtherDepartmentEditDetails = ({
             editor.isActive("heading", { level: 6 }) ? "is-active" : ""
           }
         >
-          <i class="bi bi-type-h6"></i>
+          <i className="bi bi-type-h6"></i>
         </button>
         <button
           type="button"
@@ -2267,7 +2272,7 @@ const ImportOtherDepartmentEditDetails = ({
           onClick={() => editor.chain().focus().toggleBulletList().run()}
           className={editor.isActive("bulletList") ? "is-active" : ""}
         >
-          <i class="bi bi-list-ul"></i>
+          <i className="bi bi-list-ul"></i>
         </button>
         <button
           type="button"
@@ -2275,7 +2280,7 @@ const ImportOtherDepartmentEditDetails = ({
           onClick={() => editor.chain().focus().toggleOrderedList().run()}
           className={editor.isActive("orderedList") ? "is-active" : ""}
         >
-          <i class="bi bi-list-ol"></i>
+          <i className="bi bi-list-ol"></i>
         </button>
         <button
           type="button"
@@ -2283,28 +2288,28 @@ const ImportOtherDepartmentEditDetails = ({
           onClick={() => editor.chain().focus().toggleBlockquote().run()}
           className={editor.isActive("blockquote") ? "is-active" : ""}
         >
-          <i class="bi bi-quote"></i>
+          <i className="bi bi-quote"></i>
         </button>
         <button
           type="button"
           title="Horizontal Rule"
           onClick={() => editor.chain().focus().setHorizontalRule().run()}
         >
-          <i class="bi bi-hr"></i>
+          <i className="bi bi-hr"></i>
         </button>
         <button
           type="button"
           title="Hard Break"
           onClick={() => editor.chain().focus().setHardBreak().run()}
         >
-          <i class="bi bi-file-break"></i>
+          <i className="bi bi-file-break"></i>
         </button>
         <button
           type="button"
           onClick={() => editor.chain().focus().setTextAlign("left").run()}
           className={editor.isActive({ textAlign: "left" }) ? "is-active" : ""}
         >
-          <i class="bi bi-text-left"></i>
+          <i className="bi bi-text-left"></i>
         </button>
         <button
           type="button"
@@ -2313,14 +2318,14 @@ const ImportOtherDepartmentEditDetails = ({
             editor.isActive({ textAlign: "center" }) ? "is-active" : ""
           }
         >
-          <i class="bi bi-text-center"></i>
+          <i className="bi bi-text-center"></i>
         </button>
         <button
           type="button"
           onClick={() => editor.chain().focus().setTextAlign("right").run()}
           className={editor.isActive({ textAlign: "right" }) ? "is-active" : ""}
         >
-          <i class="bi bi-text-right"></i>
+          <i className="bi bi-text-right"></i>
         </button>
         <button
           type="button"
@@ -2329,7 +2334,7 @@ const ImportOtherDepartmentEditDetails = ({
             editor.isActive({ textAlign: "justify" }) ? "is-active" : ""
           }
         >
-          <i class="bi bi-justify"></i>
+          <i className="bi bi-justify"></i>
         </button>
         <span className="setcolorcss">
           <input
@@ -2346,7 +2351,7 @@ const ImportOtherDepartmentEditDetails = ({
             onClick={() => editor.chain().focus().unsetColor().run()}
             data-testid="unsetColor"
           >
-            <i class="bi bi-palette-fill"></i>
+            <i className="bi bi-palette-fill"></i>
           </button>
         </span>
       </>
@@ -2358,6 +2363,7 @@ const ImportOtherDepartmentEditDetails = ({
       .post(APIURL + "Master/GetRoles", {
         RoleID: roleID,
         Status: "40",
+        DepartmentID:"6"
       })
       .then((res) => {
         if (res.data.responseCode == 200) {
@@ -2628,7 +2634,7 @@ const ImportOtherDepartmentEditDetails = ({
                             className="validateCrossIcon"
                             onClick={() => setValidateShow(false)}
                           >
-                            <i class="bi bi-x-circle"></i>
+                            <i className="bi bi-x-circle"></i>
                           </button>
                         </div>
                       )}
@@ -3210,18 +3216,18 @@ const ImportOtherDepartmentEditDetails = ({
               </div>
 
               <div
-                class={
+                className={
                   applicationDetail?.applicationStatus == 0 ? "d-none" : "row"
                 }
               >
-                <div class="col-md-6">
-                  <div class="inner_form_new ">
-                    <label class="controlform">Assigned To Role</label>
-                    <div class="form-bx">
+                <div className="col-md-6">
+                  <div className="inner_form_new ">
+                    <label className="controlform">Assigned To Role</label>
+                    <div className="form-bx">
                       <label>
                         <input
                           type="text"
-                          class=""
+                          className=""
                           disabled
                           value={
                             applicationDetail?.assignedToRoleName
@@ -3233,14 +3239,14 @@ const ImportOtherDepartmentEditDetails = ({
                     </div>
                   </div>
                 </div>
-                <div class="col-md-6">
-                  <div class="inner_form_new-sm ">
-                    <label class="controlform-sm">Assigned To User</label>
-                    <div class="form-bx-sm">
+                <div className="col-md-6">
+                  <div className="inner_form_new-sm ">
+                    <label className="controlform-sm">Assigned To User</label>
+                    <div className="form-bx-sm">
                       <label>
                         <input
                           type="text"
-                          class=""
+                          className=""
                           disabled
                           value={
                             applicationDetail?.assignedToName
@@ -4710,17 +4716,17 @@ const ImportOtherDepartmentEditDetails = ({
                                     </div>
                                   </div>
 
-                                  <div class="row">
-                                    <div class="col-md-12">
-                                      <div class="inner_form_new ">
-                                        <label class="controlform">
+                                  <div className="row">
+                                    <div className="col-md-12">
+                                      <div className="inner_form_new ">
+                                        <label className="controlform">
                                           Action
                                         </label>
-                                        <div class="form-bx">
+                                        <div className="form-bx">
                                           <label>
                                             <input
                                               type="text"
-                                              class=""
+                                              className=""
                                               disabled
                                               value={
                                                 item?.assignedAction ==
@@ -6058,17 +6064,17 @@ const ImportOtherDepartmentEditDetails = ({
                                     </div>
                                   </div>
 
-                                  <div class="row">
-                                    <div class="col-md-12">
-                                      <div class="inner_form_new ">
-                                        <label class="controlform">
+                                  <div className="row">
+                                    <div className="col-md-12">
+                                      <div className="inner_form_new ">
+                                        <label className="controlform">
                                           Action
                                         </label>
-                                        <div class="form-bx">
+                                        <div className="form-bx">
                                           <label>
                                             <input
                                               type="text"
-                                              class=""
+                                              className=""
                                               disabled
                                               value={
                                                 item?.assignedAction ==
@@ -7400,17 +7406,17 @@ const ImportOtherDepartmentEditDetails = ({
                                       </label>
                                     </div>
                                   </div>
-                                  <div class="row">
-                                    <div class="col-md-12">
-                                      <div class="inner_form_new ">
-                                        <label class="controlform">
+                                  <div className="row">
+                                    <div className="col-md-12">
+                                      <div className="inner_form_new ">
+                                        <label className="controlform">
                                           Action
                                         </label>
-                                        <div class="form-bx">
+                                        <div className="form-bx">
                                           <label>
                                             <input
                                               type="text"
-                                              class=""
+                                              className=""
                                               disabled
                                               value={
                                                 item?.assignedAction ==
@@ -7891,14 +7897,14 @@ const ImportOtherDepartmentEditDetails = ({
                                   setAssignUserID("");
                                   setSupervisorRoleId("");
                                   setAsignUser([]);
-                                  setapplicationstaus(
-                                    applicationDetail?.analystRecommendation
+                                  setapplicationstaus( ""
+                                    // applicationDetail?.analystRecommendation
                                   );
                                   setOtherDepartment("");
                                   setOtherDepartmentRole("");
                                   setOtherDepartmentRoles([]);
                                   setOtherDepartmentUser("");
-                                  setOtherDepartmentUsers([]);
+                                  setOtherDepartmentUsers([]); 
                                 }}
                                 name="nextactiondupty"
                                 className={
@@ -7933,14 +7939,12 @@ const ImportOtherDepartmentEditDetails = ({
                                   ChangeNextlevelHandle(e);
                                   setcheckSupervisor(true);
                                   GetRoleHandle(15);
-                                  setapplicationstaus(
-                                    applicationDetail?.analystRecommendation
-                                  );
+                                  setapplicationstaus("");
                                   setOtherDepartment("");
                                   setOtherDepartmentRole("");
                                   setOtherDepartmentRoles([]);
                                   setOtherDepartmentUser("");
-                                  setOtherDepartmentUsers([]);
+                                  setOtherDepartmentUsers([]); 
                                 }}
                                 name="nextactiondupty"
                                 onClick={() => setRecomdAnalyst("")}
@@ -7962,9 +7966,7 @@ const ImportOtherDepartmentEditDetails = ({
                                   supervisorHangechangeRole(e);
                                   setcheckSupervisor(true);
                                   GetRoleHandle(20);
-                                  setapplicationstaus(
-                                    applicationDetail?.analystRecommendation
-                                  );
+                                  setapplicationstaus("");
                                   setOtherDepartment("");
                                   setOtherDepartmentRole("");
                                   setOtherDepartmentRoles([]);
@@ -8454,7 +8456,7 @@ const ImportOtherDepartmentEditDetails = ({
                         </div>
                       </div>
 
-                      {nextlevelvalue != "35" && (
+                      {/* {nextlevelvalue != "35" && (
                         <>
                           <div
                             className={
@@ -8553,7 +8555,31 @@ const ImportOtherDepartmentEditDetails = ({
                             </div>
                           </div>
                         </>
-                      )}
+                      )} */}
+
+<div   className="inner_form_new align-items-center" >
+                            <label className="controlform">Submit Back To Original Department</label>
+                            <div className="row">
+                              <div className="col-md-12"> 
+                                  <input
+                                      type="checkbox"
+                                      value="10"
+                                      onChange={(e) => {
+                                        changeOriginalDepartment(e); 
+                                        // if (e.target.checked) {
+                                        //   getRoleHandle(10);
+                                        // } 
+                                      }}
+                                      name="applicationStatusDepartment"
+                                    checked={
+                                      applicationstaus == "10" ? true : false
+                                    }
+                                  />
+                                   
+                              </div>
+                            </div>
+                          </div>
+
                     </div>
 
                     {allcomment?.map((cur) => {
@@ -8843,17 +8869,17 @@ const ImportOtherDepartmentEditDetails = ({
                                     </div>
                                   </div>
 
-                                  <div class="row">
-                                    <div class="col-md-12">
-                                      <div class="inner_form_new ">
-                                        <label class="controlform">
+                                  <div className="row">
+                                    <div className="col-md-12">
+                                      <div className="inner_form_new ">
+                                        <label className="controlform">
                                           Action
                                         </label>
-                                        <div class="form-bx">
+                                        <div className="form-bx">
                                           <label>
                                             <input
                                               type="text"
-                                              class=""
+                                              className=""
                                               disabled
                                               value={
                                                 item?.assignedAction ==

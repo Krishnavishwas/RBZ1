@@ -43,7 +43,6 @@ import AdminNotFound from "./admin/pages/AdminNotFound";
 import ImportNewForm from "./pages/ImportNewForm";
 import ImportDashboard from "./pages/ImportDashboard";
 import ExportExpiredRequests from "./pages/ExportExpiredRequests";
-import ReturnDashboardExport from "./pages/ReturnDashboardExport";
 import ExportExpiringRequests from "./pages/ExportExpiringRequests";
 import CopiedResponse from "./pages/ExportCopiedResponse";
 import ImportApprovedRequests from "./pages/ImportApprovedRequests";
@@ -68,7 +67,6 @@ import FINVCancelledRequests from "./pages/FINVCancelledRequests";
 import FINVExpiredRequests from "./pages/FINVExpiredRequests";
 import FINVExpiringRequests from "./pages/FINVExpiringRequests";
 import INSNewRequest from "./pages/INSNewRequest";
-import PendingReturns from "./pages/PendingReturns";
 
 import CircularNewRequest from "./pages/CircularNewRequest";
 import CircularAllRequest from "./pages/CircularAllRequest";
@@ -78,6 +76,26 @@ import Home from "./pages/Home";
 import INSDashboard from "./pages/INSDashboard";
 import ImportCircularsRequests from "./pages/ImportCircularsRequests";
 import CircularsDashboardRequests from "./pages/CircularsDashboardRequests";
+import ImportSearch from "./pages/ImportSearch";
+import FINSearch from "./pages/FINSearch";
+import PendingReturns from "./pages/PendingReturns";
+import ImportPendingReturns from "./pages/ImportPendingReturns";
+import ReturnDashboardExport from "./pages/ReturnDashboardExport";
+import ImportReturnDashboard from "./pages/ImportReturnDashboard";
+import INSSubmittedRequests from "./pages/INSSubmittedRequests";
+import INSPendingRequests from "./pages/INSPendingRequests";
+import INSApprovedRequests from "./pages/INSApprovedRequests";
+import INSRejectedRequests from "./pages/INSRejectedRequests";
+import INSDeferredRequests from "./pages/INSDeferredRequests";
+import INSCancelledRequests from "./pages/INSCancelledRequests";
+import InspectorateExpiredRequests from "./pages/InspectorateExpiredRequests";
+import InspectorateExpiringRequests from "./pages/InspectorateExpiringRequests";
+
+import ImportCopiedResponse from "./pages/ImportCopiedResponse";
+import FINCopiedResponse from "./pages/FINCopiedResponse";
+import INSCopiedResponse from "./pages/INSCopiedResponse";
+import INSSearch from "./pages/INSSearch";
+import ExportBankReport from "./pages/ExportBankReport";
 
 function App() {
   const loginToken = Storage.getItem("loginToken");
@@ -95,7 +113,7 @@ function App() {
   return (
     <>
       <Routes>
-        {loginToken && userName && userID && rollId == 1 ? (
+        {userName && userID && rollId == 1 ? (
           <>
             <Route path="/" element={<AdminHome />} />
             <Route
@@ -134,10 +152,6 @@ function App() {
             <Route path="/AllDashboard" element={<Home />} />
             <Route path="/BankADLADashboard" element={<BankADLADashboard />} />
             <Route path="/ExportNewRequest" element={<ExportNewRequest />} />
-            <Route
-              path="/ReturnDashboardExport"
-              element={<ReturnDashboardExport />}
-            />
             <Route path="/ImportNewForm" element={<ImportNewForm />} />
             <Route path="/template" element={<TemplatePagePDF />} />
             <Route path="/ImportDashboard" element={<ImportDashboard />} />
@@ -187,7 +201,6 @@ function App() {
               path="/ExportCancelledRequests"
               element={<ExportCancelledRequests />}
             />
-            <Route path="/PendingReturns" element={<PendingReturns />} />
             <Route
               path="/ImportCancelledRequests"
               element={<ImportCancelledRequests />}
@@ -271,6 +284,62 @@ function App() {
               path="/CircularDashboard"
               element={<CircularsDashboardRequests />}
             />
+            <Route path="/SearchImport" element={<ImportSearch />} />
+            <Route path="/SearchFIN" element={<FINSearch />} />
+            <Route
+              path="/ReturnDashboardExport"
+              element={<ReturnDashboardExport />}
+            />
+            <Route
+              path="/ImportReturnDashboard"
+              element={<ImportReturnDashboard />}
+            />
+            <Route
+              path="/INSSubmittedRequests"
+              element={<INSSubmittedRequests />}
+            />
+
+            <Route path="/PendingReturns" element={<PendingReturns />} />
+            <Route
+              path="/ImportPendingReturns"
+              element={<ImportPendingReturns />}
+            />
+            <Route
+              path="/INSPendingRequests"
+              element={<INSPendingRequests />}
+            />
+            <Route
+              path="/INSApprovedRequests"
+              element={<INSApprovedRequests />}
+            />
+            <Route
+              path="/INSRejectedRequests"
+              element={<INSRejectedRequests />}
+            />
+            <Route
+              path="/INSDeferredRequests"
+              element={<INSDeferredRequests />}
+            />
+            <Route
+              path="/INSCancelledRequests"
+              element={<INSCancelledRequests />}
+            />
+            <Route
+              path="/InspectorateExpiredRequests"
+              element={<InspectorateExpiredRequests />}
+            />
+            <Route
+              path="/InspectorateExpiringRequests"
+              element={<InspectorateExpiringRequests />}
+            />
+            <Route
+              path="/CCResponseImport"
+              element={<ImportCopiedResponse />}
+            />
+            <Route path="/FINCopiedResponse" element={<FINCopiedResponse />} />
+            <Route path="/INSCopiedResponse" element={<INSCopiedResponse />} />
+            <Route path="/SearchINS" element={<INSSearch />} />
+            <Route path="/ExportsBankReport" element={<ExportBankReport />} />
 
             <Route path="*" element={<NotFound />} />
           </>

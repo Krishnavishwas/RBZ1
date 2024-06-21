@@ -10,9 +10,8 @@ import moment from "moment";
 import { APIURL } from "../constant";
 import { Storage } from "../login/Storagesetting";
 import Modal from "react-bootstrap/Modal";
-import ExportDashboardViewDetails from "../components/ExportDashboardViewDetails";
 import ReturnExportDashboardEditDetails from "../components/ReturnExportDashboardEditDetails";
-import { TailSpin } from "react-loader-spinner";
+import ReturnExportDashboardViewDetails from "../components/ReturnExportDashboardViewDetails";
 
 const ReturnDashboardExportTable = () => {
   const useId = Storage.getItem("userID");
@@ -32,7 +31,7 @@ const ReturnDashboardExportTable = () => {
       ? `${applicationDetail?.analystRecommendation}`
       : "0"
   );
-  const [nextlevelvalue, setnextlevelvalue] = useState("");
+  const [nextlevelvalue, setnextlevelvalue] = useState(roleID < 5 ? "10" : "");
   const [userRole, setUserrole] = useState([]);
   const [tatHistory, setTatHistory] = useState([]);
   const [asignUser, setAsignUser] = useState([]);
@@ -40,15 +39,9 @@ const ReturnDashboardExportTable = () => {
   const [AssignUserID, setAssignUserID] = useState("");
   const [Actiondata, setActiondata] = useState([]);
   const [selectedAppliation, setSelectedAppliation] = useState(null);
-  const [showDelegateModal, setshowDelegateModal] = useState(false);
-  const [delegateComment, setDelegateComment] = useState("");
-  const [delegateNote, setDelegateNote] = useState("");
-  const [delegateUserID, setDelegateUserID] = useState("");
   const [loading, setLoading] = useState(false);
   const [globalFilterValue, setGlobalFilterValue] = useState("");
-  const [checkdeligateuser, setcheckdeligateuser] = useState(0);
   const [data, setData] = useState([]);
-  const [btnLoader, setBtnLoader] = useState(false);
   const [delegateAsignUser, setDelegateAsignUser] = useState([]);
   const [noDataComment, setNoDataComment] = useState([]);
   const [showdataLoader, setshowdataloader] = useState(false);
@@ -178,7 +171,7 @@ const ReturnDashboardExportTable = () => {
     setshowEditForm(false);
     setnextlevelvalue("");
   };
-  
+
   const handleFormClose = () => setShowUpdateModal(false);
 
   // ----- Start Code For Open Edit Popup
@@ -187,28 +180,14 @@ const ReturnDashboardExportTable = () => {
   };
   // ----- End Code For Open Edit Popup
 
-  // ----- Start Code For Open delegate Popup
-  const handleClickDelegateModal = () => {
-    setshowDelegateModal(true);
-  };
-
-  const DelegateModalClose = () => {
-    setshowDelegateModal(false);
-    setnextlevelvalue("");
-    setDelegateAsignUser([]);
-    setDelegateComment("");
-    setDelegateNote("");
-    setSelectedAppliation(null);
-  };
-  // ----- End Code For Open delegate Popup
-
   // ----- Start Code For Geting Table List Data
   const handleData = async () => {
     setLoading(true);
     await axios
       .post(APIURL + "ReturnApplication/GetReturnApplications", {
         UserID: useId.replace(/"/g, ""),
-        DepartmentID: "2"
+        DepartmentID: "2",
+        RoleID: roleID,
       })
       .then((res) => {
         if (res.data.responseCode === "200") {
@@ -243,7 +222,6 @@ const ReturnDashboardExportTable = () => {
       setSupervisorRoleId("");
       setAsignUser([]);
     } else {
-      // setSupervisorRoleId(value);
       axios
         .post(APIURL + "User/GetUsersByRoleID", {
           RoleID:
@@ -254,8 +232,7 @@ const ReturnDashboardExportTable = () => {
                 value == "6" ||
                 value == "7" ||
                 value == "8"
-              ? // ? parseInt(roleID) - 1
-                value
+              ? value
               : roleID,
           DepartmentID: "2",
           UserID: useId.replace(/"/g, ""),
@@ -290,10 +267,6 @@ const ReturnDashboardExportTable = () => {
       });
   };
 
-  useEffect(() => {
-    delegatechangeRole();
-  }, [checkdeligateuser]);
-
   const supervisorHangechange = (e) => {
     const { name, value } = e.target;
     if (value == "") {
@@ -321,7 +294,6 @@ const ReturnDashboardExportTable = () => {
         ID: id,
       })
       .then((res) => {
-        console.log("ReturnApplication/GetReturnInfoByApplicationID - ", res);
         if (res.data.responseCode === "200") {
           setApplicationDetail(res.data.responseData);
           setTimeout(() => {
@@ -336,7 +308,7 @@ const ReturnDashboardExportTable = () => {
       });
 
     await axios
-      .post(APIURL + "ExportApplication/GetCommentsInfoByRoleID", {
+      .post(APIURL + "ReturnApplication/GetCommentsInfoByRoleIDReturns", {
         ApplicationID: id,
       })
       .then((res) => {
@@ -351,7 +323,7 @@ const ReturnDashboardExportTable = () => {
       });
 
     await axios
-      .post(APIURL + "ExportApplication/GetNewComments", {
+      .post(APIURL + "ReturnApplication/GetNewCommentsReturns", {
         ID: id,
       })
       .then((res) => {
@@ -366,7 +338,7 @@ const ReturnDashboardExportTable = () => {
       });
 
     await axios
-      .post(APIURL + "ExportApplication/GetApplicationHistory", {
+      .post(APIURL + "ReturnApplication/GetApplicationHistoryReturns", {
         ID: id,
       })
       .then((res) => {
@@ -381,7 +353,7 @@ const ReturnDashboardExportTable = () => {
       });
 
     await axios
-      .post(APIURL + "ExportApplication/GetApplicationActionsByApplicationID", {
+      .post(APIURL + "ReturnApplication/GetActionsByApplicationIDReturns", {
         ID: id,
       })
       .then((res) => {
@@ -398,7 +370,7 @@ const ReturnDashboardExportTable = () => {
 
   const GetApplicationCount = async (id) => {
     await axios
-      .post(APIURL + "ExportApplication/CountByApplicationID", {
+      .post(APIURL + "ReturnApplication/CountByApplicationIDReturns", {
         ApplicationID: id,
       })
       .then((res) => {
@@ -412,7 +384,6 @@ const ReturnDashboardExportTable = () => {
         console.log(err);
       });
   };
-
   // ----- End Code For Geting Table Data
 
   // ----- Start Code For Search Table Data
@@ -466,40 +437,6 @@ const ReturnDashboardExportTable = () => {
     handleData();
   }, []);
 
-  const delegateValues = selectedAppliation?.map((v) => {
-    return {
-      ApplicationID: v.id,
-      status: v.status,
-      AssignedTo: delegateUserID,
-      RoleID: roleID,
-      AssignedToRoleID: roleID,
-      Notes: delegateNote,
-      Comment: delegateComment,
-      CreatedBy: useId.replace(/"/g, ""),
-    };
-  });
-
-  const delegateSubmit = (e) => {
-    e.preventDefault();
-    setBtnLoader(true);
-    axios
-      .post(APIURL + "ExportApplication/BulkDelegate", delegateValues)
-      .then((res) => {
-        if (res.data.responseCode == 200) {
-          setBtnLoader(false);
-          DelegateModalClose();
-          handleData();
-          setDelegateAsignUser([]);
-          setDelegateComment("");
-          setDelegateNote("");
-          setSelectedAppliation(null);
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
-
   return (
     <>
       {loading == true ? (
@@ -513,7 +450,7 @@ const ReturnDashboardExportTable = () => {
             value={data}
             scrollable
             scrollHeight="650px"
-            className={roleID >= 5 || roleID == 3 ? "mt-1" : "mt-1 tablehideth"}
+            className="mt-1"
             selection={selectedAppliation}
             onSelectionChange={(e) => setSelectedAppliation(e.value)}
             paginator={data.length > 10 ? true : false}
@@ -585,6 +522,7 @@ const ReturnDashboardExportTable = () => {
           </DataTable>
         </div>
       )}
+      
       <Modal
         show={showUpdateModal}
         onHide={handleFormClose}
@@ -597,7 +535,7 @@ const ReturnDashboardExportTable = () => {
               <h5>
                 <Modal.Header closeButton className="p-0">
                   <Modal.Title>
-                    View Export Request --{" "}
+                    View Return Export Request --{" "}
                     <big>{applicationDetail?.rbzReferenceNumber}</big>
                   </Modal.Title>
                 </Modal.Header>
@@ -605,7 +543,7 @@ const ReturnDashboardExportTable = () => {
             </div>
             <div className="login_form_panel">
               <Modal.Body className="p-0">
-                <ExportDashboardViewDetails
+                <ReturnExportDashboardViewDetails
                   applicationDetail={applicationDetail}
                   handleFormClose={handleFormClose}
                   allcomment={allcomment}
@@ -643,7 +581,7 @@ const ReturnDashboardExportTable = () => {
                         }
                         style={{ alignItems: "center" }}
                       >
-                        Edit Export Request --{" "}
+                        Edit Return Export Request --{" "}
                         <big>
                           {applicationDetail?.rbzReferenceNumber
                             ? applicationDetail.rbzReferenceNumber
@@ -688,129 +626,6 @@ const ReturnDashboardExportTable = () => {
               </Modal.Body>
             </div>
           </div>
-        </div>
-      </Modal>
-
-      <Modal
-        show={showDelegateModal}
-        onHide={DelegateModalClose}
-        backdrop="static"
-        className="max-width-400"
-      >
-        <div className="application-box">
-          <form onSubmit={delegateSubmit}>
-            <div className="login_inner">
-              <div className="login_form ">
-                <h5>
-                  <Modal.Header closeButton className="p-0">
-                    <Modal.Title>Bulk Delegate</Modal.Title>
-                  </Modal.Header>
-                </h5>
-              </div>
-              <div className="login_form_panel">
-                <Modal.Body className="p-0">
-                  <div className="row">
-                    <div className="col-md-12">
-                      <div className="inner_form_new">
-                        <label className="controlformV">
-                          {roleName ? roleName.replace(/"/g, "") : "User"}
-                        </label>
-                        <div className="form-bxV">
-                          <label>
-                            <select
-                              name="AssignUserID"
-                              className=""
-                              onChange={(e) =>
-                                setDelegateUserID(e.target.value)
-                              }
-                            >
-                              <option value="">
-                                Select{" "}
-                                {roleName ? roleName.replace(/"/g, "") : "User"}
-                              </option>
-                              {delegateAsignUser?.map((item, index) => {
-                                return (
-                                  <option key={index} value={item.userID}>
-                                    {item.name}
-                                  </option>
-                                );
-                              })}
-                            </select>
-                            <span className="sspan"></span>
-                          </label>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="col-md-12">
-                      <div className="inner_form_new">
-                        <label className="controlformV">
-                          Notes <b className="text-danger">*</b>
-                        </label>
-                        <div className="form-bxV">
-                          <label>
-                            <textarea
-                              placeholder="Delegate Notes"
-                              name="delegateNote"
-                              onChange={(e) => setDelegateNote(e.target.value)}
-                              required
-                            />
-                            <span className="sspan"></span>
-                          </label>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="col-md-12">
-                      <div className="inner_form_new">
-                        <label className="controlformV">
-                          Comments <b className="text-danger">*</b>
-                        </label>
-                        <div className="form-bxV">
-                          <label>
-                            <textarea
-                              placeholder="Delegate Comments"
-                              name="delegateComment"
-                              onChange={(e) =>
-                                setDelegateComment(e.target.value)
-                              }
-                              required
-                            />
-                            <span className="sspan"></span>
-                          </label>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </Modal.Body>
-              </div>
-              <Modal.Footer className="mt-0">
-                <div className="form-footer mt-0 justify-content-center">
-                  <button
-                    type="submit"
-                    className="login"
-                    disabled={delegateUserID !== "" ? false : true}
-                  >
-                    <span className="d-flex align-items-center justify-content-center">
-                      Submit &nbsp;
-                      {btnLoader ? (
-                        <TailSpin
-                          visible={true}
-                          height="18"
-                          width="18"
-                          color="#fff"
-                          ariaLabel="tail-spin-loading"
-                          radius="1"
-                          wrapperStyle={{}}
-                          wrapperClass=""
-                        />
-                      ) : (
-                        ""
-                      )}
-                    </span>
-                  </button>
-                </div>
-              </Modal.Footer>
-            </div>
-          </form>
         </div>
       </Modal>
     </>
