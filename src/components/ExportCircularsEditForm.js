@@ -73,7 +73,7 @@ const ExportCircularsEditForm = ({
   GetHandelDetail,
 }) => {
   const ratevalue = applicationDetail?.rate;
-  // console.log("applicationDetail",applicationDetail);
+
   const CustomTableCell = TableCell.extend({
     addAttributes() {
       return {
@@ -1193,8 +1193,6 @@ const ExportCircularsEditForm = ({
         ? applicationDetail?.expiringDate
         : new Date()
     );
-
-    console.log("selectedDirectives", selectedDirectives);
     // setSelectedBanks(bankdtata);
 
     if (applicationDetail?.isReturnNeeded == 1) {
@@ -1329,12 +1327,6 @@ const ExportCircularsEditForm = ({
     setErrors(newErrors);
   };
 
-  {
-    console.log("allcomment", allcomment);
-  }
-
-  console.log("applicationDetail", applicationDetail);
-
   const removeUserImage = (index, id) => {
     const updatedUserFile = userfiles?.filter((item) => item.id !== id);
     setuserFiles(updatedUserFile);
@@ -1444,7 +1436,7 @@ const ExportCircularsEditForm = ({
     await axios
       .post(APIURL + "Master/GetRoles", {
         RoleID: "4",
-        DepartmentID:"2",
+        DepartmentID: "2",
         Status: "35",
       })
       .then((res) => {
@@ -1657,7 +1649,7 @@ const ExportCircularsEditForm = ({
     }, 0);
   };
 
-  console.log("Actiondata", Actiondata);
+  
   const filtertin_bpn = companies?.find((company) => {
     if (company.id === getCompanyName?.value) {
       return {
@@ -1979,11 +1971,6 @@ const ExportCircularsEditForm = ({
     directiveDate();
   }, []);
 
-  const handleChangecompany = (selectedOption) => {
-    setgetCompanyName(selectedOption);
-  };
-
-  console.log("errors", errors);
   const handleInputChangecompany = (input) => {
     setInputValue(input);
     if (input?.length >= 3) {
@@ -2016,8 +2003,6 @@ const ExportCircularsEditForm = ({
       }, 1500);
     }
   }, [toastDisplayed]);
-
-  console.log("Description", Description);
 
   const CCValue = applicationDetail?.copiedResponses?.length
     ? applicationDetail?.copiedResponses?.map((v, i) => (
@@ -2461,10 +2446,13 @@ const ExportCircularsEditForm = ({
                                 </div>
                                 <div className="login_form_panel">
                                   <Modal.Body className="p-0">
-                                   
-
-                                  <CircularsDirectiveListDataTable DirectiveOption={DirectiveOption} setSelectedDirectives={setSelectedDirectives} selectedDirectives={selectedDirectives} />
-                                    
+                                    <CircularsDirectiveListDataTable
+                                      DirectiveOption={DirectiveOption}
+                                      setSelectedDirectives={
+                                        setSelectedDirectives
+                                      }
+                                      selectedDirectives={selectedDirectives}
+                                    />
                                   </Modal.Body>
                                 </div>
                                 <Modal.Footer className="justify-content-end">
@@ -2662,58 +2650,85 @@ const ExportCircularsEditForm = ({
 
                     <h5 className="section_top_subheading mt-2">Attachments</h5>
 
-                    {applicationDetail?.attachedFiles?.length > 0
-                      ? applicationDetail?.attachedFiles?.map((item) => {
-                          return (
-                            <div
-                              className={
-                                item?.filePath != null
-                                  ? "attachemt_form-bx"
-                                  : "d-none"
-                              }
+                    {applicationDetail?.attachedFiles?.length > 0 ? (
+                      applicationDetail?.attachedFiles?.map((item) => {
+                        return (
+                          <div
+                            className={
+                              item?.filePath != null
+                                ? "attachemt_form-bx"
+                                : "d-none"
+                            }
+                          >
+                            <label
+                              style={{
+                                background: "#d9edf7",
+                                padding: "9px 3px",
+                                border: "0px",
+                              }}
                             >
-                              <label
-                                style={{
-                                  background: "#d9edf7",
-                                  padding: "9px 3px",
-                                  border: "0px",
-                                }}
-                              >
-                                {item?.fileName ? (
-                                  <span style={{ fontWeight: "500" }}>
-                                    {/* {item?.fileName}  */}
-                                    {item?.label ? item?.label : item?.fileName}
-                                  </span>
-                                ) : (
-                                  <span style={{ fontWeight: "500" }}>
-                                    Cover Letter
-                                  </span>
-                                )}
-                              </label>
-                              {item?.filePath ? (
-                                <span className="filename">
-                                  <Link
-                                    to={item?.filePath}
-                                    target="_blank"
-                                    className={
-                                      item?.filePath
-                                        ? "viewbtn_file"
-                                        : "viewbtn_file pe-none"
-                                    }
-                                  >
-                                    View File
-                                  </Link>
+                              {item?.fileName ? (
+                                <span style={{ fontWeight: "500" }}>
+                                  {/* {item?.fileName}  */}
+                                  {item?.label ? item?.label : item?.fileName}
                                 </span>
                               ) : (
-                                <span className="disabletext">Not Found</span>
+                                <span style={{ fontWeight: "500" }}>
+                                  Cover Letter
+                                </span>
                               )}
-                            </div>
-                          );
-                        })
-                      : ""}
+                            </label>
+                            {item?.filePath ? (
+                              <span className="filename">
+                                <Link
+                                  to={item?.filePath}
+                                  target="_blank"
+                                  className={
+                                    item?.filePath
+                                      ? "viewbtn_file"
+                                      : "viewbtn_file pe-none"
+                                  }
+                                >
+                                  View File
+                                </Link>
+                              </span>
+                            ) : (
+                              <span className="disabletext">Not Found</span>
+                            )}
+                          </div>
+                        );
+                      })
+                    ) : (
+                      <div className="text-center mb-4">File Not Found</div>
+                    )}
                   </div>
                 </div>
               </div>
+              <h5 className="section_top_subheading mt-2">Directives Files </h5>
+
+              <div className="directivefile_view_outer">
+                {selectedDirectives?.map((item, index) => {
+                  return (
+                    <>
+                      <div className="directivefile_view">
+                        <label>{item.label}</label>
+                        <div className="ddrbrk">
+                          {item?.filePath?.map((file, ind) => {
+                            return (
+                              <span key={ind}>
+                                <Link to={file?.filePath} target="_blank">
+                                  {file?.fileName}
+                                </Link>
+                              </span>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    </>
+                  );
+                })}
+              </div>
+
               {/* -------------start next level------- */}
               {/* analyst analyst code start */}
               {/* {applicationDetail?.userID !== UserID.replace(/"/g, "") && roleID >= 5 ? ( */}
@@ -2722,8 +2737,8 @@ const ExportCircularsEditForm = ({
                   <h5
                     className={
                       analystTab
-                        ? "section_top_subheading mt-0 py-3 btn-collapse_active cursorpointer"
-                        : "section_top_subheading mt-0 py-3 cursorpointer"
+                        ? "section_top_subheading mt-0 py-3 btn-collapse_active cursorpointer mt-4"
+                        : "section_top_subheading mt-0 py-3 cursorpointer mt-4"
                     }
                     onClick={() => setanalystTab(!analystTab)}
                   >
@@ -2755,8 +2770,8 @@ const ExportCircularsEditForm = ({
                                     : "nav-link w-100 border-radius0"
                                 }
                                 id="analyst"
-                              data-bs-toggle="tab"
-                              data-bs-target="#analyst-justified-home"
+                                data-bs-toggle="tab"
+                                data-bs-target="#analyst-justified-home"
                                 type="button"
                                 role="tab"
                                 aria-controls="home"
@@ -2810,7 +2825,6 @@ const ExportCircularsEditForm = ({
                         role="tabpanel"
                         aria-labelledby="analyst"
                       >
-                        
                         {Actiondata?.map((cur) => {
                           const firstItem = cur?.circularActivityData?.[0]; // Accessing the first element directly
 
@@ -2953,9 +2967,7 @@ const ExportCircularsEditForm = ({
                             );
                           }
                         })}
-                         
                       </div>
-
 
                       {allcomment?.map((cur) => {
                         return cur?.circularActivityData
@@ -2969,8 +2981,8 @@ const ExportCircularsEditForm = ({
                                     key={index}
                                     className={
                                       index == 0 && roleID != 5
-                                        ?  "tab-pane fade show active"
-                                      : "tab-pane fade show  "
+                                        ? "tab-pane fade show active"
+                                        : "tab-pane fade show  "
                                     }
                                     id={"analyst-justified-home" + index}
                                     role="tabpanel"
@@ -3509,7 +3521,7 @@ const ExportCircularsEditForm = ({
               {/* analyst analyst code end */}
 
               {/* senior analyst code start */}
-              {roleID >= 6 ? (
+              {roleID >= 4 ? (
                 <>
                   <h5
                     className={
@@ -4300,7 +4312,7 @@ const ExportCircularsEditForm = ({
                                     className="addDirectiveBtn"
                                     onClick={handleDirectiveModalShow}
                                   >
-                                    Add Directives --
+                                    Add Directives
                                   </Button>
                                   {errors?.selectedDirectives &&
                                   selectedDirectives.length == 0 ? (
@@ -4334,8 +4346,15 @@ const ExportCircularsEditForm = ({
                                         </div>
                                         <div className="login_form_panel">
                                           <Modal.Body className="p-0">
-                                          <CircularsDirectiveListDataTable DirectiveOption={DirectiveOption} setSelectedDirectives={setSelectedDirectives} selectedDirectives={selectedDirectives} />
-
+                                            <CircularsDirectiveListDataTable
+                                              DirectiveOption={DirectiveOption}
+                                              setSelectedDirectives={
+                                                setSelectedDirectives
+                                              }
+                                              selectedDirectives={
+                                                selectedDirectives
+                                              }
+                                            />
                                           </Modal.Body>
                                         </div>
                                         <Modal.Footer className="justify-content-end">
@@ -4392,155 +4411,11 @@ const ExportCircularsEditForm = ({
                             {/* end form-bx  */}
                           </>
                         ) : (
-                          <>
-                            {Actiondata?.map((cur) => {
-                              const firstItem = cur?.circularActivityData?.[0]; // Accessing the first element directly
-
-                              if (cur?.assignedToRoleID === 6 && firstItem) {
-                                // Check if firstItem exists
-                                return (
-                                  <div className="bakgroundaction">
-                                    <div key={firstItem.circularID}>
-                                      {" "}
-                                      {/* Remember to add a unique key */}
-                                      <div className="row">
-                                        <div className="col-md-6">
-                                          <div className="inner_form_new">
-                                            <label className="controlform">
-                                              Action Type
-                                            </label>
-                                            <div className="form-bx">
-                                              <label>
-                                                {" "}
-                                                <input
-                                                  type="text"
-                                                  className=""
-                                                  disabled
-                                                  // value={firstItem?.actionStatusName}
-                                                  value={
-                                                    firstItem?.actionStatusName ==
-                                                      "Approved" ||
-                                                    firstItem?.actionStatusName ==
-                                                      "Reject" ||
-                                                    firstItem?.actionStatusName ==
-                                                      "Cancelled"
-                                                      ? "Assigned" ||
-                                                        firstItem?.actionStatusName ==
-                                                          "Draft"
-                                                      : firstItem?.actionStatusName
-                                                  }
-                                                />
-                                              </label>
-                                            </div>
-                                          </div>
-                                        </div>
-
-                                        <div className="col-md-3">
-                                          <div className="inner_form_new-sm">
-                                            <label className="controlform-sm">
-                                              User{" "}
-                                              <i
-                                                className="bi bi-info-circle icons-info"
-                                                title={`Role : ${firstItem?.actionRoleName}`}
-                                              ></i>
-                                            </label>
-                                            <div className="form-bx-sm">
-                                              <label>
-                                                {" "}
-                                                <input
-                                                  type="text"
-                                                  className=""
-                                                  disabled
-                                                  value={
-                                                    firstItem?.actionUserName
-                                                  }
-                                                />
-                                              </label>
-                                            </div>
-                                          </div>
-                                        </div>
-
-                                        <div className="col-md-3">
-                                          <div className="inner_form_new-sm">
-                                            <label className="controlform-sm">
-                                              {firstItem?.actionStatusName ==
-                                                "Approved" ||
-                                              firstItem?.actionStatusName ==
-                                                "Reject" ||
-                                              firstItem?.actionStatusName ==
-                                                "Cancelled"
-                                                ? "Assigned"
-                                                : firstItem?.actionStatusName}{" "}
-                                              Date
-                                            </label>
-                                            <div className="form-bx-sm">
-                                              <label>
-                                                <input
-                                                  type="text"
-                                                  className=""
-                                                  disabled
-                                                  value={moment(
-                                                    firstItem?.createdDate
-                                                  ).format("DD/MMM/yyyy")}
-                                                />
-                                              </label>
-                                            </div>
-                                          </div>
-                                        </div>
-                                      </div>
-                                      <div
-                                        className={
-                                          firstItem?.actionNotes
-                                            ? "inner_form_new"
-                                            : "d-none"
-                                        }
-                                      >
-                                        <label className="controlform">
-                                          Action Note
-                                        </label>
-                                        <div className="form-bx">
-                                          <label>
-                                            {" "}
-                                            <textarea
-                                              type="text"
-                                              className=""
-                                              disabled
-                                              value={firstItem?.actionNotes}
-                                            />
-                                          </label>
-                                        </div>
-                                      </div>
-                                      <div
-                                        className={
-                                          firstItem?.actionComment
-                                            ? "inner_form_new"
-                                            : "d-none"
-                                        }
-                                      >
-                                        <label className="controlform">
-                                          Action Comment
-                                        </label>
-                                        <div className="form-bx">
-                                          <label>
-                                            {" "}
-                                            <textarea
-                                              type="text"
-                                              className=""
-                                              disabled
-                                              value={firstItem?.actionComment}
-                                            />
-                                          </label>
-                                        </div>
-                                      </div>
-                                    </div>
-                                  </div>
-                                );
-                              }
-                            })}
-                          </>
+                          <></>
                         )}
                         {/* next level data show and assign behalf of not equal userID  end*/}
                       </div>
+
                       {allcomment?.map((cur) => {
                         return cur?.circularActivityData
                           ?.slice()
@@ -4571,7 +4446,7 @@ const ExportCircularsEditForm = ({
                                         <div className="col-md-6">
                                           <div className="inner_form_new ">
                                             <label className="controlform">
-                                              Action Type
+                                              Action Type--
                                             </label>
                                             <div className="form-bx">
                                               <label>
@@ -5095,7 +4970,7 @@ const ExportCircularsEditForm = ({
               {/* senior analyst code end */}
               {/* Principal analyst code start */}
 
-              {roleID >= 7 ? (
+              {roleID >= 4 ? (
                 <>
                   <h5
                     className={
@@ -5916,8 +5791,15 @@ const ExportCircularsEditForm = ({
                                         </div>
                                         <div className="login_form_panel">
                                           <Modal.Body className="p-0">
-                                          <CircularsDirectiveListDataTable DirectiveOption={DirectiveOption} setSelectedDirectives={setSelectedDirectives} selectedDirectives={selectedDirectives} />
-
+                                            <CircularsDirectiveListDataTable
+                                              DirectiveOption={DirectiveOption}
+                                              setSelectedDirectives={
+                                                setSelectedDirectives
+                                              }
+                                              selectedDirectives={
+                                                selectedDirectives
+                                              }
+                                            />
                                           </Modal.Body>
                                         </div>
                                         <Modal.Footer className="justify-content-end">
@@ -6650,7 +6532,7 @@ const ExportCircularsEditForm = ({
 
               {/* Principal analyst code end */}
               {/* Dupty director code start */}
-              {roleID >= 8 ? (
+              {roleID >= 4 ? (
                 <>
                   <h5
                     className={
@@ -6737,7 +6619,7 @@ const ExportCircularsEditForm = ({
                     <div className="tab-content pt-2">
                       <div
                         className={
-                          roleID >= 8
+                          roleID >= 4
                             ? "tab-pane fade show active"
                             : "tab-pane fade show "
                         }
@@ -7504,8 +7386,15 @@ const ExportCircularsEditForm = ({
                                         </div>
                                         <div className="login_form_panel">
                                           <Modal.Body className="p-0">
-                                          <CircularsDirectiveListDataTable DirectiveOption={DirectiveOption} setSelectedDirectives={setSelectedDirectives} selectedDirectives={selectedDirectives} />
-
+                                            <CircularsDirectiveListDataTable
+                                              DirectiveOption={DirectiveOption}
+                                              setSelectedDirectives={
+                                                setSelectedDirectives
+                                              }
+                                              selectedDirectives={
+                                                selectedDirectives
+                                              }
+                                            />
                                           </Modal.Body>
                                         </div>
                                         <Modal.Footer className="justify-content-end">
@@ -7663,150 +7552,7 @@ const ExportCircularsEditForm = ({
                           </>
                         ) : (
                           <>
-                            {Actiondata?.map((cur) => {
-                              const firstItem = cur?.circularActivityData?.[0]; // Accessing the first element directly
-
-                              if (cur?.assignedToRoleID === 8 && firstItem) {
-                                // Check if firstItem exists
-                                return (
-                                  <div className="bakgroundaction">
-                                    <div key={firstItem.actionID}>
-                                      {" "}
-                                      {/* Remember to add a unique key */}
-                                      <div className="row">
-                                        <div className="col-md-6">
-                                          <div className="inner_form_new">
-                                            <label className="controlform">
-                                              Action Type
-                                            </label>
-                                            <div className="form-bx">
-                                              <label>
-                                                {" "}
-                                                <input
-                                                  type="text"
-                                                  className=""
-                                                  disabled
-                                                  // value={firstItem?.actionStatusName}
-                                                  value={
-                                                    firstItem?.actionStatusName ==
-                                                      "Approved" ||
-                                                    firstItem?.actionStatusName ==
-                                                      "Reject" ||
-                                                    firstItem?.actionStatusName ==
-                                                      "Cancelled" ||
-                                                    firstItem?.actionStatusName ==
-                                                      "Draft"
-                                                      ? "Assigned"
-                                                      : firstItem?.actionStatusName
-                                                  }
-                                                />
-                                              </label>
-                                            </div>
-                                          </div>
-                                        </div>
-
-                                        <div className="col-md-3">
-                                          <div className="inner_form_new-sm">
-                                            <label className="controlform-sm">
-                                              User{" "}
-                                              <i
-                                                className="bi bi-info-circle icons-info"
-                                                title={`Role : ${firstItem?.actionRoleName}`}
-                                              ></i>
-                                            </label>
-                                            <div className="form-bx-sm">
-                                              <label>
-                                                {" "}
-                                                <input
-                                                  type="text"
-                                                  className=""
-                                                  disabled
-                                                  value={
-                                                    firstItem?.actionUserName
-                                                  }
-                                                />
-                                              </label>
-                                            </div>
-                                          </div>
-                                        </div>
-
-                                        <div className="col-md-3">
-                                          <div className="inner_form_new-sm">
-                                            <label className="controlform-sm">
-                                              {firstItem?.actionStatusName ==
-                                                "Approved" ||
-                                              firstItem?.actionStatusName ==
-                                                "Reject" ||
-                                              firstItem?.actionStatusName ==
-                                                "Cancelled"
-                                                ? "Assigned"
-                                                : firstItem?.actionStatusName}{" "}
-                                              Date
-                                            </label>
-                                            <div className="form-bx-sm">
-                                              <label>
-                                                <input
-                                                  type="text"
-                                                  className=""
-                                                  disabled
-                                                  value={moment(
-                                                    firstItem?.createdDate
-                                                  ).format("DD/MMM/yyyy")}
-                                                />
-                                              </label>
-                                            </div>
-                                          </div>
-                                        </div>
-                                      </div>
-                                      <div
-                                        className={
-                                          firstItem?.actionNotes
-                                            ? "inner_form_new"
-                                            : "d-none"
-                                        }
-                                      >
-                                        <label className="controlform">
-                                          Action Note
-                                        </label>
-                                        <div className="form-bx">
-                                          <label>
-                                            {" "}
-                                            <textarea
-                                              type="text"
-                                              className=""
-                                              disabled
-                                              value={firstItem?.actionNotes}
-                                            />
-                                          </label>
-                                        </div>
-                                      </div>
-                                      <div
-                                        className={
-                                          firstItem?.actionComment
-                                            ? "inner_form_new"
-                                            : "d-none"
-                                        }
-                                      >
-                                        <label className="controlform">
-                                          Action Comment
-                                        </label>
-                                        <div className="form-bx">
-                                          <label>
-                                            {" "}
-                                            <textarea
-                                              type="text"
-                                              className=""
-                                              disabled
-                                              value={firstItem?.actionComment}
-                                            />
-                                          </label>
-                                        </div>
-                                      </div>
-                                    </div>
-                                  </div>
-                                );
-                              }
-                            })}
+                             
                           </>
                         )}
 
@@ -8200,6 +7946,7 @@ const ExportCircularsEditForm = ({
                             }
                           });
                       })}
+
                       {noDataComment?.map((v, i) => {
                         if (v.roleID == 8 && v.isDataAvailable == 0) {
                           return (
@@ -8337,7 +8084,7 @@ const ExportCircularsEditForm = ({
               {/* Dupty director code end */}
               {/* director code start */}
 
-              {roleID >= 9 ? (
+              {roleID >= 4 ? (
                 <>
                   <h5
                     className={
@@ -8421,10 +8168,12 @@ const ExportCircularsEditForm = ({
                       }
                     })}
 
+
+
                     <div className="tab-content pt-2 mb-2">
                       <div
                         className={
-                          roleID >= 9
+                          roleID == 9
                             ? "tab-pane fade show active"
                             : "tab-pane fade show "
                         }
@@ -8446,7 +8195,7 @@ const ExportCircularsEditForm = ({
                                     <div className="col-md-6">
                                       <div className="inner_form_new">
                                         <label className="controlform">
-                                          Action Type
+                                          Action Type--1
                                         </label>
                                         <div className="form-bx">
                                           <label>
@@ -9157,8 +8906,15 @@ const ExportCircularsEditForm = ({
                                         </div>
                                         <div className="login_form_panel">
                                           <Modal.Body className="p-0">
-                                          <CircularsDirectiveListDataTable DirectiveOption={DirectiveOption} setSelectedDirectives={setSelectedDirectives} selectedDirectives={selectedDirectives} />
-
+                                            <CircularsDirectiveListDataTable
+                                              DirectiveOption={DirectiveOption}
+                                              setSelectedDirectives={
+                                                setSelectedDirectives
+                                              }
+                                              selectedDirectives={
+                                                selectedDirectives
+                                              }
+                                            />
                                           </Modal.Body>
                                         </div>
                                         <Modal.Footer className="justify-content-end">
@@ -9694,22 +9450,20 @@ const ExportCircularsEditForm = ({
                             }
                           });
                       })}
-                      {noDataComment?.map((data, i) => {
-                        if (
-                          data.roleID == 9 &&
-                          data.isDataAvailable == 0 &&
-                          i == 8
-                        ) {
+                      
+                      {noDataComment?.map((v, i) => {
+                        if (v.roleID == 9 && v.isDataAvailable == 0) {
                           return (
                             <div
                               className={director ? "customtab" : "d-none"}
-                              key={i}
+                              key={v.roleID}
                             >
                               <div class="text-center">No Data Found</div>
                             </div>
                           );
                         }
                       })}
+                      
                     </div>
                   </div>
                 </>
@@ -9750,6 +9504,7 @@ const ExportCircularsEditForm = ({
                     ""
                   )}
 
+
                   <button
                     type="button"
                     onClick={(e) => {
@@ -9774,15 +9529,15 @@ const ExportCircularsEditForm = ({
                         checkSupervisor == false &&
                         (applicationstaus == "0" ||
                           applicationstaus == undefined) &&
-                        roleID == 9) ||
-                      (applicationDetail?.assignedTo ==
-                        UserID.replace(/"/g, "") &&
-                        applicationDetail?.actionStatus == 15 &&
-                        applicationDetail?.actionStatusName ==
-                          "Referred Back" &&
-                        applicationDetail.userID != UserID.replace(/"/g, "") &&
-                        checkSupervisor == false)
-                        ? // ||
+                        roleID == 9)
+                        ? //  || (applicationDetail?.assignedTo ==
+                          //   UserID.replace(/"/g, "") &&
+                          //   applicationDetail?.actionStatus == 15 &&
+                          //   applicationDetail?.actionStatusName ==
+                          //     "Referred Back" &&
+                          //   applicationDetail.userID != UserID.replace(/"/g, "") &&
+                          //   checkSupervisor == false)
+                          // ||
                           // (checkSupervisor == false && applicationstaus == "0" && roleID == 9)  applicationstaus == "0" && roleID == 9)
                           true
                         : false

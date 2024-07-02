@@ -79,9 +79,8 @@ import CircularsDashboardRequests from "./pages/CircularsDashboardRequests";
 import ImportSearch from "./pages/ImportSearch";
 import FINSearch from "./pages/FINSearch";
 import PendingReturns from "./pages/PendingReturns";
-import ImportPendingReturns from "./pages/ImportPendingReturns";
+
 import ReturnDashboardExport from "./pages/ReturnDashboardExport";
-import ImportReturnDashboard from "./pages/ImportReturnDashboard";
 import INSSubmittedRequests from "./pages/INSSubmittedRequests";
 import INSPendingRequests from "./pages/INSPendingRequests";
 import INSApprovedRequests from "./pages/INSApprovedRequests";
@@ -95,7 +94,24 @@ import ImportCopiedResponse from "./pages/ImportCopiedResponse";
 import FINCopiedResponse from "./pages/FINCopiedResponse";
 import INSCopiedResponse from "./pages/INSCopiedResponse";
 import INSSearch from "./pages/INSSearch";
-import ExportBankReport from "./pages/ExportBankReport";
+import ExportAdvanceSearch from "./pages/ExportAdvanceSearch";
+import ImportPendingReturns from "./pages/ImportPendingReturns";
+import ImportReturnDashboard from "./pages/ImportReturnDashboard";
+
+import FINPendingReturns from "./pages/FINPendingReturns";
+import FINReturnDashboard from "./pages/FINReturnDashboard";
+
+import INSAdvanceSearch from "./pages/INSAdvanceSearch";
+import FINAdvanceSearch from "./pages/FINAdvanceSearch";
+import ImportAdvanceSearch from "./pages/ImportAdvanceSearch";  
+
+import ExportCompletedReturns from "./pages/ExportCompletedReturns";
+import ImportCompletedReturns from "./pages/ImportCompletedReturns";
+import FINCompletedReturns from "./pages/FINCompletedReturns";
+import INSCompletedReturns from "./pages/INSCompletedReturns";
+
+import INSPendingReturns from "./pages/INSPendingReturns";
+import INSReturnDashboard from "./pages/INSReturnDashboard";
 
 function App() {
   const loginToken = Storage.getItem("loginToken");
@@ -291,19 +307,15 @@ function App() {
               element={<ReturnDashboardExport />}
             />
             <Route
-              path="/ImportReturnDashboard"
-              element={<ImportReturnDashboard />}
-            />
-            <Route
               path="/INSSubmittedRequests"
               element={<INSSubmittedRequests />}
             />
-
-            <Route path="/PendingReturns" element={<PendingReturns />} />
+            <Route path="/FINPendingReturns" element={<FINPendingReturns />} />
             <Route
-              path="/ImportPendingReturns"
-              element={<ImportPendingReturns />}
+              path="/FINReturnDashboard"
+              element={<FINReturnDashboard />}
             />
+            <Route path="/PendingReturns" element={<PendingReturns />} />
             <Route
               path="/INSPendingRequests"
               element={<INSPendingRequests />}
@@ -339,7 +351,26 @@ function App() {
             <Route path="/FINCopiedResponse" element={<FINCopiedResponse />} />
             <Route path="/INSCopiedResponse" element={<INSCopiedResponse />} />
             <Route path="/SearchINS" element={<INSSearch />} />
-            <Route path="/ExportsBankReport" element={<ExportBankReport />} />
+            <Route path="/AdvanceSearchExport" element={<ExportAdvanceSearch />} />
+            <Route path="/AdvanceSearchImport" element={<ImportAdvanceSearch />} />
+            <Route path="/AdvanceSearchFIN" element={<FINAdvanceSearch />} />
+            <Route path="/AdvanceSearchINS" element={<INSAdvanceSearch />} />
+            <Route
+              path="/ImportPendingReturns"
+              element={<ImportPendingReturns />}
+            />
+
+            <Route
+              path="/ImportReturnDashboard"
+              element={<ImportReturnDashboard />}
+            />
+
+<Route path="/CompletedReturnsExport" element={<ExportCompletedReturns />} />
+            <Route path="/CompletedReturnsImport" element={<ImportCompletedReturns />} />
+            <Route path="/CompletedReturnsFIN" element={<FINCompletedReturns />} />
+            <Route path="/CompletedReturnsINS" element={<INSCompletedReturns />} />
+            <Route path="/INSPendingReturns" element={<INSPendingReturns />} />
+            <Route path="/INSReturnDashboard" element={<INSReturnDashboard />}/>
 
             <Route path="*" element={<NotFound />} />
           </>

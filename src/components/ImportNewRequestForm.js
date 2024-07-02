@@ -810,7 +810,6 @@ const ImportNewRequestForm = () => {
         ID: id,
       })
       .then((res) => {
-        console.log("res", res);
         if (res.data.responseCode === "200") {
           setLoading(false);
           setApplicationDetail(res.data.responseData);
@@ -886,26 +885,6 @@ const ImportNewRequestForm = () => {
     //---------------------------vishwas end------------------------------
   };
 
-  // const GetApplicationCount = async (id) => {
-  //   await axios
-  //     .post(APIURL + "ImportApplication/CountByApplicationIDImport", {
-  //       ApplicationID: id,
-  //     })
-  //     .then((res) => {
-  //       if (res.data.responseCode == 200) {
-  //         setresponceCount(res.data.responseData);
-  //       } else {
-  //         setresponceCount([]);
-  //       }
-  //     })
-  //     .catch((err) => {
-  //       console.log(err);
-  //     });
-  // };
-
-  // useEffect(() => {
-  //   GetApplicationTypes();
-  // }, []);
 
   const action = (rowData) => {
     return bankName.replace(/"/g, "") == rowData?.bankName ? (

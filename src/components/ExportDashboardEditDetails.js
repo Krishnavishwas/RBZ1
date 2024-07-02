@@ -278,8 +278,6 @@ const ExportDashboardEditDetails = ({
       ? "5"
       : ExporttabDepId;
 
-      console.log("ExporttabDepId - ", ExporttabDepId);
-
   const ChangeApplicationStatus = (e) => {
     const values = e.target.value;
     setapplicationstaus(values);
@@ -1300,6 +1298,8 @@ const ExportDashboardEditDetails = ({
     }
   };
 
+  const getFrequencyName = AllFrequency?.find((item)=> item.id == getFrequencyID)
+ 
   const handleshareFileChange = (e, id) => {
     const file = e.target.files[0];
     const index = userfiles?.findIndex((item) => item.id === id);
@@ -1410,7 +1410,6 @@ const ExportDashboardEditDetails = ({
                 }
               } else {
                 if (headerImage != "") {
-                  console.log("hii ")
                   const pageCount = doc.internal.getNumberOfPages();
                   let pageHeight = doc.internal.pageSize.height;
                   var pagewidth = doc.internal.pageSize.width;
@@ -2640,7 +2639,7 @@ const ExportDashboardEditDetails = ({
         console.log("User/GetUsersByRoleID - Error", error);
       });
   };
-console.log("DeptID", DeptID)
+
   const SubmitOtherDepartment = async () => {
     try {
       setOtherDepartmentLoader(true);
@@ -2929,8 +2928,6 @@ console.log("DeptID", DeptID)
               ) : (
                 ""
               )}
-
-{console.log("filtertin_bpn", filtertin_bpn)}
 
               {/* end form-bx  */}
 
@@ -5386,7 +5383,7 @@ console.log("DeptID", DeptID)
             ) : (
               ""
             )}
-{console.log("nextlevelvalue - ", nextlevelvalue)}
+
             {roleID >= 4 ? (
               <>
                 <h5
@@ -15432,8 +15429,8 @@ console.log("DeptID", DeptID)
                           </tr>
                           <tr
                             className={
-                              applicationDetail?.returnFrequencyName == null ||
-                              applicationDetail?.returnFrequencyName == ""
+                              getFrequencyName == undefined &&  (applicationDetail?.returnFrequencyName == null ||
+                              applicationDetail?.returnFrequencyName == "")
                                 ? "d-none"
                                 : ""
                             }
@@ -15457,14 +15454,14 @@ console.log("DeptID", DeptID)
                               }}
                             >
                               :{" "}
-                              {applicationDetail?.returnFrequencyName == null ||
+                              {getFrequencyName != undefined ? getFrequencyName.name : applicationDetail?.returnFrequencyName == null ||
                               applicationDetail?.returnFrequencyName == ""
                                 ? "N/A"
                                 : applicationDetail?.returnFrequencyName}
                             </td>
                           </tr>
-                          {applicationDetail?.returnFrequencyName == "Once" ? (
-                            <tr>
+                          {getFrequencyName?.name == "Once" || applicationDetail?.returnFrequencyName == "Once" ? (
+                            <tr className={getFrequencyName !=undefined && getFrequencyName.name == "Once" ? "" : "d-none"}>
                               <td
                                 style={{
                                   fontSize: "18px",
@@ -15484,7 +15481,7 @@ console.log("DeptID", DeptID)
                                 }}
                               >
                                 :{" "}
-                                {applicationDetail?.returnDate == null ||
+                                {getFrequencyName?.name == "Once" && IsReturnExpiringDate != "0001-01-01T00:00:00" ?  moment(IsReturnExpiringDate).format("DD MMMM YYYY") : applicationDetail?.returnDate == null ||
                                 applicationDetail?.returnDate == "" ||
                                 applicationDetail?.returnDate ==
                                   "0001-01-01T00:00:00"
@@ -16454,8 +16451,8 @@ console.log("DeptID", DeptID)
                           </tr>
                           <tr
                             className={
-                              applicationDetail?.returnFrequencyName == null ||
-                              applicationDetail?.returnFrequencyName == ""
+                              getFrequencyName == undefined &&  (applicationDetail?.returnFrequencyName == null ||
+                              applicationDetail?.returnFrequencyName == "")
                                 ? "d-none"
                                 : ""
                             }
@@ -16478,19 +16475,20 @@ console.log("DeptID", DeptID)
                               }}
                             >
                               :{" "}
-                              {applicationDetail?.returnFrequencyName == null ||
+                              {getFrequencyName != undefined ? getFrequencyName.name : applicationDetail?.returnFrequencyName == null ||
                               applicationDetail?.returnFrequencyName == ""
                                 ? "N/A"
                                 : applicationDetail?.returnFrequencyName}
                             </td>
                           </tr>
-                          {applicationDetail?.returnFrequencyName == "Once" ? (
-                            <tr>
+                          {getFrequencyName?.name == "Once" || applicationDetail?.returnFrequencyName == "Once" ? (
+                            <tr className={getFrequencyName !=undefined && getFrequencyName.name == "Once" ? "" : "d-none"}>
                               <td
                                 style={{
                                   fontSize: "18px",
                                   fontWeight: "400",
                                   color: "#000",
+                                  letterSpacing: "0.01px",
                                 }}
                               >
                                 Returns Date
@@ -16504,14 +16502,14 @@ console.log("DeptID", DeptID)
                                 }}
                               >
                                 :{" "}
-                                {applicationDetail?.returnDate == null ||
+                                {getFrequencyName?.name == "Once" && IsReturnExpiringDate != "0001-01-01T00:00:00" ?  moment(IsReturnExpiringDate).format("DD MMMM YYYY") : applicationDetail?.returnDate == null ||
                                 applicationDetail?.returnDate == "" ||
                                 applicationDetail?.returnDate ==
                                   "0001-01-01T00:00:00"
                                   ? "N/A"
                                   : moment(
                                       applicationDetail?.returnDate
-                                    ).format("DD MMMM  YYYY")}
+                                    ).format("DD MMMM YYYY")}
                               </td>
                             </tr>
                           ) : (

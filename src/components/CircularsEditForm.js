@@ -35,7 +35,6 @@ const CircularsEditForm = ({ handleEditModalClose, circularID, handleCircularLis
 
     //--------Edit BY Id Api Call start
     const editBYID = async () => {
-        console.log("circularIDEDIT", circularID);
         await axios.post(APIURL + 'Circular/GetCircularDataByID', {
             id: circularID
         }).then((res) => {
@@ -74,7 +73,6 @@ const CircularsEditForm = ({ handleEditModalClose, circularID, handleCircularLis
     };
     //---------- End form fill data handle
 
-// console.log("exportForm",exportForm);
     //---bank data start
     const bankData = async () => {
         await axios
@@ -84,7 +82,7 @@ const CircularsEditForm = ({ handleEditModalClose, circularID, handleCircularLis
 
             })
     }
-console.log("selectedBankOption",selectedBankOption);
+
     const panelFooterTemplate = () => {
         const length = exportForm.bankData ? exportForm.bankData.length : 0;
 
@@ -114,7 +112,7 @@ console.log("selectedBankOption",selectedBankOption);
 
             })
     }
-    console.log("selectedDirectivesOpt",selectedDirectivesOpt);
+
     //---------director end
     //--------analyst user api start
     const analystUserFun = async () => {
@@ -171,34 +169,25 @@ console.log("selectedBankOption",selectedBankOption);
     const bankSelectedID = exportForm?.bankData?.map((res) => res.id);
     const directiveSelectedID = exportForm?.directiveData?.map((res) => res.id);
 
-    console.log("exportForm.directiveData",exportForm.directiveData);
-    console.log("exportForm.bankData",exportForm.bankData);
-
     const HandleSubmit = async (e) => {
         e.preventDefault();
         const data = {
             ID: circularID,
             UserID: userID.replace(/"/g, ""),
-            // RoleID: roleID,
             Name: exportForm.name,
-            // BankID: '"'+bankSelectedID.join()+'"',
             BankID: bankSelectedID.join(),
             Subject: exportForm.subject,
             Content: exportForm.content,
             DirectiveID: directiveSelectedID.join(),
-            // CircularReferenceNumber: exportForm.circularReference,
             AssignedTo: checkAnalyst ? exportForm.analyst : userID.replace(/"/g, ""),
             AssignedToRoleID: checkAnalyst ? "6" : roleID,
-            // FutureDate: futureDate,
             ReleasingDate: releasingDate
 
         }
-        console.log("exportFormINSUBMIT", data);
         if (validateForm()) {
             await axios
                 .post(APIURL + "Circular/UpdateCircular", data)
                 .then((res) => {
-                    console.log("resUPDATE", res);
                     if (res.data.responseCode === '200') {
                         toast.success(res.data.responseMessage, { autoClose: 2000 })
                         setTimeout(() => {
@@ -258,7 +247,7 @@ console.log("selectedBankOption",selectedBankOption);
     }, [toastDisplayed]);
 
     // ----- End Code For Geting Table Data
-    console.log("exportForm.analyst", exportForm.analyst);
+
     return (
         <>
             <form className="circular-form">

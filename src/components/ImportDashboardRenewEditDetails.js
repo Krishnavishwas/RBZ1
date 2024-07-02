@@ -116,7 +116,7 @@ const ImportDashboardRenewEditDetails = ({
   ]);
   const [selectuserRoleRecordofficer, setselectuserRoleRecordofficer] =
     useState("");
-  const [otherfiles, setOtherfiles] = useState([]);
+  const [otherfiles, setOtherfiles] = useState([{ filename: "File Upload", upload: "" },]);
   const [files, setFiles] = useState([]);
   const [toastDisplayed, setToastDisplayed] = useState(false);
   const [errors, setErrors] = useState({});
@@ -1391,6 +1391,12 @@ const ImportDashboardRenewEditDetails = ({
                   <DatePicker
                     closeOnScroll={(e) => e.target === document}
                     selected={startDate}
+                    disabled={
+                      menuname === "Imports" &&
+                      submenuname !== "Pending Returns"
+                        ? false
+                        : true
+                    }
                     onChange={(date) => setStartDate(date)}
                     peekNextMonth
                     showMonthDropdown
@@ -1432,10 +1438,17 @@ const ImportDashboardRenewEditDetails = ({
                               changeHandelForm(e);
                             }}
                             value={applicationDetail?.pecaNumber}
+                            placeholder="Prior Exchange Control Authority Number"
                             className={
                               errors.PECANNumber
                                 ? "text-uppercase error"
                                 : "text-uppercase"
+                            }
+                            disabled={
+                              menuname === "Imports" &&
+                              submenuname !== "Pending Returns"
+                                ? false
+                                : true
                             }
                           />
                           <span className="sspan"></span>
@@ -1448,7 +1461,12 @@ const ImportDashboardRenewEditDetails = ({
                           )}
                         </label>
                       </div>
-                      <button type="button" className="primrybtn  v-button">
+                      <button type="button" className="primrybtn v-button" disabled={
+                      menuname === "Imports" &&
+                      submenuname !== "Pending Returns"
+                        ? false
+                        : true
+                    }>
                         Validate
                       </button>
                     </div>
@@ -1513,11 +1531,11 @@ const ImportDashboardRenewEditDetails = ({
                             : "Please provide at least 3 characters for auto search of Company Name"
                         }
                         onMenuClose={handleClear}
-                        className="selectinput"
+                        className="selectinput"                        
                         isDisabled={
-                          roleID == 2 ||
-                          roleID == 3 ||
-                          applicationDetail?.roleID == 4
+                          (roleID == 2 || roleID == 4) &&
+                          menuname === "Imports" &&
+                          submenuname !== "Pending Returns"
                             ? false
                             : true
                         }
@@ -1615,6 +1633,12 @@ const ImportDashboardRenewEditDetails = ({
                           onChange={(e) => {
                             changeHandelForm(e);
                           }}
+                          disabled={
+                            menuname === "Imports" &&
+                            submenuname !== "Pending Returns"
+                              ? false
+                              : true
+                          }
                           placeholder={applicationDetail?.name}
                           value={ImportForm.applicant}
                           className={errors.applicant ? "error" : ""}
@@ -1645,9 +1669,10 @@ const ImportDashboardRenewEditDetails = ({
                         changeHandelForm(e);
                       }}
                       disabled={
-                        roleID == 2 ||
+                        (roleID == 2 ||
                         roleID == 3 ||
-                        applicationDetail?.roleID == 4
+                        applicationDetail?.roleID == 4) && (menuname === "Imports" &&
+                            submenuname !== "Pending Returns")
                           ? false
                           : true
                       }
@@ -1697,6 +1722,12 @@ const ImportDashboardRenewEditDetails = ({
                       onChange={(e) => {
                         changeHandelForm(e);
                       }}
+                      disabled={
+                        menuname === "Imports" &&
+                        submenuname !== "Pending Returns"
+                          ? false
+                          : true
+                      }
                       value={applicationDetail?.beneficiaryName}
                     />
                     <span className="sspan"></span>
@@ -1717,6 +1748,12 @@ const ImportDashboardRenewEditDetails = ({
                 <div className="form-bx">
                   <label>
                     <select
+                    disabled={
+                      menuname === "Imports" &&
+                      submenuname !== "Pending Returns"
+                        ? false
+                        : true
+                    }
                       name="baneficiaryCountry"
                       onChange={(e) => {
                         changeHandelForm(e);
@@ -1746,6 +1783,12 @@ const ImportDashboardRenewEditDetails = ({
                   <div className="form-bx">
                     <label>
                       <select
+                      disabled={
+                        menuname === "Imports" &&
+                        submenuname !== "Pending Returns"
+                          ? false
+                          : true
+                      }
                         ref={govtAgencieRef}
                         name="govtAgencie"
                         onChange={(e) => {
@@ -1788,6 +1831,12 @@ const ImportDashboardRenewEditDetails = ({
                     <div className="form-bx">
                       <label>
                         <select
+                        disabled={
+                          menuname === "Imports" &&
+                          submenuname !== "Pending Returns"
+                            ? false
+                            : true
+                        }
                           ref={currencyRef}
                           name="currency"
                           onChange={(e) => {
@@ -1835,6 +1884,12 @@ const ImportDashboardRenewEditDetails = ({
                           onChange={(e) => {
                             changeHandelForm(e);
                           }}
+                          disabled={
+                            menuname === "Imports" &&
+                            submenuname !== "Pending Returns"
+                              ? false
+                              : true
+                          }
                           placeholder={applicationDetail?.amount}
                           className={
                             errors.amount && applicationDetail.amount === ""
@@ -1868,14 +1923,7 @@ const ImportDashboardRenewEditDetails = ({
                           ref={rateRef}
                           type="text"
                           name="rate"
-                          value={curRate}
-                          // value={
-                          //   applicationDetail?.currency
-                          //     ? curRate
-                          //       ? curRate
-                          //       : applicationDetail.rate
-                          //     : "Rate"
-                          // }
+                          value={curRate}                         
                           disabled
                         />
                         <span className="sspan"></span>
@@ -1922,6 +1970,12 @@ const ImportDashboardRenewEditDetails = ({
                       onChange={(e) => {
                         changeHandelForm(e);
                       }}
+                      disabled={
+                        menuname === "Imports" &&
+                        submenuname !== "Pending Returns"
+                          ? false
+                          : true
+                      }
                       className={
                         errors.sector && ImportForm.sector === "" ? "error" : ""
                       }
@@ -1957,14 +2011,15 @@ const ImportDashboardRenewEditDetails = ({
                       name="subSector"
                       onChange={(e) => {
                         changeHandelForm(e);
-                      }}
+                      }}                     
                       disabled={
                         applicationDetail.sector === "" ||
                         (roleID == 2 ||
                         roleID == 3 ||
                         applicationDetail?.roleID == 4
                           ? false
-                          : true)
+                          : true) || ( menuname === "Imports" &&
+                        submenuname === "Pending Returns")
                           ? true
                           : false
                       }
@@ -2007,6 +2062,12 @@ const ImportDashboardRenewEditDetails = ({
                       onChange={(e) => {
                         changeHandelForm(e);
                       }}
+                      disabled={
+                        menuname === "Imports" &&
+                        submenuname !== "Pending Returns"
+                          ? false
+                          : true
+                      }
                       placeholder={applicationDetail?.applicantComment}
                       className={errors.applicantComments ? "error" : ""}
                     />
@@ -2577,7 +2638,7 @@ const ImportDashboardRenewEditDetails = ({
                 <UpdatePopupMessage
                   heading={heading}
                   para={para}
-                  applicationNumber={applicationNumber}
+                  // applicationNumber={applicationNumber}
                   closePopupHandle={closePopupHandle}
                 ></UpdatePopupMessage>
               ) : (

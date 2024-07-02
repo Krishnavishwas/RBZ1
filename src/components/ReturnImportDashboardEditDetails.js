@@ -2775,7 +2775,6 @@ const ReturnImportDashboardEditDetails = ({
                       </small>
                     </div>
                   </div>
-                  {console.log("filtertin_bpn", filtertin_bpn)}
                   <div className="inner_form_new ">
                     <label className="controlform">TIN Number</label>
                     <div className="form-bx">
@@ -4865,8 +4864,6 @@ const ReturnImportDashboardEditDetails = ({
                       );
                     }
                   })}
-
-                  {console.log("errors - ", errors)}
 
                   <div className="tab-content pt-2">
                     <div
@@ -12517,32 +12514,7 @@ const ReturnImportDashboardEditDetails = ({
                             </tr>
                             <tr>
                               <td colSpan="2">&nbsp;</td>
-                            </tr>
-                            {/* <tr>
-                              <td
-                                style={{
-                                  color: "#000",
-                                  fontSize: "18px",
-                                  fontWeight: "400",
-                                }}
-                              >
-                                Importer
-                              </td>
-                              <td
-                                style={{
-                                  color: "#000",
-                                  fontSize: "18px",
-                                  fontWeight: "800",
-                                  letterSpacing: "0.01px"
-                                }}
-                              >
-                                :{" "}
-                                {applicationDetail?.companyName == null || applicationDetail?.companyName == ""
-                                  ? applicationDetail?.name
-                                  : applicationDetail?.companyName} 
-                                  {console.log(applicationDetail)}
-                              </td>
-                            </tr> */}
+                            </tr>                            
                             <tr>
                               <td
                                 style={{

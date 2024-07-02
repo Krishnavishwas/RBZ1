@@ -622,7 +622,6 @@ const INSOtherDepartmentEditDetails = ({
           ID: value,
         })
         .then((res) => {
-          console.log("GetSubApplicationTypeByApplicationTypeID", res);
           if (res.data.responseCode === "200") {
             setapplicationSubType(res.data.responseData);
           } else {
@@ -713,8 +712,6 @@ const INSOtherDepartmentEditDetails = ({
     setapplicationstaus(checked ? 10 : "0");
   };
 
-  console.log("applicationstaus - ", applicationstaus);
-
   const handleChangecompany = (selectedOption) => {
     setgetCompanyName(selectedOption);
   };
@@ -782,7 +779,7 @@ const INSOtherDepartmentEditDetails = ({
       });
 
     axios
-      .post(APIURL + "InspectorateApplication/InspectorateApplication", {
+      .post(APIURL + "InspectorateApplication/GetINSFilesByApplicationID", {
         ID: applicationDetail.id,
       })
       .then((res) => {
@@ -1608,7 +1605,7 @@ const INSOtherDepartmentEditDetails = ({
             RBZReferenceNumber: applicationDetail?.rbzReferenceNumber,
             UserTypeID: applicationDetail?.userTypeID,
             Name: applicationDetail?.name,
-            BeneficiaryName: applicationDetail?.beneficiaryName,
+            // BeneficiaryName: applicationDetail?.beneficiaryName,
             PECANumber: applicationDetail.pecaNumber,
             TINNumber:
               filtertin_bpn != undefined &&
@@ -3400,7 +3397,7 @@ const INSOtherDepartmentEditDetails = ({
                 </div>
               </div>
 
-              <div className="inner_form_new ">
+              {/* <div className="inner_form_new ">
                 <label className="controlform">Beneficiary Name</label>
                 <div className="form-bx">
                   <label>
@@ -3430,9 +3427,9 @@ const INSOtherDepartmentEditDetails = ({
                     )}
                   </label>
                 </div>
-              </div>
+              </div> */}
 
-              <div className="inner_form_new ">
+              {/* <div className="inner_form_new ">
                 <label className="controlform">Beneficiary Country</label>
                 <div className="form-bx">
                   <label>
@@ -3459,7 +3456,7 @@ const INSOtherDepartmentEditDetails = ({
                     <span className="sspan"></span>
                   </label>
                 </div>
-              </div>
+              </div> */}
 
               {bankID === "" ? (
                 <div className="inner_form_new ">
@@ -10898,32 +10895,7 @@ const INSOtherDepartmentEditDetails = ({
                             </tr>
                             <tr>
                               <td colSpan="2">&nbsp;</td>
-                            </tr>
-                            {/* <tr>
-                              <td
-                                style={{
-                                  color: "#000",
-                                  fontSize: "18px",
-                                  fontWeight: "400",
-                                }}
-                              >
-                                Importer
-                              </td>
-                              <td
-                                style={{
-                                  color: "#000",
-                                  fontSize: "18px",
-                                  fontWeight: "800",
-                                  letterSpacing: "0.01px"
-                                }}
-                              >
-                                :{" "}
-                                {applicationDetail?.companyName == null || applicationDetail?.companyName == ""
-                                  ? applicationDetail?.name
-                                  : applicationDetail?.companyName} 
-                                  {console.log(applicationDetail)}
-                              </td>
-                            </tr> */}
+                            </tr>                            
                             <tr>
                               <td
                                 style={{

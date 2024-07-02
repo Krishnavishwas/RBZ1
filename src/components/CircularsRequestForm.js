@@ -194,8 +194,6 @@ const CircularsRequestForm = ({ handleFormClose,handleCircularListData }) => {
   const bankSelectedID = exportForm?.bankSelectValue.map((res) => res.id);
   const directiveSelectedID = exportForm?.directiveSelectValue.map((res) => res.directiveID);
 
-console.log("files",files);
-console.log("otherfilesupload",otherfilesupload);
   const HandleSubmit = async (e) => {
     e.preventDefault();
     let formData = new FormData();
@@ -221,7 +219,6 @@ console.log("otherfilesupload",otherfilesupload);
       await axios
         .post(APIURL + "Circular/CreateCircular", data)
         .then((res) => {
-          console.log("resSHREYA", res);
           if (res.data.responseCode === '200') {
             for (let i = 0; i < files?.length; i++) { // Corrected loop condition
               formData.append("files", files[i].file);
@@ -294,7 +291,6 @@ console.log("otherfilesupload",otherfilesupload);
   }, [toastDisplayed]);
 
   // ----- End Code For Geting Table Data
-  console.log("exportForm.analyst", exportForm.analyst);
   return (
     <>
       <form className="circular-form">

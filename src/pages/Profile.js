@@ -43,6 +43,8 @@ const Home = () => {
   const heading = "Profile Updated Successfully!";
   const para = "Profile updated successfully!";
 
+  const MenunameLocal = Storage.getItem("menuname")
+
   const changeHandelForm = (e) => {
     const { name, value } = e.target;
     if (name === "outOfOffice") {
@@ -206,7 +208,23 @@ const Home = () => {
   };
 
   const closePopupHandle = () => {
-    navigate("/BankADLADashboard");
+
+    if(MenunameLocal == "Home"){
+      navigate("/AllDashboard");
+      
+    }if(MenunameLocal == "Exports"){
+      navigate("/BankADLADashboard")
+    }if(MenunameLocal == "Imports"){
+      navigate("/ImportDashboard")
+    }if(MenunameLocal == "Foreign Investments"){
+      navigate("/FINVDashboard")
+    }if(MenunameLocal == "Inspectorate"){
+      navigate("/INSDashboard")
+    }
+
+    
+
+
   };
 
   return (

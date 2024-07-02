@@ -157,10 +157,12 @@ const ImportOtherDepartmentEditDetails = ({
   const [analystTab, setanalystTab] = useState(roleID == 5 ? true : false);
   const [btnLoader, setBtnLoader] = useState(false);
   const [sranalystTab, setsranalystTab] = useState(roleID == 6 ? true : false);
+  const [ValidateShow, setValidateShow] = useState(false);
   const [principalanalystTab, setprincipalanalystTab] = useState(
     roleID == 7 ? true : false
   );
   const [deputyTab, setdeputyTab] = useState(roleID == 8 ? true : false);
+  const [director, setdirector] = useState(roleID == 9 ? true : false);
   const [inputValue, setInputValue] = useState("");
   const [viewShareFile, setviewShareFile] = useState([]);
   const [applicationType, setapplicationType] = useState([]);
@@ -173,6 +175,7 @@ const ImportOtherDepartmentEditDetails = ({
   const [options, setOptions] = useState([]);
   const [startDate, setStartDate] = useState(new Date());
   const [newData, setnewData] = useState([]);
+  const [getCompanyId, setgetCompanyId] = useState("");
   const [geninfoFile, setgeninfoFile] = useState([]);
   const [getBlankFile, setgetBlankFile] = useState([]);
   const [otheruserfiles, setOtheruserfiles] = useState([]);
@@ -194,6 +197,7 @@ const ImportOtherDepartmentEditDetails = ({
   const [IsReturn, setIsReturn] = useState("0");
   const [checksectorchange, setchecksectorchange] = useState(false);
   const [getFrequencyID, setGetFrequencyID] = useState("0");
+  const [loading, setLoading] = useState(false);
   const [AllFrequency, setAllFrequency] = useState([]);
   const [getalluser, setGetalluser] = useState([]);
   const [OtherDepartment, setOtherDepartment] = useState("");
@@ -203,6 +207,7 @@ const ImportOtherDepartmentEditDetails = ({
   const [otherDepartmentUsers, setOtherDepartmentUsers] = useState([]);
   const [OtherDepartmentPopup, setOtherDepartmentPopup] = useState(false);
   const [OtherDepartmentLoader, setOtherDepartmentLoader] = useState(false);
+  const [loader, setLoader] = useState(false);
   const [sharefiletab, setsharefiletab] = useState(false);
   const [othersharefile, setOthersharefile] = useState([]);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
@@ -745,11 +750,6 @@ const ImportOtherDepartmentEditDetails = ({
   useEffect(() => {
     getRoleHandle();
   }, []);
-
-
-  console.log("OtherDepartmentPopup", OtherDepartmentPopup)
-
-console.log("updatepopup", updatepopup)
 
   const getNextvaluesupervisor = (e) => {
     const value = e.target.checked;
@@ -2410,7 +2410,6 @@ console.log("updatepopup", updatepopup)
         })
         .then((res) => {
           if (res.data.responseCode == 200) {
-            console.log("vbbbbb---", res);
             setOtherDepartmentLoader(false);
             setOtherDepartmentPopup(true);
           }
@@ -10536,7 +10535,6 @@ console.log("updatepopup", updatepopup)
                           applicationDetail?.companyName == ""
                             ? applicationDetail?.name
                             : applicationDetail?.companyName}
-                          {console.log(applicationDetail)},
                         </td>
                       </tr>
                       <tr>
@@ -11124,7 +11122,6 @@ console.log("updatepopup", updatepopup)
                           applicationDetail?.companyName == ""
                             ? applicationDetail?.name
                             : applicationDetail?.companyName}
-                          {console.log(applicationDetail)},
                         </td>
                       </tr>
                       <tr>

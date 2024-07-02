@@ -35,7 +35,6 @@ const INSOtherDepartmentViewDetails = ({
   const [tabstatus6, settabstatus6] = useState(true);
   const [sharefiletab, setsharefiletab] = useState(false);
 
-  console.log("applicationDetail", applicationDetail);
   return (
     <>
       {showdataLoader == true || !noDataComment?.length ? (
@@ -407,7 +406,7 @@ const INSOtherDepartmentViewDetails = ({
               </div>
             </div>
 
-            <div className="inner_form_new ">
+            {/* <div className="inner_form_new ">
               <label className="controlform">Beneficiary Name</label>
               <div className="form-bx">
                 <label>
@@ -421,9 +420,9 @@ const INSOtherDepartmentViewDetails = ({
                   />
                 </label>
               </div>
-            </div>
+            </div> */}
 
-            <div className="inner_form_new ">
+            {/* <div className="inner_form_new ">
               <label className="controlform">Baneficiary Country</label>
               <div className="form-bx">
                 <label>
@@ -437,7 +436,7 @@ const INSOtherDepartmentViewDetails = ({
                   />
                 </label>
               </div>
-            </div>
+            </div> */}
 
             <div className="row">
               <div className="col-md-6">

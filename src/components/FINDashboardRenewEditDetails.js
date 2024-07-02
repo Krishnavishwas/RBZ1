@@ -12,8 +12,6 @@ import Select from "react-select";
 import UpdatePopupMessage from "./UpdatePopupMessage";
 import "react-quill/dist/quill.snow.css";
 import logo from "../rbz_LOGO.png";
-//import SunEditor from "suneditor-react";
-//import "suneditor/dist/css/suneditor.min.css";
 import NoSign from "../NoSign.png";
 import { MultiSelect } from "primereact/multiselect";
 import jsPDF from "jspdf";
@@ -32,8 +30,6 @@ import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import CustomMultiSelect from "./SearchUI/CustomMultiSelect";
 /* Tiptp Editor Ends */
-
-// import MultiSelect from "react-multi-select-component";
 
 const FINDashboardRenewEditDetails = ({
   applicationDetail,
@@ -72,10 +68,7 @@ const FINDashboardRenewEditDetails = ({
   const CustomTableCell = TableCell.extend({
     addAttributes() {
       return {
-        // extend the existing attributes …
         ...this.parent?.(),
-
-        // and add a new one …
         backgroundColor: {
           default: null,
           parseHTML: (element) => element.getAttribute("data-background-color"),
@@ -107,7 +100,6 @@ const FINDashboardRenewEditDetails = ({
   const BeneficiaryNameRef = useRef(null);
   const applicantCommentsRef = useRef(null);
   const applicantReferenceNumberRef = useRef(null);
-  // const applicantYearRef = useRef(null);
   const applicationTypeRef = useRef(null);
   const bankSupervisorRef = useRef(null);
   const assignedToRef = useRef(null);
@@ -135,8 +127,9 @@ const FINDashboardRenewEditDetails = ({
   const PdfRolename = Storage.getItem("roleName");
   const bankidcheck = bankID !== "" ? "1" : "3";
   const roleID = Storage.getItem("roleIDs");
-
   const userSign = Storage.getItem("signImageURL");
+  const menuname = Storage.getItem("menuname");
+  const submenuname = Storage.getItem("submenuname");
 
   const navigate = useNavigate();
 
@@ -188,18 +181,14 @@ const FINDashboardRenewEditDetails = ({
     applicationDetail?.userTypeID
   );
   const [supervisordecision, setsupervisordecision] = useState(false);
-
   const [files, setFiles] = useState([]);
-
-  const [otherfiles, setOtherfiles] = useState([]);
-
+  const [otherfiles, setOtherfiles] = useState([
+    { filename: "File Upload", upload: "" },
+  ]);
   const [userfiles, setuserFiles] = useState([]);
-
   const [otheruserfiles, setOtheruserfiles] = useState([]);
-
   const [sharefile, setsharefile] = useState([]);
   const [othersharefile, setOthersharefile] = useState([]);
-
   const [errors, setErrors] = useState({});
   const [applicationType, setapplicationType] = useState([]);
   const [subsectorData, setsubsectorData] = useState([]);
@@ -215,7 +204,6 @@ const FINDashboardRenewEditDetails = ({
   const [options, setOptions] = useState([]);
   const [Description, setDescription] = useState("");
   const [updatepopup, setupdatepopup] = useState(false);
-  const [lastComments, setLastComments] = useState({});
   const [ExpiringDate, setExpiringDate] = useState(new Date());
   const [asignnextLeveldata, setasignnextLeveldata] = useState({
     Notes: "",
@@ -243,11 +231,15 @@ const FINDashboardRenewEditDetails = ({
   const [geninfoFile, setgeninfoFile] = useState([]);
   const [newData, setnewData] = useState([]);
   const [SubmitBtnLoader, setSubmitBtnLoader] = useState(false);
+  const [PendingReturnComment, setPendingReturnComment] = useState("");
+  const [PendingReturnNote, setPendingReturnNote] = useState("");
   const [content, setEditorContent] = useState("<p></p>");
   const applicationNumber = applicationDetail.rbzReferenceNumber;
   const heading = "Application Submitted Successfully!";
   const para =
     "Foreign Investments application request submitted successfully!";
+  const heading1 = "Returns Submitted Successfully!";
+  const para1 = " Foreign Investments returns request submitted successfully!";
 
   const ChangeApplicationStatus = (e) => {
     const values = e.target.value;
@@ -267,7 +259,6 @@ const FINDashboardRenewEditDetails = ({
     if (!editor) {
       return null;
     }
-
     return (
       <>
         <button
@@ -543,13 +534,6 @@ const FINDashboardRenewEditDetails = ({
         >
           <i className="bi bi-list-ol"></i>
         </button>
-        {/* <button
-          type="button"
-          onClick={() => editor.chain().focus().toggleCodeBlock().run()}
-          className={editor.isActive('codeBlock') ? 'is-active' : ''}
-        >
-          code block
-        </button> */}
         <button
           type="button"
           title="Blockquote"
@@ -626,13 +610,6 @@ const FINDashboardRenewEditDetails = ({
     );
   };
 
-  useEffect(() => {
-    setasignnextLeveldata({
-      Notes: lastComments?.notes,
-      Comment: lastComments?.comment,
-    });
-  }, [lastComments]);
-
   const editor = useEditor({
     extensions: [
       Color.configure({ types: [TextStyle.name, ListItem.name] }),
@@ -665,25 +642,17 @@ const FINDashboardRenewEditDetails = ({
 
   useEffect(() => {
     if (editor) {
-      editor.commands.setContent(
-        applicationDetail.parentApplicationID !== 0 && lastComments
-          ? lastComments?.description
-          : ""
-      );
+      editor.commands.setContent("");
       setDescription(editor.getHTML());
     }
-  }, [applicationDetail, lastComments]);
+  }, [applicationDetail]);
 
   useEffect(() => {
     if (editorAnalyst) {
-      editorAnalyst.commands.setContent(
-        applicationDetail.parentApplicationID !== 0 && lastComments
-          ? lastComments?.description
-          : applicationDetail?.analystDescription
-      );
+      editorAnalyst.commands.setContent(applicationDetail?.analystDescription);
       setDescription(editorAnalyst.getHTML());
     }
-  }, [applicationDetail, lastComments]);
+  }, [applicationDetail]);
 
   const editorAnalyst = useEditor({
     extensions: [
@@ -718,13 +687,11 @@ const FINDashboardRenewEditDetails = ({
   useEffect(() => {
     if (editorSrAnalyst) {
       editorSrAnalyst.commands.setContent(
-        applicationDetail.parentApplicationID !== 0 && lastComments
-          ? lastComments?.description
-          : applicationDetail?.analystDescription
+        applicationDetail?.analystDescription
       );
       setDescription(editorSrAnalyst.getHTML());
     }
-  }, [applicationDetail, lastComments]);
+  }, [applicationDetail]);
 
   const editorSrAnalyst = useEditor({
     extensions: [
@@ -758,14 +725,10 @@ const FINDashboardRenewEditDetails = ({
 
   useEffect(() => {
     if (editorDeputy) {
-      editorDeputy.commands.setContent(
-        applicationDetail.parentApplicationID !== 0 && lastComments
-          ? lastComments?.description
-          : applicationDetail?.analystDescription
-      );
+      editorDeputy.commands.setContent(applicationDetail?.analystDescription);
       setDescription(editorDeputy.getHTML());
     }
-  }, [applicationDetail, lastComments]);
+  }, [applicationDetail]);
 
   const editorDeputy = useEditor({
     extensions: [
@@ -800,13 +763,11 @@ const FINDashboardRenewEditDetails = ({
   useEffect(() => {
     if (editorPrincipleAnalyst) {
       editorPrincipleAnalyst.commands.setContent(
-        applicationDetail.parentApplicationID !== 0 && lastComments
-          ? lastComments?.description
-          : applicationDetail?.analystDescription
+        applicationDetail?.analystDescription
       );
       setDescription(editorPrincipleAnalyst.getHTML());
     }
-  }, [applicationDetail, lastComments]);
+  }, [applicationDetail]);
 
   const editorPrincipleAnalyst = useEditor({
     extensions: [
@@ -840,14 +801,10 @@ const FINDashboardRenewEditDetails = ({
 
   useEffect(() => {
     if (editorDirector) {
-      editorDirector.commands.setContent(
-        applicationDetail.parentApplicationID !== 0 && lastComments
-          ? lastComments?.description
-          : applicationDetail?.analystDescription
-      );
+      editorDirector.commands.setContent(applicationDetail?.analystDescription);
       setDescription(editorDirector.getHTML());
     }
-  }, [applicationDetail, lastComments]);
+  }, [applicationDetail]);
 
   const editorDirector = useEditor({
     extensions: [
@@ -883,7 +840,6 @@ const FINDashboardRenewEditDetails = ({
     const value = e.target.value;
     setSupervisorRoleId("");
     setSupervisorRoleId("");
-
     setnextlevelvalue(value);
     setAsignUser([]);
   };
@@ -937,24 +893,6 @@ const FINDashboardRenewEditDetails = ({
         });
     }
   }, [applicationDetail]);
-
-  const modules = {
-    toolbar: [
-      [{ header: [1, 2, 3, 4, 5, 6] }],
-      [{ font: [] }],
-      [{ size: ["small", "large", "huge"] }],
-      [{ color: [] }],
-      [{ background: [] }],
-      [{ script: "sub" }, { script: "super" }],
-      ["bold", "italic", "underline"],
-      [
-        { list: "ordered" },
-        { list: "bullet" },
-        { indent: "+1" },
-        { indent: "-1" },
-      ],
-    ],
-  };
 
   const GetApplicationTypes = async () => {
     await axios
@@ -1024,22 +962,13 @@ const FINDashboardRenewEditDetails = ({
       };
     });
 
-    const lastResponseCCTodata = lastComments?.copiedResponseData?.map(
-      (items, i) => {
-        return {
-          value: items.bankID,
-          label: items.bankName,
-        };
-      }
-    );
-
     setExpiringDate(
       applicationDetail?.expiringDate
         ? applicationDetail?.expiringDate
         : new Date()
     );
 
-    setSelectedBanks(lastResponseCCTodata ? lastResponseCCTodata : bankdtata);
+    setSelectedBanks(bankdtata);
 
     if (applicationDetail?.isReturnNeeded == 1) {
       axios
@@ -1055,7 +984,7 @@ const FINDashboardRenewEditDetails = ({
           console.log(err);
         });
     }
-  }, [applicationDetail, lastComments]);
+  }, [applicationDetail]);
 
   const formatecopyresponse = selectedBanks?.map((item) => {
     return item.value;
@@ -1288,84 +1217,6 @@ const FINDashboardRenewEditDetails = ({
     setapplicationSubTypeValue(e.target.value);
   };
 
-  const HandleDateExpiryOption = (e) => {
-    const { name, value } = e.target;
-    setDateExpiryOption(e.target.value);
-    setdefaultnoExpiry(value);
-
-    if (value == 0) {
-      setDateExpirydisplay("");
-      if (dateExpirydisplayRef.current) dateExpirydisplayRef.current.value = "";
-      if (optionExpirydisplayRef.current) optionExpirydisplayRef.current = "";
-    }
-  };
-
-  const HandleIsReturnOption = (e) => {
-    const { name, value } = e.target;
-    setIsReturnOption(e.target.value);
-    setIsReturn(value);
-
-    if (value == 0) {
-      setIsReturndisplay("");
-      setIsReturnExpiringDate(new Date());
-      setGetFrequencyID("");
-      if (FrequencyRef.current) FrequencyRef.current.value = "";
-      if (FrequencyDateRef.current) FrequencyDateRef.current = "";
-    } else {
-      axios
-        .post(APIURL + "Master/GetAllFrequencies")
-        .then((res) => {
-          if (res.data.responseCode == 200) {
-            setAllFrequency(res.data.responseData);
-          } else {
-            setAllFrequency([]);
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    }
-  };
-  const SelectReturnFrequency = (e) => {
-    const { name, value } = e.target;
-
-    if (value == 1) {
-      setGetFrequencyID(value);
-      setIsReturnExpiringDate(new Date());
-    } else {
-      setGetFrequencyID(value);
-      setIsReturnExpiringDate(new Date());
-    }
-  };
-
-  const handleshareFileChange = (e, id) => {
-    const file = e.target.files[0];
-    const index = userfiles?.findIndex((item) => item.id === id);
-    if (index !== -1) {
-      setsharefile((prevFiles) => {
-        const newFiles = [...prevFiles];
-        newFiles[index] = { file, id };
-        return newFiles;
-      });
-    } else {
-      setsharefile((prevFiles) => [...prevFiles, { file, id }]);
-    }
-  };
-
-  const handlesharefileAddMore = (e) => {
-    setOthersharefile([...othersharefile, null]);
-  };
-
-  const removeshareImage = (index, id) => {
-    const updatedShareFile = sharefile?.filter((item) => item.id !== id);
-    setsharefile(updatedShareFile);
-  };
-
-  const removeUserImage = (index, id) => {
-    const updatedUserFile = userfiles?.filter((item) => item.id !== id);
-    setuserFiles(updatedUserFile);
-  };
-
   const removefileImage = (label) => {
     const updatedUserFile = files?.filter((item, i) => item?.label != label);
     setFiles(updatedUserFile);
@@ -1374,6 +1225,7 @@ const FINDashboardRenewEditDetails = ({
   const clearInputFile = (index) => {
     if (fileInputRefs[index].current) fileInputRefs[index].current.value = "";
   };
+
   const clearInputFileother = (index) => {
     if (fileInputRefsother[index]?.current)
       fileInputRefsother[index].current.value = "";
@@ -1387,7 +1239,6 @@ const FINDashboardRenewEditDetails = ({
         format: "a4",
         unit: "pt",
       });
-
       axios
         .post(APIURL + "Admin/GetBankByID", {
           id: applicationDetail?.bankID,
@@ -1489,7 +1340,6 @@ const FINDashboardRenewEditDetails = ({
                 doc.setGState(new doc.GState({ opacity: 0.4 }));
                 doc.setFont("helvetica", "normal");
                 doc.setFontSize(80);
-                //doc.text("PREVIEW", 50, 150, {align: 'center', baseline: 'middle'})
                 doc.text(
                   doc.internal.pageSize.width / 3,
                   doc.internal.pageSize.height / 2,
@@ -1523,8 +1373,6 @@ const FINDashboardRenewEditDetails = ({
                   title: `${applicationDetail?.rbzReferenceNumber}`,
                 });
                 var string = doc.output("dataurlnewwindow");
-                // var blob = doc.output("blob");
-                // window.open(URL.createObjectURL(blob), "_blank");
               },
             });
             setBtnLoader(false);
@@ -1537,36 +1385,12 @@ const FINDashboardRenewEditDetails = ({
   };
   /* Ends Here */
 
-  const HandleNextleveldata = (e) => {
-    const name = e.target.name;
-    const value = e.target.value;
-    const specialChars = /[!@#$%^&*(),.?":{}|<>]/;
-    const specialCharsnote = /[!@#$%^*|<>]/;
-    let newErrors = {};
-    let valid = true;
-
-    if (name == "Notes" && value.charAt(0) === " ") {
-      newErrors.Notes = "First character cannot be a blank space";
-      valid = false;
-    } else if (name == "Comment" && value.charAt(0) === " ") {
-      newErrors.Comment = "First character cannot be a blank space";
-      valid = false;
-    } else {
-      setErrors({});
-      setasignnextLeveldata((pre) => ({
-        ...pre,
-        [name]: value,
-      }));
-    }
-    setErrors(newErrors);
-  };
-
   const getRoleHandle = async () => {
     await axios
       .post(APIURL + "Master/GetRoles", {
         RoleID: "4",
         Status: "35",
-        DepartmentID:"4"
+        DepartmentID: "4",
       })
       .then((res) => {
         if (res.data.responseCode == 200) {
@@ -1611,7 +1435,6 @@ const FINDashboardRenewEditDetails = ({
 
   const handleuserByrecordOfficer = (e) => {
     const value = e.target.value;
-
     if (value == "") {
       setAssignUserID("");
       setSupervisorRoleId("");
@@ -1716,13 +1539,13 @@ const FINDashboardRenewEditDetails = ({
         console.log(err);
       });
   };
+
   useEffect(() => {
     handleFIleview();
   }, [applicationDetail]);
 
   const HandelSupervisorcheck = () => {
     setcheckSupervisor(!checkSupervisor);
-    //Temporary Solution  later we will pass 0
     if (roleID == 3 && checkSupervisor == true) {
       setAssignUserID("0");
     } else if (roleID == 3 && checkSupervisor == false) {
@@ -1731,15 +1554,6 @@ const FINDashboardRenewEditDetails = ({
     setAssignUserID("");
     setSupervisorRoleId("");
     setselectuserRoleRecordofficer("");
-  };
-
-  const getNextvaluesupervisor = (e) => {
-    const value = e.target.checked;
-
-    if (value == false) {
-      setnextlevelvalue("");
-    }
-    setapplicationstaus("");
   };
 
   const validateForm = () => {
@@ -1810,7 +1624,6 @@ const FINDashboardRenewEditDetails = ({
     }
 
     if (
-      //  (checkSupervisor == false && nextlevelvalue == "" &&  roleID == 3 && Description == "<p></p>") ||
       Description == null ||
       (Description == "<p></p>" &&
         roleID == 3 &&
@@ -1853,22 +1666,6 @@ const FINDashboardRenewEditDetails = ({
       newErrors.applicant = "Applicant name is required";
       valid = false;
     }
-    // if (
-    //   asignnextLeveldata.Notes === "" &&
-    //   (AssignUserID == "" || AssignUserID == null) &&
-    //   roleID >= 5
-    // ) {
-    //   newErrors.Notes = "Notes is required";
-    //   valid = false;
-    // }
-    // if (
-    //   asignnextLeveldata.Comment === "" &&
-    //   (AssignUserID == "" || AssignUserID == null) &&
-    //   roleID >= 5
-    // ) {
-    //   newErrors.Comment = "Comments is required";
-    //   valid = false;
-    // }
 
     if (AssignUserID == "" && checkSupervisor == true && roleID == 2) {
       newErrors.assignedTo = "Bank Supervisor is required";
@@ -1955,23 +1752,6 @@ const FINDashboardRenewEditDetails = ({
     return valid;
   };
 
-  const onShow = () => {
-    setTimeout(() => {
-      let selectAllCheckbox = document.querySelector(
-        ".p-multiselect-header > .p-multiselect-select-all"
-      );
-      if (selectAllCheckbox) {
-        // Create a new span element
-        let selectAllSpan = document.createElement("span");
-        selectAllSpan.className = "select_all";
-        selectAllSpan.textContent = "Select All";
-
-        // Append the span after the select all checkbox
-        selectAllCheckbox.after(selectAllSpan);
-      }
-    }, 0);
-  };
-
   const filtertin_bpn = companies?.find((company) => {
     if (company.id === getCompanyName?.value) {
       return {
@@ -1986,17 +1766,16 @@ const FINDashboardRenewEditDetails = ({
     label: res.bankName,
   }));
 
-  const handleChangeBank = (e) => {
-    const values = e;
-    setSelectedBanks(values);
-  };
-
   const PdftargetRef = useRef();
   const PdfPrivewRef = useRef();
   const PdfPrivewsupervisorRef = useRef();
 
   const closePopupHandle = () => {
-    navigate("/FINVDashboard");
+    if (menuname == "Foreign Investments" && submenuname == "Pending Returns") {
+      navigate("/FINPendingReturns");
+    } else {
+      navigate("/FINVDashboard");
+    }
     EditModalClose();
     handleData();
     setupdatepopup(false);
@@ -2012,7 +1791,6 @@ const FINDashboardRenewEditDetails = ({
     if (BeneficiaryNameRef.current) BeneficiaryNameRef.current.value = "";
     if (applicantReferenceNumberRef.current)
       applicantReferenceNumberRef.current.value = "";
-    // if(applicantYearRef.current) applicantYearRef.current.value = '';
     if (applicationTypeRef.current) applicationTypeRef.current.value = "";
     if (assignedToRef.current) assignedToRef.current.value = "";
     if (companyNameRef.current) companyNameRef.current.value = "";
@@ -2036,11 +1814,9 @@ const FINDashboardRenewEditDetails = ({
 
   // Code start for save form
   const HandleSubmit = async (e) => {
-    // setSubmitBtnLoader(true);
     e.preventDefault();
     let formData = new FormData();
     let shareformData = new FormData();
-
     if (validateForm()) {
       setSubmitBtnLoader(true);
       await axios
@@ -2057,7 +1833,6 @@ const FINDashboardRenewEditDetails = ({
               : AssignUserID
               ? AssignUserID
               : UserID.replace(/"/g, ""),
-
           BankID: applicationDetail?.bankID,
           CompanyID:
             (applicationDetail?.applicantType == "1" ||
@@ -2067,8 +1842,8 @@ const FINDashboardRenewEditDetails = ({
                 ? getCompanyName.value
                 : applicationDetail?.companyID
               : "",
-          ApplicationPurpose: applicationDetail?.applicationPurpose,
-          UserTypeID: applicationDetail?.userTypeID,
+          ApplicationPurpose: applicationDetail?.applicationPurpose,          
+          ApplicantType:applicationDetail?.applicantType,
           Name: applicationDetail?.name,
           BeneficiaryName: applicationDetail?.beneficiaryName,
           BeneficiaryCountry: applicationDetail?.beneficiaryCountry,
@@ -2097,19 +1872,12 @@ const FINDashboardRenewEditDetails = ({
           ApplicationDate: startDate
             ? startDate
             : applicationDetail?.applicationDate,
-          Comment: asignnextLeveldata.Comment,
-          // AssignedToRoleID: SupervisorRoleId
-          //   ? SupervisorRoleId
-          //   : AssignUserID && SupervisorRoleId == ""
-          //   ? parseInt(roleID) + 1
-          //   : roleID,
-
+          Comment: asignnextLeveldata.Comment,          
           AssignedToRoleID: SupervisorRoleId
             ? SupervisorRoleId
             : AssignUserID && SupervisorRoleId == "" && nextlevelvalue != "20"
             ? parseInt(roleID) + 1
             : roleID,
-
           Notes: asignnextLeveldata.Notes,
           ExpiringDate: defaultnoExpiry == "0" ? "" : ExpiringDate,
           ApplicationStatus:
@@ -2122,7 +1890,6 @@ const FINDashboardRenewEditDetails = ({
             (AssignUserID == "" || AssignUserID == null) &&
             roleID != 5 &&
             roleID != 2 &&
-            //roleID != 3 &&
             roleID != 4
               ? "100"
               : nextlevelvalue,
@@ -2143,14 +1910,16 @@ const FINDashboardRenewEditDetails = ({
               setupdatepopup(true);
             }
 
-            // setupdatepopup(true);
+            Storage.setItem(
+              "generatedNumber",
+              res.data.responseData.rbzReferenceNumber
+            );
             if (
               (AssignUserID == "" || AssignUserID == null) &&
               roleID != 5 &&
               roleID != 2 &&
               roleID != 4
             ) {
-              //When application gets closed by bank supervisor
               setTimeout(() => {
                 const doc = new jsPDF({
                   format: "a4",
@@ -2210,6 +1979,7 @@ const FINDashboardRenewEditDetails = ({
                             }
                           );
                         }
+
                         //} else {
                         // if (footerImage != "") {
                         //   const footerpositionfromTop =
@@ -2620,8 +2390,7 @@ const FINDashboardRenewEditDetails = ({
                 console.log("sharefile Upload ", err);
               });
 
-            handleData();
-
+            // handleData();
             // setSupervisorRoleId("");
             // setupdatepopup(true);
             //   setSubmitBtnLoader(false);
@@ -2644,8 +2413,85 @@ const FINDashboardRenewEditDetails = ({
       // setSubmitBtnLoader(false);
     }
   };
+
+  const HandleSubmitPendingReturns = async (e) => {
+    e.preventDefault();
+    let formData = new FormData();
+    if (validateForm()) {
+      setSubmitBtnLoader(true);
+      await axios
+        .post(APIURL + "ReturnApplication/CreateReturnApplication", {
+          ID: applicationDetail?.id,
+          RoleID: roleID,
+          UserID: UserID.replace(/"/g, ""),
+          DepartmentID: "4",
+          Status: "300",
+          AssignedToRoleID: SupervisorRoleId
+            ? SupervisorRoleId
+            : AssignUserID && SupervisorRoleId == "" && nextlevelvalue != "20"
+            ? parseInt(roleID) + 1
+            : roleID,
+          AssignedTo:
+            roleID >= 3 && AssignUserID == ""
+              ? ""
+              : AssignUserID
+              ? AssignUserID
+              : UserID.replace(/"/g, ""),
+          Comment: PendingReturnComment,
+          Notes: PendingReturnNote,
+        })
+        .then((res) => {
+          if (res.data.responseCode === "200") {
+            const fileupload = userfiles.length > 0 ? userfiles : files;
+            for (let i = 0; i < fileupload?.length; i++) {
+              formData.append("files", fileupload[i].file);
+              formData.append("Label", fileupload[i].label);
+            }
+            formData.append(
+              "ApplicationActivityID",
+              roleID == 2 || roleID == 4
+                ? ""
+                : res.data.responseData?.applicationActivityID
+            );
+            formData.append(
+              "RBZReferenceNumber",
+              applicationDetail?.rbzReferenceNumber
+            );
+            formData.append("ApplicationID", applicationDetail?.id);
+            formData.append("DepartmentID", "7");
+            formData.append("UserID", UserID.replace(/"/g, ""));
+            axios
+              .post(ImageAPI + "File/UploadFile", formData)
+              .then((res) => {
+                console.log("UploadFile success");
+              })
+              .catch((err) => {
+                console.log("file Upload ", err);
+              });
+            handleData();
+            setSupervisorRoleId("");
+            setupdatepopup(true);
+            setSubmitBtnLoader(false);
+            setAssignUserID("");
+            setselectuserRoleRecordofficer("");
+          } else {
+            setSubmitBtnLoader(false);
+            toast.error(res.data.responseMessage);
+          }
+        })
+        .catch((err) => {
+          setSubmitBtnLoader(false);
+          console.log(err);
+        });
+    } else {
+      if (!toastDisplayed) {
+        toast.warning("Please fill all mandatory fields");
+      }
+      setToastDisplayed(true);
+      setSubmitBtnLoader(false);
+    }
+  };
   // End code for save form
- 
 
   const handleChangecompany = (selectedOption) => {
     setgetCompanyName(selectedOption);
@@ -2654,7 +2500,6 @@ const FINDashboardRenewEditDetails = ({
   const handleInputChangecompany = (input) => {
     setInputValue(input);
     if (input?.length >= 3) {
-      // Filter options when input length is at least 3 characters
       const filteredOptions = companies
         ?.filter((company) =>
           company?.companyName?.toLowerCase().includes(input.toLowerCase())
@@ -2665,7 +2510,6 @@ const FINDashboardRenewEditDetails = ({
         }));
       setOptions(filteredOptions?.length > 0 ? filteredOptions : []);
     } else {
-      // Reset options when input length is less than 3 characters
       setOptions([]);
     }
   };
@@ -2709,22 +2553,6 @@ const FINDashboardRenewEditDetails = ({
       })
       .catch((error) => {
         console.log("FileRemove Error", error);
-      });
-  };
-
-  const getLastComment = async (id) => {
-    await axios
-      .post(APIURL + "FINApplication/GetLastApplicationDataByIDFIN", {
-        ApplicationID: id,
-        RoleID: roleID,
-      })
-      .then((res) => {
-        setLastComments(res.data.responseData);
-
-        setDescription(res.data.responseData.description);
-      })
-      .catch((error) => {
-        console.log("GetLastApplicationDataByID Error", error);
       });
   };
 
@@ -2798,36 +2626,6 @@ const FINDashboardRenewEditDetails = ({
                 </div>
               )}
 
-              {/* <div className="inner_form_new ">
-                  <label className="controlform">
-                    Purpose of the Application
-                  </label>
-
-                  <div className="form-bx">
-                    <label>
-                      <textarea
-                        name="applicationPurpose"
-                        ref={applicationPurposeRef}
-                        onChange={(e) => {
-                          changeHandelForm(e);
-                        }}
-                        placeholder="Purpose of the Application"
-                        className={errors.applicationPurpose ? "error" : ""}
-                        value={applicationDetail.applicationPurpose}
-                        disabled={roleID == 2 || roleID == 4 ? false : true}
-                      />
-                      <span className="sspan"></span>
-                      {errors.applicationPurpose ? (
-                        <small className="errormsg">
-                          {errors.applicationPurpose}
-                        </small>
-                      ) : (
-                        ""
-                      )}
-                    </label>
-                  </div>
-                </div> */}
-
               <div className="inner_form_new ">
                 <label className="controlform">Type of Applicant</label>
                 <div className="form-bx-radio mt-4">
@@ -2838,7 +2636,11 @@ const FINDashboardRenewEditDetails = ({
                         applicationDetail?.applicantType === 1 ? true : false
                       }
                       disabled={
-                        applicationDetail?.applicantType === 1 ? false : true
+                        applicationDetail?.applicantType === 1 &&
+                        menuname === "Foreign Investments" &&
+                        submenuname === "Pending Returns"
+                          ? false
+                          : true
                       }
                     />{" "}
                     <span>Corporate</span>
@@ -2850,7 +2652,11 @@ const FINDashboardRenewEditDetails = ({
                         applicationDetail?.applicantType === 2 ? true : false
                       }
                       disabled={
-                        applicationDetail?.applicantType === 2 ? false : true
+                        applicationDetail?.applicantType === 2 &&
+                        menuname === "Foreign Investments" &&
+                        submenuname === "Pending Returns"
+                          ? false
+                          : true
                       }
                     />{" "}
                     <span>Individual</span>
@@ -2893,7 +2699,13 @@ const FINDashboardRenewEditDetails = ({
                         }
                         onMenuClose={handleClear}
                         className="selectinput"
-                        isDisabled={roleID == 2 || roleID == 4 ? false : true}
+                        isDisabled={
+                          (roleID == 2 || roleID == 4) &&
+                          menuname === "Foreign Investments" &&
+                          submenuname !== "Pending Returns"
+                            ? false
+                            : true
+                        }
                       />
 
                       {errors.companyName ? (
@@ -2962,7 +2774,13 @@ const FINDashboardRenewEditDetails = ({
                               ? "error"
                               : ""
                           }
-                          disabled={roleID == 2 || roleID == 4 ? false : true}
+                          disabled={
+                            (roleID == 2 || roleID == 4) &&
+                            menuname === "Foreign Investments" &&
+                            submenuname !== "Pending Returns"
+                              ? false
+                              : true
+                          }
                         />
                         <span className="sspan"></span>
                         {errors.applicant && applicationDetail.name === "" ? (
@@ -2978,12 +2796,9 @@ const FINDashboardRenewEditDetails = ({
                 ""
               )}
 
-              {/* end form-bx  */}
-
               {applicationDetail?.applicantType == "1" && bankID != "" ? (
                 <div className="inner_form_new ">
                   <label className="controlform">BPN Code</label>
-
                   <div className="form-bx">
                     <label>
                       <input
@@ -3020,12 +2835,9 @@ const FINDashboardRenewEditDetails = ({
                 ""
               )}
 
-              {/* end form-bx  */}
-
               {bankID == "" ? (
                 <div className="inner_form_new ">
                   <label className="controlform">Government Agencies</label>
-
                   <div className="form-bx">
                     <label>
                       <select
@@ -3040,7 +2852,13 @@ const FINDashboardRenewEditDetails = ({
                             ? "error"
                             : ""
                         }
-                        disabled={roleID == 2 || roleID == 4 ? false : true}
+                        disabled={
+                          (roleID == 2 || roleID == 4) &&
+                          menuname === "Foreign Investments" &&
+                          submenuname !== "Pending Returns"
+                            ? false
+                            : true
+                        }
                       >
                         <option value="">
                           Select Government Agencies Name
@@ -3067,53 +2885,9 @@ const FINDashboardRenewEditDetails = ({
                 ""
               )}
 
-              {/* end form-bx  */}
-
-              {/* <div className="inner_form_new ">
-                  <label className="controlform">
-                    Applicant Reference Number
-                  </label>
-
-                  <div className="form-bx">
-                    <label>
-                      <input
-                        ref={applicantReferenceNumberRef}
-                        type="text"
-                        name="applicantReferenceNumber"
-                        onChange={(e) => {
-                          changeHandelForm(e);
-                        }}
-                        placeholder="Applicant Reference Number"
-                        className={
-                          errors.applicantReferenceNumber
-                            ? "error text-uppercase"
-                            : "text-uppercase"
-                        }
-                        value={
-                          applicationDetail?.applicantReferenceNumber
-                            ? applicationDetail?.applicantReferenceNumber
-                            : ""
-                        }
-                        disabled={roleID == 2 || roleID == 4 ? false : true}
-                      />
-                      <span className="sspan"></span>
-                      {errors.applicantReferenceNumber ? (
-                        <small className="errormsg">
-                          {errors.applicantReferenceNumber}
-                        </small>
-                      ) : (
-                        ""
-                      )}
-                    </label>
-                  </div>
-                </div> */}
-              {/* end form-bx  */}
-
               <div className="inner_form_new ">
                 <label className="controlform">Application Date</label>
-
                 <div className="form-bx">
-                  {/* <label> */}
                   <DatePicker
                     closeOnScroll={(e) => e.target === document}
                     selected={
@@ -3127,10 +2901,16 @@ const FINDashboardRenewEditDetails = ({
                     showYearDropdown
                     dropdownMode="select"
                     dateFormat="dd/MMM/yyyy"
-                    disabled={roleID == 2 || roleID == 4 ? false : true}
+                    disabled={
+                      (roleID == 2 || roleID == 4) &&
+                      menuname === "Foreign Investments" &&
+                      submenuname !== "Pending Returns"
+                        ? false
+                        : true
+                    }
                     onKeyDown={(e) => {
                       const key = e.key;
-                      const allowedKeys = /[0-9\/]/; // Allow numbers and '/'
+                      const allowedKeys = /[0-9\/]/;
                       if (
                         !allowedKeys.test(key) &&
                         key !== "Backspace" &&
@@ -3140,16 +2920,12 @@ const FINDashboardRenewEditDetails = ({
                       }
                     }}
                   />
-
                   <span className="sspan"></span>
-                  {/* </label> */}
                 </div>
               </div>
-              {/* end form-bx  */}
 
               <div className="inner_form_new ">
                 <label className="controlform">Application Category</label>
-
                 <div className="form-bx">
                   <label>
                     <select
@@ -3160,7 +2936,13 @@ const FINDashboardRenewEditDetails = ({
                         setapplicationSubTypeValue("");
                       }}
                       className={errors.applicationTypeID ? "error" : ""}
-                      disabled={roleID == 2 || roleID == 4 ? false : true}
+                      disabled={
+                        (roleID == 2 || roleID == 4) &&
+                        menuname === "Foreign Investments" &&
+                        submenuname !== "Pending Returns"
+                          ? false
+                          : true
+                      }
                     >
                       <option value="">Select Application Type</option>
                       {applicationType?.map((item, ind) => {
@@ -3188,7 +2970,6 @@ const FINDashboardRenewEditDetails = ({
                   </label>
                 </div>
               </div>
-              {/* end form-bx  */}
 
               {applicationDetail?.applicationSubTypeID !== "" ? (
                 <div className="inner_form_new ">
@@ -3201,7 +2982,6 @@ const FINDashboardRenewEditDetails = ({
                   <div className="form-bx">
                     <label>
                       <select
-                        // ref={applicationSubTypeRef}
                         name="applicationSubTypeValue"
                         onChange={(e) => {
                           changeHandelFormSubtype(e);
@@ -3211,6 +2991,13 @@ const FINDashboardRenewEditDetails = ({
                           applicationSubTypeValue == ""
                             ? "error"
                             : ""
+                        }
+                        disabled={
+                          (roleID == 2 || roleID == 4) &&
+                          menuname === "Foreign Investments" &&
+                          submenuname !== "Pending Returns"
+                            ? false
+                            : true
                         }
                       >
                         <option value="">Select Nature of Application</option>
@@ -3256,6 +3043,13 @@ const FINDashboardRenewEditDetails = ({
                       onChange={(e) => {
                         changeHandelForm(e);
                       }}
+                      disabled={
+                        (roleID == 2 || roleID == 4) &&
+                        menuname === "Foreign Investments" &&
+                        submenuname !== "Pending Returns"
+                          ? false
+                          : true
+                      }
                       placeholder="Beneficiary Name"
                       value={applicationDetail.beneficiaryName}
                     />
@@ -3281,14 +3075,15 @@ const FINDashboardRenewEditDetails = ({
                       onChange={(e) => {
                         changeHandelForm(e);
                       }}
-                      // className={
-                      //   errors.baneficiaryCountry && FINForm.baneficiaryCountry === ""
-                      //     ? "error"
-                      //     : ""
-                      // }
+                      disabled={
+                        (roleID == 2 || roleID == 4) &&
+                        menuname === "Foreign Investments" &&
+                        submenuname !== "Pending Returns"
+                          ? false
+                          : true
+                      }
                     >
                       <option value="">Select Beneficiary Country</option>
-
                       {countries?.map((item, ind) => {
                         return (
                           <option
@@ -3312,7 +3107,6 @@ const FINDashboardRenewEditDetails = ({
                 <div className="col-md-6">
                   <div className="inner_form_new">
                     <label className="controlform">Currency</label>
-
                     <div className="form-bx">
                       <label>
                         <select
@@ -3327,7 +3121,13 @@ const FINDashboardRenewEditDetails = ({
                               ? "error"
                               : ""
                           }
-                          disabled={roleID == 2 || roleID == 4 ? false : true}
+                          disabled={
+                            (roleID == 2 || roleID == 4) &&
+                            menuname === "Foreign Investments" &&
+                            submenuname !== "Pending Returns"
+                              ? false
+                              : true
+                          }
                         >
                           <option value="">Select Currency</option>
                           {currency?.map((cur, ind) => {
@@ -3376,7 +3176,13 @@ const FINDashboardRenewEditDetails = ({
                               ? "error"
                               : ""
                           }
-                          disabled={roleID == 2 || roleID == 4 ? false : true}
+                          disabled={
+                            (roleID == 2 || roleID == 4) &&
+                            menuname === "Foreign Investments" &&
+                            submenuname !== "Pending Returns"
+                              ? false
+                              : true
+                          }
                         />
                         <span className="sspan"></span>
                         {errors.amount && applicationDetail?.amount === "" ? (
@@ -3387,7 +3193,6 @@ const FINDashboardRenewEditDetails = ({
                       </label>
                     </div>
                   </div>
-                  {/* end form-bx  */}
                 </div>
 
                 <div className="col-md-3">
@@ -3417,13 +3222,11 @@ const FINDashboardRenewEditDetails = ({
                       </label>
                     </div>
                   </div>
-                  {/* end form-bx  */}
                 </div>
               </div>
 
               <div className="inner_form_new ">
                 <label className="controlform">USD Equivalent</label>
-
                 <div className="form-bx">
                   <label>
                     <input
@@ -3475,7 +3278,13 @@ const FINDashboardRenewEditDetails = ({
                                 ? "error text-uppercase"
                                 : "text-uppercase"
                             }
-                            disabled={roleID == 2 || roleID == 4 ? false : true}
+                            disabled={
+                              (roleID == 2 || roleID == 4) &&
+                              menuname === "Foreign Investments" &&
+                              submenuname !== "Pending Returns"
+                                ? false
+                                : true
+                            }
                           />
                           <span className="sspan"></span>
                           {errors.relatedexchangeControlNumber ? (
@@ -3487,7 +3296,17 @@ const FINDashboardRenewEditDetails = ({
                           )}
                         </label>
                       </div>
-                      <button type="button" className="primrybtn  v-button">
+                      <button
+                        type="button"
+                        className="primrybtn v-button"
+                        disabled={
+                          (roleID == 2 || roleID == 4) &&
+                          menuname === "Foreign Investments" &&
+                          submenuname !== "Pending Returns"
+                            ? false
+                            : true
+                        }
+                      >
                         Validate
                       </button>
                     </div>
@@ -3510,7 +3329,13 @@ const FINDashboardRenewEditDetails = ({
                           ? "error"
                           : ""
                       }
-                      disabled={roleID == 2 || roleID == 4 ? false : true}
+                      disabled={
+                        (roleID == 2 || roleID == 4) &&
+                        menuname === "Foreign Investments" &&
+                        submenuname !== "Pending Returns"
+                          ? false
+                          : true
+                      }
                     >
                       <option value="">Select Sector</option>
                       {sectorData?.map((item, ind) => {
@@ -3547,9 +3372,11 @@ const FINDashboardRenewEditDetails = ({
                       }}
                       disabled={
                         applicationDetail.sector === "" ||
-                        (roleID == 2 || roleID == 4 ? false : true)
-                          ? true
-                          : false
+                        ((roleID == 2 || roleID == 4) &&
+                          menuname === "Foreign Investments" &&
+                          submenuname !== "Pending Returns")
+                          ? false
+                          : true
                       }
                       className={errors.subSector ? "error" : ""}
                     >
@@ -3589,7 +3416,13 @@ const FINDashboardRenewEditDetails = ({
                       placeholder="Applicant Comments"
                       className={errors.applicantComment ? "error" : ""}
                       value={applicationDetail.applicantComment}
-                      disabled={roleID == 2 || roleID == 4 ? false : true}
+                      disabled={
+                        (roleID == 2 || roleID == 4) &&
+                        menuname === "Foreign Investments" &&
+                        submenuname !== "Pending Returns"
+                          ? false
+                          : true
+                      }
                     />
                     <span className="sspan"></span>
                     {errors.applicantComment ? (
@@ -3601,52 +3434,7 @@ const FINDashboardRenewEditDetails = ({
                     )}
                   </label>
                 </div>
-              </div>
-
-              <div
-                className={
-                  applicationDetail?.applicationStatus == 0 ? "d-none" : "row"
-                }
-              >
-                <div className="col-md-6">
-                  <div className="inner_form_new ">
-                    <label className="controlform">Assigned To Role</label>
-                    <div className="form-bx">
-                      <label>
-                        <input
-                          type="text"
-                          className=""
-                          disabled
-                          value={
-                            applicationDetail?.assignedToRoleName
-                              ? applicationDetail?.assignedToRoleName
-                              : "N/A"
-                          }
-                        />
-                      </label>
-                    </div>
-                  </div>
-                </div>
-                <div className="col-md-6">
-                  <div className="inner_form_new-sm ">
-                    <label className="controlform-sm">Assigned To User</label>
-                    <div className="form-bx-sm">
-                      <label>
-                        <input
-                          type="text"
-                          className=""
-                          disabled
-                          value={
-                            applicationDetail?.assignedToName
-                              ? applicationDetail?.assignedToName
-                              : "N/A"
-                          }
-                        />
-                      </label>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              </div>           
 
               <div className={roleID == 4 ? "d-none" : "inner_form_new "}>
                 <label className="controlform">Submit To Next Level </label>
@@ -3713,11 +3501,6 @@ const FINDashboardRenewEditDetails = ({
                         onChange={(e) => {
                           supervisorHangechangeRoleRecordofficer(e);
                         }}
-                        // className={
-                        //   errors.assignedTo && !SupervisorRoleId
-                        //     ? "error"
-                        //     : ""
-                        // }
                       >
                         <option value="">Select Role</option>
                         {userRole?.map((item, index) => {
@@ -3848,7 +3631,6 @@ const FINDashboardRenewEditDetails = ({
                             border: "0px",
                           }}
                         >
-                          {/* <i className="bi bi-forward"></i> */}
                           <span style={{ fontWeight: "500" }}>
                             {" "}
                             {items.name}{" "}
@@ -4005,6 +3787,128 @@ const FINDashboardRenewEditDetails = ({
               ) : (
                 ""
               )}
+
+              {menuname === "Foreign Investments" &&
+              submenuname === "Pending Returns" ? (
+                <>
+                  <h5 className="section_top_subheading mt-2">
+                    Pending Returns
+                  </h5>
+                  <div className="inner_form_new ">
+                    <label className="controlform">Returns Notes</label>
+                    <div className="form-bx">
+                      <label>
+                        <textarea
+                          ref={applicantCommentsRef}
+                          name="applicantComment"
+                          onChange={(e) => {
+                            setPendingReturnNote(e.target.value);
+                          }}
+                          placeholder="Returns Notes"
+                          value={PendingReturnNote}
+                          disabled={roleID == 2 ? false : true}
+                        />
+                        <span className="sspan"></span>
+                      </label>
+                    </div>
+                  </div>
+                  <div className="inner_form_new ">
+                    <label className="controlform">Returns Comments</label>
+                    <div className="form-bx">
+                      <label>
+                        <textarea
+                          ref={applicantCommentsRef}
+                          name="applicantComment"
+                          onChange={(e) => {
+                            setPendingReturnComment(e.target.value);
+                          }}
+                          placeholder="Returns Comments"
+                          value={PendingReturnComment}
+                          disabled={roleID == 2 ? false : true}
+                        />
+                        <span className="sspan"></span>
+                      </label>
+                    </div>
+                  </div>
+
+                  {otherfiles.map((file, index) => (
+                    <div
+                      key={index == "0" ? "Attachment" : `Other File ${index}`}
+                      className="attachemt_form-bx"
+                    >
+                      <label
+                        style={{
+                          background: "#d9edf7",
+                          padding: "9px 3px",
+                          border: "0px",
+                        }}
+                      >
+                        <span style={{ fontWeight: "500" }}>
+                          {index == "0" ? "Attachment" : `Other File ${index}`}
+                        </span>
+                      </label>
+                      <div className="browse-btn">
+                        Browse{" "}
+                        <input
+                          type="file"
+                          ref={fileInputRefs[index]}
+                          onChange={(e) => {
+                            handleFileChange(
+                              e,
+                              index == "0"
+                                ? "Attachment"
+                                : `Other File ${index}`
+                            );
+                          }}
+                        />
+                      </div>
+                      <span className="filename">
+                        {files.find(
+                          (f) =>
+                            f.label ===
+                            (index == "0"
+                              ? "Attachment"
+                              : `Other File ${index}`)
+                        )?.file?.name || "No file chosen"}
+                      </span>
+
+                      {files?.length &&
+                      files?.find(
+                        (f) =>
+                          f.label ===
+                          (index == "0" ? "Attachment" : `Other File ${index}`)
+                      )?.file?.name ? (
+                        <button
+                          type="button"
+                          className="remove-file"
+                          onClick={() => {
+                            removefileImage(
+                              index == "0"
+                                ? "Attachment"
+                                : `Other File ${index}`
+                            );
+                            clearInputFile(index);
+                          }}
+                        >
+                          Remove
+                        </button>
+                      ) : (
+                        ""
+                      )}
+                    </div>
+                  ))}
+
+                  <button
+                    type="button"
+                    className="addmore-btn mb-2"
+                    onClick={(e) => handleAddMore(e)}
+                  >
+                    Add More File{" "}
+                  </button>
+                </>
+              ) : (
+                ""
+              )}
             </div>
 
             <div className="form-footer mt-5 mb-3">
@@ -4047,25 +3951,52 @@ const FINDashboardRenewEditDetails = ({
                   ""
                 )}
 
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    HandleSubmit(e);
-                  }}
-                  disabled={
-                    (!checkSupervisor && roleID == 4) ||
-                    (checkSupervisor && !AssignUserID && roleID == 4) ||
-                    (checkSupervisor === false && roleID == 2) ||
-                    (checkSupervisor && !AssignUserID && roleID == 4)
-                      ? true
-                      : false
-                  }
-                  className="login"
-                >
-                  Submit{" "}
-                </button>
+                {menuname === "Foreign Investments" &&
+                submenuname === "Pending Returns" ? (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      HandleSubmitPendingReturns(e);
+                    }}
+                    disabled={
+                      (!checkSupervisor && roleID == 2) ||
+                      (checkSupervisor && !AssignUserID && roleID == 4) ||
+                      (menuname === "Imports" &&
+                        submenuname === "Pending Returns" &&
+                        !PendingReturnComment) ||
+                      (menuname === "Imports" &&
+                        submenuname === "Pending Returns" &&
+                        !PendingReturnNote) ||
+                      !files.length
+                        ? true
+                        : false
+                    }
+                    className="login"
+                  >
+                    Submit
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      HandleSubmit(e);
+                    }}
+                    disabled={
+                      (!checkSupervisor && roleID == 4) ||
+                      (checkSupervisor && !AssignUserID && roleID == 4) ||
+                      (checkSupervisor === false && roleID == 2) ||
+                      (checkSupervisor && !AssignUserID && roleID == 4)
+                        ? true
+                        : false
+                    }
+                    className="login"
+                  >
+                    Submit{" "}
+                  </button>
+                )}
               </div>
             </div>
+
             {/* pdf-preview data start Arun Verma Final Pdf Generation and Preview */}
             <div className="login_inner" style={{ display: "none" }}>
               <div className="login_form_panel" style={{ display: "none" }}>
@@ -4154,20 +4085,6 @@ const FINDashboardRenewEditDetails = ({
                           ? applicationDetail?.bankAddress3
                           : ""}
                         <br />
-                        {/* <span
-                            style={{
-                              borderBottom: "1px solid #000",
-                              fontWeight: "800",
-                              fontSize: "18px",
-                              letterSpacing: "0.01px"
-                            }}
-                            className="text-uppercase"
-                          >
-                            {applicationDetail?.bankCity != null ||
-                            applicationDetail?.bankCity != ""
-                              ? applicationDetail?.bankCity
-                              : ""}
-                          </span> */}
                       </td>
                     </tr>
                     <tr>
@@ -4184,13 +4101,6 @@ const FINDashboardRenewEditDetails = ({
                         }}
                       >
                         Dear{" "}
-                        {/* {applicationDetail?.applicantType == 1
-                            ? applicationDetail?.companyName
-                            : applicationDetail?.applicantType == 2
-                            ? applicationDetail?.name
-                            : applicationDetail?.applicantType == 3
-                            ? applicationDetail?.agencyName
-                            : " "} */}
                         {applicationDetail?.companyName == null ||
                         applicationDetail?.companyName == ""
                           ? applicationDetail?.name
@@ -4380,7 +4290,6 @@ const FINDashboardRenewEditDetails = ({
                                 : applicationstaus == "25"
                                 ? "Cancelled"
                                 : ""}
-                              {/* {applicationDetail?.statusName} */}
                             </td>
                           </tr>
                           <tr
@@ -4959,7 +4868,6 @@ const FINDashboardRenewEditDetails = ({
                                 : applicationstaus == "25"
                                 ? "Cancelled"
                                 : ""}
-                              {/* {applicationDetail?.statusName} */}
                             </td>
                           </tr>
                         </table>
@@ -4997,8 +4905,7 @@ const FINDashboardRenewEditDetails = ({
                                       className="tableEditorData"
                                       dangerouslySetInnerHTML={{
                                         __html: asignnextLeveldata
-                                          ? // ? asignnextLeveldata.Notes
-                                            Description
+                                          ? Description
                                           : "",
                                       }}
                                       style={{
@@ -5198,20 +5105,6 @@ const FINDashboardRenewEditDetails = ({
                             <br />
                           </>
                         )}
-                        {/* <span
-                            style={{
-                              borderBottom: "1px solid #000",
-                              fontWeight: "800",
-                              fontSize: "18px",
-                              letterSpacing: "0.01px"
-                            }}
-                            className="text-uppercase"
-                          >
-                            {applicationDetail?.bankCity != null ||
-                            applicationDetail?.bankCity != ""
-                              ? applicationDetail?.bankCity
-                              : ""}
-                          </span> */}
                       </td>
                     </tr>
                     <tr>
@@ -5228,13 +5121,6 @@ const FINDashboardRenewEditDetails = ({
                         }}
                       >
                         Dear{" "}
-                        {/* {applicationDetail?.applicantType == 1
-                            ? applicationDetail?.companyName
-                            : applicationDetail?.applicantType == 2
-                            ? applicationDetail?.name
-                            : applicationDetail?.applicantType == 3
-                            ? applicationDetail?.agencyName
-                            : " "} */}
                         {applicationDetail?.companyName == null ||
                         applicationDetail?.companyName == ""
                           ? applicationDetail?.name
@@ -5422,7 +5308,6 @@ const FINDashboardRenewEditDetails = ({
                                 : applicationstaus == "25"
                                 ? "Cancelled"
                                 : ""}
-                              {/* {applicationDetail?.statusName} */}
                             </td>
                           </tr>
                           <tr
@@ -5804,20 +5689,6 @@ const FINDashboardRenewEditDetails = ({
                             <br />
                           </>
                         )}
-                        {/* <span
-                            style={{
-                              borderBottom: "1px solid #000",
-                              fontWeight: "800",
-                              fontSize: "18px",
-                              letterSpacing: "0.01px"
-                            }}
-                            className="text-uppercase"
-                          >
-                            {applicationDetail?.bankCity != null ||
-                            applicationDetail?.bankCity != ""
-                              ? applicationDetail?.bankCity
-                              : ""}
-                          </span> */}
                       </td>
                     </tr>
                     <tr>
@@ -5834,13 +5705,6 @@ const FINDashboardRenewEditDetails = ({
                         }}
                       >
                         Dear{" "}
-                        {/* {applicationDetail?.applicantType == 1
-                            ? applicationDetail?.companyName
-                            : applicationDetail?.applicantType == 2
-                            ? applicationDetail?.name
-                            : applicationDetail?.applicantType == 3
-                            ? applicationDetail?.agencyName
-                            : " "} */}
                         {applicationDetail?.companyName == null ||
                         applicationDetail?.companyName == ""
                           ? applicationDetail?.name
@@ -6076,11 +5940,19 @@ const FINDashboardRenewEditDetails = ({
               </div>
             </div>
 
-            {updatepopup == true ? (
+            {updatepopup == true &&
+            menuname === "Foreign Investments" &&
+            submenuname === "Pending Returns" ? (
+              <UpdatePopupMessage
+                heading={heading1}
+                para={para1}
+                closePopupHandle={closePopupHandle}
+              ></UpdatePopupMessage>
+            ) : updatepopup == true ? (
               <UpdatePopupMessage
                 heading={heading}
                 para={para}
-                applicationNumber={applicationNumber}
+                // applicationNumber={applicationNumber}
                 closePopupHandle={closePopupHandle}
               ></UpdatePopupMessage>
             ) : (

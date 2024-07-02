@@ -1076,7 +1076,6 @@ const DeptID = menuname === "Exports" ? "2" : menuname === "Imports" ? "3": menu
     setSelectedBanks(values); 
   };
 
-  console.log("selectedBanks", selectedBanks)
   const HandleIsReturnOption = (e) => {
     const { name, value } = e.target;
     setIsReturnOption(e.target.value);
@@ -1147,6 +1146,8 @@ const DeptID = menuname === "Exports" ? "2" : menuname === "Imports" ? "3": menu
       setIsReturnExpiringDate(new Date());
     }
   };
+
+  const getFrequencyName = AllFrequency?.find((item)=> item.id == getFrequencyID)
 
   const HandleDateExpiryOption = (e) => {
     const { name, value } = e.target;
@@ -1829,16 +1830,7 @@ const DeptID = menuname === "Exports" ? "2" : menuname === "Imports" ? "3": menu
               .catch((err) => {
                 setSubmitBtnLoader(false);
                 console.log("file Upload ", err);
-              });
-            // axios
-            //   .post(APIURL + "ExportApplication/CopyingResponses", copyresponse)
-            //   .then((resposnse) => {
-            //     console.log("CopyingResponses");
-            //   })
-            //   .catch((error) => {
-            //     setSubmitBtnLoader(false);
-            //     console.log("error", error);
-            //   });
+              });    
             for (let i = 0; i < sharefile?.length; i++) {
               shareformData.append("files", sharefile[i].file);
               shareformData.append("fileInfoID", sharefile[i].fileInfoID);
@@ -2565,7 +2557,6 @@ const DeptID = menuname === "Exports" ? "2" : menuname === "Imports" ? "3": menu
         })
         .then((res) => {
           if (res.data.responseCode == 200) {
-            console.log("vbbbbb---", res);
             setOtherDepartmentLoader(false);
             setOtherDepartmentPopup(true);
           }
@@ -2886,7 +2877,6 @@ const DeptID = menuname === "Exports" ? "2" : menuname === "Imports" ? "3": menu
                       </small>
                     </div>
                   </div>
-                      {console.log("filtertin_bpn", filtertin_bpn)}
                   <div className="inner_form_new ">
                     <label className="controlform">TIN Number</label>
                     <div className="form-bx">
@@ -2899,11 +2889,6 @@ const DeptID = menuname === "Exports" ? "2" : menuname === "Imports" ? "3": menu
                             changeHandelForm(e);
                           }}
                           disabled
-                          // value={
-                          //   ImportForm.TINNumber
-                          //     ? ImportForm.TINNumber?.trim()
-                          //     : "N/A"
-                          // }
                           value={
                             filtertin_bpn != undefined && filtertin_bpn?.tinNumber && filtertin_bpn?.tinNumber != null
                               ? filtertin_bpn?.tinNumber
@@ -3446,7 +3431,7 @@ const DeptID = menuname === "Exports" ? "2" : menuname === "Imports" ? "3": menu
                 ""
               )}
 
-              {checkSupervisor === true ? (
+              {checkSupervisor === true && roleID == 2 ? (
                 <div className="inner_form_new ">
                   <label className="controlform">Bank Supervisor</label>
                   <div className="form-bx">
@@ -3490,7 +3475,7 @@ const DeptID = menuname === "Exports" ? "2" : menuname === "Imports" ? "3": menu
                 ""
               )}
 
-              <h5 className="section_top_subheading">Attachments</h5>
+              <h5 className="section_top_subheading mt-3">Attachments</h5>
               {applicationDetail?.fileName || applicationDetail?.filePath ? (
                 <div
                   className={
@@ -14807,14 +14792,42 @@ const DeptID = menuname === "Exports" ? "2" : menuname === "Imports" ? "3": menu
                               </td>
                             </tr>
                             <tr
-                              className={
-                                applicationDetail?.returnFrequencyName ==
-                                  null ||
-                                applicationDetail?.returnFrequencyName == ""
-                                  ? "d-none"
-                                  : ""
-                              }
+                            className={
+                              getFrequencyName == undefined &&  (applicationDetail?.returnFrequencyName == null ||
+                              applicationDetail?.returnFrequencyName == "")
+                                ? "d-none"
+                                : ""
+                            }
+                          >
+                            <td
+                              style={{
+                                fontSize: "18px",
+                                fontWeight: "400",
+                                color: "#000",
+                                letterSpacing: "0.01px",
+                              }}
                             >
+                              Returns Frequency
+                            </td>
+                            <td
+                              style={{
+                                color: "#000",
+                                fontSize: "18px",
+                                fontWeight: "800",
+                              }}
+                            >
+                              :{" "}
+                              {getFrequencyName != undefined ? getFrequencyName.name : applicationDetail?.returnFrequencyName == null ||
+                              applicationDetail?.returnFrequencyName == ""
+                                ? "N/A"
+                                : applicationDetail?.returnFrequencyName}
+                            </td>
+                          </tr>
+
+
+
+                          {getFrequencyName?.name == "Once" || applicationDetail?.returnFrequencyName == "Once" ? (
+                            <tr className={getFrequencyName !=undefined && getFrequencyName.name == "Once" ? "" : "d-none"}>
                               <td
                                 style={{
                                   fontSize: "18px",
@@ -14823,7 +14836,7 @@ const DeptID = menuname === "Exports" ? "2" : menuname === "Imports" ? "3": menu
                                   letterSpacing: "0.01px",
                                 }}
                               >
-                                Returns Frequency
+                                Returns Date
                               </td>
                               <td
                                 style={{
@@ -14834,48 +14847,19 @@ const DeptID = menuname === "Exports" ? "2" : menuname === "Imports" ? "3": menu
                                 }}
                               >
                                 :{" "}
-                                {applicationDetail?.returnFrequencyName ==
-                                  null ||
-                                applicationDetail?.returnFrequencyName == ""
+                                {getFrequencyName?.name == "Once" && IsReturnExpiringDate != "0001-01-01T00:00:00" ?  moment(IsReturnExpiringDate).format("DD MMMM YYYY") : applicationDetail?.returnDate == null ||
+                                applicationDetail?.returnDate == "" ||
+                                applicationDetail?.returnDate ==
+                                  "0001-01-01T00:00:00"
                                   ? "N/A"
-                                  : applicationDetail?.returnFrequencyName}
+                                  : moment(
+                                      applicationDetail?.returnDate
+                                    ).format("DD MMMM YYYY")}
                               </td>
                             </tr>
-                            {applicationDetail?.returnFrequencyName ==
-                            "Once" ? (
-                              <tr>
-                                <td
-                                  style={{
-                                    fontSize: "18px",
-                                    fontWeight: "400",
-                                    color: "#000",
-                                    letterSpacing: "0.01px",
-                                  }}
-                                >
-                                  Returns Date
-                                </td>
-                                <td
-                                  style={{
-                                    color: "#000",
-                                    fontSize: "18px",
-                                    fontWeight: "800",
-                                    letterSpacing: "0.01px",
-                                  }}
-                                >
-                                  :{" "}
-                                  {applicationDetail?.returnDate == null ||
-                                  applicationDetail?.returnDate == "" ||
-                                  applicationDetail?.returnDate ==
-                                    "0001-01-01T00:00:00"
-                                    ? "N/A"
-                                    : moment(
-                                        applicationDetail?.returnDate
-                                      ).format("DD MMMM YYYY")}
-                                </td>
-                              </tr>
-                            ) : (
-                              ""
-                            )}
+                          ) : (
+                            ""
+                          )}
                           </table>
                         </td>
                       </tr>
@@ -15833,8 +15817,8 @@ const DeptID = menuname === "Exports" ? "2" : menuname === "Imports" ? "3": menu
                           </tr>
                           <tr
                             className={
-                              applicationDetail?.returnFrequencyName == null ||
-                              applicationDetail?.returnFrequencyName == ""
+                             getFrequencyName == undefined &&  (applicationDetail?.returnFrequencyName == null ||
+                              applicationDetail?.returnFrequencyName == "")
                                 ? "d-none"
                                 : ""
                             }
@@ -15857,19 +15841,20 @@ const DeptID = menuname === "Exports" ? "2" : menuname === "Imports" ? "3": menu
                               }}
                             >
                               :{" "}
-                              {applicationDetail?.returnFrequencyName == null ||
+                              {getFrequencyName != undefined ? getFrequencyName.name : applicationDetail?.returnFrequencyName == null ||
                               applicationDetail?.returnFrequencyName == ""
                                 ? "N/A"
                                 : applicationDetail?.returnFrequencyName}
                             </td>
                           </tr>
-                          {applicationDetail?.returnFrequencyName == "Once" ? (
-                            <tr>
+                          {getFrequencyName?.name == "Once" || applicationDetail?.returnFrequencyName == "Once" ? (
+                            <tr className={getFrequencyName !=undefined && getFrequencyName.name == "Once" ? "" : "d-none"}>
                               <td
                                 style={{
                                   fontSize: "18px",
                                   fontWeight: "400",
                                   color: "#000",
+                                  letterSpacing: "0.01px",
                                 }}
                               >
                                 Returns Date
@@ -15883,14 +15868,14 @@ const DeptID = menuname === "Exports" ? "2" : menuname === "Imports" ? "3": menu
                                 }}
                               >
                                 :{" "}
-                                {applicationDetail?.returnDate == null ||
+                                {getFrequencyName?.name == "Once" && IsReturnExpiringDate != "0001-01-01T00:00:00" ?  moment(IsReturnExpiringDate).format("DD MMMM YYYY") : applicationDetail?.returnDate == null ||
                                 applicationDetail?.returnDate == "" ||
                                 applicationDetail?.returnDate ==
                                   "0001-01-01T00:00:00"
                                   ? "N/A"
                                   : moment(
                                       applicationDetail?.returnDate
-                                    ).format("DD MMMM  YYYY")}
+                                    ).format("DD MMMM YYYY")}
                               </td>
                             </tr>
                           ) : (
@@ -16243,32 +16228,7 @@ const DeptID = menuname === "Exports" ? "2" : menuname === "Imports" ? "3": menu
                           </tr>
                           <tr>
                             <td colSpan="2">&nbsp;</td>
-                          </tr>
-                          {/* <tr>
-                              <td
-                                style={{
-                                  color: "#000",
-                                  fontSize: "18px",
-                                  fontWeight: "400",
-                                }}
-                              >
-                                Importer
-                              </td>
-                              <td
-                                style={{
-                                  color: "#000",
-                                  fontSize: "18px",
-                                  fontWeight: "800",
-                                  letterSpacing: "0.01px"
-                                }}
-                              >
-                                :{" "}
-                                {applicationDetail?.companyName == null || applicationDetail?.companyName == ""
-                                  ? applicationDetail?.name
-                                  : applicationDetail?.companyName} 
-                                  {console.log(applicationDetail)}
-                              </td>
-                            </tr> */}
+                          </tr>                          
                           <tr>
                             <td
                               style={{

@@ -1859,8 +1859,6 @@ const ExportOtherDepartmentEditDetails = ({
   const PdftargetRef = useRef();
   const PdfPrivewRef = useRef();
   const PdfPrivewsupervisorRef = useRef();
-
-  console.log("setapplicationstaus", applicationstaus)
   
   const closePopupHandle = () => {
     navigate("/ReferredDashboard");

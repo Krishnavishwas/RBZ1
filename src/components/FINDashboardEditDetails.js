@@ -355,7 +355,7 @@ const FINDashboardEditDetails = ({
       console.log("User/GetUsersByRoleID - catch - Error", error);
     }
   };
-console.log("application details", applicationDetail)
+
   useEffect(() => {
     setEditorContent(applicationDetail?.analystDescription);
   }, [content]);
@@ -1433,6 +1433,7 @@ console.log("application details", applicationDetail)
       setIsReturnExpiringDate(new Date());
     }
   };
+  const getFrequencyName = AllFrequency?.find((item)=> item.id == getFrequencyID)
 
   const handleshareFileChange = (e, id) => {
     const file = e.target.files[0];
@@ -1571,7 +1572,7 @@ console.log("application details", applicationDetail)
                 } else {
                   doc.setFont("helvetica", "bold");
                   doc.setFontSize(20);
-                  doc.text("Final Letter", 250, 40);
+                  doc.text(applicationstaus && applicationstaus != "0" ? "Final Letter" : "Cover Letter", 250, 40);
                 }
               }
             };
@@ -1915,7 +1916,7 @@ console.log("application details", applicationDetail)
         roleID == 3 &&
         nextlevelvalue != "20")
     ) {
-      newErrors.Description = "Description is required-11";
+      newErrors.Description = "Description is required";
       valid = false;
     }
     if (
@@ -2950,7 +2951,7 @@ console.log("application details", applicationDetail)
                       </small>
                     </div>
                   </div>
-{console.log("filtertin_bpn",filtertin_bpn)}
+
                   <div className="inner_form_new ">
                     <label className="controlform">TIN Number</label>
                     <div className="form-bx">
@@ -6656,7 +6657,7 @@ console.log("application details", applicationDetail)
                             </div>
                           </div>
                         </div>
-{console.log("getFrequencyID", getFrequencyID)}
+
                         <div className="col-md-5">
                           <div
                             className={
@@ -15612,8 +15613,8 @@ console.log("application details", applicationDetail)
                           </tr>
                           <tr
                             className={
-                              applicationDetail?.returnFrequencyName == null ||
-                              applicationDetail?.returnFrequencyName == ""
+                              getFrequencyName == undefined &&  (applicationDetail?.returnFrequencyName == null ||
+                              applicationDetail?.returnFrequencyName == "")
                                 ? "d-none"
                                 : ""
                             }
@@ -15633,18 +15634,20 @@ console.log("application details", applicationDetail)
                                 color: "#000",
                                 fontSize: "18px",
                                 fontWeight: "800",
-                                letterSpacing: "0.01px",
                               }}
                             >
                               :{" "}
-                              {applicationDetail?.returnFrequencyName == null ||
+                              {getFrequencyName != undefined ? getFrequencyName.name : applicationDetail?.returnFrequencyName == null ||
                               applicationDetail?.returnFrequencyName == ""
                                 ? "N/A"
                                 : applicationDetail?.returnFrequencyName}
                             </td>
                           </tr>
-                          {applicationDetail?.returnFrequencyName == "Once" ? (
-                            <tr>
+
+
+
+                          {getFrequencyName?.name == "Once" || applicationDetail?.returnFrequencyName == "Once" ? (
+                            <tr className={getFrequencyName !=undefined && getFrequencyName.name == "Once" ? "" : "d-none"}>
                               <td
                                 style={{
                                   fontSize: "18px",
@@ -15664,7 +15667,7 @@ console.log("application details", applicationDetail)
                                 }}
                               >
                                 :{" "}
-                                {applicationDetail?.returnDate == null ||
+                                {getFrequencyName?.name == "Once" && IsReturnExpiringDate != "0001-01-01T00:00:00" ?  moment(IsReturnExpiringDate).format("DD MMMM YYYY") : applicationDetail?.returnDate == null ||
                                 applicationDetail?.returnDate == "" ||
                                 applicationDetail?.returnDate ==
                                   "0001-01-01T00:00:00"
@@ -16652,8 +16655,8 @@ console.log("application details", applicationDetail)
                           </tr>
                           <tr
                             className={
-                              applicationDetail?.returnFrequencyName == null ||
-                              applicationDetail?.returnFrequencyName == ""
+                              getFrequencyName == undefined &&  (applicationDetail?.returnFrequencyName == null ||
+                              applicationDetail?.returnFrequencyName == "")
                                 ? "d-none"
                                 : ""
                             }
@@ -16676,19 +16679,23 @@ console.log("application details", applicationDetail)
                               }}
                             >
                               :{" "}
-                              {applicationDetail?.returnFrequencyName == null ||
+                              {getFrequencyName != undefined ? getFrequencyName.name : applicationDetail?.returnFrequencyName == null ||
                               applicationDetail?.returnFrequencyName == ""
                                 ? "N/A"
                                 : applicationDetail?.returnFrequencyName}
                             </td>
                           </tr>
-                          {getFrequencyID == "1" ? (
-                            <tr>
+
+
+
+                          {getFrequencyName?.name == "Once" || applicationDetail?.returnFrequencyName == "Once" ? (
+                            <tr className={getFrequencyName !=undefined && getFrequencyName.name == "Once" ? "" : "d-none"}>
                               <td
                                 style={{
                                   fontSize: "18px",
                                   fontWeight: "400",
                                   color: "#000",
+                                  letterSpacing: "0.01px",
                                 }}
                               >
                                 Returns Date
@@ -16702,14 +16709,14 @@ console.log("application details", applicationDetail)
                                 }}
                               >
                                 :{" "}
-                                {IsReturnExpiringDate ?  moment(IsReturnExpiringDate).format("DD MMMM  YYYY") : applicationDetail?.returnDate == null ||
+                                {getFrequencyName?.name == "Once" && IsReturnExpiringDate != "0001-01-01T00:00:00" ?  moment(IsReturnExpiringDate).format("DD MMMM YYYY") : applicationDetail?.returnDate == null ||
                                 applicationDetail?.returnDate == "" ||
                                 applicationDetail?.returnDate ==
                                   "0001-01-01T00:00:00"
                                   ? "N/A"
                                   : moment(
                                       applicationDetail?.returnDate
-                                    ).format("DD MMMM  YYYY")}
+                                    ).format("DD MMMM YYYY")}
                               </td>
                             </tr>
                           ) : (

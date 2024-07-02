@@ -1889,7 +1889,7 @@ const ReturnExportDashboardEditDetails = ({
     if (optionOtherDepartmentRef.current)
       optionOtherDepartmentRef.current.value = "";
   };
-
+  
   // Code start for save form
   const HandleSubmit = async (e) => {
     e.preventDefault();
@@ -5042,7 +5042,7 @@ const ReturnExportDashboardEditDetails = ({
                           </div>
                         </div>
                       </div>
-                      
+
                       {nextlevelvalue != "" ? (
                         <div className="row mt-2">
                           <div className="col-md-7 d-none">
@@ -5171,14 +5171,12 @@ const ReturnExportDashboardEditDetails = ({
                             <MenuBar editor={editorAnalyst} />
                             <EditorContent editor={editorAnalyst} />
                             <span className="sspan"></span>
-                            {errors.Description || Description == "<p></p>" ? (
+                            {errors.Description && Description == "<p></p>" ? (
                               <small
                                 className="errormsg"
                                 style={{ bottom: "-19px" }}
                               >
-                                {Description == "<p></p>"
-                                  ? "Description is required"
-                                  : errors.Description}
+                                {errors.Description}
                               </small>
                             ) : (
                               ""
@@ -5644,6 +5642,7 @@ const ReturnExportDashboardEditDetails = ({
                                               key={items.id}
                                             >
                                               <label className="mb-2 mb-0 pt-2 pb-2">
+                                                {/* {items.filename} */}
                                                 {items?.fileName
                                                   ? items?.fileName
                                                   : `FileUpload ${index}`}
@@ -5879,6 +5878,12 @@ const ReturnExportDashboardEditDetails = ({
                                     aria-controls="home"
                                     aria-selected="true"
                                   >
+                                    {/* {index == 0
+                                  ? "Recent"
+                                  : `Response ${
+                                      cur?.applicationActivityData.length -
+                                      index
+                                    }`} */}
                                     Response{" "}
                                     {cur?.applicationActivityData?.length -
                                       index}
@@ -9237,6 +9242,12 @@ const ReturnExportDashboardEditDetails = ({
                                     aria-controls="home"
                                     aria-selected="true"
                                   >
+                                    {/* {index == 0
+                          ? "Recent"
+                          : `Response ${
+                              cur?.applicationActivityData.length -
+                              index
+                            }`} */}
                                     Response{" "}
                                     {cur?.applicationActivityData?.length -
                                       index}

@@ -64,8 +64,6 @@ const ExportDashboardViewDetails = ({
       });
   };
 
-  console.log("applicationDetail - ", applicationDetail);
-
   useEffect(() => {
     handleFIleview();
   }, [applicationDetail]);
@@ -75,8 +73,6 @@ const ExportDashboardViewDetails = ({
         <li key={i}>{v.bankName}</li>
       ))
     : null;
-
-  console.log("allcomment - ", allcomment);
 
   return (
     <>

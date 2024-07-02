@@ -14,7 +14,7 @@ import Modal from "react-bootstrap/Modal";
 import FINDashboardViewDetails from "../components/FINDashboardViewDetails";
 import FINDashboardEditDetails from "../components/FINDashboardEditDetails";
 import { TailSpin } from "react-loader-spinner";
-const FINDashboardTable = ({tabDepId}) => {
+const FINDashboardTable = ({ tabDepId }) => {
   const useId = Storage.getItem("userID");
   const rollId = Storage.getItem("roleIDs");
   const roleID = Storage.getItem("roleIDs");
@@ -60,6 +60,8 @@ const FINDashboardTable = ({tabDepId}) => {
     tinNumber: { value: null, matchMode: FilterMatchMode.IN },
   });
 
+  const [viewotherpopup, setviewotherpopup] = useState(false);
+
   const csvLinkRef = useRef();
 
   FilterService.register("custom_activity", (value, filters) => {
@@ -77,6 +79,10 @@ const FINDashboardTable = ({tabDepId}) => {
     setFilters(_filters);
     setGlobalFilterValue(value);
   };
+
+  const handleotherpopupOpen = () => setviewotherpopup(true);
+
+  const handleotherpopupClose = () => setviewotherpopup(false);
 
   const renderHeader = () => {
     return (
@@ -475,7 +481,7 @@ const FINDashboardTable = ({tabDepId}) => {
       .post(APIURL + "Master/GetRoles", {
         RoleID: roleID,
         Status: `${id}`,
-        DepartmentID:"4"
+        DepartmentID: "4",
       })
       .then((res) => {
         if (res.data.responseCode == 200) {
@@ -640,7 +646,7 @@ const FINDashboardTable = ({tabDepId}) => {
   };
 
   //Fetch Referred to Other Department data
-  const [referredDataTrue, setreferredDataTrue] = useState(false);
+  // const [referredDataTrue, setreferredDataTrue] = useState(false);
   const [RODLoader, setRODLoader] = useState(false);
   const [referredData, setReferredData] = useState({});
   const GetReferredData = async (id) => {
@@ -662,7 +668,7 @@ const FINDashboardTable = ({tabDepId}) => {
         .catch((err) => {
           console.log(err);
           setRODLoader(false);
-          setreferredDataTrue(false);
+          // setreferredDataTrue(false);
         });
     } catch (error) {
       console.log("GetReferredFINByID error - ", error);
@@ -910,63 +916,15 @@ const FINDashboardTable = ({tabDepId}) => {
                               : "d-none"
                           }
                           onClick={() => {
-                            referredDataTrue == false &&
-                              GetReferredData(
-                                applicationDetail?.referredApplicationID
-                              );
-                            setreferredDataTrue(!referredDataTrue);
+                            GetReferredData(
+                              applicationDetail?.referredApplicationID
+                            );
+                            // setreferredDataTrue(!referredDataTrue);
+                            handleotherpopupOpen();
                           }}
                         >
                           View Other Department Response
                         </button>
-                        <div
-                          className={
-                            referredDataTrue == true ? "tooltip-bx" : "d-none"
-                          }
-                        >
-                          <h3 className="deparment-headertooltip">
-                            <span>Response</span>{" "}
-                            <span
-                              onClick={() =>
-                                setreferredDataTrue(!referredDataTrue)
-                              }
-                              className="closedepartment_btnicn"
-                            >
-                              <i className="bi bi-x-lg"></i>
-                            </span>{" "}
-                          </h3>
-
-                          {RODLoader === true ? (
-                            <label className="outerloader2">
-                              <span className="loader"></span>
-                              <span className="loaderwait">Please Wait...</span>
-                            </label>
-                          ) : (
-                            <>
-                              <div className="toolinner">
-                                <label>Decision</label>{" "}
-                                <p>{referredData.statusName}</p>
-                              </div>
-                              <div className="toolinner">
-                                <label>Recommendation</label>{" "}
-                                <p
-                                  dangerouslySetInnerHTML={{
-                                    __html: referredData.description
-                                      ? referredData.description
-                                      : "N/A",
-                                  }}
-                                />
-                              </div>
-                              <div className="toolinner">
-                                <label>Notes</label> <p>{referredData.notes}</p>
-                              </div>
-                              <div className="toolinner">
-                                <label>Comments</label>{" "}
-                                <p>{referredData.comment}</p>
-                              </div>
-                            </>
-                          )}
-                        </div>
                       </div>
                     </div>
                   </Modal.Title>
@@ -1131,6 +1089,123 @@ const FINDashboardTable = ({tabDepId}) => {
               </Modal.Footer>
             </div>
           </form>
+        </div>
+      </Modal>
+
+      <Modal
+        show={viewotherpopup}
+        onHide={handleotherpopupClose}
+        backdrop="static"
+        className="max-width-600"
+      >
+        <div className="application-box">
+          <div className="login_inner">
+            <div className="login_form ">
+              <h5>
+                <Modal.Header closeButton className="p-0">
+                  <Modal.Title>
+                    View Other Department Response --{" "}
+                    <big>{applicationDetail?.rbzReferenceNumber}</big>
+                  </Modal.Title>
+                </Modal.Header>
+              </h5>
+            </div>
+            <div className="login_form_panel">
+              <Modal.Body className="p-0">
+                <div className="view-bx">
+                  <h3 className="deparment-headertooltip">
+                    <span>Response</span>{" "}
+                  </h3>
+
+                  {RODLoader === true ? (
+                    <label className="outerloader2">
+                      <span className="loader"></span>
+                      <span className="loaderwait">Please Wait...</span>
+                    </label>
+                  ) : (
+                    <>
+                      {/* <div className="toolinner">
+                                <label>Decision</label>{" "}
+                                <p>{referredData.statusName}</p>
+                              </div> */}
+                      <div className="toolinner">
+                        <label>Recommendation</label>{" "}
+                        <p
+                          dangerouslySetInnerHTML={{
+                            __html: referredData.description
+                              ? referredData.description
+                              : "N/A",
+                          }}
+                        />
+                      </div>
+                      <div className="toolinner">
+                        <label>Notes</label> <p>{referredData.notes}</p>
+                      </div>
+                      <div className="toolinner">
+                        <label>Comments</label> <p>{referredData.comment}</p>
+                      </div>
+
+                      <h3 className="deparment-headertooltip">
+                        <span>Shared File </span>
+                      </h3>
+
+                      {referredData?.sharedFilesData?.length ? (
+                        referredData?.sharedFilesData?.map((items, index) => {
+                          return (
+                            <div className="attachemt_form-bx" key={items.id}>
+                              <label
+                                style={{
+                                  background: "#d9edf7",
+                                  padding: "10px",
+                                }}
+                              >
+                                {/* {items.filename} */}
+                                {items?.fileName
+                                  ? items?.fileName
+                                  : `FileUpload ${index}`}
+                              </label>
+                              <span className="filename">
+                                <Link
+                                  to={items?.filePath}
+                                  target="_blank"
+                                  className="viewbtn"
+                                >
+                                  View File
+                                </Link>
+                              </span>
+                            </div>
+                          );
+                        })
+                      ) : (
+                        <span
+                          style={{
+                            fontSize: "14px",
+                            display: "block",
+                            marginLeft: "10px",
+                          }}
+                        >
+                          No File Found
+                        </span>
+                      )}
+                    </>
+                  )}
+                </div>
+              </Modal.Body>
+              <Modal.Footer className="mt-0">
+                <div className="form-footer mt-0 justify-content-end">
+                  <button
+                    type="submit"
+                    onClick={() => handleotherpopupClose()}
+                    className="register"
+                  >
+                    <span className="d-flex align-items-center justify-content-center">
+                      Close
+                    </span>
+                  </button>
+                </div>
+              </Modal.Footer>
+            </div>
+          </div>
         </div>
       </Modal>
     </>

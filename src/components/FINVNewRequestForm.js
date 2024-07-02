@@ -128,6 +128,7 @@ const FINVNewRequestForm = () => {
   const [allcomment, setallcomment] = useState([]);
   const [noDataComment, setNoDataComment] = useState([]);
   const [responceCount, setresponceCount] = useState([]);
+  const [bankUser, setbankUser] = useState(""); 
   const handleFormClose = () => setShowUpdateModal(false);
   const Navigate = useNavigate();
   const fileInputRefsother = [
@@ -240,6 +241,12 @@ const FINVNewRequestForm = () => {
         }
       });
   };
+
+  const handleseletuser = (e)=>{
+    const values = e.target.value
+
+    setbankUser(values)
+  }
 
   const changeHandelForm = (e) => {
     let newErrors = {};
@@ -671,12 +678,14 @@ const FINVNewRequestForm = () => {
     getRoleHandle();
   }, []);
 
+
   const supervisorHangechangeRole = (e) => {
     const value = e.target.value;
     setErrors({});
     setselectuserRole(value);
     if (value == "") {
       setGetalluser([]);
+      setbankUser('');
     } else {
       axios
         .post(APIURL + "User/GetUsersByRoleID", {
@@ -741,7 +750,7 @@ const FINVNewRequestForm = () => {
         getCompanyName === "Company Name" ||
         getCompanyName == null)
     ) {
-      newErrors.companyName = "Company name is required";
+      newErrors.companyName = "Company Name is required";
       valid = false;
     }
     if (FINForm.applicationType === "") {
@@ -793,10 +802,15 @@ const FINVNewRequestForm = () => {
       newErrors.applicantComments = "Applicant comments is required";
       valid = false;
     }
-    if (checkSupervisor === true && FINForm.bankSupervisor === "") {
+    if (checkSupervisor === true && FINForm.bankSupervisor === "" && roleID == 2) {
       newErrors.bankSupervisor = "Bank supervisor is required";
       valid = false;
     }
+if(checkSupervisor == true && bankUser == "" && roleID ==4){
+  newErrors.bankSupervisor = "Bank supervisor is required";
+      valid = false;
+}
+
     if (checkSupervisor == true && selectuserRole == "" && roleID == 4) {
       newErrors.selectuserRole = "Role is required";
       valid = false;
@@ -1268,7 +1282,7 @@ const FINVNewRequestForm = () => {
               <label className="controlform">Company Name</label>
               <div className="form-bx">
                 <Select
-                  placeholder="Select company name"
+                  placeholder="Select Company Name"
                   value={getCompanyName}
                   onChange={handleChangecompany}
                   onInputChange={handleInputChangecompany}
@@ -1333,8 +1347,7 @@ const FINVNewRequestForm = () => {
                     name="BPNCode"
                     onChange={(e) => {
                       changeHandelForm(e);
-                    }}
-                    // value={exportForm?.BPNCode?.trim()}
+                    }}                    
                     value={
                       filtertin_bpn ? filtertin_bpn?.bpnNumber : "BPN Code"
                     }
@@ -2075,9 +2088,10 @@ const FINVNewRequestForm = () => {
                     name="bankSupervisor"
                     onChange={(e) => {
                       changeHandelForm(e);
+                      handleseletuser(e);
                     }}
                     className={
-                      errors.bankSupervisor && FINForm.bankSupervisor === ""
+                      errors.bankSupervisor && bankUser=== ""
                         ? "error"
                         : ""
                     }
@@ -2094,7 +2108,7 @@ const FINVNewRequestForm = () => {
                     })}
                   </select>
                   <span className="sspan"></span>
-                  {errors.bankSupervisor && FINForm.bankSupervisor === "" ? (
+                  {errors.bankSupervisor && bankUser === "" ? (
                     <small className="errormsg">User is required</small>
                   ) : (
                     ""

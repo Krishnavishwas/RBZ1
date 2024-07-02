@@ -311,8 +311,6 @@ const INSDashboardEditDetails = ({
     },
   });
 
-  console.log("applicationDetail", applicationDetail);
-
   useEffect(() => {
     setexactReturnType("");
 
@@ -321,7 +319,6 @@ const INSDashboardEditDetails = ({
       ID: applicationDetail?.applicationTypeID,
     })
     .then((res) => {
-      console.log("GetSubApplicationTypeByApplicationTypeID", res)
       if (res.data.responseCode === "200") {
         setapplicationSubType(res.data.responseData);
       } else {
@@ -616,24 +613,6 @@ const INSDashboardEditDetails = ({
     }
 
     setErrors(newErrors);
-    // if (name === "sector") {
-    //   axios
-    //     .post(APIURL + "Master/GetSubSectorBySectorID", {
-    //       SectorID: value,
-    //     })
-    //     .then((res) => {
-    //       if (res.data.responseCode == "200") {
-    //         setchecksectorchange(true);
-    //         setsubsectorData(res.data.responseData);
-    //       } else {
-    //         setsubsectorData([]);
-    //         console.log(res.data.responseMessage);
-    //       }
-    //     })
-    //     .catch((err) => {
-    //       console.log(err);
-    //     });
-    // }
 
     if (name == "subSector") {
       setchecksectorchange(false);
@@ -682,7 +661,6 @@ const INSDashboardEditDetails = ({
           ID: value,
         })
         .then((res) => {
-          console.log("GetSubApplicationTypeByApplicationTypeID", res)
           if (res.data.responseCode === "200") {
             setapplicationSubType(res.data.responseData);
           } else {
@@ -847,7 +825,7 @@ const INSDashboardEditDetails = ({
       });
 
     axios
-      .post(APIURL + "InspectorateApplication/InspectorateApplication", {
+      .post(APIURL + "InspectorateApplication/GetINSFilesByApplicationID", {
         ID: applicationDetail.id,
       })
       .then((res) => {
@@ -1464,6 +1442,8 @@ const INSDashboardEditDetails = ({
     }
   };
 
+  const getFrequencyName = AllFrequency?.find((item)=> item.id == getFrequencyID)
+
   const HandleDateExpiryOption = (e) => {
     const { name, value } = e.target;
     setDateExpiryOption(e.target.value);
@@ -1680,7 +1660,7 @@ const INSDashboardEditDetails = ({
           RBZReferenceNumber: applicationDetail?.rbzReferenceNumber,
           UserTypeID: applicationDetail?.userTypeID,
           Name: applicationDetail?.name,
-          BeneficiaryName: applicationDetail?.beneficiaryName,
+          // BeneficiaryName: applicationDetail?.beneficiaryName,
           PECANumber: applicationDetail.pecaNumber,
           TINNumber:filtertin_bpn != undefined && filtertin_bpn?.tinNumber && filtertin_bpn?.tinNumber != null
           ? filtertin_bpn?.tinNumber?.toUpperCase()
@@ -2156,15 +2136,7 @@ const INSDashboardEditDetails = ({
                 setSubmitBtnLoader(false);
                 console.log("file Upload ", err);
               });
-            // axios
-            //   .post(APIURL + "ExportApplication/CopyingResponses", copyresponse)
-            //   .then((resposnse) => {
-            //     console.log("CopyingResponses");
-            //   })
-            //   .catch((error) => {
-            //     setSubmitBtnLoader(false);
-            //     console.log("error", error);
-            //   });
+           
             for (let i = 0; i < sharefile?.length; i++) {
               shareformData.append("files", sharefile[i].file);
               shareformData.append("fileInfoID", sharefile[i].fileInfoID);
@@ -2892,7 +2864,6 @@ const INSDashboardEditDetails = ({
         })
         .then((res) => {
           if (res.data.responseCode == 200) {
-            console.log("vbbbbb---", res);
             setOtherDepartmentLoader(false);
             setOtherDepartmentPopup(true);
           }
@@ -3092,7 +3063,7 @@ const INSDashboardEditDetails = ({
                           value={
                             filtertin_bpn != undefined && filtertin_bpn?.tinNumber && filtertin_bpn?.tinNumber != null
                             ? filtertin_bpn?.tinNumber
-                            : filtertin_bpn?.tinNumber == null && filtertin_bpn != undefined ? "N/A" : applicationDetail?.tinNumber }
+                            : filtertin_bpn?.tinNumber == null || filtertin_bpn != undefined ? "N/A" : applicationDetail?.tinNumber }
                           className={
                             errors.BPNCode
                               ? "error text-uppercase"
@@ -3108,6 +3079,7 @@ const INSDashboardEditDetails = ({
                       </label>
                     </div>
                   </div>
+
                   <div className="inner_form_new ">
                     <label className="controlform">BPN Code</label>
                     <div className="form-bx">
@@ -3120,11 +3092,10 @@ const INSDashboardEditDetails = ({
                             changeHandelForm(e);
                           }}
                           disabled
-                          //   value={ImportForm.BPNCode?.trim()}
                           value={
                             filtertin_bpn != undefined && filtertin_bpn?.bpnNumber && filtertin_bpn?.bpnNumber != null
                               ? filtertin_bpn?.bpnNumber
-                              : filtertin_bpn?.bpnNumber == null && filtertin_bpn != undefined ? "N/A" : applicationDetail?.bpnCode 
+                              : filtertin_bpn?.bpnNumber == null && filtertin_bpn == undefined ? "N/A" : applicationDetail?.bpnCode 
                           }
                           placeholder={
                             applicationDetail?.bpnCode
@@ -3250,7 +3221,7 @@ const INSDashboardEditDetails = ({
                       : ""
                   }
                 >
-                  <option value="">Select Application Type</option>
+                  <option value="">Select Exact Return Type</option>
                   {applicationSubType?.map((item, ind) => {
                     return (
                       <option key={item.id} value={item.id} selected={applicationDetail?.applicationSubTypeID == item.id}>
@@ -3557,7 +3528,7 @@ const INSDashboardEditDetails = ({
                 </div>
               </div>
 
-              <div className="inner_form_new ">
+              {/* <div className="inner_form_new ">
                 <label className="controlform">Beneficiary Name</label>
                 <div className="form-bx">
                   <label>
@@ -3587,9 +3558,9 @@ const INSDashboardEditDetails = ({
                     )}
                   </label>
                 </div>
-              </div>
+              </div> */}
 
-              <div className="inner_form_new ">
+              {/* <div className="inner_form_new ">
                 <label className="controlform">Beneficiary Country</label>
                 <div className="form-bx">
                   <label>
@@ -3616,7 +3587,7 @@ const INSDashboardEditDetails = ({
                     <span className="sspan"></span>
                   </label>
                 </div>
-              </div>
+              </div> */}
 
               {bankID === "" ? (
                 <div className="inner_form_new ">
@@ -15297,14 +15268,42 @@ const INSDashboardEditDetails = ({
                               </td>
                             </tr>
                             <tr
-                              className={
-                                applicationDetail?.returnFrequencyName ==
-                                  null ||
-                                applicationDetail?.returnFrequencyName == ""
-                                  ? "d-none"
-                                  : ""
-                              }
+                            className={
+                              getFrequencyName == undefined &&  (applicationDetail?.returnFrequencyName == null ||
+                              applicationDetail?.returnFrequencyName == "")
+                                ? "d-none"
+                                : ""
+                            }
+                          >
+                            <td
+                              style={{
+                                fontSize: "18px",
+                                fontWeight: "400",
+                                color: "#000",
+                                letterSpacing: "0.01px",
+                              }}
                             >
+                              Returns Frequency
+                            </td>
+                            <td
+                              style={{
+                                color: "#000",
+                                fontSize: "18px",
+                                fontWeight: "800",
+                              }}
+                            >
+                              :{" "}
+                              {getFrequencyName != undefined ? getFrequencyName.name : applicationDetail?.returnFrequencyName == null ||
+                              applicationDetail?.returnFrequencyName == ""
+                                ? "N/A"
+                                : applicationDetail?.returnFrequencyName}
+                            </td>
+                          </tr>
+
+
+
+                          {getFrequencyName?.name == "Once" || applicationDetail?.returnFrequencyName == "Once" ? (
+                            <tr>
                               <td
                                 style={{
                                   fontSize: "18px",
@@ -15313,7 +15312,7 @@ const INSDashboardEditDetails = ({
                                   letterSpacing: "0.01px",
                                 }}
                               >
-                                Returns Frequency
+                                Returns Date
                               </td>
                               <td
                                 style={{
@@ -15324,48 +15323,19 @@ const INSDashboardEditDetails = ({
                                 }}
                               >
                                 :{" "}
-                                {applicationDetail?.returnFrequencyName ==
-                                  null ||
-                                applicationDetail?.returnFrequencyName == ""
+                                {getFrequencyName?.name == "Once" && IsReturnExpiringDate != "0001-01-01T00:00:00" ?  moment(IsReturnExpiringDate).format("DD MMMM YYYY") : applicationDetail?.returnDate == null ||
+                                applicationDetail?.returnDate == "" ||
+                                applicationDetail?.returnDate ==
+                                  "0001-01-01T00:00:00"
                                   ? "N/A"
-                                  : applicationDetail?.returnFrequencyName}
+                                  : moment(
+                                      applicationDetail?.returnDate
+                                    ).format("DD MMMM YYYY")}
                               </td>
                             </tr>
-                            {applicationDetail?.returnFrequencyName ==
-                            "Once" ? (
-                              <tr>
-                                <td
-                                  style={{
-                                    fontSize: "18px",
-                                    fontWeight: "400",
-                                    color: "#000",
-                                    letterSpacing: "0.01px",
-                                  }}
-                                >
-                                  Returns Date
-                                </td>
-                                <td
-                                  style={{
-                                    color: "#000",
-                                    fontSize: "18px",
-                                    fontWeight: "800",
-                                    letterSpacing: "0.01px",
-                                  }}
-                                >
-                                  :{" "}
-                                  {applicationDetail?.returnDate == null ||
-                                  applicationDetail?.returnDate == "" ||
-                                  applicationDetail?.returnDate ==
-                                    "0001-01-01T00:00:00"
-                                    ? "N/A"
-                                    : moment(
-                                        applicationDetail?.returnDate
-                                      ).format("DD MMMM YYYY")}
-                                </td>
-                              </tr>
-                            ) : (
-                              ""
-                            )}
+                          ) : (
+                            ""
+                          )}
                           </table>
                         </td>
                       </tr>
@@ -16321,14 +16291,42 @@ const INSDashboardEditDetails = ({
                               </td>
                             </tr>
                             <tr
-                              className={
-                                applicationDetail?.returnFrequencyName ==
-                                  null ||
-                                applicationDetail?.returnFrequencyName == ""
-                                  ? "d-none"
-                                  : ""
-                              }
+                            className={
+                              getFrequencyName == undefined &&  (applicationDetail?.returnFrequencyName == null ||
+                              applicationDetail?.returnFrequencyName == "")
+                                ? "d-none"
+                                : ""
+                            }
+                          >
+                            <td
+                              style={{
+                                fontSize: "18px",
+                                fontWeight: "400",
+                                color: "#000",
+                                letterSpacing: "0.01px",
+                              }}
                             >
+                              Returns Frequency
+                            </td>
+                            <td
+                              style={{
+                                color: "#000",
+                                fontSize: "18px",
+                                fontWeight: "800",
+                              }}
+                            >
+                              :{" "}
+                              {getFrequencyName != undefined ? getFrequencyName.name : applicationDetail?.returnFrequencyName == null ||
+                              applicationDetail?.returnFrequencyName == ""
+                                ? "N/A"
+                                : applicationDetail?.returnFrequencyName}
+                            </td>
+                          </tr>
+
+
+
+                          {getFrequencyName?.name == "Once" || applicationDetail?.returnFrequencyName == "Once" ? (
+                            <tr>
                               <td
                                 style={{
                                   fontSize: "18px",
@@ -16337,57 +16335,30 @@ const INSDashboardEditDetails = ({
                                   letterSpacing: "0.01px",
                                 }}
                               >
-                                Returns Frequency
+                                Returns Date
                               </td>
                               <td
                                 style={{
                                   color: "#000",
                                   fontSize: "18px",
                                   fontWeight: "800",
+                                  letterSpacing: "0.01px",
                                 }}
                               >
                                 :{" "}
-                                {applicationDetail?.returnFrequencyName ==
-                                  null ||
-                                applicationDetail?.returnFrequencyName == ""
+                                {getFrequencyName?.name == "Once" && IsReturnExpiringDate != "0001-01-01T00:00:00" ?  moment(IsReturnExpiringDate).format("DD MMMM YYYY") : applicationDetail?.returnDate == null ||
+                                applicationDetail?.returnDate == "" ||
+                                applicationDetail?.returnDate ==
+                                  "0001-01-01T00:00:00"
                                   ? "N/A"
-                                  : applicationDetail?.returnFrequencyName}
+                                  : moment(
+                                      applicationDetail?.returnDate
+                                    ).format("DD MMMM YYYY")}
                               </td>
                             </tr>
-                            {applicationDetail?.returnFrequencyName ==
-                            "Once" ? (
-                              <tr>
-                                <td
-                                  style={{
-                                    fontSize: "18px",
-                                    fontWeight: "400",
-                                    color: "#000",
-                                  }}
-                                >
-                                  Returns Date
-                                </td>
-                                <td
-                                  style={{
-                                    color: "#000",
-                                    fontSize: "18px",
-                                    fontWeight: "800",
-                                    letterSpacing: "0.01px",
-                                  }}
-                                >
-                                  :{" "}
-                                  {applicationDetail?.returnDate == null ||
-                                  applicationDetail?.returnDate == "" ||
-                                  applicationDetail?.returnDate ==
-                                    "0001-01-01T00:00:00"
-                                    ? "N/A"
-                                    : moment(
-                                        applicationDetail?.returnDate
-                                      ).format("DD MMMM  YYYY")}
-                                </td>
-                              </tr>
-                            ) : (
-                              ""
-                            )}
+                          ) : (
+                            ""
+                          )}
                           </table>
                         </td>
                       </tr>
@@ -16733,32 +16704,7 @@ const INSDashboardEditDetails = ({
                             </tr>
                             <tr>
                               <td colSpan="2">&nbsp;</td>
-                            </tr>
-                            {/* <tr>
-                              <td
-                                style={{
-                                  color: "#000",
-                                  fontSize: "18px",
-                                  fontWeight: "400",
-                                }}
-                              >
-                                Importer
-                              </td>
-                              <td
-                                style={{
-                                  color: "#000",
-                                  fontSize: "18px",
-                                  fontWeight: "800",
-                                  letterSpacing: "0.01px"
-                                }}
-                              >
-                                :{" "}
-                                {applicationDetail?.companyName == null || applicationDetail?.companyName == ""
-                                  ? applicationDetail?.name
-                                  : applicationDetail?.companyName} 
-                                  {console.log(applicationDetail)}
-                              </td>
-                            </tr> */}
+                            </tr>                            
                             <tr>
                               <td
                                 style={{

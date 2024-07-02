@@ -1888,6 +1888,12 @@ margin-left: 7px;
   margin: auto;
 }
 
+.advance_save .form-bx label {
+  margin: 0;
+  background-color: #fff;
+  padding: 0 5px;
+}
+
 
 .form-bx label input[type=number]::-webkit-outer-spin-button,
 .form-bx label input[type=number]::-webkit-inner-spin-button {
@@ -2486,6 +2492,7 @@ color: #8d8c8c;
   border-bottom: 1px solid #ccc;
   font-size: 14px;
   color: #000;
+  max-width: calc(100% - 129px);
   min-width: 360px;
 }
 .attachemt_form-bx label i{
@@ -2554,8 +2561,7 @@ color: #8d8c8c;
   padding: 30px 0px;
   text-align: center;
 }
-
-export company name dropdown start /
+ 
 .dropdownExpComName {
   position: relative;
   color: #333;
@@ -3911,29 +3917,33 @@ margin-top: 20px;
   color: #000;
   width: 100%;
   font-size: 14px;
-  margin-bottom: 8px;
-  column-gap: 10px;
+  margin-bottom: 20px;
+  column-gap: 19px;
   align-items: center;
 }
 
 .toolinner label {
-  width: 140px;
+  width: 180px;
   text-align: left;
   background: #d9edf7;
   padding: 4px;
   color: #000;
-  font-size: 10px;
+  font-size: 14px;
   text-transform: capitalize;
-  font-weight: bold;
+  font-weight:  500;
+  padding-top: 16px;
+  padding-bottom: 16px;
+  padding-left: 10px;
 }
 
 .toolinner p {
   margin: 0px;
   text-align: left;
   width: calc(100% - 140px);
-  font-size: 10px;
+  font-size: 14px;
   font-weight: normal;
   text-transform: none !important;
+  color: #8d8c8c;
 }
 
 .tooltip-bx:after {
@@ -3958,9 +3968,14 @@ margin-top: 20px;
 }
 .deparment-headertooltip{
   background: #42a5f5;
-  font-size: 14px;
-  padding: 6px 8px;
+  padding: 9px 18px;
+  margin: 0 0 18px;
+  font-size: 16.25px;
   text-align: left;
+  border-left: 5px solid #5e62a1;
+  color: #fff;
+  padding-top: 1rem !important;
+  padding-bottom: 1rem !important;
 }
 .closedepartment_btnicn{
   position: relative;
@@ -4073,4 +4088,78 @@ margin-top: 20px;
     font-weight: bold;
     padding: 10px 10px;
     margin-bottom: 15px;
+}
+.p-connected-overlay-enter-done {
+  z-index: 111;
+  display: -webkit-box;
+  z-index: 11111 !important;
+}
+.p-dropdown-items {
+  padding: 0px;
+  width: 80px; 
+  text-align: center;
+}
+.view-bx{
+  display: block;
+  width: 100%;
+  height: 69.3vh;
+  overflow-y: auto;
+}
+.directivefile_view_outer{
+  display: inline-flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  max-height: 260px;
+  overflow: auto;
+  width: 100%;
+}
+.directivefile_view{
+  display: inline-flex;
+  margin-top: 9px;
+  margin-bottom: 7px;
+  align-items: flex-start;
+}
+.directivefile_view label {
+  display: inline-block;
+  font-size: 14px;
+  line-height: 1.0875;
+  color: #000;
+  min-width: 360px;
+  font-weight: 500;
+  text-transform: capitalize;
+  background: #d9edf7;
+  padding: 12px 10px;
+  margin-right: 10px;
+}
+.directivefile_view span{
+  display: inline-block; 
+}
+.directivefile_view span a{
+  text-decoration: underline;
+  color: #333;
+  background: #eee;
+  padding: 9.1px 12px;
+  font-size: 14px;
+  margin-right: 6px;
+  float: left;
+}
+.directivefile_view span:last-child a{
+  border: 0px;
+}
+.ddrbrk{
+  display: inline-flex;
+  flex-wrap: wrap;
+  row-gap: 5px;
+}
+.multiselect input {
+  grid-area: auto !important;
+  min-width: 0px !important;
+}
+.tagsname{
+  background: #42a5f5;
+  padding: 3px;
+  margin-right: 3px;
+  border: 1px solid #64a8df;
+  color: #fff;
+  text-transform: capitalize;
 }

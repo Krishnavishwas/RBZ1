@@ -1077,9 +1077,6 @@ useEffect(() => {
     CopiedResponse: formatecopyresponse?.join(),
   }));
 
-  console.log("selectedBanks", selectedBanks)
-
-
   const changeHandelForm = (e) => {
     const name = e.target.name;
     const value = e.target.value;
@@ -1894,18 +1891,10 @@ useEffect(() => {
       valid = false;
     }
 
-    // if(files.length < attachmentData.length){
-    //   newErrors.files = "All Files Required";
-    //   valid = false;
-    // }
-
     setErrors(newErrors);
     return valid;
   };
-  //console.log("--t", AssignUserID == "" , nextlevelvalue == "20" , nextlevelvalue == "10"  ,  checkSupervisor == true)
 
-  console.log("AssignUserID", AssignUserID);
-  console.log("nextlevelvalue", nextlevelvalue);
   const onShow = () => {
     setTimeout(() => {
       let selectAllCheckbox = document.querySelector(
@@ -2378,7 +2367,6 @@ useEffect(() => {
                         } else {
                           var headerImage = "";
                         }
-                        //console.log('FooterData---',response.data.responseData.headerFooterData['1']);
                         if (
                           response.data.responseData?.headerFooterData["1"]
                             ?.fileType == "FooterFile"
@@ -2658,65 +2646,13 @@ useEffect(() => {
       ))
     : null;
 
-  // console.log("applicationDetail--applicationDetail", applicationDetail);
-
-  // const finalArray = getBlankFile?.map((blankFile) => {
-  //   const attachedFile = applicationDetail?.attachedFiles?.find(
-  //     (file) => file.label === blankFile.name
-  //   );
-  //   if (attachedFile) {
-  //     return {
-  //       ...attachedFile,
-  //       ...blankFile,
-  //     };
-  //   } else {
-  //     return blankFile;
-  //   }
-  // });
-
-  // Combine attachedFiles and getBlankFile arrays
-
-  //   const finalArray = applicationDetail?.attachedFiles?.map(attachedFile => {
-  //     const matchingFile = getBlankFile?.find(blankFile => blankFile.name == attachedFile.label);
-
-  //     if (matchingFile) {
-  //         // Combine properties from both objects
-  //         return { ...matchingFile, ...attachedFile };
-  //     } else {
-  //         // If there's no matching file, return the attachedFile as is
-  //         return attachedFile;
-  //     }
-  // });
-
-  // const labelSet = new Set(getBlankFile?.map((item) => item.name));
-  // geninfoFile?.forEach((item) => labelSet.add(item.label));
-
-  // Create the finalArray by merging attachedFiles and getBlankFile based on the labelSet
-
   useEffect(() => {
-    //     const finalArray = Array.from(labelSet)?.map(label => {
-    //       const attachedFile = geninfoFile?.find(item => item.label === label);
-    //       const getBlankFileItem = getBlankFile?.find(item => item.name === label);
-    //       if (attachedFile) {
-    //           return { ...attachedFile, status: 0 };
-    //       } else if (getBlankFileItem) {
-    //           return { ...getBlankFileItem, status: 0 };
-    //       }
-    //   });
-    //   console.log("finalArray", finalArray)
-    // if(finalArray){
-    // setFiles(finalArray)
-    // }
-
     let newData1 = getBlankFile?.filter((blankFile) => {
       return !geninfoFile?.some(
         (infoFile) => infoFile.label === blankFile.name
       );
     });
-
     setnewData(newData1);
-
-    // setFiles(geninfoFile);
   }, [applicationDetail, geninfoFile, allcomment]);
 
   const handleRemovfile = (id) => {
@@ -2731,8 +2667,6 @@ useEffect(() => {
         console.log("FileRemove Error", error);
       });
   };
-
-  console.log("errors", errors);
 
   const getLastComment = async (id) => {
     await axios
@@ -2749,8 +2683,6 @@ useEffect(() => {
         console.log("GetLastApplicationDataByID Error", error);
       });
   };
-  console.log("applicationDetail - ", applicationDetail);
-  console.log("lastComments - ", lastComments);
 
   return (
     <>
@@ -5624,17 +5556,12 @@ useEffect(() => {
                         role="tabpanel"
                         aria-labelledby="analyst"
                       >
-                        {console.log("Actiondata", Actiondata)}
                         {Actiondata?.map((cur) => {
-                          const firstItem = cur?.applicationActivityData?.[0]; // Accessing the first element directly
-
+                          const firstItem = cur?.applicationActivityData?.[0];
                           if (cur?.assignedToRoleID === 5 && firstItem) {
-                            // Check if firstItem exists
                             return (
                               <div className="bakgroundaction">
                                 <div key={firstItem.actionID}>
-                                  {" "}
-                                  {/* Remember to add a unique key */}
                                   <div className="row">
                                     <div className="col-md-6">
                                       <div className="inner_form_new">
@@ -5643,7 +5570,6 @@ useEffect(() => {
                                         </label>
                                         <div className="form-bx">
                                           <label>
-                                            {" "}
                                             <input
                                               type="text"
                                               className=""
@@ -16049,19 +15975,11 @@ useEffect(() => {
                             letterSpacing: "0.01px",
                           }}
                         >
-                          Dear{" "}
-                          {/* {applicationDetail?.applicantType == 1
-                            ? applicationDetail?.companyName
-                            : applicationDetail?.applicantType == 2
-                            ? applicationDetail?.name
-                            : applicationDetail?.applicantType == 3
-                            ? applicationDetail?.agencyName
-                            : " "} */}
+                          Dear{" "}                         
                           {applicationDetail?.companyName == null ||
                           applicationDetail?.companyName == ""
                             ? applicationDetail?.name
                             : applicationDetail?.companyName}
-                          {console.log(applicationDetail)},
                         </td>
                       </tr>
                       <tr>
@@ -16113,7 +16031,6 @@ useEffect(() => {
                                 applicationDetail?.companyName == ""
                                   ? applicationDetail?.name
                                   : applicationDetail?.companyName}
-                                {console.log(applicationDetail)}
                               </td>
                             </tr>
                             <tr>
@@ -16662,18 +16579,10 @@ useEffect(() => {
                           }}
                         >
                           Dear{" "}
-                          {/* {applicationDetail?.applicantType == 1
-                            ? applicationDetail?.companyName
-                            : applicationDetail?.applicantType == 2
-                            ? applicationDetail?.name
-                            : applicationDetail?.applicantType == 3
-                            ? applicationDetail?.agencyName
-                            : " "} */}
                           {applicationDetail?.companyName == null ||
                           applicationDetail?.companyName == ""
                             ? applicationDetail?.name
                             : applicationDetail?.companyName}
-                          {console.log(applicationDetail)},
                         </td>
                       </tr>
                       <tr>
@@ -16701,32 +16610,7 @@ useEffect(() => {
                             </tr>
                             <tr>
                               <td colSpan="2">&nbsp;</td>
-                            </tr>
-                            {/* <tr>
-                              <td
-                                style={{
-                                  color: "#000",
-                                  fontSize: "18px",
-                                  fontWeight: "400",
-                                }}
-                              >
-                                Exporter
-                              </td>
-                              <td
-                                style={{
-                                  color: "#000",
-                                  fontSize: "18px",
-                                  fontWeight: "800",
-                                  letterSpacing: "0.01px"
-                                }}
-                              >
-                                :{" "}
-                                {applicationDetail?.companyName == null || applicationDetail?.companyName == ""
-                                  ? applicationDetail?.name
-                                  : applicationDetail?.companyName} 
-                                  {console.log(applicationDetail)}
-                              </td>
-                            </tr> */}
+                            </tr>                           
                             <tr>
                               <td
                                 style={{

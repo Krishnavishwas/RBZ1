@@ -298,7 +298,6 @@ const [responceCount, setresponceCount] = useState([]);
               setOrganogram(eq);
             }
             if (res.data.responseData[5].id == 55) {
-              // setantimoney(res.data.responseData[5].subData)
               const eq = res.data.responseData[5].subData?.map((item) => {
                 return {
                   label: item.name,
@@ -315,23 +314,6 @@ const [responceCount, setresponceCount] = useState([]);
         });
     }
 
-    // if (name === "sector" && value !== "") {
-    //   axios
-    //     .post(APIURL + "Master/GetSubSectorBySectorID", {
-    //       SectorID: value,
-    //     })
-    //     .then((res) => {
-    //       if (res.data.responseCode === "200") {
-    //         setsubsectorData(res.data.responseData);
-    //       } else {
-    //         setsubsectorData([]);
-    //         console.log(res.data.responseMessage);
-    //       }
-    //     })
-    //     .catch((err) => {
-    //       console.log(err);
-    //     });
-    // }
     if (name === "currency" && value !== "") {
       axios
         .post(APIURL + "Master/GetRateByCurrencyID", {
@@ -518,11 +500,15 @@ const [responceCount, setresponceCount] = useState([]);
         getCompanyName === "Company Name" ||
         getCompanyName == null)
     ) {
-      newErrors.companyName = "Company name is required";
+      newErrors.companyName = "Company Name is required";
       valid = false;
     }
     if (INSForm.applicationType === "") {
       newErrors.applicationType = "Application type is required";
+      valid = false;
+    }
+    if (INSForm.applicantionTitle === "") {
+      newErrors.applicantionTitle = "Application Title is required";
       valid = false;
     }
     if (
@@ -537,11 +523,6 @@ const [responceCount, setresponceCount] = useState([]);
       newErrors.applicant = "Applicant name is required";
       valid = false;
     }
-    // if (INSForm.applicationreferenceNumber === "") {
-    //   newErrors.applicationreferenceNumber =
-    //     "Application Reference Number is required";
-    //   valid = false;
-    // }
     if (INSForm.currency === "") {
       newErrors.currency = "Currency is required";
       valid = false;
@@ -582,14 +563,6 @@ const [responceCount, setresponceCount] = useState([]);
       newErrors.amount = "Amount is required";
       valid = false;
     }
-    // if (INSForm.sector === "") {
-    //   newErrors.sector = "Sector is required";
-    //   valid = false;
-    // }
-    // if (INSForm.subsector === "" && INSForm.sector != 2) {
-    //   newErrors.subsector = "Subsector is required";
-    //   valid = false;
-    // }
     if (checkSupervisor == true && selectuserRole == "" && roleID == 4) {
       newErrors.selectuserRole = "Role is required";
       valid = false;
@@ -838,9 +811,9 @@ const [responceCount, setresponceCount] = useState([]);
             ApplicantTypeID: registerusertype,
             AssignedToRoleID: roleID == 2 ? 3 : selectuserRole,
             ApplicationTypeID: INSForm.applicationType,
-            BeneficiaryName: INSForm.BeneficiaryName,
+            // BeneficiaryName: INSForm.BeneficiaryName,
             PreviousRBZNumber:ValidateChange.previousRBZReferenceNumber?.trim().toUpperCase(),
-            BeneficiaryCountry: INSForm.baneficiaryCountry,
+            // BeneficiaryCountry: INSForm.baneficiaryCountry,
             BPNCode: registerusertype === "1" && bankID !== ""
                 ? filtertin_bpn && filtertin_bpn.bpnNumber !== null
                 ? filtertin_bpn?.bpnNumber
@@ -897,7 +870,7 @@ const [responceCount, setresponceCount] = useState([]);
             axios
               .post(ImageAPI + "File/UploadFile", formData)
               .then((res) => {
-                console.log("res99999");
+                console.log("Upload File success");
               })
               .catch((err) => {
                 console.log("file Upload ", err);
@@ -971,10 +944,6 @@ const [responceCount, setresponceCount] = useState([]);
       setToastDisplayed(true);
     }
   };
-
-  console.log("ValidateChange.previousRBZReferenceNumber?.trim()", ValidateChange.previousRBZReferenceNumber?.trim())
-  console.log("INSForm.relatedapplicationreferenceNumber", INSForm.relatedapplicationreferenceNumber)
-  console.log("previousRBZReferenceNumber", INSForm.previousRBZReferenceNumber)
 
   const closePopupHandle = () => {
     Navigate("/INSDashboard");
@@ -1157,7 +1126,6 @@ const [responceCount, setresponceCount] = useState([]);
         if (res.data.responseCode === "200") { 
           setApplicationDetail(res.data.responseData);
         } else { 
-          // setApplicationmessage(res.data.responseMessage);
          toast.warn(res.data.responseMessage)
         }
       })
@@ -1247,7 +1215,7 @@ const [responceCount, setresponceCount] = useState([]);
         </div>
 
         <div className="inner_form_new ">
-          <label className="controlform">Applicantion Title</label>
+          <label className="controlform">Application Title</label>
           <div className="form-bx">
             <label>
               <input
@@ -1304,7 +1272,7 @@ const [responceCount, setresponceCount] = useState([]);
               <label className="controlform">Company Name</label>
               <div className="form-bx">
                 <Select
-                  placeholder="Select company name"
+                  placeholder="Select Company Name"
                   value={getCompanyName}
                   onChange={handleChangecompany}
                   onInputChange={handleInputChangecompany}
@@ -1350,8 +1318,8 @@ const [responceCount, setresponceCount] = useState([]);
                     }
                     className={
                       errors.TINNumber
-                        ? "error text-uppercase"
-                        : "text-uppercase"
+                        ? "error text-capitalize"
+                        : "text-capitalize"
                     }
                   />
                   <span className="sspan"></span>
@@ -1382,7 +1350,7 @@ const [responceCount, setresponceCount] = useState([]);
                     }
                     placeholder="BPN Code"
                     className={
-                      errors.BPNCode ? "error text-uppercase" : "text-uppercase"
+                      errors.BPNCode ? "error text-capitalize" : "text-capitalize"
                     }
                   />
                   <span className="sspan"></span>
@@ -1524,7 +1492,7 @@ const [responceCount, setresponceCount] = useState([]);
                       : ""
                   }
                 >
-                  <option value="">Select Application Type</option>
+                  <option value="">Select Exact Return Type</option>
                   {applicationSubType?.map((item, ind) => {
                     return (
                       <option key={item.id} value={item.id}>
@@ -1707,7 +1675,7 @@ const [responceCount, setresponceCount] = useState([]);
 
         <div className="inner_form_new ">
           <label className="controlform">
-            Department Applicantion Belong To
+            Department Application Belong To
           </label>
           <div className="form-bx">
             <label>
@@ -1749,8 +1717,8 @@ const [responceCount, setresponceCount] = useState([]);
                       placeholder="Applicant Reference Number"
                       className={
                         errors.relatedapplicationreferenceNumber
-                          ? "text-uppercase error"
-                          : "text-uppercase"
+                          ? "text-capitalize error"
+                          : "text-capitalize"
                       }
                     />
                     <span className="sspan"></span>
@@ -1779,12 +1747,7 @@ const [responceCount, setresponceCount] = useState([]);
                   <label>
                     <input
                       ref={previousRBZReferenceNumberRef}
-                      type="text"
-                      // name="previousRBZReferenceNumber"
-                      // onChange={(e) => {
-                      //   changeHandelForm(e);
-                      // }}
-                      // value={INSForm.previousRBZReferenceNumber?.trim()}
+                      type="text"                     
                       min={0}
                       value={ValidateChange.previousRBZReferenceNumber?.trim()}
                       name="previousRBZReferenceNumber"
@@ -1801,8 +1764,8 @@ const [responceCount, setresponceCount] = useState([]);
                         errors.previousRBZReferenceNumber
                         ? "text-uppercase error"
                         : ValidateShow.previousRBZReferenceNumber
-                        ? "text-uppercase"
-                        : "text-uppercase"
+                        ? "text-capitalize"
+                        : "text-capitalize"
                       }
                     />
                     <span className="sspan"></span>
@@ -1916,7 +1879,7 @@ const [responceCount, setresponceCount] = useState([]);
         </div>
         {/* end form-bx  */}
 
-        <div className="inner_form_new ">
+        {/* <div className="inner_form_new ">
           <label className="controlform">Beneficiary Name</label>
           <div className="form-bx">
             <label>
@@ -1938,10 +1901,11 @@ const [responceCount, setresponceCount] = useState([]);
               )}
             </label>
           </div>
-        </div>
+        </div> */}
+
         {/* end form-bx  */}
 
-        <div className="inner_form_new ">
+        {/* <div className="inner_form_new ">
           <label className="controlform">Baneficiary Country</label>
           <div className="form-bx">
             <label>
@@ -1963,7 +1927,8 @@ const [responceCount, setresponceCount] = useState([]);
               <span className="sspan"></span>
             </label>
           </div>
-        </div>
+        </div> */}
+
         {/* end form-bx  */}
 
         {bankID === "" ? (

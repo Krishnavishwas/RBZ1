@@ -201,24 +201,9 @@ const ExportDashboardRenewEditDetails = ({
   const para = "Export application request submitted successfully!";
   const heading1 = "Returns Submitted Successfully!";
   const para1 = " Export returns request submitted successfully!";
+   
 
-  const ChangeApplicationStatus = (e) => {
-    const values = e.target.value;
-    setapplicationstaus(values);
-  };
-
-  const handleUserRole = (e) => {
-    const value = e.target.value;
-    setSupervisorRoleId(value);
-  };
-
-  const ChangeNextlevelHandle = (e) => {
-    const value = e.target.value;
-    setSupervisorRoleId("");
-    setSupervisorRoleId("");
-    setnextlevelvalue(value);
-    setAsignUser([]);
-  };
+  const applicationNumbernew = Storage.getItem("generatedNumber")
 
   useEffect(() => {
     if (applicationDetail?.applicationTypeID) {
@@ -2946,14 +2931,14 @@ const ExportDashboardRenewEditDetails = ({
               <UpdatePopupMessage
                 heading={heading1}
                 para={para1}
-                // applicationNumber={applicationNumber}
+                applicationNumbernew={applicationNumbernew}
                 closePopupHandle={closePopupHandle}
               ></UpdatePopupMessage>
             ) : 
               updatepopup == true ? <UpdatePopupMessage
               heading={heading}
               para={para}
-              applicationNumber={applicationNumber}
+              // applicationNumber={applicationNumber}
               closePopupHandle={closePopupHandle}
             ></UpdatePopupMessage> : ""
             }

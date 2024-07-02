@@ -8,9 +8,6 @@ const ExportCirculargenInfo = ({ applicationDetail }) => {
   const roleID = Storage.getItem("roleIDs");
  
 
-
-  console.log("applicationDetail-------------========", applicationDetail);
-
   return (
     <>
 

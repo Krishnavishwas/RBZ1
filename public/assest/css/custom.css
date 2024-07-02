@@ -1116,12 +1116,13 @@ ul.labelbx li {
     overflow-y: auto;
 }
 .newdirectivelist li {
-    background: lightgray;
-    margin-right: 3px;
+    background: #d3d3d3;
+    margin-right: 5px;
     margin-bottom: 3px;
     padding: 3px;
     border-radius: 2px;
     cursor: no-drop;
+    text-transform: capitalize;
 }
 .directiveFileData-field {
     height: 500px;
@@ -1153,3 +1154,79 @@ ul.labelbx li {
     padding: 30px 0px;
     width: 100%;
   }
+
+  .bankMultiSelect .css-13cymwt-control>div:first-child {
+    max-height: 35px;
+    overflow: auto;
+}
+
+.nested-children {
+    padding-left: 20px;
+}
+.nasted-multi-box {
+    position: relative;
+    width: calc(100% - 200px);
+}
+
+.nasted-multi-topBox {
+    display: block;
+    position: relative;
+    margin: 10px 0px;
+    border-bottom: 1px solid #ccc;
+    padding: 4px 0px;
+    cursor: pointer;
+}
+
+.nested-multi-select {
+    overflow: auto;
+    position: absolute;
+    max-height: 200px;
+    background-color: #fff;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+    padding: 10px;
+    font-size: 14px;
+    z-index: 9;
+}
+.multi-topBox-content {
+    margin-bottom: 0px;
+    display: block;
+    width: 100%;
+    border: 0;
+    font-size: 14px;
+    outline: 0;
+    padding: 8px 5px;
+    height: 40px;
+    color: #000;
+    overflow: auto;
+}
+.parent-box {
+    font-weight: 500;
+    margin: 5px 0px;
+}
+
+.parent-box span,
+.nested-children span {
+    padding-left: 5px;
+}
+
+.multi-topBox-content span {
+    background-color: #dedede;
+    color: #333;
+    margin: 2px;
+    padding: 3px;
+    cursor: no-drop;
+    display: inline-block;
+}
+
+.adSearchButton {
+    border: 0px;
+    padding: 10px 16px;
+    margin-left: 10px;
+    background: #d9d7d7;
+    color: #000;
+    font-weight: 500;
+}
+
+.css-swicq1-MultiValueGeneric, .css-1w941pa-MultiValueRemove{
+    background-color: #eeeeee !important;
+}

@@ -6,7 +6,7 @@ import { Storage } from "../login/Storagesetting";
 import Modal from "react-bootstrap/Modal";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
-import { FilterMatchMode, FilterService } from "primereact/api";
+import { FilterMatchMode, FilterService, FilterOperator } from "primereact/api";
 import "primereact/resources/themes/lara-light-cyan/theme.css";
 import { InputText } from "primereact/inputtext";
 import "primeicons/primeicons.css";
@@ -55,13 +55,31 @@ const PendingRetunrsTable = () => {
     return from <= value && value <= to;
   });
 
-  const [filters, setFilters] = useState({
-    global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    companyName: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-    bankName: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-    tinNumber: { value: null, matchMode: FilterMatchMode.IN },
-  });
+  const [filters, setFilters] = useState(null);
   const [globalFilterValue, setGlobalFilterValue] = useState("");
+
+  const initFilters = () => {
+    setFilters({
+      global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+      companyName: {
+        operator: FilterOperator.AND,
+        constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
+      },
+      bankName: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+      returnDate: {
+        operator: FilterOperator.OR,
+        constraints: [
+          { value: null, matchMode: FilterMatchMode.DATE_IS },
+          { value: null, matchMode: FilterMatchMode.DATE_AFTER },
+        ],
+      },
+      tinNumber: {
+        operator: FilterOperator.AND,
+        constraints: [{ value: null, matchMode: FilterMatchMode.IN }],
+      },
+    });
+    setGlobalFilterValue("");
+  };
 
   const onGlobalFilterChange = (e) => {
     const value = e.target.value;
@@ -71,17 +89,49 @@ const PendingRetunrsTable = () => {
     setGlobalFilterValue(value);
   };
 
+  const filterNextSevenDays = (value) => {
+    let _filters = { ...filters };
+    if (value !== "all") {
+      const nextDays = moment().subtract(value, "days").toDate();
+      const newdate = new Date(nextDays);
+      _filters["returnDate"].constraints[0].value = new Date();
+      _filters["returnDate"].constraints[1].value = newdate;
+    } else {
+      _filters["returnDate"].constraints[0].value = null;
+      _filters["returnDate"].constraints[1].value = null;
+    }
+    setFilters(_filters);
+  };
+
   const renderHeader = () => {
     return (
-      <div className="flex justify-content-end">
-        <span className="p-input-icon-left">
-          <i className="pi pi-search" />
-          <InputText
-            value={globalFilterValue}
-            onChange={onGlobalFilterChange}
-            placeholder="Search"
-          />
-        </span>
+      <div className="d-flex justify-content-between">
+        <div>
+          <span className="p-input-icon-left">
+            <i className="pi pi-search" />
+            <InputText
+              value={globalFilterValue}
+              onChange={onGlobalFilterChange}
+              placeholder="Search"
+            />
+          </span>
+        </div>
+        <div className="form-bx">
+          <label>
+          <select
+          className="daySelect"
+          aria-label="Large select example"
+          // onChange={(e) => filterNextSevenDays(e.target.value)}
+        >
+          <option value="all" selected>
+            Select Days
+          </option>
+          <option value="60">60 Days</option>
+          <option value="180">180 Days</option>
+          <option value="365">365 Days</option>
+        </select>
+          </label>
+        </div>
       </div>
     );
   };
@@ -118,7 +168,7 @@ const PendingRetunrsTable = () => {
           {rollId === "2" && (
             <button
               className="btn viewbtn_file"
-              style={{ fontSize: "13px", textDecoration :"none" }}
+              style={{ fontSize: "13px", textDecoration: "none" }}
               key={rowData.title}
               onClick={() => {
                 handleClickEditModal(rowData.title);
@@ -129,7 +179,7 @@ const PendingRetunrsTable = () => {
               }}
             >
               Submit
-            </button>            
+            </button>
           )}
         </div>
       </>
@@ -319,6 +369,7 @@ const PendingRetunrsTable = () => {
   // ----- End Code For Search Table Data
 
   useEffect(() => {
+    initFilters();
     handleData();
     setExportPendingReturns([]);
   }, []);
@@ -385,7 +436,7 @@ const PendingRetunrsTable = () => {
       .post(APIURL + "Master/GetRoles", {
         RoleID: rollId,
         Status: `${id}`,
-        DepartmentID:"7"
+        DepartmentID: "7",
       })
       .then((res) => {
         if (res.data.responseCode == 200) {
@@ -450,12 +501,6 @@ const PendingRetunrsTable = () => {
                 style={{ width: "140px" }}
                 body={submittedDate}
               ></Column>
-              {/* <Column
-                field="applicationType"
-                header="Application Type"
-                sortable
-                style={{ width: "200px" }}
-              ></Column> */}
               <Column
                 field=""
                 header="Amount"
@@ -536,7 +581,12 @@ const PendingRetunrsTable = () => {
                             }
                             style={{ alignItems: "center" }}
                           >
-                            Edit {menuname === "Exports" && submenuname === "Pending Returns" ? "Returns" : ""} Export Request --{" "}
+                            Edit{" "}
+                            {menuname === "Exports" &&
+                            submenuname === "Pending Returns"
+                              ? "Returns"
+                              : ""}{" "}
+                            Export Request --{" "}
                             <big>
                               {applicationDetail?.rbzReferenceNumber
                                 ? applicationDetail.rbzReferenceNumber

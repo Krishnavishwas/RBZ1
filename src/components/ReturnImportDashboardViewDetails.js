@@ -35,7 +35,6 @@ const ReturnImportDashboardViewDetails = ({
   const [tabstatus6, settabstatus6] = useState(true);
   const [sharefiletab, setsharefiletab] = useState(false);
 
-  console.log("applicationDetail",applicationDetail)
   return (
     <>
       {showdataLoader == true || !noDataComment?.length ? (

@@ -19,7 +19,7 @@ const CircularsDirectiveListDataTable = ({ DirectiveOption, selectedDirectives, 
     setDirectivefiles(filePath);
     setDirectiveName(directivename);
   };
-
+ 
   
   const action = (rowData) => {
     return (
@@ -69,7 +69,7 @@ const CircularsDirectiveListDataTable = ({ DirectiveOption, selectedDirectives, 
         <InputText
           type="search"
           onInput={(e) => setGlobalFilter(e.target.value)}
-          placeholder="Search"
+          placeholder="Search by directive names and tags"
         />
         <span className="p-inputgroup-addon">
           <i className="pi pi-search" />
@@ -91,6 +91,8 @@ const CircularsDirectiveListDataTable = ({ DirectiveOption, selectedDirectives, 
          paginatorLeft
          selectionMode="checkbox"
          rowHover
+         isDataSelectable={(rowData) => (rowData.data.status === 1)}
+         rowClassName={(rowData) => (rowData.status === 1 ? '' : 'p-disabled')}
          emptyMessage="No Data found."
          globalFilter={globalFilter}
       >
@@ -100,15 +102,34 @@ const CircularsDirectiveListDataTable = ({ DirectiveOption, selectedDirectives, 
     exportable={false}  >
     </Column>
         <Column
-          field="label"
-          header="Directives"
-          sortable
-          style={{ width: "78%" }}
+           field="label"
+           header="Directives"
+           sortable
+           style={{ width: "44%" }}
+           body={(rowData) => <span style={{ textTransform: "capitalize" }}>{rowData.label}</span>}
         ></Column>
+        {/* <Column
+        field='tagName'
+        header='Tag Name' 
+        body={(rowData) => rowData.tagName.split(",").map(tag => <span className="tagsname">{tag.trim()}</span>)}
+        style={{width:"36%"}}
+        ></Column> */}
+        <Column
+    field='tagName'
+    header='Tag Name' 
+    body={(rowData) => 
+        rowData.tagName.split(",").map(tag => {
+            const trimmedTag = tag.trim();
+            const capitalizedTag = trimmedTag.charAt(0).toUpperCase() + trimmedTag.slice(1);
+            return <span className="tagsname">{capitalizedTag}</span>;
+        })
+    }
+    style={{width:"36%"}}
+/>
         <Column
           field=""
           header="View Files"
-          style={{ width: "150px" }}
+          style={{ width: "300px" }}
           frozen
           alignFrozen="right"
           body={action}

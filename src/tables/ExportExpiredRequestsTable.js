@@ -45,35 +45,31 @@ const ExportExpiredRequestsTable = () => {
     return from <= value && value <= to;
   });
 
-
   const [filters, setFilters] = useState(null);
-
-  // const [filters, setFilters] = useState({
-  //   global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-  //   companyName: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-  //   bankName: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-  //   tinNumber: { value: null, matchMode: FilterMatchMode.IN },
-  // });
-
-
+  const [globalFilterValue, setGlobalFilterValue] = useState("");
 
   const initFilters = () => {
     setFilters({
-        global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-        companyName: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-        bankName: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-        expiringDate: { operator: FilterOperator.OR, constraints: [
-          { value: null, matchMode: FilterMatchMode.DATE_IS  },
-          { value: null, matchMode: FilterMatchMode.DATE_AFTER }
-        ] },
-        tinNumber: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.IN }] },
+      global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+      companyName: {
+        operator: FilterOperator.AND,
+        constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
+      },
+      bankName: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+      expiringDate: {
+        operator: FilterOperator.OR,
+        constraints: [
+          { value: null, matchMode: FilterMatchMode.DATE_IS },
+          { value: null, matchMode: FilterMatchMode.DATE_AFTER },
+        ],
+      },
+      tinNumber: {
+        operator: FilterOperator.AND,
+        constraints: [{ value: null, matchMode: FilterMatchMode.IN }],
+      },
     });
-    setGlobalFilterValue('');
-};
-
-
-  const [loading, setLoading] = useState(false);
-  const [globalFilterValue, setGlobalFilterValue] = useState("");
+    setGlobalFilterValue("");
+  };
 
   const onGlobalFilterChange = (e) => {
     const value = e.target.value;
@@ -83,37 +79,25 @@ const ExportExpiredRequestsTable = () => {
     setGlobalFilterValue(value);
   };
 
-
   const filterNextSevenDays = (value) => {
-    if(value!="all"){
-      const nextDays = moment().subtract(value, 'days').format('MM/DD/YYYY');
-      const newdate=new Date(nextDays)
+    if (value != "all") {
+      const nextDays = moment().subtract(value, "days").format("MM/DD/YYYY");
+      const newdate = new Date(nextDays);
       let _filters = { ...filters };
-      _filters['expiringDate'].constraints[0].value = new Date();
-      _filters['expiringDate'].constraints[1].value = newdate;
+      _filters["expiringDate"].constraints[0].value = new Date();
+      _filters["expiringDate"].constraints[1].value = newdate;
 
       setFilters(_filters);
-    }else{
+    } else {
       let _filters = { ...filters };
-      _filters['expiringDate'].constraints[0].value = null;
-      _filters['expiringDate'].constraints[1].value = null;
+      _filters["expiringDate"].constraints[0].value = null;
+      _filters["expiringDate"].constraints[1].value = null;
       setFilters(_filters);
     }
   };
 
   const renderHeader = () => {
     return (
-      // <div className="flex justify-content-end">
-      //   <span className="p-input-icon-left">
-      //     <i className="pi pi-search" />
-      //     <InputText
-      //       value={globalFilterValue}
-      //       onChange={onGlobalFilterChange}
-      //       placeholder="Search"
-      //     />
-      //   </span>
-      // </div>
-
       <div className="d-flex justify-content-between">
         <div>
           <span className="p-input-icon-left">
@@ -126,18 +110,18 @@ const ExportExpiredRequestsTable = () => {
           </span>
         </div>
         <div className="form-bx">
-        <select
-         className="daySelect" aria-label="Large select example" 
-          onChange={(e) => filterNextSevenDays(e.target.value)}
-        >
-          {/* <option selected disabled>
-            Filter By Days
-          </option> */}
-          <option value="all" selected>30 days</option>
-          <option value="2">Today & Yesterday</option>
-          <option value="7">7 Days</option>
-          <option value="15">15 Days</option>
-        </select>
+          <select
+            className="daySelect"
+            aria-label="Large select example"
+            onChange={(e) => filterNextSevenDays(e.target.value)}
+          >
+            <option value="all" selected>
+              30 days
+            </option>
+            <option value="2">Today & Yesterday</option>
+            <option value="7">7 Days</option>
+            <option value="15">15 Days</option>
+          </select>
         </div>
       </div>
     );
@@ -266,10 +250,10 @@ const ExportExpiredRequestsTable = () => {
 
   const getCustomers = (data) => {
     return [...(data || [])].map((d) => {
-        d.expiringDate = new Date(d.expiringDate);
-        return d;
+      d.expiringDate = new Date(d.expiringDate);
+      return d;
     });
-};
+  };
 
   // ----- End Code For Geting Table List Data
 
@@ -432,12 +416,6 @@ const ExportExpiredRequestsTable = () => {
             My Expired ({tabCount?.myDataCount})
           </a>
         </li>
-        {/* <li className="nav-item">
-          <a class={tabDepId == 'All' ? "nav-link active" : "nav-link"} onClick={() => handleClickTag('All')}>All Expired ()</a>
-        </li>
-        <li className="nav-item">
-          <a class={tabDepId == 'My' ? "nav-link active" : "nav-link"} onClick={() => handleClickTag('My')}>My Expired ()</a>
-        </li> */}
       </ul>
     </div>
   );
@@ -494,7 +472,6 @@ const ExportExpiredRequestsTable = () => {
                 style={{ width: "140px" }}
                 body={submittedDate}
               ></Column>
-
               <Column
                 field="applicationType"
                 header="Application Type"
